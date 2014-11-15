@@ -1,0 +1,5 @@
+Example calculator for the LALR parser
+
+You need to install the relevant egg:
+http://chicken.wiki.br/eggref/4/lalr
+It has a little documentation, too

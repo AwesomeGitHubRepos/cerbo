@@ -1,0 +1,17 @@
+CHICKEN 4.5.0 21-Jul-2010
+
+make PLATFORM=mingw-msys PREFIX=c:/mingw DEBUGBUILD=1
+make PLATFORM=mingw-msys PREFIX=/mingw install
+
+In an non rxvt shell, type
+   csi
+and the interpreter should fire up
+
+create the file hello.scm:
+   (display "hello from chicken")
+
+Compile it:
+   csc -static hello.scm
+Ignore the warnings. It should have compiled. Excecute it:
+   hello
+hello.exe is 3.3M on account of containing the chicken library. It will 7z down to 385k.

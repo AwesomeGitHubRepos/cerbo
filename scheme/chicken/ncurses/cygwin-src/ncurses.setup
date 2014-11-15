@@ -1,0 +1,9 @@
+(compile -s -O2 -d1 ncurses.scm -L -lncurses -j ncurses)
+(compile -s -O2 -d0 ncurses.import.scm)
+(compile -c -O2 -d1 ncurses.scm -L -lncurses -unit ncurses)
+
+(install-extension
+ 'ncurses
+ '("ncurses.o" "ncurses.so" "ncurses.import.so")
+ '((version 1.4)
+  (static "ncurses.o")))

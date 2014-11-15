@@ -1,0 +1,12 @@
+LALR PARSER
+
+Bigloo has an excellent LALR parser - you can see it in operation in my
+directory sc/scpt. Bigloo seems to produce very large executables, though. 
+scpt was about 1.3M in size using cygwin.
+
+Chicken's LALR parser looks much less nice than bigloo's.
+
+A portable and quite nice looking parser (but I haven' used it) is 
+available at:
+http://www.iro.umontreal.ca/~boucherd/Lalr/documentation/lalr-2.html#Portability
+

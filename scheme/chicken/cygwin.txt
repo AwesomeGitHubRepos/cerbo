@@ -1,0 +1,48 @@
+INSTALLING CHICKEN ON CYGWIN
+
+Felix asked me to try compiling the latest version of chicken from
+git. I am happy to announce that it all goes very well - expect for
+the command chicken-install - which seems to be a Win7/Vista
+problem. Here's a more detailed report of what I did:
+
+I installed a fresh copy of cygwin - ensuring that chicken 3.4.0 was
+NOT included in the installation. I then performed the following
+actions:
+git clone http://chicken.wiki.br/git/chicken-core.git
+cd chicken-core
+make PLATFORM=cygwin confclean
+make PLATFORM=cygwin PREFIX=/usr/local bootstrap
+make PLATFORM=cygwin PREFIX=/usr/local CHICKEN=./chicken-boot
+make PLATFORM=cygwin PREFIX=/usr/local install
+cd ..
+csi
+
+csi worked successfully. I obtained the output
+CHICKEN
+(c)2008-2010 The Chicken Team
+(c)2000-2007 Felix L. Winkelmann
+Version 4.4.1
+windows-cygwin-x86 [ manyargs dload ptables ]
+compiled 2010-03-12 on mcarter-PC (CYGWIN_NT-6.1)
+
+#;1>
+
+I also confirm that csc compiles a file correctly.
+
+FYI, the git commit from which chicken was built is:
+commit 590e58d9cfaed30d1b79abcc8bab4c13b80691ce
+Author: felix <felix@call-with-current-continuation.org>
+Date:   Fri Mar 12 07:51:21 2010 +0100
+
+
+Installation of eggs proved problematical:
+chicken-install loop
+bash: /usr/local/bin/chicken-install: Permission denied
+
+To overcome this, I did:
+cp /usr/local/bin/chicken-install.exe /usr/local/bin/chickeni.exe
+
+It is then possible to do:
+chickeni loop
+csi
+> (use loop)

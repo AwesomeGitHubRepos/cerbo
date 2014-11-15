@@ -1,0 +1,10 @@
+;;; ncurses.meta -*- Scheme -*-
+
+((egg "ncurses.egg")
+ (synopsis "An interface to the UNIX ncurses package")
+ (category ui)
+ (license "BSD")
+ (doc-from-wiki)
+ (needs easyffi)
+ (author "felix winkelmann")
+ (files "ncurses.setup" "ncurses.scm"))
