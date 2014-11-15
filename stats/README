@@ -1,0 +1,3 @@
+TODO - stats no longer requires flex
+
+sudo apt-get install libgsl0-dev libtecla1-dev

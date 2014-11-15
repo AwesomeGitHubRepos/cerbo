@@ -1,0 +1,5 @@
+help.c
+lex.yy.c
+*.o
+stats
+stats.exe

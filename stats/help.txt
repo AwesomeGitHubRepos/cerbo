@@ -1,0 +1,10 @@
+stats - generate statistics
+
+Enter data separated by whitespace, including newlines. Type `g' to
+go, i.e. perform the calculations.
+
+COMMANDS:
+g go - find the stats
+h this help
+q quit
+
