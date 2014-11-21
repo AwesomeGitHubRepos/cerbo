@@ -1,0 +1,5 @@
+Enable core dump:
+ulimit -c unlimited
+
+gdb bad core 
+
