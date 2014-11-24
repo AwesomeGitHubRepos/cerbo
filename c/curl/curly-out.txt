@@ -1,0 +1,92 @@
+Thread 0, gets AZN
+Thread 1, gets BOGUS
+Thread 2, gets ULVR
+Thread 3, gets VOD
+Thread 0 terminated
+Thread 1 terminated
+Thread 2 terminated
+Thread 3 terminated
+Epic=<AZN>
+Epic=<BOGUS>
+Epic=<ULVR>
+Epic=<VOD>
+URL: <http://finance.google.com/finance/info?client=ig&q=LON:AZN>
+URL: <http://finance.google.com/finance/info?client=ig&q=LON:BOGUS>
+URL: <http://finance.google.com/finance/info?client=ig&q=LON:ULVR>
+URL: <http://finance.google.com/finance/info?client=ig&q=LON:VOD>
+Results...
+AZN
+
+// [
+{
+"id": "1966410"
+,"t" : "AZN"
+,"e" : "LON"
+,"l" : "4,300.00"
+,"l_fix" : "4300.00"
+,"l_cur" : "GBX4,300.00"
+,"s": "0"
+,"ltt":"5:07PM GMT+1"
+,"lt" : "Oct 10, 5:07PM GMT+1"
+,"lt_dts" : "2014-10-10T17:07:42Z"
+,"c" : "+90.00"
+,"c_fix" : "90.00"
+,"cp" : "2.14"
+,"cp_fix" : "2.14"
+,"ccol" : "chg"
+,"pcls_fix" : "4210"
+}
+]
+
+
+BOGUS
+
+
+ULVR
+
+// [
+{
+"id": "11262480"
+,"t" : "ULVR"
+,"e" : "LON"
+,"l" : "2,515.05"
+,"l_fix" : "2515.05"
+,"l_cur" : "GBX2,515.05"
+,"s": "0"
+,"ltt":"4:36PM GMT+1"
+,"lt" : "Oct 10, 4:36PM GMT+1"
+,"lt_dts" : "2014-10-10T16:36:45Z"
+,"c" : "-25.95"
+,"c_fix" : "-25.95"
+,"cp" : "-1.02"
+,"cp_fix" : "-1.02"
+,"ccol" : "chr"
+,"pcls_fix" : "2541"
+}
+]
+
+
+VOD
+
+// [
+{
+"id": "834331"
+,"t" : "VOD"
+,"e" : "LON"
+,"l" : "195.81"
+,"l_fix" : "195.81"
+,"l_cur" : "GBX195.81"
+,"s": "0"
+,"ltt":"5:59PM GMT+1"
+,"lt" : "Oct 10, 5:59PM GMT+1"
+,"lt_dts" : "2014-10-10T17:59:57Z"
+,"c" : "-1.54"
+,"c_fix" : "-1.54"
+,"cp" : "-0.78"
+,"cp_fix" : "-0.78"
+,"ccol" : "chr"
+,"pcls_fix" : "197.35"
+}
+]
+
+
