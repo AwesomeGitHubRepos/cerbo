@@ -1,0 +1,26 @@
+FC=gfortran
+COPTS=-g -fbounds-check -Warray-bounds
+
+.PHONY : all clean
+
+all : maff.mod test
+	echo made all
+
+clean :
+	rm -f *~ *.o *.mod *.exe examples *.stackdump
+
+%.o %.mod : %.f90
+	$(FC) $(COPTS) -c -o $(*F).o $<
+
+ex01 : ex01.f90
+	gfortran -o ex01 ex01.f90 
+
+#ex02.o : ex02.f90
+#	gfortran -c ex02.f90
+
+ex02 : ex02.f90 maff.f90
+	gfortran -o ex02 ex02.f90 maff.f90
+
+ex03 : ex03.f90 maff.f90 maff.mod
+	gfortran $(COPTS) -o ex03 ex03.f90 maff.f90
+
