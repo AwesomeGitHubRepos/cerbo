@@ -1,0 +1,38 @@
+beancounter=> \dt
+             List of relations
+ Schema |      Name      | Type  |  Owner  
+--------+----------------+-------+---------
+ public | beancounter    | table | mcarter
+ public | cash           | table | mcarter
+ public | fxprices       | table | mcarter
+ public | indices        | table | mcarter
+ public | pfm_attribute  | table | mcarter
+ public | pfm_form       | table | mcarter
+ public | pfm_link       | table | mcarter
+ public | pfm_report     | table | mcarter
+ public | pfm_section    | table | mcarter
+ public | pfm_value      | table | mcarter
+ public | pfm_value_list | table | mcarter
+ public | pfm_version    | table | mcarter
+ public | portfolio      | table | mcarter
+ public | stockinfo      | table | mcarter
+ public | stockprices    | table | mcarter
+(15 rows)
+
+beancounter=> \d+ stockprices
+                                          
+     Column     |         Type          | 
+----------------+-----------------------+-
+ symbol         | character varying(12) | 
+ date           | date                  | 
+ previous_close | real                  | 
+ day_open       | real                  | 
+ day_low        | real                  | 
+ day_high       | real                  | 
+ day_close      | real                  | 
+ day_change     | real                  | 
+ bid            | real                  | 
+ ask            | real                  | 
+ volume         | numeric               | 
+Indexes:
+    "stockprices_pkey" UNIQUE, btree (symbol, date)
