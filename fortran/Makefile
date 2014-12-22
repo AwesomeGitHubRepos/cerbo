@@ -1,5 +1,5 @@
 FC=gfortran
-COPTS=-g -fbounds-check -Warray-bounds
+COPTS=-g -fcheck=bounds
 
 .PHONY : all clean
 
@@ -23,4 +23,7 @@ ex02 : ex02.f90 maff.f90
 
 ex03 : ex03.f90 maff.f90 maff.mod
 	gfortran $(COPTS) -o ex03 ex03.f90 maff.f90
+
+hdf5ex: hdf5ex.f90
+	h5fc $(COPTS) $< -o $@
 

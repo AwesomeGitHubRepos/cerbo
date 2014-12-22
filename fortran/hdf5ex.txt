@@ -1,0 +1,3 @@
+&config
+h5file = "dtg_l.h5"
+/
