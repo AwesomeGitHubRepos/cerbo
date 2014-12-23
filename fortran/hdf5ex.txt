@@ -1,3 +1,4 @@
 &config
-h5file = "dtg_l.h5"
+symbol = "tht_l"
+aug_h5 = T
 /
