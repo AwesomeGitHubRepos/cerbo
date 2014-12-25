@@ -11,11 +11,13 @@ character:: filename = "/home/mcarter/.fortran/itrk_l.h5"
 character(len=10):: symbol
 integer(HID_T) :: file_id, dset_id, dspace_id, dataspace
 integer*8:: npoints
-integer:: error
+integer:: rank, error
 double precision, dimension(10000):: closing, rsi14, sma20, sma50, sma200, vol
+character (len=10), dimension(10000)::dstamp
+!character, dimension(10000, 10)::dstamp
 !sd_id = sfstart(file_name, DFACC_READ)
 !integer(Hsize_t), dimension(1:2):: dims = (/10000, 1 /)
-integer::dstamp, i
+integer::i, j
 logical::aug_h5 ! set to true if you want to update the HDF5 file
 integer(Hsize_t), dimension(1):: dims
 
@@ -44,8 +46,10 @@ call h5sget_simple_extent_npoints_f(dspace_id, npoints, error)
 if(error.eq.-1)stop 4
 print *, "Contains the following number of points:", npoints
 if(npoints>10000)stop 5
+dims = (/ npoints /)
 CALL h5dread_f(dset_id, H5T_NATIVE_DOUBLE, closing, dims, error)
 if(error.eq.-1)stop 6
+print *, "dims are:", dims
 !print *, "values are:", buff(1:npoints)
 CALL h5dclose_f(dset_id, error)
 if(error.eq.-1)stop 7
@@ -62,6 +66,38 @@ if(aug_h5)then
    call write_h5_darray(file_id, dspace_id, sma200, npoints, "sma200")
 endif
 
+
+!experiment with the dstamps
+call h5dopen_f(file_id, "dstamp", dset_id, error)
+CALL h5dget_space_f(dset_id, dspace_id, error)
+call h5sget_simple_extent_npoints_f(dspace_id, npoints, error)
+print *, "dstamp npoints =", npoints
+call h5sget_simple_extent_ndims_f(dspace_id, rank, error)
+if(error.eq.1) stop 500
+print *, "With rank ", rank ! rank is 1
+dims = (/ npoints /)
+!CALL h5dread_f(dset_id, H5T_STRING, dstamp, dims, error)
+!CALL h5dread_f(dset_id, H5T_FORTRAN_S1, dstamp, dims, error)
+CALL h5dread_f(dset_id, H5T_STRING, dstamp, dims, error)
+!CALL h5dread_f(dset_id, H5T_NATIVE_CHARACTER, dstamp, dims, error)
+
+if(error.eq.1) stop 501
+CALL h5dclose_f(dset_id, error)
+print *, "First dsampt is ", dims
+!dstamp = reshape(dstamp, (/  10000, 10 /))
+!do i=1,npoints
+!do j =1, 10
+!   write(*, "(A)", advance = "no")  dstamp(i,j)
+!enddo
+!write(*,*)
+do i=1,10
+!do j=1,10
+!write(*, "(A)", advance = "no") dstamp(j, i)
+write(*,*) dstamp(i)
+enddo
+!write(*,*)
+!enddo
+
 CALL h5fclose_f(file_id, error)
 if(error.eq.-1)stop 8
 CALL h5close_f(error)
@@ -70,10 +106,10 @@ if(error.eq.-1)stop 9
 !dump data
 open(unit =11, file = trim(symbol) // ".dat")
 write(11,*) "#idx dstamp closing vol rsi14 sma20 sma50 sma200"
-dstamp = 666 ! TODO fix
+!dstamp = 666 ! TODO fix
 vol = 666 ! TODO fix
 do i = 1,npoints
-   write(11,"(I0,I10,6F8.3)") i, dstamp, closing(i), vol(i), rsi14(i), sma20(i), sma50(i), sma200(i)
+  ! write(11,"(I0,A10,6F8.3)") i, dstamp(i), closing(i), vol(i), rsi14(i), sma20(i), sma50(i), sma200(i)
 enddo
 close(11)
 
@@ -84,6 +120,8 @@ end program
 
 subroutine write_h5_darray(file_id, dspace_id, arr, npoints, name)
   use HDF5
+  use h5lt
+  implicit none
   integer(HID_T), intent(in) :: file_id
   integer(HID_T), intent(in) :: dspace_id
   integer*8, intent(in):: npoints
@@ -94,11 +132,18 @@ subroutine write_h5_darray(file_id, dspace_id, arr, npoints, name)
   integer(HID_T):: dset_id
   integer(Hsize_t), dimension(1):: dims
   integer:: error
+  logical:: exists
 
   dims(1) = npoints
 
-  call h5dcreate_f(file_id, name, H5T_NATIVE_DOUBLE, dspace_id, dset_id, error)
+  exists = 1.eq.h5ltfind_dataset_f(file_id, name) ! does dataset already exist?
+  if(exists) then
+     call h5dopen_f(file_id, name, dset_id, error)
+  else
+     call h5dcreate_f(file_id, name, H5T_NATIVE_DOUBLE, dspace_id, dset_id, error)
+  end if
   if(error.eq.01)stop 501
+
   call h5dwrite_f(dset_id, H5T_NATIVE_DOUBLE, arr, dims, error)
   if(error.eq.-1)stop 502
   call h5dclose_f(dset_id, error)
