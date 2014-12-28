@@ -1,5 +1,5 @@
 FC=gfortran
-COPTS=-g -fcheck=bounds
+COPTS=-g -fcheck=all -fbacktrace
 
 .PHONY : all clean
 
@@ -26,4 +26,13 @@ ex03 : ex03.f90 maff.f90 maff.mod
 
 hdf5ex: hdf5ex.f90
 	h5fc $(COPTS) $< -o $@
+
+y2nc : y2nc.f90
+	gfortran $< -o $@ -I/usr/include  -lnetcdff
+
+quant90 : quant90.o quant.o maff.o maff.mod
+	$(FC) $(COPTS) quant90.o quant.o maff.o -o $@
+
+maff90 : maff90.o maff.mod
+	$(FC) $(COPTS) $+ -o $@
 

@@ -2,4 +2,8 @@
 *.o
 *.mod
 hdf5ex
+maff90
+quant90
+y2nc
+
 

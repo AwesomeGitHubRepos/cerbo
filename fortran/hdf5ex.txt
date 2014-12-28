@@ -1,4 +1,4 @@
 &config
-symbol = "tht_l"
+symbol = "CRAW.L"
 aug_h5 = T
 /
