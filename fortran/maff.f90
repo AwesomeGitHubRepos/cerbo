@@ -26,6 +26,13 @@ subroutine rebase_array(in, out)
   end do
 end subroutine rebase_array
 
+double precision function sgn(x)
+  double precision, intent(in):: x
+  sgn = 0.0
+  if(x.gt.0.0) sgn = 1.0
+  if(x.lt.0.0) sgn = -1.0
+end function sgn
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! calendrical routines
 
@@ -35,15 +42,6 @@ function leapinc(y)
   integer:: leapinc
   logical:: m4, m100not, m400
 
-  !leap = .false.
-  !if(modz(y, 4)) then
-  !  if(.not. modz(y, 100)) then
-  !    if(modz(y, 400) then
-  !leap = .true.
-  !else
-  !  leap = .false.
-  
-  !  leap =  y .eq. 4 * floor( real(y) /4)
   m4 = (modulo(y, 4).eq.0)
   m100not = (modulo(y, 100).ne.0)
   m400 = (modulo(y, 400).eq.0)
@@ -108,17 +106,28 @@ real function year1900(y, m, d)
 end function year1900
 
 
+subroutine str2ymd(str10, y, m, d)
+  character(len=10), intent(in):: str10
+  integer, intent(out):: y,m,d
+  read (str10(1:4), "(I4)") y
+  read (str10(6:7), "(I2)") m
+  read (str10(9:10), "(I2)") d
+end subroutine str2ymd
+
 integer function str2days1900(str)
   !convert YYYY-MM-DD to days since 1900
   !TODO test
   character (len=10)::str
   integer::y,m,d
-  read (str(1:4), "(I4)") y
-  read (str(6:7), "(I2)") m
-  read (str(9:10), "(I2)") d
+  call str2ymd(str, y, m, d)
   str2days1900 = days1900(y,m,d)
 end function str2days1900
 
+integer function int_date(y, m, d)
+  !convert (y,m,d) into interer YYYYMMDD
+  integer, intent(in):: y,m,d
+  int_date = (y * 100 + m)*100 +d
+end function int_date
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

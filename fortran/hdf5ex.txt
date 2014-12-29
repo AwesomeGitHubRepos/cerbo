@@ -1,4 +1,5 @@
 &config
 symbol = "CRAW.L"
+symbol_arg = T ! set to true if you want to read symbol as from the command line
 aug_h5 = T
 /

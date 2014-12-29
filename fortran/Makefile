@@ -30,8 +30,8 @@ hdf5ex: hdf5ex.f90
 y2nc : y2nc.f90
 	gfortran $< -o $@ -I/usr/include  -lnetcdff
 
-quant90 : quant90.o quant.o maff.o maff.mod
-	$(FC) $(COPTS) quant90.o quant.o maff.o -o $@
+quant90 : quant90.f90 quant.mod maff.mod
+	$(FC) $(COPTS) $<  quant.o maff.o -o $@
 
 maff90 : maff90.o maff.mod
 	$(FC) $(COPTS) $+ -o $@
