@@ -1,0 +1,79 @@
+Value Investing From Braham To Buffett and Beyond
+by Bruce Greenwald, Judd Kahnm Paul Sonkin, Michael van Biema
+
+p18 From 1952 through 1994, the top 50 selected on the basis of
+relative strength bested the market as a whole by an average of 3.7%
+pa (O'Shaghnessy, 1994, p 193).
+
+p 19 But momentum plays out fairly quickly. When stocks are selected
+on the basis of price change over three prior years, rather than last
+year alone, the results are different: the worse do better.
+
+p 22 A standard measure of the small capitalization discount compares
+the price to earnings (P/E) ratio for companies in the S&P500 to the
+P/E multiple of a small cap index (e.g. Salomon Smith Barney Emerging
+Growth Index). The ratio varies over time, but generally the small cap
+P/Es are higher, befitting their more realistic prospects for
+growth. In 1983, just after the start of the longest bull market in US
+history, the small cap P/E ratio reached a pinnacle of more than 2.3
+time the P/E of the S&P 500. That marked the end of small cap superior
+performance. By the end of 1998, the ratio had fallen along a vary
+jagged course to around 1 to 1.
+
+p 39 Using these assumptions, the equation for the earnings power
+value (EPV) of a company is EPV = Adjusted Earnings * 1 /R, where R is
+the current cost of capital. Because the cash flow is assumed to be
+constant, the growth rate G is zero.
+
+p 45 Careful investigation can determine which of these conditions,
+poor management, or excess capacity, is responsible. If it is poor
+management, then potential value may be unlocked by a catalyst, such
+as a takeover or even the threat of one, that will either bring in new
+faces or concentrate the attention of the incumbents. If the problem
+is overcapacity, the firm's value will increase no faster than the
+rate at which the excess capacity is absorbed by new demand or
+eliminated as assets decay and are not replaced. In both situations,
+the true value investor will ignore the higer asset value and use the
+lower earnings power figure as his or her measure of the firm's
+intrinisc value. he or she will also look to purchase shares when the
+market prices them far enough below this intrinsic value to provide a
+sufficient margin of safety. Discrepancies between asset value and EPV
+suggest both an opprtunity and a caution. If the gap can be closed
+because of better management, then the intrinsic value of the firm
+will increase, which should be quickly reflected in its market price
+because the earnings will grow (i.e. return to normal). On the other
+hand, the fact that the assets are not producing the earnings they
+should may indicate that the firm is operating at a competitive
+disadvantage. If the firm raises additional capital to invest in
+growth, that investment will tend to destroy rather than add value.
+
+
+p 177 My [Buffett] first mistake, of course, was in buying control of
+Berkshire. Though I new its business - text manufacturing - to be
+unpromising, I was enticed to buy because the price looked
+cheap. Stock purchases of that kind had proved reasonably rewarding in
+my early years, though by the time Berkshire came along in 1965 I was
+becoming aware that the strategy was not ideal.
+
+
+p 178 I [Buffett] could give you other personal examples of
+"bargain-purchase" folly but I'm sure you get the picture: It's far
+batter to buy a wonderful company at a fair price than a fair company
+at a wonderful price.
+
+p 190 We extend this business-valuation approach even to bond
+purcahses such as WPPSS. We compare the $139m cost of our yearend
+investment in WPPS to a similar $139m investment in an operating
+business. In the case of WPPSS, the "business" contractually earns
+$22.7m after tax (via the interest paid on the bonds), and those
+earnings are available to us curently in cash. We are unable to buy
+operating businesses with economics close to these. Only a relatively
+few businesses earn the 16.3% after tax on unleveraged capital that
+our WPSS investment does and those businesses, when available for
+purchase, sell at large premiums to that capital. In the average
+negotiated business transaction, unleveraged corporate earnings of
+$22.7m after-tax (equivalient to about $45m pre-tax). For a business
+we understand well and strongly like, we will gladly pay that
+much. But it is double the price we paid to realise the same earnings
+from WPSS bonds.
+

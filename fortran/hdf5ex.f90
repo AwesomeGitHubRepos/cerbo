@@ -20,6 +20,7 @@ character (len=10), dimension(10000)::dstamp
 integer::i, j
 logical::aug_h5 ! set to true if you want to update the HDF5 file
 integer(Hsize_t), dimension(1):: dims
+type(c_ptr)::f_ptr
 
 namelist /config/ symbol, aug_h5
 
@@ -77,8 +78,10 @@ if(error.eq.1) stop 500
 print *, "With rank ", rank ! rank is 1
 dims = (/ npoints /)
 !CALL h5dread_f(dset_id, H5T_STRING, dstamp, dims, error)
-!CALL h5dread_f(dset_id, H5T_FORTRAN_S1, dstamp, dims, error)
-CALL h5dread_f(dset_id, H5T_STRING, dstamp, dims, error)
+!call h5screate_simple_f(1, 
+f_ptr = C_LOC(dstamp(1)(1:1))
+CALL h5dread_f(dset_id, H5T_FORTRAN_S1, f_ptr, dims, error)
+!CALL h5dread_f(dset_id, H5T_STRING, dstamp, dims, error)
 !CALL h5dread_f(dset_id, H5T_NATIVE_CHARACTER, dstamp, dims, error)
 
 if(error.eq.1) stop 501

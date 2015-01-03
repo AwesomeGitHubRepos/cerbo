@@ -1,0 +1,89 @@
+The Little Book of Sideways Markets
+Vitaliy N Katsenelson
+Started 15-Apr-2012
+
+p 33 If you were fortunate enough to be alive over the past
+hundred-plus years and you had both your easy and your hard-earned
+money invested in the stock market, half of your returns came from
+dividends. Half! It gets more interesting: During the last three
+sideways markets, dividends were responsible for ove 90 percent of
+stock market returns.
+
+p 33 During the last century dividend payout was about 60 percent of
+earnings; however, from mid-1990s to the mid-2000s it declined to
+about 30 percent as amangements favored stock buybacks over dividend
+payments.
+
+p 74 There is a way to capitalize on companies that have high maintenance-capital expenditures: Buy companies that sell capital equipment to them. For instance, semiconductor companies have high maintenance-capital expenditures. As we discussed, they need to constantly upgrade their factories as microprocessors  keep getting faster and smaller - in general, not a great business. However, companies that sell them equipment are much more attractive businesses. The semicondutor company's high maintenance-capital expenditures turn into the equipment company's recurring revenues.
+
+p 81 Recurrence of revenues beats consistency of earnings
+
+p 82 Comapnies that have high recurring revenue components usually exhibit lower sales volatility and greater predictability of their earnings and cash flows, thus exhibiting less operational risk.
+
+A high level of recurring revenues creates higher predictability and sustainability, and this reduces risk for investors. It also removes a lot of strain from growth, since a company with high recurring revenues has to put forth a lot less effort to grow revenues.
+
+p 83 Timing is extremely important when buying companies that produce highly durable products such as houses, capital equipment, and the like that have very long useful life. These companies compete against external competitive threats and their own past sales.
+
+p 88 The strategy of buying out-of-favour stocks comes with the risk that a supposedly temporary setback will turn into a longer separation and the stock becomes dead money - staying undrevalued and not going anywhere for a long time. This is where growth comes in handy. A company that is growing earnings and paying a dividend is compensating for the wait, substantially reducing the dead-money risk.
+
+p 90 The sources of profitability growth pyramid: revenues, net income, free cash flow, free cash flow per share.
+
+p 91 Revenue Growth. Selling more products and services to existing and/or new customers. This one of the most commonly followed strategies by corporate America and companies around the world.
+
+Expanding to new markets, domestic or international.
+
+Raising prices.
+
+p 92 Growth from margin improvements.
+
+Above-average (high) profit margins in general are not sustainable in the long run - free markets are usually doing a good job of curing companies from above-average profit margins.
+
+p 93 Profit margins are probably the most mean-reverting series in finance, and if profit margins do not mean-revert, then soemthing has gone badly wrong with capitalism. If high profits do not attract competition, there is seomthing wrong witht he system and it is not functioning properly -- Jeremy Grantham.
+
+p 94 Therefore, it is difficult for a company to maintain competitive benefits from superior operating efficiency in the long run.
+
+For example, Wal-Mart's rise in the retail industry was achieved through a very efficient inventory management and distrivution system that passed cost savings to consumers and drove less efficient competitors out of business. Today, however, that same - or even better - technology is available to retailers like Dollar Tree or Family Dollar, whose outlets are about the same size as a couple of Walm-Mart bathrooms. Oracle or SAP will gladly sell state-of-the-art distribution/inventory software systems to any outfit ablr to spell it name correctly on a check.
+
+p 95 Economies of scale are a more sustainable source of marin expansion, but two things have to be present for economies of scale to materialise: sales growth and high ration of fixed to variable costs.
+
+p 102 The historical evidence strongly suggests that expected furute earnings growth is fastest when current payout ratios are high and solowest when payout ratios are low.
+
+p 103 During the twentieth century, average dividend yield was 4.2%. Current yield is less than half of that, floating around the lowest levels of the past 100 years.
+
+The importance of dividends quadruples in sideways markets, where thy historically represent over 90 percent of total returns, versus only 19 percent of total return in bull markets.
+
+p 113 price-to-book is the more appropriate model for banks, because their assets and liabilities are marked to market values frequently. Hoever, price-to-book analysis fails to capture true value of companies that have a lot of intellectual property (such as software or pharmaceutical companies).
+
+p 116 i cannot stress enough that you should be very cautious about how much you pay for growth. As a sidewys market persisits, investors become more indifferent to growth and are will to pay less and less for it.
+
+p 131 Do not compromise on more than one dimension, since that introduces too much risk and often leads to subpar returns. Each of the Quality, Valutaion and Growth dimensions is an important source of value creation. Valuation and Growth, as Warren Buffett put it, "are joined at the hip", being the source of returns, while Quality makes sure that the company will still be around to collect the fruits of its labor.
+
+p 114Buy-and-hold is really just a code name for "buy and forget to sell" strategy. A stock likely went through a fairly rigorous buy process but "hol" is just camouflage for the absence of a tangible sell process, unless you call "I'll own it to death do us part" a sell process. "Buy and forget to sell" works great in a prolonged bull market, P/Es keep expanding from much below to much above average. Howeverm as we've seen in previous chapters, the complete opposite to mull market behaviour takes place during the sideways market.
+
+In the sideways market you should employ an active buy-and-sell strategy; buying stocks when they are undervalued and selling them when they are about to be fully valued, as oposed to waiting until they become overvalued.
+
+p 135 it is hard if not impossible to create a successful market-timing process.  Aside from the fact that it demands that you are correct twoce- when you buy and when you sell - emotions are in the driver's seat of the market, expecially at the tops and bottoms.
+
+p 136 Instead of trying to time the market, my answer to volatility is to time individual stock valuations through a strict buy-and-sell process. if you don't like the word timing, call it pricing - you need to price individual stocks. you buy them when they are undervalued and sell them when they become about fully valued.
+
+p 136
+1. Is XYZ a good company?
+2. Is XYZ a good stock (investment)?
+To take this a step further, if both 9good company and good stock) conclusions lead to "yes", the stock is bought.
+
+p 137 If the good-company test is failed, move on to the next stock - there are a lot more stocks where that one came from! However, for the companies that pass the good-company test but fail the good-stock test, create a wish list of "Companies I Would lover to Own at the Right Price" list.
+
+p 167 One doesn't need the benefit of hindsight to know that at over 50 times earnings Coke was tremendously overvalued in 1999. Coke, like the majority of Buffett's top public holdings (Procter and Gamble, Johnson & Johnson, and many others), did not go anywhere for a decade.
+
+p 169 We should buy stocks in the hope of staying maried to them forever, but knowing that there is a chance that it wont work out.
+
+The terms of your prenup should be specific: You will identify and closely track important variables that constitute a scorecard of a company's fundamental performance such as sales growth, net margins, return on capital, or some industry-specific variables. For retailers, for instance, these variables could be same-store sales growth, inventory turnover, sales per square foot, operating margin, losses due to theft and spoilage, and so on.
+
+p 170 Once these variables stop meeting your expectations, the stock should be put on "double sercret probation" to see if it improves and should be closely watched. If these variables don't improve in a set time frame such as a few quarters, it's time for a divorce and the stock should be sold.
+
+p 171 Similar to a company reaching a price or valuation target, once a company makes it onto your double secret probation list, its presumption of innocence is forfetied - it is now guilty until priven otherwise!
+
+p 173 Paraphrasing my friend Todd Harrison, "The there wasn't risk, it would be called winning, not investing!"
+
+Finished
+02-Jun-2012

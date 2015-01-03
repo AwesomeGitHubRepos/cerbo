@@ -1,0 +1,111 @@
+﻿++ Dhandho Investor
+
+p2 The street translation of Dhando is simply "business". Dhandho is this best described as endeavors that create wealth while taking virtually no risk.
+
+p3 Patels orignally were known as 'patidars' - loosely translated as loandlords. Most billages in Gujarat had a patidar appointed by the ruler who was responsible for collecting land taxes, providing security, and running a streamlined farming operation (According to Google, Patels belong to the caste Vaisya--business and farmer class.)
+
+p24 (Richard) Branson noted that when an executive in the music business received a business plan to start an airline involving a 747 jumbo jet, he knew that the business plan had been turned down in at least three thousand other places before landing on his desk. He was also aware that the other businessmen with strong domain knowledge had turned it down. The business plan claimed that the sector was underserved by the existing players. All weekend long he tried calling the other major discount airlines flying that route but could never get through
+
+His conclusion was that they either were lousy businessmen or were overwhelmend by demand - which meant that there was an opportunity to start competing against them.
+
+p35
+
+It is these nine pricincples that constitute the Dhando framework:
+
+1. Focus on buying an existing business. When Pap Patel decdoded to become an entrpreneur, he did not go out and start a brand-new business. He bought an existing business with a well-defined business model and one with a long history of operations that he could analyse. This is way less risky than doing a startup. Manilal and Mittal did the same.
+2. Buy simple businesses inindustries with an ultra-slow rate of change.
+
+p36 
+
+3. Buy distresses businesses in distressed industries. 
+
+4. Buy dusinesses with a durable competitive advantage - the moat. 
+
+The key to investing is not assessing how much an industry is going to affect society, or how much it will grow, but rather determining the competitve advantage of any given company and, above all, the durability of that advantage. The products and services that have wide, sustainable moats around them are the ones that deliver rewards to investors. -- Warren Buffett
+
+p 39
+
+5. Bet heavily when the odds are overwhelmingly in your favour.
+
+Charlie Munger uses horse racing's pari-mutuel betting system as one of his mental models when approaching investing in the stock market. I horse racing you are betting against other bettors.
+
+p 40
+
+6. Focus on arbitrage
+
+p 44
+
+7. Buy businesses at big discounts to their underlying asset value.
+
+p 45
+
+8. Look for low-risk, high-uncertainty businesses.
+
+p 46
+
+9. It's better to be a copycat than an innovator
+
+p 57
+
+Everything about Dhandho is simple, and therein lies its power. As we see in Chapter 15, the psychological warfare with our brains really gets heated *after* we buy a stock. The most potent weapon in your arsenal to fight these powerful forces is to buy painfully simple businesses with painfully simple theses for why you're likely to make a great deal of money and unlikely to lose much. I always write the thesis down. If it takes more than a short paragraph, there is a fundamental problem. If it requires me to fire up Excel, it is a big red flag that strongly suggests that I ought to take a pass.
+
+p 60
+
+Stock prices, in most instances, do reflect the underlying fundamentals. Trying to figure out the variance between prices and underlying intrinsic value, for most businesses, is usually a waste of time. The market is mostly efficient. However, there is a huge difference between mostly and fully efficient.
+
+p 61 With the rapid-fire trading of thousands of securities, every once in a while a few stocks might have a great deal of bad news come out. This sometimes leads to extreme fear and the wholesale unloading of these stocks. But when you sell a stock, there has to be a buyer at the other end. The buyer is looking at the same bad news as you are. The only way such a sale gets consummated is at a deeply distressed price.
+
+Papa Patel, manilal, and Mittal all made their fortunes by fixating on buying distressed businesses. Most of the time, they did it when the entire industry was severely wounded - the motel industry right after 9/11 or the bankruptcy-ridden steel industry in the 1980s and 1990s.
+
+p 61 How do we get a list of distressed businesses or industries? There are many sources, but here are six to being with:
+
+1. If you read the business headlines on a daily basis, you'll find plenty of stories about publicly traded businesses. Many of these news clips reflect negative news about a certain business or industry.
+2. Value Line publishes a weekly summary of the stocks that have lost the most value in the preceding 13 weeks. It is another terrific indicator of distress. This list of 40 stocks routinely shows prices drops of 20-70% over that period. The ones with the largest drops are likely to be the most distrssed. It also has a summary every week of the stocks with the lowest price-to-earnings rations (P/Es), widest discount to book value, highest dividend yield, and so on. Not all these businesses are distresses, but if a business is trading at a P/E o3 3, it is worth a closer look.
+3. There is a publication called Portfolio Reports, that is published monthly. It lists the 10 most recent stock purchase by 80 of the top value managers.
+4. (p 63 ) If you'd like to avoid the subscription price tag for Portfolio Reports, then much of that data can be gleaned by looking directly at the public filings (e.g. SEC Form 13-F) that institutional investors have to make.
+5. Take a look at Value Investors Club
+6. (p 64) Read "The Little Book That Beats the Market" by Joel Greenblatt.
+
+Between these sources, there are now a plethora of candidate distressed businesses to examin. How can we ever get our arms around all of them? Well, we don't. We begin by elimating all businesses that are either not simple businesses or fall squarelyoutseide our circle of competence. What's left is a very small handful of simple, well-understood businesses under distress. We are now ready to apply the rest of the Dhandho framework to this select group.
+
+p 65 Capitalists strive hard to capitalize on any opprotunity to make outsize profits. The irony is that, in that pursuit, they usually destroy all outsized profits. But, every once in a while a business with a secret sauce for enduring outsize profits emerges.
+
+p68 Of the fifty most important stocks on the NYSE in 1911, today only one, General Electric, remains in business. ... that's how powerful the forces of competitive destruction are. Over the very long term, history shows that the chances of any business surviving in a manner agreeable to a company's owners are slim at best. (Peter D. Kaufman ed., Poor Charlie's Almanack (Virginia Beach, VA: Donning company Publishers, 2005), p59)
+
+p69 Geus studied the life expectancy of companies of all sizes and was very surprised to find that the average Fortune 500 company had a life expectancy of just 40 to 50 years. It takes about 25 to 30 years from formation for a highly successful company to earn a spot on the Fortune 500. Geus found that it typically takes many blue chips less than 20 years after they get on the list to cease to exist. The average Fortune 500 business is already past its prime by the time it gets on the list.
+
+p 100 Einstein's five ascending levels of ittelect were "Smart, Inteligent, Brillian, Genius, Simple".
+
+p 107 Invest in low-risk, high-uncertainty businesses.
+
+P 108 The Street just hates uncertainty, and it demonstrates that hate by collapsing the quoted stock price of the underlyng business. Here are a few scenarious that are likely to lead to a depressed stock price:
+* high risk, low uncertainty
+* high risk, high uncertainty
+* low risk, high uncertainty
+The fourth logical combination, low risk and low uncertainty, is loved by Wall STreet, and stock prices of these securities sport some of the highest trading multiples.
+
+p 153 A critical rule of the chakravyuh traversal is that any stock that you buy cannot be sold at a loss within two to three years of buying it unless you can say with a high degree of certainty that current intrinsic value is less than the current price the market is offering.
+
+p 174 The Magic Formula is a very good place to go hunting for fifty-cent dollar bills. We cold keep it very simple, only analyzing Magic Formula stocks day in and day out, and becoming quite wealthy over time. I strongly recommend this approach. It is simple. You're shooting fish in a small barrel, and the results are likely to be vastly superior to the indexes. 
+
+p 175 However, here are nine other ponds where we are likely to find more of these fifty-cent dollars.
+
+1. The Value Investors' Club (VIC) web site is open to the public, and it is loaded with a plethora of fifty-cent dollars. Anyone can view these write-ups on individual stocks on www.valueinvestorsclub.com. This web site was created by joel Greenblatt.
+
+2. Subscribe to Value Line. Study their "bottom lists" every week. They list sotcks that have lost the most value in the preceding 13 weeks, ones trading at the widest discounts to book value, lowest P/E, highest dividend yield, and so on.
+
+3. Look at the 52-week lows on the NYSE daily. Most stocks will be ones you've never heard of. Ignore these. Fixate on familiar names and then dig deeper on any that pique your interest.
+
+4. Subscribe to Outstanding Investor Digest (OID; www.oid.com) and Value Investor Insight (www.valueinvestorinsight,com). Both carry detailed interviews and write-ups with some of the best value money managers in the United States.
+
+5. Subscribe to "Portfolio Reports". It is published by the same people as OID, and it lists the recent buying activity of some of the best money managers in North America.
+
+6. Guru Focus (www.gurufocus.com). This is a free web site that tracks the buying and selling activity of the leading value investors in North America.
+
+7. "Super Investor Insight" It too tracks the 13-F filings of the super investors of our time.
+
+8. Subscribe to the major business publications - Fortune, Forbes, the Wall Stree Hournal, Barron's, and Business Week.
+
+9. Attend the biannual Value Investing Congress (www.valueinvestingcongress.com).
+
+If an investor runs a portfolio of 5 to 10 stocks and holds them for one to three years, he or she needs to come up woth an investment idea or two just every few months.

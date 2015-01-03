@@ -1,0 +1,34 @@
+JUST ONE THING
+John Mauldin
+http://www.scribd.com/doc/60915779/6/The-2-Percent-Solution
+
+
+Chapter 1 - Signposts in the Fog - Andy Kessler
+
+p 6 The whole idea of investing in the fog is /not/ about being a contrarian. It's about seeing things others can't. Most people get in the fog and panic; but the trick is to get in the fog and feel comfortable, let your imagination run wild, imagine what things might look like up ahead, make out vague outlines in the distance, and invest as if those outlines were real things.
+
+I remember a comedian on /Ed Sullivan/ saying his mother-in-law drank so much, she saw color television years before anyone else.
+
+Over time, if those outlines become real, or even close to being real, you will make a killing. Just don't forget that you are no longer in the fog when you can see what was once an outline and is now living breathing reality. Get ye back into the fog. The stock market always looks ahead. A great investor has a continued paranoia concerning who knows what, what they know, and when they know it.
+
+p 7 I want to know everything, because then and only then can I know if my investment ideas are already out there - or are they still just figments of my twisted mind, outlines in the fog, flutters in my gut.
+
+The trick is to figure out what the fire hose of information overload is going to say in three months, six months, 18 months, even three to five years if you are really patient. When all that information is blaring loud and clear what you squinted to see way back when, then that's it, it's over, you win.
+
+p 8 So what are these signposts or trail markets I'm talking about? Quite simply, they are big trends that you believe in, have confidence in, know in your gut to be true, have 99.99 percent probability of coming to fruition. These aren't picked randomly or without lots of work, tons of swear, and consternation. As my hero Bullwinkle once said, holding up a drawing of two people, 'This is Froth with Portent'.
+
+Pick the wrong trend and you are following signposts off a cliff. Sometimes worse - pick too obvious a trend and you'll never find your way /into/ the fog to discover the hidden paths to riches. In the twenty years I spent on Wall Street, I have only been able to find two real signposts for investing in the fog. Here they are:
+* Elasticity: lower cost creates its own huge markets
+* Intelligence moves out to the edge of the network
+
+Elasticity in the Marketplace:
+In 1986, Intel, TI, Motorola and AMD all saw their stocks plummet. Orders dried up and prices for memoty and microprocessors were plummeting. I somehow figured out it was distributors buying chips in 1985, not IBM, so I actually had one of the rare sell recommendations on these stocks. With these stocks headed to hat sizes 6-7/8. 7 ... I was looking for an excuse to turn around and recommend them. I read an article in /Electronics/ magazine about EPROMS - Reaseable Programmable Read-Only Memories. It suggested that every time prices dropped for EPROMs, some new device would use them, or use more EPROM - 16,000 bits instead of 1,000 bits.
+
+p 9 Whenever prices collapsed; and at some point, when the cycle turned, even though prices were still low, sales would increase because more EPROMs would be sold. I looked it up, and the word that describes that phenomenon is /elasticity/. So anyway, I went to work on this wacky concept of elasticity of chips and semiconductors, looked back in time at other cycles, and sure enough, it was real. Intel founder Gordon Moore made the observation that chip density doubles every eighteen months.
+
+Done selling? Great, now buy back Intel and Motorola, because elasticity will kick in and this will be a great grwoth market for microprocessors with faster and faster clock speeds. 
+
+p 10 I got a lot of "what the hell are you talking about" looks from my portfolio manager clients.
+
+So I calmly explained that every time prices dropped, some new application would open u to take advantage of the cheaper functionality.
+

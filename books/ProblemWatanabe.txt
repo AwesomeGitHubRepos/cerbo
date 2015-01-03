@@ -1,0 +1,14 @@
+Problem Solve 101
+Ken Watanabe
+
+p 13 Problem solving is a process that can be broken down into four steps:
+(1) understand the current situation;
+(2) identify the root cause of the problem;
+(3) develop an effective action plan; and
+(4) execute until the problem is solved, making modifications as necessary.
+
+p 39 If you start coleecting and analysing data without first clarifying the question you are trying to answer, you're probably doing yourself more harm than good. You'll end up drowning in a flood of information and realise only later that most of that research was a waste of time.
+
+Finis
+19-Sep-2011
+

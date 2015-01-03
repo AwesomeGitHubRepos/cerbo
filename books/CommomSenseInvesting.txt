@@ -1,0 +1,324 @@
+Common Sense Investing: The Papers of Benjamin Graham
+Written by Behnjamin Graham
+Compiled by www.valuehuntr.com
+
+p 17:
+
+My first, more limited, technique confines itself to the purchase of
+common stocks at less than their working-capital value, or
+net-current-asset value, giving no weight to the plant and other fixed
+assets, and deducting all liabilities in full from the current
+assets. We used this approach extensively in managing investment
+funds, and over a 30-odd year period we must have earned an average of
+some 20 per cent per year from this source. For a while, however,
+after the mid- 1950's, this brand of buying opportunity became very
+scarce because of the pervasive bull market. But it has returned in
+quantity since the 1973-74 decline. In January 1976 we counted over
+300 such issues in the Standard & Poor's Stock Guide--about 10 per
+cent of the total. I consider it a foolproof method of systematic
+investment--once again, not on the basis of individual results but in
+terms of the expectable group outcome.
+
+The second approach is similar to the first in its underlying
+philosophy. It consists of buying groups of stocks at less than their
+current or intrinsic value as indicated by one or more simple
+criteria. The criterion I prefer is seven times the reported earnings
+for the past 12 months.  You can use others--such as a current
+dividend return above seven per cent or book value more than 120
+percent of price, etc. We are just finishing a performance study of
+these approaches over the past half-century--1925-1975. They
+consistently show results of 15 per cent or better per annum, or twice
+the record of the DJIA for this long period. I have every confidence
+in the threefold merit of this general method based on (a) sound
+logic, (b) simplicity of application, and (c) an excellent supporting
+record. At bottom it is a technique by which true investors can
+exploit the recurrent excessive optimism and excessive apprehension of
+the speculative public.
+
+[NB: Graham appears to be talking about a portfolio consisting of
+about 30 stocks]
+
+p 37 When we come to valuing individual stocks I should like to divide
+them into three classes, as I find them in the NYSE list. Group I is
+the growth issues selling at more than 20 times their last 12 months'
+earnings. Group II is the relatively unpopular sockes selling for less
+than 7 times recent earnings - i.e. at 15% yield or better. Group III
+has multipliers between 7 and 20. In my count of 1530 NYSE issues
+there were 63, or 4% of the total, selling above 20 times earnings, of
+which 24 passed the 30 times mark. By contrast, more that 500 - over a
+third - sold below 7 times earnings and of there about 150 - say, 10%
+of the total - were quoted under five times the last 12 months'
+profits. If the earnings on which these multipliers are based can be
+counted on, more or less, in the future - without any special
+requirements as to growth - it is evident that many NYSE issues can
+now compete in attractiveness with bonds at 8.5%.
+
+I may be so bold as to suggest that this situation makes possible a
+quite simple approach to equity investment that is open to almost
+everyone from the small investor to the quite large pension fund
+manager. This is the idea of buying selected common stocks - those
+meeting additional criteria of financial strength, etc. - obtainable
+at 2/3 or less of book value, and holding them for sale at their net
+asset value - to show a non-spectacular but quite satisfactory 50%
+profit. We cannot predict with assurance how this apparently too
+simple investment program will work out in the future. But I can say
+that my studies covering the period 1961 to 1974 sgiw tge oresebce if
+sufficient opportunities of this kind in most years, and also
+excellent overall results from the assumed operations.
+
+p 39 Another distinction is that between current analysus and
+long-term analysis. There is a tendency in the part of Wall Street
+people to pay excessive attention to the most recent figures and the
+present financial picture.
+
+A word or two about asset component on earning power valuation. I will
+not like to stress the following too much as it is not customarily
+used and we have I have no particular reason for believing I am right,
+but would the earning power value exceed the asset value then some
+reduction should be made. I would suggest a reduction of a quarter of
+the difference between the two. In cases where assets exceed earning
+power we do not value the company upward, as we not very much
+impressed by assets with no earnings power, with only one exception:
+in cases where working capital alone exceeds earnings power. In this
+case, we are inclined to add half the difference to the earning power
+to allow for the excess working capital which in some way or other
+tends to trickle down to stockholders over the years. This effect can
+take place as a distribution, sale of property, company policy
+changes, etc.
+
+
+p 40 Valuation of Common Stocks
+
+Of the various approaches to common stock valuation, the most widely
+accepted is that which estimates the average earnings and dividends
+for a period of years in the future and capitalizes these elements at
+an appropriate rate. We may observe here that since there is no a
+priori rule governing the number of years to which the value should
+look forward in the future, it is almost inevitable that in bull
+markets investors and analysts will tend to see far and hopefully
+ahead, whereas at other times they will be so disposed to "heed the
+rumble of a distant drum".
+
+In security analysis the past is always being thrown out of the window
+of theory and coming in again through the back door of practice.
+
+
+p 41 It is the XY factor, or multiplier of past earnings, that my
+students would dearly love to learn about and calculate. When I tell
+them that there is no dependable method of finding this multiplier
+they tend to be incredulous or to ask, "What good is security analysis
+then?"
+
+In this article, I propose to explain tow approached of this kind
+which have been developed in a seminar on common-stock valuation. I
+believe the first will illustrate reasonably well formula operations
+of this kind may work out and applied. Ours is an endeavour to
+establish a comparitive value in 1957 for each of the 30 stocks in the
+Dow-Jones Industrial Average, related to a base valuation of 400 and
+500, respectively, for the composite or group. (The 400 figure
+represented the approximate "Central Value" of the DJIA, as found
+separately by a whole series of formula methods derived from
+historical relationships. The 500 figure represented about the average
+market level for the preceding twelve months.
+
+As will be seen, the valuations of each component issue take into
+account the four "quality elements" of profitability, growth,
+stability and dividend pay-out, applying them as multipliers to the
+average earnings for 1947-1956. In addition, and entirely separatelym
+a weight of 20% is given to the net asset value.
+
+p 42
+
+
+The second approach is essentially the reverse of that just
+described. Whereas the first method attempts to derive an independent
+value to be compared with the market price, the second starts with the
+market price and calculates there from the rate of future growth
+expected by the market. From that figure we readily derive the
+earnings expected for the future period, in our case 1957-1966, and
+hence the multiplier for such future earnings implicit in the current
+market price.
+
+(1) Our own "formula valuations" for the individual stocks, and
+probably any others of the same general type, have little if any
+utility in themselves, It would be silly to assert that Stock A is
+"worth" only half its market price, or Stock B twice its market price,
+because these figures result from our valuation formula.
+
+(2) On the other hand, they may be suggestive and useful as composite
+reflections of the past record, taken by itself. They may even be said
+to represent what the value would be, assuming that the future were
+merely a continuation of past performances.
+
+(3) The analyst is thus presented with a "discrepancy" of definite
+magnitude, between formula "value" and the price, which it becomes his
+task to deal with in terms of his superior knowledge and judgment. The
+actual size of these discrepancies, and the attitude that may possibly
+be taken respecting them, are discussed below.
+
+Similarly, the approach which starts from the market price, and
+derives an implied "growth factor" and an implied multiplier
+therefrom, may have utility in concentrating the analyst's attention
+on just what the market seems to be expecting from each stock in the
+future, in comparison or contrast with what it actually accomplished
+in the past. Here again his knowledge and judgment are called upon
+either to accept or reject the apparent assumptions of the market
+place.
+
+The first method consists of a formula valuation based solely on past
+performance in relation to the Dow-Jones Industrial Average as a
+group. The assumptions underlying this method are the following:
+
+(1) Each component issue of the Dow-Jones Industrial Average may be
+valued in relation to a base value of the average as a whole by a
+comparison of the statistical records.
+
+(2) The data to be considered are the following:
+
+
+p 43
+
+(a) Profitability--as measured by the rate of return on invested
+capital. (For convenience this was computed only for the year 1956.)
+
+(b) Growth of per-share earnings--as shown by two measurements:
+1947-56 earnings vs. 1947 earnings, and 1956 earnings vs. 1947-56
+earnings.  (It would have been more logical to have used the 1954-56
+average instead of the single year 1956, but the change would have
+little effect on the final valuations.)
+
+(c) Stability--as measured by the greatest shrinkage of profits in the
+periods 1937-1938 and 1947-1956.  (The calculation is based on the
+percentage of earnings retained in the period of maximum shrinkage.)
+
+(d) Payout--as measured by the ratio of 1956 dividends to 1956
+earnings. In the few cases where the 1956 earnings were below the
+1947-56 average we substituted the latter or the former, to get a more
+realistic figure of current payout.
+
+These criteria demonstrate the quality of the company's earnings (and
+dividend policy) and thus may control the multiplier to be applied to
+the earnings. The figure found under each heading is divided by the
+corresponding figure for the Dow-Jones group as a whole, to give the
+company's relative performance. The four relatives were then combined
+on the basis of equal weights to give a final "quality index" of the
+company as against the overall quality of the group.
+
+The rate of earnings on invested capital is perhaps the most logical
+measure of the success and quality of an enterprise. It tells how
+productive are the dollars invested in the business. In studies made
+in the relatively "normal" market of 1953 I found a surprisingly good
+correlation between the profitability rate and the price-earnings
+ratio, after introducing a major adjustment for the dividend payout
+and a minor (moderating) adjustment for net asset value.
+
+It is not necessary to emphasize the importance of the growth factor
+to stock-market people.  They are likely to ask rather why we have not
+taken it as the major determinant of quality and multipliers. There is
+little doubt that the expected future growth is in fact the major
+influence upon current price-earnings ratios, and this truth is fully
+recognized in our second approach, which deals with growth
+expectations as reflected in market prices. But the correlation
+between market multipliers and past growth is by no means close.
+
+The companies with high multipliers may not have had the best growth
+in 1948-55, but most of them had greater than average stability of
+earnings over the past two decades.
+
+These considerations led us to adopt the simple arithmetical course of
+assigning equal weight to past growth, past stability, and current
+profitability in working out the quality coefficient for each
+company. The dividend payout is not strictly a measure of quality of
+earning power, though in the typical case investors probably regard it
+in some such fashion. Its importance in most instances is undeniable,
+and it is both convenient and plausible to give it equal weight and
+similar treatment with each of the other factors just discussed.
+
+The extent of these disparities naturally suggests that our method is
+technically a poor one, and that more plausible valuations could be
+reached--i.e., ones more congruous with market prices--if a better
+choice were made of the factors and weights entering into the method.
+
+p 46
+
+It is quite evident from Table I that the stock market fixes its
+valuation of a given common stock on the basis not of its past
+statistical performance but rather of its expected future performance,
+which may differ significantly from its past behavior. The market is,
+of course, fully justified in seeking to make this independent
+appraisal of the future, and for that reason any automatic rejection
+of the market's verdict because it differs from a formula valuation
+would be the height of folly. We cannot avoid the observation,
+however, that the independent appraisals made in the stock market are
+themselves far from infallible, as is shown in part by the rapid
+changes to which they are subject. It is possible, in fact, that they
+may be on the whole a no more dependable guide to what the future will
+produce than the "values" reached by our mechanical processing of past
+data, with all the latter's obvious shortcomings.
+
+Let us turn now to our second mathematical approach, which concerns
+itself with future growth, or future earnings, as they appear to be
+predicted by the market price itself. We start with the theory that
+the market price of a representative stock, such as anyone in the
+Dow-Jones group, reflects the earnings to be expected in a future
+period, times a multiplier which is in turn based on the percentage of
+future growth. Thus an issue for which more than average growth is
+expected will have this fact shown to a double degree, or "squared,"
+in its market price--first in the higher figure taken for future
+earnings, and second in the higher multiplier applied to those higher
+earnings.
+
+Let us turn now to our second mathematical approach, which concerns
+itself with future growth, or future earnings, as they appear to be
+predicted by the market price itself. We start with the theory that
+the market price of a representative stock, such as anyone in the
+Dow-Jones group, reflects the earnings to be expected in a future
+period, times a multiplier which is in turn based on the percentage of
+future growth. Thus an issue for which more than average growth is
+expected will have this fact shown to a double degree, or "squared,"
+in its market price--first in the higher figure taken for future
+earnings, and second in the higher multiplier applied to those higher
+earnings.
+
+We shall measure growth by comparing the expected 1957-66 earnings
+with the actual figures for 1947-56. Our basic formula says, somewhat
+arbitrarily, that where no growth is expected the current price will
+be 8 times both 1947-56 earnings and the expected 1957-66 earnings. If
+growth G is expected, expressed as the ratio of 1957-66 to 1947-56
+earnings, then the price reflects such next decade earnings multiplied
+by 8 times G.
+
+From these assumptions we obtain the simple formula:
+
+Price equals (E x G) x (8 x G), or 8G sup 2 x E, where E is the
+per-share earnings for 1947-56.
+
+To find G, the expected rate of future growth, we have only to divide
+the current price by 8 times 1947-56 earnings, and take the square
+root.
+
+Ten of the companies (plus AT&T) sold at prices anticipating at least
+twice the Dow-ones Average rate of growth, comparing 1957-66 with
+1956. Of these only two, Du Pont and General Electric, had actually
+shown distinctly better than average growth in the last ten years.
+Conversely, eight of the companies were indicating less than half the
+average expected rate of growth, including five for which actual
+declines from 1956 levels were apparently predicted. Yet of these
+eight companies, no less than five had actually shown far greater than
+average growth in the past decade.
+
+This leads us to our final observations, which tie our two tables
+together. The ten companies previously mentioned, for which unusually
+rapid growth is anticipated, include seven of those shown in Table I
+as selling significantly above their formula valuation. Again, the
+eight for which subnormal or no growth is expected include six which
+were selling substantially below their formula valuations.
+
+Typically, the midpoint range of the value range has been found by
+applying an appropriate multiplier to estimated future earnings. My
+present view is that this is not the best technique.  Instead, the
+earnings figure taken should be what we call "normal current
+earnings", and all the future prospects - favorable or unfavorable,
+specific or general - should enter into the multiplier.  This
+procedural change obviates the necessity of establishing a future
+value and then discounting same to its present worth.

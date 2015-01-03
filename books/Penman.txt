@@ -1,0 +1,44 @@
+Financial Statements Analysis and Security Valuation
+Stephen Penman
+
+Page 80 : Table 3.3
+Percentiles of Common Price Multiples, 1963-2003, for U.S. Listed Firms
+
+                   Enterprise  Trailing  Forward         Unlevered             Unlevered  Unlevered
+Percentile     P/B     P/B        P/E      P/E       P/S     P/S      P/CFO     P/ebitda     P/ebit
+   95          7.9     12.7    Negative    49.2      8.9    8.1     Negative       30.1   Negative
+   75          2.9      2.7       23.5     19.1      1.7    2.0       18.8         10.6      15.3
+   50          1.7      1.5       15.2     13.1      0.8    0.9        9.9          7.0       9.9
+   25          1.0      1.0       10.3      9.2      0.3    0.5        5.6          4.8       6.6
+    5          0.5      0.6        5.9      5.6      0.1    0.2        2.3          2.5       3.3
+Note: CFO is cash flow from operations. Firms with negative denominators are treated as high multiple firms. 
+Thus firms in the upper percentiles of P/E, P/CFO an P/ebit are those with negative earnings (losses),
+cash flows, or ebit, as indicated.
+
+
+Page 81 : Table 3.4 Returns to Screening on Price-to-Earnings (P/E) and Priced-toBook (P/B), 1963-2006.
+Annual returns from screening on trailing P/E alone, P/B alone, and trailing P/E and P/E together. The
+screening strategy ranks firms on the screen each year and assigns firms to five portfolios based on the 
+ranking. For the screen using both P/E and P/B, firms are assigned to five portfolios each year from a ranking on P/E and then, within each P/E portfolio, assigned to five portfolios based on the ranking on P/B. Reported returns are averages from implementing the screening strategies each year from 1963 to 2006.
+
+                     Screening on P/E and P/B alone
+
+                Average  Annual           P/B     Average   Annual
+P/E Portfolio     P/E    return       Portfolio     P/B     Return
+   5 (low P/E)    7.1     23.2%       5 (low P/B)   0.61     24.3%
+   4             10.8     18.1        4             1.08     18.4
+   3             14.7     14.9        3             1.47     15.4
+   2             31.3     12.1        2             2.17     12.6
+   1 (high P/E) Losses*   13.5        1 (high P/B)  4.55      9.3
+
+
+                              Screening on Both P/E and P/B
+                                        P/E Portfolio
+                        1 (high)     2         3        4      5 (Low)
+             1 (High)      4.3%   10.9%       14.2%   17.1%     19.7%
+P/B          2             8.8     9.1        13.0     6.0      22.1
+portfolio    3            14.4     8.5        12.1    17.0      21.6
+             4            15.5    13.4        14.7     8.0      24.3
+             5            26.4    20.1        20.2    22.6      30.0
+* Firms in this loss portfolio have an average E/P of -18.4 percent. Earnings are before extraordinary and special items.
+
