@@ -1,0 +1,24 @@
+======
+shname
+======
+
+--------------------------------------------------
+print name of the latest sharelock holmes csv file
+--------------------------------------------------
+
+:Author: mark carter
+:Date: 2013-05-20
+:Copyright: public domain
+:Version: 1
+:Manual section: 1
+:Manual group: mcarter
+
+SYNOPSIS
+========
+
+``shname``
+
+DESCRIPTION
+===========
+
+Print the name of the latest Sharelock Holmes CSV file to stdout.

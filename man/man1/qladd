@@ -1,0 +1,24 @@
+=====
+qladd
+=====
+
+-----------------------------
+add a local quicklisp project
+-----------------------------
+
+:Author: mark carter
+:Date: 2013-01-16
+:Copyright: public domain
+:Version: 1
+:Manual section: 1
+:Manual group: mcarter
+
+SYNOPSIS
+========
+
+  qladd
+
+DESCRIPTION
+===========
+
+Adds the current working directory to the quicklisp local-projects directory so that it is visible as a quicklisp project.

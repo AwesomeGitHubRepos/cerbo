@@ -1,0 +1,28 @@
+======
+fixcsv
+======
+
+
+--------------
+fix a csv file
+--------------
+
+:Author: mark carter
+:Date: 2012-10-27
+:Copyright: public domain
+:Version: 2
+:Manual section: 1
+:Manual group: mcarter
+
+SYNOPSIS
+========
+
+  fixcsv -f FILE
+
+DESCRIPTION
+===========
+
+fixcsv cleans up csv files, fixing niggles that predominate in Sharelock Holmes downloads.
+
+fixcsv used to fix for latest file in ~/Downloads/StatsList*.csv and generates the file 
+/home/mcarter/repos/nokilli/sharelock/int/misc/clean-statslist.csv

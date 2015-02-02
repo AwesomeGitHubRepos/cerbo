@@ -1,0 +1,27 @@
+=====
+shlup
+=====
+
+----------------------------
+sharelock holmes epic lookup
+----------------------------
+
+:Author: mark carter
+:Date: 2013-05-20
+:Copyright: public domain
+:Version: 1
+:Manual section: 1
+:Manual group: mcarter
+
+SYNOPSIS
+========
+
+``shlup epic field``
+
+DESCRIPTION
+===========
+
+Using the latest Sharelock Holmes CSV file to stdout, print the value in the column named FIELD whose epic is EPIC
+
+Example: shlup TAST RS_6Month
+

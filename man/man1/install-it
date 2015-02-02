@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+# on Debian systems: sudo apt-get install python-docutils
+# See also http://jimmyg.org/blog/2009/generating-man-pages-from-restructuredtext.html
+# Example: http://docutils.sourceforge.net/sandbox/manpage-writer/rst2man.txt
+
+DEST=~/.local/man/man1
+mkdir -p $DEST
+
+function enman { rst2man $1 >$DEST/$1.1 ; } 
+function enman1 { rst2man $1.rst >$DEST/$1.1 ; }
+
+
+#rst2man fixcsv >$DEST/fixcsv.1
+#rst2man qladd >$DEST/qladd.1
+enman1 dvdw
+enman fixcsv
+enman fookies
+enman qladd
+enman1 mcarter
+enman shget
+enman shlup
+enman shname
+enman tomp3
+enman tomp4
+enman tws
+
+
+mandb # Debian

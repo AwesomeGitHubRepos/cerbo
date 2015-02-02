@@ -1,0 +1,30 @@
+=====
+tomp3
+=====
+
+----------------------------
+convert a file to mp3 format
+----------------------------
+
+:Author: mark carter
+:Date: 2013-01-30
+:Copyright: public domain
+:Version: 1
+:Manual section: 1
+:Manual group: mcarter
+
+SYNOPSIS
+========
+
+tomp3 file
+
+
+DESCRIPTION
+===========
+
+Converts a file to MP3 format using aconv
+
+SUPPORTED INPUT FORMATS
+=======================
+
+FLV, MP4

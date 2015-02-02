@@ -1,0 +1,26 @@
+=======
+fookies
+=======
+
+-------------------------------------
+Export Firefox cookies as a text file
+-------------------------------------
+
+:Author: mark carter
+:Date: 2013-05-26
+:Copyright: public domain
+:Version: 1
+:Manual section: 1
+:Manual group: mcarter
+
+SYNOPSIS
+========
+
+``fookies``
+
+DESCRIPTION
+===========
+
+Export Firefox cookies to stdout in Netscape CookieJar text format.
+The output is suitable for use in Python's MozillaCookieJar 
+

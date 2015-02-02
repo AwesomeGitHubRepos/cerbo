@@ -1,0 +1,31 @@
+=====
+shget
+=====
+
+---------------------------------
+fetch sharelock holmes statistics
+---------------------------------
+
+:Author: mark carter
+:Date: 2013-05-26
+:Copyright: public domain
+:Version: 1
+:Manual section: 1
+:Manual group: mcarter
+
+SYNOPSIS
+========
+
+``shget``
+
+DESCRIPTION
+===========
+
+Retrieves statistics from the Sharelock Holmes website and stores it as a CSV file. The location of the CSV file can be determined by running ``shname``. 
+
+Currently, only the RS6 query is downloaded - but this shouldn't be too hard to fix in subsequent releases.
+
+SEE ALSO
+========
+
+``shname``
