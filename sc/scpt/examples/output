@@ -1,0 +1,1 @@
+((leftstring (cell 1 0) "LEFTY") (rightstring (cell 2 0) "RIGHTY") (leftstring (cell 3 0) "MI") (let (cell 1 1) 12) (let (cell 2 1) (add (mul (cell 1 1) 2) 3)) . #f)

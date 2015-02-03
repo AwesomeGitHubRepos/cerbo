@@ -1,0 +1,4 @@
+Convert a parse tree to a list of lists
+
+Typical usage:
+    scpt <foo.sc | scx2lol

@@ -1,0 +1,17 @@
+THE BASIC IDEA
+
+
+I'm primarily interested in adding macrology to sc, and this is my experimentation with such concepts.
+
+old - a junk basket which neverthless contains some interesting stuff like a client and server.
+
+scpt - sc file parser. Generates sexpr of sc file
+
+scrc - sc resource file example.
+
+
+OTHER SPREADSHEETS THAT MIGHT BE INTERESTING
+
+Squirrel - http://www.vromans.org/johan/software/sw_scalc.html
+Teapot - http://www.moria.de/~michael/teapot/
+Various - http://linuxfinances.info/info/spreadsheets.html 
