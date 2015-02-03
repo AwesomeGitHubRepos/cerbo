@@ -40,6 +40,7 @@ endif
 
 
 BINS = curly globals gofic parser ssa 
+VERSION := $(shell date)
 
 .PHONY : all clean globals-test info install leaks tags uninstall profile
 
@@ -74,7 +75,8 @@ tags :
 
 
 %.o : %.c
-	$(CC) -c $(CFLAGS) $< -o $@
+	# echo a version is $(VERSION)
+	$(CC) -DVERSION="\"$(VERSION)\"" -c $(CFLAGS) $< -o $@
 
 
 curly.xxd : curly.txt
@@ -97,6 +99,7 @@ fetch-script.xxd : fetch-script.sh
 #http.o : http.c fetch-script.xxd
 
 ssa : ssa.o $(OBJS)
+	# echo ssa version is $(VERSION)
 	$(CC) ssa.o $(OBJS) $(CFLAGS) -lm $(CYGL) $(LDFLAGS) -lpthread -lcurl -o ssa
 
 

@@ -43,7 +43,7 @@
 
 #define N_(Text) Text
 #define PACKAGE "ssa"
-#define VERSION "X"
+//#define VERSION "X" // set in compiling
 
 
 
@@ -174,7 +174,8 @@ show_version (FILE *stream, struct argp_state *state)
   (void) state;
   /* Print in small parts whose localizations can hopefully be copied
      from other programs.  */
-  fputs(PACKAGE" "VERSION"\n", stream);
+  //fputs(PACKAGE" "VERSION"\n", stream);
+  fprintf(stream, "%s: %s\n", PACKAGE, VERSION);
   fprintf(stream, "Written by %s.\n\n", "mark carter");
   fprintf(stream, "Copyright (C) %s %s\n", "2014", "mark carter");
   fputs("\

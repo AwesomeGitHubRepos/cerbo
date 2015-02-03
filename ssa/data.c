@@ -181,17 +181,7 @@ void insert_etran(char *dstamp, char * way, char* folio, char* sym,
 	
 	e->qty = buy * atof(qty);
 	e->valuep = buy * pstoi(amount);
-	// printf("qty = %f\n", p_etran->qty);
 
-	// ensure each etran has a comm
-	comm *c = find_comm(sym);
-	if(c == 0) {
-		fprintf(stderr, "Error trying to insert etran. COMModity not found:%s.\n", sym);
-		dump_etran(stderr, e);
-		fprintf(stderr, "Aborting.\n");
-		exit(EXIT_FAILURE);
-	}
-	e->comm = c;
 
 	insert_inodes(&etrans, e);
 	star();
@@ -434,6 +424,7 @@ int cmp_etran(const void * a, const void * b)
 void derive_data()
 {
 	comm *c;
+        etran *e;
 
 	while(c = linode(&comms)) {
 	  //comm *c = (comm *)comms.pnodes[i];
@@ -446,11 +437,24 @@ void derive_data()
 	}
 
 
+        // ensure each etran has a comm
+        while(e = linode(&etrans)) {
+          c = find_comm(e->sym);
+          if(c == 0) {
+            fprintf(stderr, "Error trying to insert etran. COMModity not found:%s.\n", e->sym);
+            dump_etran(stderr, e);
+            fprintf(stderr, "Aborting.\n");
+            exit(EXIT_FAILURE);
+          }
+          e->comm = c;
+        }
+
+
 	/* etrans need to be sorted by date, or else their costings 
 	can come out wrong */
         qsort(etrans.pnodes, etrans.nnodes, sizeof(void *), cmp_etran);
 
-	etran *e;
+
 	while(e = linode(&etrans)) {       
 	  //e = (etran *)etrans.pnodes[i];
 		switch(dslot(e->dstamp)) {
