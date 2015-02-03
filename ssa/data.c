@@ -577,7 +577,7 @@ void init_dirs()
 	mk_rc_subdir("");
 	mk_rc_subdir("gofi");
 	mk_rc_subdir("etb");
-	mk_rc_subdir("fetches");
+	//mk_rc_subdir("fetches");
 
 	write_htm_template(rc_dir);
 }
