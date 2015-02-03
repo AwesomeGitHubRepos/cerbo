@@ -1,0 +1,9 @@
+curly [OPTION]
+
+Curly will download and parse some Google Finance
+stock symbols, storing them in PATHSPEC (see below)
+
+
+-h   this help message
+-x   no download. In this case, the required example
+     files must exist in PATHSPEC, otherwise an assertion error will occur.

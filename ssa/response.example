@@ -1,0 +1,41 @@
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=ISO-8859-1
+Set-Cookie: SC=RV=:ED=us; expires=Sat, 11-Oct-2014 11:31:38 GMT; path=/finance; domain=.google.com
+Set-Cookie: PREF=ID=9a5e52a2a57ccffc:TM=1397215898:LM=1397215898:S=M6OBcQD43tbvWRxQ; expires=Sun, 10-Apr-2016 11:31:38 GMT; path=/; domain=.google.com
+Date: Fri, 11 Apr 2014 11:31:38 GMT
+Pragma: no-cache
+Expires: Fri, 01 Jan 1990 00:00:00 GMT
+Cache-Control: no-cache, no-store, must-revalidate, proxy-revalidate
+X-UA-Compatible: IE=EmulateIE7
+X-Content-Type-Options: nosniff
+X-Frame-Options: SAMEORIGIN
+X-XSS-Protection: 1; mode=block
+Server: GSE
+Alternate-Protocol: 80:quic
+Transfer-Encoding: chunked
+
+147
+
+// [
+{
+"id": "1966410"
+,"t" : "AZN"
+,"e" : "LON"
+,"l" : "3,763.50"
+,"l_fix" : "3763.50"
+,"l_cur" : "GBX3,763.50"
+,"s": "0"
+,"ltt":"12:30PM GMT+1"
+,"lt" : "Apr 11, 12:30PM GMT+1"
+,"lt_dts" : "2014-04-11T12:30:26Z"
+,"c" : "-73.50"
+,"c_fix" : "-73.50"
+,"cp" : "-1.92"
+,"cp_fix" : "-1.92"
+,"ccol" : "chr"
+,"pcls_fix" : "3837"
+}
+]
+
+0
+

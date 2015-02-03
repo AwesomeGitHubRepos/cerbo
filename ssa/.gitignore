@@ -1,0 +1,16 @@
+*~
+*.exe
+*.o
+*.so
+*.xxd
+core
+curly
+globals
+gofic
+parser
+ssa
+ssa.1.gz
+ssa.exe.stackdump
+tags
+
+

@@ -1,0 +1,8 @@
+echo "Loading ssarc file"
+#download_method  shell
+#verbose
+
+
+parsedir "/home/mcarter/redact/docs/accts2014/data"
+parsefile "/home/mcarter/.ssa/etrans-auto.txt"
+
