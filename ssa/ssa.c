@@ -97,21 +97,9 @@ int main (int argc, char **argv)
 
   parse_rc_file();
   init_dirs();
-  /*
-  parse_data_file1("coms.txt");
-  parse_data_file1("etrans.txt");
-  parse_data_file1("financials.txt");
-  parse_data_file1("manual-prices.txt");
-  parse_data_file1("naccs.txt");
-  parse_data_file1("ntrans.txt");
-  parse_data_file1("period.txt");
-  parse_data_file1("returns.txt");
-  parse_data_file1("start-prices.txt");
-  */
-  
   
   if(want_web || want_snapshot) { download_prices(); }
-  parse_rc_subdir("gofi"); // Do it after download of prices, otherwise they wont be picked up
+  // parse_rc_subdir("gofi"); // Do it after download of prices, otherwise they wont be picked up
   derive_data();
   print_etb();
   report_etrans();

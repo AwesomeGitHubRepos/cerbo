@@ -56,6 +56,7 @@ bool parse(parser *p)
   // parse a non-blank line
   p->pos = -1;
   p->nargs = 0;
+  //printf("parse() line '%s'\n", s);
   while(interp_line(p)) {
     // got a string, let's do something with it
     assert(p->nargs<10);

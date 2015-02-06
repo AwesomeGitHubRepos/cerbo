@@ -1,5 +1,5 @@
-005 
----
+* Fails to read last line of file if it is not terminated by newline
+
 
 
 

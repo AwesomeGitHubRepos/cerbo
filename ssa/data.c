@@ -20,7 +20,6 @@
 #include "htm.h"
 #include "portfolios.h"
 
-
 inodes command_strings;
 inodes comms;
 inodes etrans;
@@ -138,23 +137,24 @@ void init_data()
 void insert_comm(char *sym, char *fetch, char *type, char *unit, 
 		 char *exchange, char *ticker, char *name)
 {
-	comm *c;
-	c = (comm *)malloc(sizeof(comm));
-	c->sym = sym;
-	c->fetch = fetch[0] == 'W';
-	c->type = type[0];
-	c->unit = unit;
-	c->exchange = exchange;
-	c->ticker = ticker;
-	c->name = name;
-	
-	init_curly(&(c->acurly), exchange, ticker);
-	c->end_qty = 0;
-	c->start_price = 0;
-	c->end_price = 0;
-	
-	insert_inodes(&comms, c);      
-	star();
+  //printf("insert_comm(): %s\n", sym);
+  comm *c;
+  c = (comm *)malloc(sizeof(comm));
+  c->sym = sym;
+  c->fetch = fetch[0] == 'W';
+  c->type = type[0];
+  c->unit = unit;
+  c->exchange = exchange;
+  c->ticker = ticker;
+  c->name = name;
+  
+  init_curly(&(c->acurly), exchange, ticker);
+  c->end_qty = 0;
+  c->start_price = 0;
+  c->end_price = 0;
+  
+  insert_inodes(&comms, c);      
+  star();
 }
 
 
@@ -229,14 +229,14 @@ void insert_ntran(char *dstamp, char *dr, char *cr, char* amount, char *clear,
 
 
 
-void insert_price(char *dstamp, char *tstamp, char *sym, char* value, char *unit)
+void insert_price(char *dstamp, char *tstamp, char *sym, double value, char *unit)
 {
   price* p_price;
   p_price = (price *)malloc(sizeof(price));
   p_price->dstamp = dstamp;
   p_price->tstamp = tstamp;
   p_price->sym = sym;
-  p_price->price = atof(value);
+  p_price->price = value;
   p_price->unit = unit;
   insert_inodes(&prices, p_price);
   star();
@@ -266,11 +266,9 @@ price *find_price(char *sym, char *dstamp)
   price *p;
   //puts("finding price");
   while(p = linode(&prices)) {
-    // price *p = (price *)prices.pnodes[i];
-    if(strcmp(sym, p->sym) == 0 && dcmp(p->dstamp, dstamp)<=0)
-      {
-	if(found==0 || dcmp(p->dstamp, found->dstamp)>=0) found = p;
-      }
+    if(strcmp(sym, p->sym) != 0) continue;
+    if(dcmp(p->dstamp, dstamp)>0) continue;
+    if(found == 0 || dcmp(p->dstamp, found->dstamp)>=0) found = p;
   }
 
   return found; // could be 0
@@ -292,7 +290,8 @@ void download_prices()
 
 	time_t rawtime;
 	struct tm * timeinfo;
-	char dstamp[11], tstamp[9], fname[256];
+	static char dstamp[11], tstamp[9]; // we reference this outside the function
+	char  fname[256];
 	time ( &rawtime );
 	timeinfo = localtime ( &rawtime );
 	strftime(dstamp, 11, "%Y-%m-%d", timeinfo);
@@ -321,14 +320,15 @@ void download_prices()
 
 	FILE *fp = fopen(fname,"w");
 	if(fp == 0) {
-		fprintf(stderr, "Couldn't open file '%s' for writing\n", fname);
-		fail();
+          fprintf(stderr, "Couldn't open file '%s' for writing\n", fname);
+          fail();
 	}
 
 	while(c = linode(&comms)) {
 	  if(c->fetch) { 
 	    fprintf(fp, "P\t%s\t%s\t%s\t%.4f\t%s\n", dstamp, 
-		    tstamp, c->sym, c->acurly.last,  c->unit);		
+		    tstamp, c->sym, c->acurly.last,  c->unit);
+            insert_price(dstamp, tstamp, c->sym, c->acurly.last, c->unit);
 	  }
 	}
 

@@ -113,7 +113,8 @@ void insert_nacc(char *acc, char *desc);
 void print_etb();
 
 // prices
-void insert_price(char *dstamp, char *tstamp, char *sym, char* value, char *unit);
+void insert_price(char *dstamp, char *tstamp, char *sym, 
+                  double value, char *unit);
 price *find_price(char *sym, char *dstamp);
 double find_price_def(char *sym, char *dstamp, double defval);
 void download_prices();

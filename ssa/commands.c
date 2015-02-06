@@ -124,7 +124,7 @@ prim P_parsefile(char **args)
 prim P_insert_price(char **args) 
 {
   insert_price(astring(args[1]), astring(args[2]), 
-               astring(args[3]), args[4], astring(args[5]));
+               astring(args[3]), atof(args[4]), astring(args[5]));
 }
 
 prim P_return(char **args) {   

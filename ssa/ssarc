@@ -4,5 +4,6 @@ echo "Loading ssarc file"
 
 
 parsedir "/home/mcarter/redact/docs/accts2014/data"
+parsedir "/home/mcarter/.ssa/gofi"
 #parsefile "/home/mcarter/.ssa/etrans-auto.txt"
 
