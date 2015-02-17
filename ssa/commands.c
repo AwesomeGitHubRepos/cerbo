@@ -92,6 +92,7 @@ void parse_file1(char *full)
 }
 
 
+prim P_noop(char **args) { /* do nothing */ }
 
 prim P_insert_comm(char **args)
 {
@@ -146,6 +147,7 @@ prim P_echo(char **args)
 }
 
 
+
 prim P_parsedir(char **args)
 {
   parse_dir(args[1]);
@@ -166,9 +168,10 @@ prim P_download_method(char **args)
 static struct primfcn cmd[] = {
   {"comm", P_insert_comm, 7},
   //  {"download_method", P_download_method, 1},
+  {"desc", P_noop, -1},
   {"echo", P_echo, 1},
   {"etran", P_insert_etran, 6},
-  {"FIN", P_insert_financial, 3},
+  {"fin", P_insert_financial, 3},
   {"nacc", P_insert_nacc, 2},
   {"ntran", P_insert_ntran, 6},
   {"P", P_insert_price, 5},
@@ -187,7 +190,7 @@ void parse_command(parser *p)
   struct primfcn *c = cmd;
   while(c->pcode) {
     if(strcmp(c->name, p->args[0]) ==0) {
-      if(p->nargs != c->nargs +1) {
+      if(c->nargs >=0 && p->nargs != c->nargs +1) {
 	fprintf(stderr, "Wrong number of arguments in:\n%s\nExiting.", p->line_copy);
 	exit(EXIT_FAILURE);
       }
