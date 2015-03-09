@@ -1,7 +1,8 @@
 import Data.Char
 --import Data.Text
 import System.Directory
-import System.FilePath.Glob
+--import System.FilePath.Glob
+import System.Path.Glob
 
 filterInputs inputs =
   filter (\x -> isAlpha (x !! 0)) nonblanks
