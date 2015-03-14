@@ -97,7 +97,8 @@ prim P_noop(char **args) { /* do nothing */ }
 prim P_insert_comm(char **args)
 {
   insert_comm(astring(args[1]), args[2], args[3], astring(args[4]), 
-	      astring(args[5]), astring(args[6]), astring(args[7])); 
+	      astring(args[5]), astring(args[6]), astring(args[7]),
+	      astring(args[8])); 
 }
 
 prim P_insert_etran(char **args)
@@ -166,7 +167,7 @@ prim P_download_method(char **args)
 */
 
 static struct primfcn cmd[] = {
-  {"comm", P_insert_comm, 7},
+  {"comm", P_insert_comm, 8},
   //  {"download_method", P_download_method, 1},
   {"desc", P_noop, -1},
   {"echo", P_echo, 1},

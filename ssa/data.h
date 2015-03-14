@@ -22,6 +22,7 @@ typedef struct comm {
   char *ticker;
   char *exchange;
   //char *gepic; 
+  char *yahoo;
   char *name;
   
   // derived fields
@@ -91,7 +92,7 @@ void dump_data();
 
 void derive_data();
 void insert_comm(char *sym, char *fetch, char *type, char *unit, 
-		 char *exchange, char *ticker, char *name);
+		 char *exchange, char *ticker, char *yahoo, char *name);
 
 //prim insert_comm(pline *p);
 

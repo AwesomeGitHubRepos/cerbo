@@ -135,7 +135,7 @@ void init_data()
 #define UEQ(x) (strcmp(x, unit) == 0)
 
 void insert_comm(char *sym, char *fetch, char *type, char *unit, 
-		 char *exchange, char *ticker, char *name)
+		 char *exchange, char *ticker, char *yahoo, char *name)
 {
   //printf("insert_comm(): %s\n", sym);
   comm *c;
@@ -146,6 +146,7 @@ void insert_comm(char *sym, char *fetch, char *type, char *unit,
   c->unit = unit;
   c->exchange = exchange;
   c->ticker = ticker;
+  c->yahoo = yahoo;
   c->name = name;
   
   init_curly(&(c->acurly), exchange, ticker);
@@ -158,7 +159,51 @@ void insert_comm(char *sym, char *fetch, char *type, char *unit,
 }
 
 
+char cj_sep;
+FILE *fpcj; // file pointer to output comm json file
 
+void _print_jcommx(char *key, char *val) { 
+  // char fmt[20]; 
+  fprintf(fpcj, "  \"%s\": %s %c\n", key, val, cj_sep); 
+  //  fprintf(fpcj, fmt, key, val); 
+}
+void _print_jcomms(char *key, char *val) {char s[100]; sprintf(s, "\"%s\"", val); _print_jcommx(key, s); }
+void _print_jcommc(char *key, char val) { char s[100]; sprintf(s, "\"%c\"", val); _print_jcommx(key, s); }
+void _print_jcommf(char *key, double val) { char s[100]; sprintf(s, "%f", val); _print_jcommx(key, s); }
+void _print_jcommb(char *key, bool val) { char *b = val ? "true" : "false";     _print_jcommx( key, b); }
+
+void comm_to_json()
+{
+  comm *c;
+  fpcj = fout_cache("comm.json");
+  fprintf(fpcj, "[\n");
+
+  int i;
+  for(i=0; i<comms.nnodes; i++) {
+    c = (comm *) comms.pnodes[i];    
+    fprintf(fpcj, " {\n");
+    cj_sep = ',';
+    _print_jcomms("sym", c->sym);
+    _print_jcommb("fetch", c->fetch);
+    _print_jcommc("type", c->type);
+    _print_jcomms("unit", c->unit);
+    _print_jcomms("exch", c->exchange);
+    _print_jcomms("gticker", c->ticker);
+    _print_jcomms("yticker", c->yahoo);
+    _print_jcomms("name", c->name);
+  
+    _print_jcommf("eqty", c->end_qty);
+    _print_jcommf("sprice", c->start_price);
+    cj_sep = ' ';
+    _print_jcommf("eprice", c->end_price);  
+
+    fprintf(fpcj, " }");
+    if(i< comms.nnodes-1) fprintf(fpcj, ",");
+    fprintf(fpcj, "\n");
+  }
+  fprintf(fpcj, "]\n");
+  fclose(fpcj);
+}
 
 void insert_etran(char *dstamp, char * way, char* folio, char* sym, 
 		  char *qty, char *amount)
@@ -435,7 +480,7 @@ void derive_data()
 	  //c->scale = find_price_def(c->unit, end, 1.0f);
 	  //printf("derive_data():comm = %s, start_price =%f, end_price=%f\n", c->sym, c->start_price, c->end_price);
 	}
-
+	
 
         // ensure each etran has a comm
         while(e = linode(&etrans)) {
@@ -477,7 +522,7 @@ void derive_data()
   
 	create_postings();
 
-
+	comm_to_json();
 }
 
 
