@@ -109,10 +109,11 @@ int main (int argc, char **argv)
   //parse_data_file1("financials.txt");
   create_financials();
   report_returns();
-  create_ofx();
-  export_prolog();
+  // create_ofx(); TO depracate
+  //export_prolog(); TODO depracte
   if(want_snapshot) { create_snapshot(); }
   dump_data();
+  comm_to_json();
   free_resources();
   
   exit (0);

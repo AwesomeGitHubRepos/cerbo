@@ -87,7 +87,7 @@ double round2(double x); // round to 2 dp (subject to arithmetic precision)
 void init_data();
 void dump_data();
 //void report();
-
+void comm_to_json();
 
 
 void derive_data();

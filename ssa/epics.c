@@ -20,15 +20,6 @@ void accum_comm_etran(char *folio, comm *c, double *qty,
 		bool fmatch = all || (strcmp(e->folio, folio) == 0);
 		bool cmatch = strcmp(e->sym, c->sym) == 0;
 		bool match;
-/*
-		if (all) {
-			match = strcmp(e->folio, "ut") != 0;
-		} else {
-			match = fmatch;
-		}
-
-		match = match && cmatch;
-*/
 
 		match = fmatch && cmatch;
 		if (match) {

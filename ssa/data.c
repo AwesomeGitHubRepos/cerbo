@@ -473,10 +473,8 @@ void derive_data()
 
 	while(c = linode(&comms)) {
 	  //comm *c = (comm *)comms.pnodes[i];
-	  c->start_price = find_price_def(c->sym, start, 0.0f) *
-	    find_price_def(c->unit, start, 0.0f);
-	  c->end_price = find_price_def(c->sym, end, 0.0f) *
-	    find_price_def(c->unit, end, 0.0f);
+	  c->start_price = find_price_def(c->sym, start, 0.0f); // *  find_price_def(c->unit, start, 0.0f);
+	  c->end_price = find_price_def(c->sym, end, 0.0f); // *    find_price_def(c->unit, end, 0.0f);
 	  //c->scale = find_price_def(c->unit, end, 1.0f);
 	  //printf("derive_data():comm = %s, start_price =%f, end_price=%f\n", c->sym, c->start_price, c->end_price);
 	}
@@ -522,7 +520,7 @@ void derive_data()
   
 	create_postings();
 
-	comm_to_json();
+	//comm_to_json();
 }
 
 

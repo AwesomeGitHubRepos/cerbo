@@ -173,6 +173,7 @@ static struct primfcn cmd[] = {
   {"echo", P_echo, 1},
   {"etran", P_insert_etran, 6},
   {"fin", P_insert_financial, 3},
+  {"fx", P_noop, -1},
   {"nacc", P_insert_nacc, 2},
   {"ntran", P_insert_ntran, 6},
   {"P", P_insert_price, 5},
