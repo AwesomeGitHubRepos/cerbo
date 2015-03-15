@@ -13,13 +13,15 @@ filterInputs inputs =
 
 
 
+
 readInputs = do
   files <- glob "/home/mcarter/redact/docs/accts2014/data/*.txt"
   contents <- mapM readFile files
   let allLines = filterInputs contents
   let commands = map foldLine allLines
-  --let commands = allLines
-  mapM_ print commands
+  let etrans = filter (\x -> ((head x) == "etran")) commands
+  mapM_ print etrans
+  --return ntrans
 
 -- main = readInputs
 
