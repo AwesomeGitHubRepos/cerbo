@@ -110,3 +110,5 @@ makeYahooCsv = do
   let comms = makeTypes mkComm "comm" inputs
   let ys = yepics comms
   fetchAndSave ys
+
+loadYahooCsv = loadSaves

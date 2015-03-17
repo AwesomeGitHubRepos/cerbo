@@ -21,7 +21,7 @@ symUrl sym =
   pre ++ sym ++ post
   where
     pre =  "http://download.finance.yahoo.com/d/quotes.csv?s="
-    post = "&f=snl1c1p2&e=.csv"
+    post = "&f=sl1c1p2&e=.csv"
 
 
 getUrl :: String -> IO String
@@ -29,7 +29,8 @@ getUrl url = do
     response <- simpleHTTP $ getRequest url
     getResponseBody response
 
-fetchSym sym = getUrl $ symUrl $ replace "^" "%5E" sym
+stripJunkM = liftM (stripChars "\"+%\n")
+fetchSym sym =  stripJunkM $ getUrl $ symUrl $ replace "^" "%5E" sym
 
 fetchSyms symList = mapConcurrently fetchSym symList
 
@@ -39,19 +40,19 @@ testHyh = (liftM decodeFetch) (fetchSym "HYH")
 
    
 
-data Yfetch = Yfetch String String Float Float Float deriving (Show)
+data Yfetch = Yfetch String Float Float Float deriving (Show)
 
 
 
 
-chgPc :: [Char] -> Float
-chgPc s = asFloat $ stripChars "\"%\n+" s
+--chgPc :: [Char] -> Float
+--chgPc s = asFloat $ stripChars "\"%\n+" s
 
 decodeFetch :: [Char] -> Yfetch
 decodeFetch f =
-  Yfetch ticker name price chg chgpc
+  Yfetch ticker price chg chgpc
   where
-    ticker:name:priceStr:chgStr:chgpcStr:[] = splitStr "," f
+    ticker:priceStr:chgStr:chgpcStr:[] = splitStr "," f
     price = asFloat(priceStr)
     chg  = asFloat(chgStr)
     chgpc = asFloat(chgpcStr)
@@ -59,12 +60,13 @@ decodeFetch f =
 
 fetchAndDecode urls = fmap (liftM decodeFetch) (fetchSyms urls)
 
+yfile = "/home/mcarter/.ssa/yahoo.csv"
+
 fetchAndSave urls = do
   fetches <- fmap (liftM (stripChars "\n")) (fetchSyms urls)
-  writeFile "yahoo.csv" (unlines fetches)
+  writeFile yfile (unlines fetches)
 
 loadSaves = do
-  let txt = readFile "yahoo.csv"
-  --ls <-  (fmap lines) (readFile "yahoo.csv")
+  let txt = readFile yfile
   let ls = (liftM lines) txt
   fmap (liftM decodeFetch) ls
