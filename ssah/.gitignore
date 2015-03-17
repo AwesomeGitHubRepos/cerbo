@@ -1,2 +1,5 @@
 *.hi
 yahoo.csv
+.cabal-sandbox/
+dist/
+

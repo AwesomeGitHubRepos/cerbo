@@ -1,4 +1,4 @@
-module Ssah where
+module Ssah.Ssah where
 
 import Data.Char
 --import Data.Text
@@ -112,3 +112,16 @@ makeYahooCsv = do
   fetchAndSave ys
 
 loadYahooCsv = loadSaves
+
+
+mainSsah = print "TODO!"
+
+
+data Price = Price String String Float deriving (Show)
+
+mkPrice :: [[Char]] ->Price
+mkPrice["P", dstamp, _, sym, price, _ ] =
+    Price dstamp sym (asFloat price)
+
+    
+
