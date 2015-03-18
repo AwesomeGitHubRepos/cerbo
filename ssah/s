@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-tmux send-keys -t cabal ":l moan" C-m ":main" C-m
+tmux send-keys -t cabal C-m C-m C-m C-m C-m C-m C-m ":l moan" C-m ":main" C-m
