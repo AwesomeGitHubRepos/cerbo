@@ -2,6 +2,7 @@ module Ssah.Ssah where
 
 import Data.Char
 --import Data.Text
+import Data.Tuple.Select
 import System.Directory
 --import System.FilePath.Glob
 import System.Path.Glob
@@ -74,12 +75,20 @@ mkEtran ["etran", dstamp, way, acc, sym, qty, amount] =
         sgn1 = if way == "B" then 1.0 else -1.0
         signed f = (asFloat f ) * sgn1
 
-qty :: Etran -> Float
-qty (Etran  _ _ _ _ q _) = q
+etranTuple (Etran dstamp way acc sym qty amount) =
+  (dstamp, way, acc, sym, qty, amount)
+
+etranSym :: Etran -> Sym
+etranSym e = sel4 $ etranTuple e
+
+qty :: Etran -> Qty
+qty e = sel5 $ etranTuple e
 
 
 qtys :: [Etran] -> Float
 qtys es = sum $ map qty es
+
+getEtrans = makeTypes mkEtran "etran"
 
 matchHeads str = filter (\x -> head x == str)
 
@@ -93,17 +102,29 @@ mkComm ["comm", sym, fetch, ctype, unit, exch, gepic, yepic, name] =
     Comm sym bfetch ctype unit exch gepic yepic name
     where bfetch = (fetch == "W")
 
-printn n  lst = mapM_ print  (take n lst)
 
+commTuple (Comm sym fetch ctype unit exch gepic yepic name) =
+  (sym, fetch, ctype, unit, exch, gepic, yepic, name)
 
-yepic :: Comm -> String
-yepic (Comm _ _ _ _ _ _ y _) = y
+commSym :: Comm -> Sym
+commSym c = sel1 $ commTuple c
+
 
 fetchRequired :: Comm -> Bool
-fetchRequired (Comm _ f _ _ _ _ _ _) = f
+fetchRequired c = sel2 $ commTuple c
+
+commType c = sel3 $ commTuple c
+
+yepic :: Comm -> String
+yepic c = sel7 $ commTuple c
+
+
+getComms inputs = makeTypes mkComm "comm" inputs
+
 
 yepics comms = map yepic $ filter fetchRequired comms
 
+{-
 -- attempt to get around Jupyter crashing when using networking
 makeYahooCsv = do
   inputs <- readInputs
@@ -112,7 +133,7 @@ makeYahooCsv = do
   fetchAndSave ys
 
 loadYahooCsv = loadSaves
-
+-}
 
 mainSsah = print "TODO!"
 

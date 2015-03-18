@@ -8,3 +8,7 @@ cabal repl
 
 To rebuild the modules:
 cabal build
+
+TODO Finish off snap
+:l Ssah/Snap
+snapAll

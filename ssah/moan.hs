@@ -16,14 +16,14 @@ soFar = do
     inputs <-readInputs
     printn 3 inputs
     print "."
-    let comms = makeTypes mkComm "comm" inputs
+    let comms = getComms inputs -- makeTypes mkComm "comm" inputs
     printn 3 comms
     putStrLn "."
     putStrLn "Loading Cached Yahoo data. Consider using fresh download"
     y <- loadYahooCsv
     printn 3 y
     putStrLn "."
-    let etrans = makeTypes mkEtran "etran" inputs
+    let etrans = getEtrans inputs -- makeTypes mkEtran "etran" inputs
     printn 3 etrans
     putStrLn "I'm confused"
     putStrLn "But then, aren't we all?"

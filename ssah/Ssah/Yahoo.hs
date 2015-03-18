@@ -18,11 +18,7 @@ import Ssah.Utils
 --import Data.ByteString.Lazy.Char8
 
 
--- TODO put some of these in Utils
-type Dstamp = String
-type Rox = Float
-type Ticker = String
-type Tstamp = String
+
 
 
 splitStr = Data.String.Utils.split -- alias a function

@@ -3,6 +3,13 @@ module Ssah.Utils where
 import Data.Time
 import System.Locale (defaultTimeLocale)
 
+type Dstamp = String
+type Qty = Float
+type Rox = Float
+type Sym = String
+type Ticker = String
+type Tstamp = String
+
 
 
 stripChars :: String -> String -> String
@@ -22,3 +29,4 @@ timeString = do
   return tstamp
     
   
+printn n  lst = mapM_ print  (take n lst)
