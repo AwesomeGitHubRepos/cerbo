@@ -66,6 +66,18 @@ quoteAsText sq =
     (dstamp, tstamp, ticker, rox,   price, chg,   chgpc) = quoteTuple sq
     
 
+fetchUsd = do
+  let url1 = "http://download.finance.yahoo.com/d/quotes.csv?s="
+  let url2 = "USDGBP"
+  let url3 = "=X&f=nl1d1t1"
+  let url  = url1 ++ url2 ++ url3
+  resp <- getUrl url
+  let clean = stripJunk resp
+  let fields = splitStr "," clean
+  let roxStr = (fields !! 1)
+  let rox = 100.0 * (asFloat roxStr)
+  return rox
+
 testQuoteAsText = do
   let sq = StockQuote "2015-03-18" "12:59:23" "HYH" 1.0 47.5745 0.5645 1.2008
   print (quoteAsText sq)
@@ -75,8 +87,8 @@ decodeFetch dstamp tstamp rox serverText =
   StockQuote dstamp tstamp ticker rox   price chg   chgpc
   where
     ticker:priceStr:chgStr:chgpcStr:[] = splitStr "," serverText
-    price = asFloat(priceStr)
-    chg  = asFloat(chgStr)
+    price = asFloat(priceStr) * rox
+    chg  = asFloat(chgStr) * rox
     chgpc = asFloat(chgpcStr)
 
 fetchQuote ::  String -> String -> (String, Float)  -> IO StockQuote
@@ -92,12 +104,21 @@ testFtas = fetchQuote  "2015-03-18" "12:59:23" ("^FTAS", 1.0)
 testHyh = fetchQuote "2015-03-18" "12:59:23" ("HYH", 1.0)
 
 
-
 fetchQuotes :: Dstamp -> Tstamp -> [(Ticker, Rox)] -> IO [StockQuote]
 fetchQuotes dstamp tstamp pairs = do
   let fq = fetchQuote dstamp tstamp
   res <- mapConcurrently fq pairs
   return res
+
+fetchQuotesA :: [Ticker] -> [Rox] -> IO [StockQuote]
+fetchQuotesA tickers roxs = do
+  ds <- dateString
+  ts <- timeString
+  let pairs = zip tickers roxs
+  quotes <- fetchQuotes ds ts pairs
+  return quotes
+
+testFqa = fetchQuotesA ["HYH", "^FTAS"] [1.0, 1.0]
 
 testTickers = [ ("AML.L", 1.0), ("ULVR.L", 1.0), ("HYH", 1.0)]
 testFetches = fetchQuotes "2015-03-18" "12:59:23" testTickers

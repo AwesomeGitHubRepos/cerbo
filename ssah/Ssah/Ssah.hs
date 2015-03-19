@@ -109,11 +109,18 @@ commTuple (Comm sym fetch ctype unit exch gepic yepic name) =
 commSym :: Comm -> Sym
 commSym c = sel1 $ commTuple c
 
+allComms = do
+  inputs <- readInputs -- for testing purposes
+  let comms = getComms inputs
+  return comms
 
 fetchRequired :: Comm -> Bool
 fetchRequired c = sel2 $ commTuple c
 
 commType c = sel3 $ commTuple c
+
+commCurrency :: Comm -> String
+commCurrency c = sel4 $ commTuple c
 
 yepic :: Comm -> String
 yepic c = sel7 $ commTuple c

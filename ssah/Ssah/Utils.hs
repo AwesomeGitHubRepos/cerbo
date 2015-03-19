@@ -30,3 +30,4 @@ timeString = do
     
   
 printn n  lst = mapM_ print  (take n lst)
+printAll lst = mapM_ print lst
