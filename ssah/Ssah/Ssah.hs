@@ -7,6 +7,8 @@ import System.Directory
 --import System.FilePath.Glob
 import System.Path.Glob
 
+import Ssah.Nacc
+import Ssah.Ntran
 import Ssah.Yahoo
 import Ssah.Utils
 
@@ -90,9 +92,6 @@ qtys es = sum $ map qty es
 
 getEtrans = makeTypes mkEtran "etran"
 
-matchHeads str = filter (\x -> head x == str)
-
-makeTypes maker match  inputs = map maker $ matchHeads match inputs
 
 data Comm = Comm String Bool String String String String String String deriving (Show)
 
@@ -171,24 +170,32 @@ fetchCommQuotes comms = do
   let roxs = map (rox usd) comms
   fetchQuotesA tickers roxs
 
-data Ledger = Ledger [Comm] [Etran] deriving (Show)
+data Ledger = Ledger [Comm] [Etran] [Ntran] [Nacc] deriving (Show)
 
 readLedger :: IO Ledger
 readLedger = do
   inputs <- readInputs
   let comms = getComms inputs
   let etrans = getEtrans inputs
-  let ledger = Ledger comms etrans
+  let ntrans = getNtrans inputs
+  let naccs = getNaccs inputs
+  let ledger = Ledger comms etrans ntrans naccs
   return ledger
 
-ledgerTuple (Ledger comms etrans) =
-  (comms, etrans)
+ledgerTuple (Ledger comms etrans ntrans naccs) =
+  (comms, etrans, ntrans, naccs)
 
 ledgerComms :: Ledger -> [Comm]
 ledgerComms l = sel1 $ ledgerTuple l
 
 ledgerEtrans :: Ledger -> [Etran]
 ledgerEtrans l = sel2 $ ledgerTuple l
+
+ledgerNtrans :: Ledger -> [Ntran]
+ledgerNtrans l = sel3 $ ledgerTuple l
+
+ledgerNaccs :: Ledger -> [Nacc]
+ledgerNaccs l = sel4 $ ledgerTuple l
 
 createYahooFiles = do -- only where we need to download the comms
   led <- readLedger

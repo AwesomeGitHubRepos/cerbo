@@ -3,6 +3,7 @@ module Ssah.Snap  where
 import Data.Tuple.Select
 import Text.Printf
 
+--import Ssah.Ntran
 import Ssah.Ssah
 import Ssah.Utils
 import Ssah.Yahoo
@@ -57,9 +58,12 @@ snap1 comms etrans = do
 
 snapAll :: IO ()
 snapAll = do
-  let (comms, etrans) = readLedger
+  led <- readLedger
+  let comms = ledgerComms led
+  let etrans = ledgerEtrans led
   snap1 comms etrans
 
 snap = snapAll
 
+hsnap = snap
 
