@@ -109,6 +109,7 @@ commTuple (Comm sym fetch ctype unit exch gepic yepic name) =
 commSym :: Comm -> Sym
 commSym c = sel1 $ commTuple c
 
+allComms :: IO [Comm]
 allComms = do
   inputs <- readInputs -- for testing purposes
   let comms = getComms inputs
@@ -151,5 +152,50 @@ mkPrice :: [[Char]] ->Price
 mkPrice["P", dstamp, _, sym, price, _ ] =
     Price dstamp sym (asFloat price)
 
-    
 
+rox :: Float -> Comm -> Float
+rox  usd c =
+  scale
+  where
+    curr = commCurrency c
+    tbl = [ ("USD", usd), ("P", 1.0), ("GBP", 100.0), ("NIL", 1.0) ]
+    lup = lookup curr tbl
+    scale = case lup of
+      Nothing -> 666.0
+      Just q -> q
+
+fetchCommQuotes :: [Comm] ->  IO [StockQuote]
+fetchCommQuotes comms = do
+  let tickers = map yepic comms
+  usd <- fetchUsd
+  let roxs = map (rox usd) comms
+  fetchQuotesA tickers roxs
+
+data Ledger = Ledger [Comm] [Etran] deriving (Show)
+
+readLedger :: IO Ledger
+readLedger = do
+  inputs <- readInputs
+  let comms = getComms inputs
+  let etrans = getEtrans inputs
+  let ledger = Ledger comms etrans
+  return ledger
+
+ledgerTuple (Ledger comms etrans) =
+  (comms, etrans)
+
+ledgerComms :: Ledger -> [Comm]
+ledgerComms l = sel1 $ ledgerTuple l
+
+ledgerEtrans :: Ledger -> [Etran]
+ledgerEtrans l = sel2 $ ledgerTuple l
+
+createYahooFiles = do -- only where we need to download the comms
+  led <- readLedger
+  let comms = ledgerComms led
+  let hitComms = filter fetchRequired comms
+  quotes <- fetchCommQuotes hitComms
+  saveStockQuotes yfile quotes
+  ds <- dateString
+  let fname = "/home/mcarter/.ssa/yahoo/" ++ ds ++ ".txt"
+  saveStockQuotes fname quotes

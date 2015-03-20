@@ -17,16 +17,6 @@ totalQty etrans comm =
     hit e = (commSym comm) == (etranSym e)
     commEtrans = filter hit  etrans
 
-rox :: Float -> Comm -> Float
-rox  usd c =
-  scale
-  where
-    curr = commCurrency c
-    tbl = [ ("USD", usd), ("P", 1.0), ("GBP", 100.0), ("NIL", 1.0) ]
-    lup = lookup curr tbl
-    scale = case lup of
-      Nothing -> 666.0
-      Just q -> q
 
 snapFmt = "%8s %9.2f %8.2f %6.2f"
 
@@ -65,19 +55,11 @@ snap1 comms etrans = do
   putStrLn tLine
       
 
-  --return quotes
-  --print "FIXME NOW - finish this off. It's quite advanced"
-
 snapAll :: IO ()
 snapAll = do
-  inputs <- readInputs
-  let comms = getComms inputs
-  let etrans = getEtrans inputs
+  let (comms, etrans) = readLedger
   snap1 comms etrans
-  --let c1 = head comms
-  --print c1
-  --print (commCurrency (head comms))
 
 snap = snapAll
 
--- main = snap
+

@@ -10,7 +10,9 @@ import Network.HTTP
 import System.IO
 import Text.Printf
 
+--import Ssah.Ssah
 import Ssah.Utils
+
 
 --import Network.Wreq
 --import Control.Applicative
@@ -120,36 +122,33 @@ fetchQuotesA tickers roxs = do
 
 testFqa = fetchQuotesA ["HYH", "^FTAS"] [1.0, 1.0]
 
-testTickers = [ ("AML.L", 1.0), ("ULVR.L", 1.0), ("HYH", 1.0)]
+testTickers = [ ("AML.L", 1.0), ("ULVR.L", 1.0), ("HYH", 1000.0)]
 testFetches = fetchQuotes "2015-03-18" "12:59:23" testTickers
-
-
--- TODO perform Rox scaling
-
-   
 
 
 
 
 --fetchAndDecode urls = fmap (liftM decodeFetch) (fetchSyms urls)
 
-yfile = "/home/mcarter/.ssa/yahoo.csv"
+yfile = "/home/mcarter/.ssa/yahoo-cached.txt"
 
 
- -- TODO reinstate!
-fetchAndSave tickerPairs = do
-  -- TODO rox translation
-  dstamp <- dateString
-  tstamp <- timeString
-  let fname = "/home/mcarter/.ssa/yahoo/" ++ dstamp ++ ".txt"
+saveStockQuotes :: FilePath -> [StockQuote] -> IO ()
+saveStockQuotes fname quotes = do
   h <- openFile fname WriteMode
   let writeQuote quote = hPrintf h (quoteAsText quote)
-  --let  roxs = replicate (length urls) 1.0 -- TODO FIXME 1.0
-  --let pairs  = zip urls roxs
-  quotes <- fetchQuotes  dstamp tstamp tickerPairs
   mapM_ writeQuote quotes
   hFlush h
   hClose h
+
+fetchAndSave :: [(Ticker, Rox)] -> IO ()   
+fetchAndSave tickerPairs = do
+  dstamp <- dateString
+  tstamp <- timeString
+  let fname = "/home/mcarter/.ssa/yahoo/" ++ dstamp ++ ".txt"
+  quotes <- fetchQuotes  dstamp tstamp tickerPairs
+  saveStockQuotes fname quotes 
+
 
 testFas = fetchAndSave testTickers
 
