@@ -1,6 +1,7 @@
 module Ssah.Ssah where
 
 import Data.Char
+import Data.List
 --import Data.Text
 import Data.Tuple.Select
 import System.Directory
@@ -68,24 +69,32 @@ readInputs = do
   return commands
 
 
-data Etran = Etran String String String String Float Float deriving (Show)
+data Etran = Etran Dstamp String Acc Sym Qty Pennies deriving (Show)
 
 mkEtran :: [[Char]] -> Etran
 mkEtran ["etran", dstamp, way, acc, sym, qty, amount] =
-    Etran dstamp way acc sym (signed qty) (signed amount)
+    Etran dstamp way acc sym qtyF amountP
     where
         sgn1 = if way == "B" then 1.0 else -1.0
-        signed f = (asFloat f ) * sgn1
+        qtyF = (asFloat qty) * sgn1
+        amountP = enPennies (sgn1 * (asFloat amount ))
+
 
 etranTuple (Etran dstamp way acc sym qty amount) =
   (dstamp, way, acc, sym, qty, amount)
+
+etranDstamp :: Etran -> Dstamp
+etranDstamp e = sel1 $ etranTuple e
 
 etranSym :: Etran -> Sym
 etranSym e = sel4 $ etranTuple e
 
 qty :: Etran -> Qty
 qty e = sel5 $ etranTuple e
+etranQty = qty
 
+etranAmount :: Etran -> Pennies
+etranAmount e = sel6 $ etranTuple e
 
 qtys :: [Etran] -> Float
 qtys es = sum $ map qty es
@@ -93,7 +102,7 @@ qtys es = sum $ map qty es
 getEtrans = makeTypes mkEtran "etran"
 
 
-data Comm = Comm String Bool String String String String String String deriving (Show)
+data Comm = Comm Sym Bool String String String String Ticker String deriving (Show)
 
 
 mkComm :: [[Char]] -> Comm
@@ -114,6 +123,18 @@ allComms = do
   let comms = getComms inputs
   return comms
 
+findComm :: [Comm] -> Sym -> Comm
+findComm comms sym =
+  case hit of
+    Just value -> value
+    Nothing -> error ("ERR: findComm couldn't find Comm with Sym " ++ sym)
+  where
+    hit = find (\c -> sym == (commSym c)) comms
+    
+findTicker :: [Comm] -> Sym -> Ticker
+findTicker comms sym =
+  yepic $ findComm comms sym
+               
 fetchRequired :: Comm -> Bool
 fetchRequired c = sel2 $ commTuple c
 

@@ -6,6 +6,7 @@ import Data.List
 import Data.List.Split
 import Data.String.Utils
 import Data.Tuple.Select
+import GHC.Exts
 import Network.HTTP
 import System.IO
 import Text.Printf
@@ -50,9 +51,13 @@ data StockQuote = StockQuote String String String Float Float Float Float derivi
 quoteTuple (StockQuote       dstamp tstamp ticker rox   price chg   chgpc ) =
   (dstamp, tstamp, ticker, rox, price, chg, chgpc) 
 
+quoteDstamp sq = sel1 $ quoteTuple sq
+
+quoteTicker sq = sel3 $ quoteTuple sq
+
 --quotePrice :: StockQuote -> Price
-quotePrice sq = sel3 $ quoteTuple sq
-quoteSym   sq = sel1 $ quoteTuple sq
+quotePrice sq = sel5 $ quoteTuple sq
+--quoteSym   sq = sel1 $ quoteTuple sq
 
 str4 :: Float -> String -- TODO promote to Utils
 str4 f = printf "%9.4f" f
@@ -158,3 +163,14 @@ loadSaves = do
   let ls = (liftM lines) txt
   fmap (liftM decodeFetch) ls
 
+getStockQuote :: Dstamp -> Ticker -> [StockQuote] -> Float
+getStockQuote dstamp ticker sqs =
+  quotePrice sqLast
+  where
+    f sq = ticker == (quoteTicker sq) && (quoteDstamp sq) <= dstamp
+    matches = filter f sqs
+    sortedMatches = sortWith quoteDstamp matches 
+    sqLast = last sortedMatches
+
+testGsq = do -- test getStockQuote
+  print "FIXME NOW"
