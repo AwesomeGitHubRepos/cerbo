@@ -5,5 +5,5 @@ module Main where
 --main :: IO ()
 --main = MySnap.snap
 
-import Ssah.Snap (snapAll)
-main = snapAll
+import Ssah.Snap (snap1)
+main = snap1

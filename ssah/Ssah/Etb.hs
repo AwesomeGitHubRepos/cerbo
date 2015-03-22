@@ -44,7 +44,7 @@ createEtb  = do
         Ntran dstamp cr dr (negPennies pennies) clear desc
   let ntrans2 = map opp ntrans1
   let ntrans = ntrans1 ++ ntrans2
-  let naccNtrans = combineKeysStrict naccAcc ntranDr naccs ntrans
+  let naccNtrans = strictlyCombineKeys naccAcc ntranDr naccs ntrans
   let blocks = map2 showEtbAcc naccs naccNtrans
   putStrLn (unlines blocks)
   print "FIXME NOW"

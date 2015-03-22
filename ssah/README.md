@@ -1,4 +1,4 @@
-To run interpretter:
+To run interpreter:
 
 cabal repl
 :l moan
@@ -9,6 +9,4 @@ cabal repl
 To rebuild the modules:
 cabal build
 
-TODO Finish off snap
-:l Ssah/Snap
-snapAll
+Generate documentation: cabal haddock

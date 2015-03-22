@@ -146,12 +146,36 @@ commCurrency c = sel4 $ commTuple c
 yepic :: Comm -> String
 yepic c = sel7 $ commTuple c
 
+commTicker = yepic
 
 getComms inputs = makeTypes mkComm "comm" inputs
 
 
 yepics comms = map yepic $ filter fetchRequired comms
 
+precacheCommsUsing :: [Comm] -> IO [StockQuote]
+precacheCommsUsing comms = do
+  quotes <- fetchCommQuotes comms -- will be filtered automatically
+  saveStockQuotes "/home/mcarter/.ssa/yahoo-cached.txt" quotes
+  ds <- dateString
+  let fname = "/home/mcarter/.ssa/yahoo/" ++ ds ++ ".txt"
+  saveStockQuotes fname quotes
+  return quotes
+ 
+-- | Download the Comms that apparently require fetching, and store to disk
+precacheComms = do
+  inputs <- readInputs
+  let comms = makeTypes mkComm "comm" inputs
+  cache <- precacheCommsUsing comms
+  --print cache
+  return cache
+
+loadPrecachedComms = do
+  contents <- readFile "/home/mcarter/.ssa/yahoo-cached.txt"
+  let commands = map foldLine (lines contents)
+  let quotes = getQuotes commands
+  return quotes
+  
 {-
 -- attempt to get around Jupyter crashing when using networking
 makeYahooCsv = do
@@ -184,11 +208,13 @@ rox  usd c =
       Nothing -> 666.0
       Just q -> q
 
+-- | Fetch StockQuotes of Comm for which a fetch is required
 fetchCommQuotes :: [Comm] ->  IO [StockQuote]
 fetchCommQuotes comms = do
-  let tickers = map yepic comms
+  let hitComms = filter fetchRequired comms
+  let tickers = map yepic hitComms
   usd <- fetchUsd
-  let roxs = map (rox usd) comms
+  let roxs = map (rox usd) hitComms
   fetchQuotesA tickers roxs
 
 data Ledger = Ledger [Comm] [Etran] [Ntran] [Nacc] deriving (Show)
@@ -218,6 +244,7 @@ ledgerNtrans l = sel3 $ ledgerTuple l
 ledgerNaccs :: Ledger -> [Nacc]
 ledgerNaccs l = sel4 $ ledgerTuple l
 
+{-
 createYahooFiles = do -- only where we need to download the comms
   led <- readLedger
   let comms = ledgerComms led
@@ -227,3 +254,4 @@ createYahooFiles = do -- only where we need to download the comms
   ds <- dateString
   let fname = "/home/mcarter/.ssa/yahoo/" ++ ds ++ ".txt"
   saveStockQuotes fname quotes
+-}

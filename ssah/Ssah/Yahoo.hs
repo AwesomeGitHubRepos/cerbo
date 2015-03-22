@@ -51,6 +51,13 @@ data StockQuote = StockQuote String String String Float Float Float Float derivi
 quoteTuple (StockQuote       dstamp tstamp ticker rox   price chg   chgpc ) =
   (dstamp, tstamp, ticker, rox, price, chg, chgpc) 
 
+
+mkQuote :: [String] -> StockQuote
+mkQuote ["yahoo", dstamp, tstamp, ticker, rox, price, chg, chgpc, "P"] =
+  StockQuote dstamp tstamp ticker (asFloat rox) (asFloat price) (asFloat chg) (asFloat chgpc)
+
+getQuotes = makeTypes mkQuote "yahoo"
+
 quoteDstamp sq = sel1 $ quoteTuple sq
 
 quoteTicker sq = sel3 $ quoteTuple sq
@@ -58,6 +65,9 @@ quoteTicker sq = sel3 $ quoteTuple sq
 --quotePrice :: StockQuote -> Price
 quotePrice sq = sel5 $ quoteTuple sq
 --quoteSym   sq = sel1 $ quoteTuple sq
+
+quoteChg sq = sel6 $ quoteTuple sq
+quoteChgPc sq = sel7 $ quoteTuple sq
 
 str4 :: Float -> String -- TODO promote to Utils
 str4 f = printf "%9.4f" f
@@ -163,6 +173,7 @@ loadSaves = do
   let ls = (liftM lines) txt
   fmap (liftM decodeFetch) ls
 
+-- | Return the a price for Ticker on or before Dstamp
 getStockQuote :: Dstamp -> Ticker -> [StockQuote] -> Float
 getStockQuote dstamp ticker sqs =
   quotePrice sqLast

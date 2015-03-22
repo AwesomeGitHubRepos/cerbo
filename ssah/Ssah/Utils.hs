@@ -20,7 +20,7 @@ unPennies :: Pennies -> Float
 unPennies (Pennies p) = (fromIntegral p) / 100.0
 
 instance Show Pennies where
-  show (Pennies p) = printf "%12.4f" p -- FIXME probable small rounding problems
+  show (Pennies p) = printf "%12.2f" (unPennies (Pennies p)) -- FIXME probable small rounding problems
 
 --(-) :: Pennies -> Pennies
 negPennies :: Pennies -> Pennies -- unary negate pennies
