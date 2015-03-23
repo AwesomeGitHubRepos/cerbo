@@ -8,6 +8,8 @@ import System.Directory
 --import System.FilePath.Glob
 import System.Path.Glob
 
+import Ssah.Comm
+import Ssah.Etran
 import Ssah.Nacc
 import Ssah.Ntran
 import Ssah.Yahoo
@@ -62,96 +64,20 @@ foldLine str = foldLine' [] str
 
 
 readInputs = do
-  files <- glob "/home/mcarter/redact/docs/accts2014/data/*.txt"
+  files1 <- glob "/home/mcarter/redact/docs/accts2014/data/*.txt"
+  files2 <- glob "/home/mcarter/.ssa/yahoo/*.txt"
+  let files = files1 ++ files2
   contents <- mapM readFile files
   let allLines = filterInputs contents
   let commands = map foldLine allLines
   return commands
 
 
-data Etran = Etran Dstamp String Acc Sym Qty Pennies deriving (Show)
-
-mkEtran :: [[Char]] -> Etran
-mkEtran ["etran", dstamp, way, acc, sym, qty, amount] =
-    Etran dstamp way acc sym qtyF amountP
-    where
-        sgn1 = if way == "B" then 1.0 else -1.0
-        qtyF = (asFloat qty) * sgn1
-        amountP = enPennies (sgn1 * (asFloat amount ))
 
 
-etranTuple (Etran dstamp way acc sym qty amount) =
-  (dstamp, way, acc, sym, qty, amount)
-
-etranDstamp :: Etran -> Dstamp
-etranDstamp e = sel1 $ etranTuple e
-
-etranSym :: Etran -> Sym
-etranSym e = sel4 $ etranTuple e
-
-qty :: Etran -> Qty
-qty e = sel5 $ etranTuple e
-etranQty = qty
-
-etranAmount :: Etran -> Pennies
-etranAmount e = sel6 $ etranTuple e
-
-qtys :: [Etran] -> Float
-qtys es = sum $ map qty es
-
-getEtrans = makeTypes mkEtran "etran"
 
 
-data Comm = Comm Sym Bool String String String String Ticker String deriving (Show)
 
-
-mkComm :: [[Char]] -> Comm
-mkComm ["comm", sym, fetch, ctype, unit, exch, gepic, yepic, name] = 
-    Comm sym bfetch ctype unit exch gepic yepic name
-    where bfetch = (fetch == "W")
-
-
-commTuple (Comm sym fetch ctype unit exch gepic yepic name) =
-  (sym, fetch, ctype, unit, exch, gepic, yepic, name)
-
-commSym :: Comm -> Sym
-commSym c = sel1 $ commTuple c
-
-allComms :: IO [Comm]
-allComms = do
-  inputs <- readInputs -- for testing purposes
-  let comms = getComms inputs
-  return comms
-
-findComm :: [Comm] -> Sym -> Comm
-findComm comms sym =
-  case hit of
-    Just value -> value
-    Nothing -> error ("ERR: findComm couldn't find Comm with Sym " ++ sym)
-  where
-    hit = find (\c -> sym == (commSym c)) comms
-    
-findTicker :: [Comm] -> Sym -> Ticker
-findTicker comms sym =
-  yepic $ findComm comms sym
-               
-fetchRequired :: Comm -> Bool
-fetchRequired c = sel2 $ commTuple c
-
-commType c = sel3 $ commTuple c
-
-commCurrency :: Comm -> String
-commCurrency c = sel4 $ commTuple c
-
-yepic :: Comm -> String
-yepic c = sel7 $ commTuple c
-
-commTicker = yepic
-
-getComms inputs = makeTypes mkComm "comm" inputs
-
-
-yepics comms = map yepic $ filter fetchRequired comms
 
 precacheCommsUsing :: [Comm] -> IO [StockQuote]
 precacheCommsUsing comms = do
@@ -217,7 +143,13 @@ fetchCommQuotes comms = do
   let roxs = map (rox usd) hitComms
   fetchQuotesA tickers roxs
 
-data Ledger = Ledger [Comm] [Etran] [Ntran] [Nacc] deriving (Show)
+mkPeriod :: [[Char]] -> Period
+mkPeriod ["period", start, end] =
+  (start, end)
+  
+getPeriods inputs = makeTypes mkPeriod "period" inputs
+
+data Ledger = Ledger [Comm] [Etran] [Ntran] [Nacc] Period [StockQuote] deriving (Show)
 
 readLedger :: IO Ledger
 readLedger = do
@@ -226,11 +158,22 @@ readLedger = do
   let etrans = getEtrans inputs
   let ntrans = getNtrans inputs
   let naccs = getNaccs inputs
-  let ledger = Ledger comms etrans ntrans naccs
+  let period = last $ getPeriods inputs
+  let yahoos = getQuotes inputs
+  let googles = getGoogles inputs
+  let quotes = yahoos ++ googles
+  --      let period = last periods
+  let ledger = Ledger comms etrans ntrans naccs period quotes
+  --printAll quotes
   return ledger
 
-ledgerTuple (Ledger comms etrans ntrans naccs) =
-  (comms, etrans, ntrans, naccs)
+printQuotes = do
+  inputs <- readInputs
+  let quotes =  getQuotes inputs
+  printAll quotes
+
+ledgerTuple (Ledger comms etrans ntrans naccs period quotes) =
+  (comms, etrans, ntrans, naccs, period, quotes)
 
 ledgerComms :: Ledger -> [Comm]
 ledgerComms l = sel1 $ ledgerTuple l
@@ -244,14 +187,15 @@ ledgerNtrans l = sel3 $ ledgerTuple l
 ledgerNaccs :: Ledger -> [Nacc]
 ledgerNaccs l = sel4 $ ledgerTuple l
 
-{-
-createYahooFiles = do -- only where we need to download the comms
-  led <- readLedger
-  let comms = ledgerComms led
-  let hitComms = filter fetchRequired comms
-  quotes <- fetchCommQuotes hitComms
-  saveStockQuotes yfile quotes
-  ds <- dateString
-  let fname = "/home/mcarter/.ssa/yahoo/" ++ ds ++ ".txt"
-  saveStockQuotes fname quotes
--}
+ledgerPeriod :: Ledger -> Period
+ledgerPeriod l = sel5 $ ledgerTuple l
+
+ledgerQuotes :: Ledger -> [StockQuote]
+ledgerQuotes l = sel6 $ ledgerTuple l
+  
+allComms :: IO [Comm]
+allComms = do
+  inputs <- readInputs -- for testing purposes
+  let comms = getComms inputs
+  return comms
+  

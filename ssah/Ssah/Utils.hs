@@ -5,8 +5,10 @@ import System.Locale (defaultTimeLocale)
 import Text.Printf
 
 type Acc = String
+type Desc = String -- description
 type Dstamp = String
---type Pennies = Int
+type Folio = String
+type Period = (Dstamp, Dstamp)
 type Qty = Float
 type Rox = Float
 type Sym = String
@@ -22,13 +24,34 @@ unPennies (Pennies p) = (fromIntegral p) / 100.0
 instance Show Pennies where
   show (Pennies p) = printf "%12.2f" (unPennies (Pennies p)) -- FIXME probable small rounding problems
 
+infixl 6 |+|
+Pennies a |+| Pennies b = Pennies (a+b)
+
+infixl 6 |-|
+Pennies a |-| Pennies b = Pennies (a-b)
+  
 --(-) :: Pennies -> Pennies
 negPennies :: Pennies -> Pennies -- unary negate pennies
-negPennies p =
-  Pennies (negp p)
+negPennies p = (Pennies 0) |-| p
+{-  Pennies (negp p)
   where
     negp (Pennies posp ) = -posp
+-}
 
+cumPennies :: [Pennies] -> [Pennies]
+--cumPennies (p:[]) = p
+--cumPennies (p:ps) = p: |+| (cumPennies ps)
+cumPennies ps =
+  fst resultTuple
+  where
+    f (pennies, tot)  p =
+      (pennies ++ [newTot],  newTot)
+      where
+        newTot = tot |+| p
+    resultTuple = foldl f ([], Pennies 0) ps
+      
+testCumPennies = cumPennies [Pennies 3, Pennies 4, Pennies 5]
+  
 
 matchHeads str = filter (\x -> head x == str)
 
@@ -68,3 +91,5 @@ map2 f list1 list2 =
 
 
 testMap2 = map2 (+) [10, 11] [12, 13]
+
+putAll alist =  mapM_ putStr alist

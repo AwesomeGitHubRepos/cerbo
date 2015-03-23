@@ -183,5 +183,25 @@ getStockQuote dstamp ticker sqs =
     sortedMatches = sortWith quoteDstamp matches 
     sqLast = last sortedMatches
 
-testGsq = do -- test getStockQuote
-  print "FIXME NOW"
+
+mkGoogle :: [String] -> StockQuote
+mkGoogle ["P", dstamp, tstamp, sym, priceStr, unit] =
+  StockQuote dstamp tstamp ticker 1.0 priceF 0.0 0.0
+  where
+    priceRaw = (asFloat priceStr)
+    rox1 = 1.0
+    (ticker, scale) = case sym of
+      "FTAS"  -> ("^FTAS", 1.0)
+      "FTSE"  -> ("^FTSE", 1.0)
+      "AUG"   -> ("AUG?", rox1)
+      "AUS"   -> ("AUS?", rox1)
+      "AFUSO" -> ("AFUSO?", rox1)
+      "FGF"   -> ("GB0003860789.L", rox1)
+      "FGSS"  -> ("GB00B196XG23.L", rox1)
+      "FSS"   -> ("GB0003875100.L", rox1)
+      s       -> (s ++ ".L", 1.0)
+    priceF = priceRaw * scale
+      
+getGoogles = makeTypes mkGoogle "P"
+
+
