@@ -13,7 +13,7 @@ import Ssah.Utils
 data Post = Post Dstamp Acc Acc Pennies Desc deriving (Show)
 
 postTuple (Post dstamp dr cr pennies desc) =
-  (dstamp, dr, dr, pennies, desc)
+  (dstamp, dr, cr, pennies, desc)
 
 
 postDstamp p = sel1 $ postTuple p
@@ -27,18 +27,18 @@ postingsFromNtran ntran =
   where
     (dstamp, dr, cr, pennies, _, desc) = ntranTuple ntran
     n1 = Post dstamp dr cr pennies desc
-    n2 = Post dstamp cr dr (negPennies pennies) desc
+    n2 = Post dstamp cr dr (negp pennies) desc
     
-postingsFromNtrans ntrans = concatMap postingsFromNtran ntrans
+postingsFromNtrans  = concatMap postingsFromNtran 
   
 postingsFromEtran etran =
   [n1, n2, n3, n4]
   where
     odstamp = etranOdstamp etran
     sym = etranSym etran
-    n1 = Post odstamp "opn" "pga" (etranStartValue etran) sym
-    n2 = Post odstamp (etranFolio etran) "pga" (etranFlow etran) sym
-    n3 = Post odstamp "pga" "prt" (negPennies (etranProfit etran)) sym
+    n1 = Post odstamp "opn" "pga" (negp $ etranStartValue etran) sym
+    n2 = Post odstamp (etranFolio etran) "pga" (negp $ etranFlow etran) sym
+    n3 = Post odstamp "pga" "pga" (negp $ etranProfit etran) sym -- FIXME - how can they be the same account ??
     n4 = Post odstamp "prt" "pga" (etranEndValue etran) sym
 
 postingsFromEtrans etrans =
@@ -50,12 +50,13 @@ testPostings = do -- won't work because it doesn't do any derivations
   let posts = postingsFromEtrans etrans
   printAll posts
 
-createPostings :: [Ntran] -> [Etran] -> [Post]
-createPostings ntrans etrans =
+--createPostings :: [Ntran] -> [Etran] -> [Post]
+createPostings start comms ntrans etrans =
   postings
   where
     ntranPostings = postingsFromNtrans ntrans
-    etranPostings = postingsFromEtrans etrans
+    derivedEtrans = deriveEtrans start comms etrans
+    etranPostings = postingsFromEtrans derivedEtrans
     unsortedPostings = ntranPostings ++ etranPostings
     postings = sortBy (comparing $ postDstamp) unsortedPostings
     
@@ -63,4 +64,4 @@ createPostings ntrans etrans =
 --showPost :: Post -> String
 showPost p =
   let (dstamp, dr, cr, pennies, desc) = postTuple p in
-  printf "%s %4.4s %20.20s %s" dstamp dr desc (show pennies) 
+  printf "%s %4.4s %4.4s %20.20s %s" dstamp dr cr desc (show pennies) 

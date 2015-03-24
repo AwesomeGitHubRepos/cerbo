@@ -174,14 +174,16 @@ loadSaves = do
   fmap (liftM decodeFetch) ls
 
 -- | Return the a price for Ticker on or before Dstamp
-getStockQuote :: Dstamp -> Ticker -> [StockQuote] -> Float
+getStockQuote :: Dstamp -> Ticker -> [StockQuote] -> Maybe Float
 getStockQuote dstamp ticker sqs =
-  quotePrice sqLast
+  sqLast
   where
     f sq = ticker == (quoteTicker sq) && (quoteDstamp sq) <= dstamp
     matches = filter f sqs
-    sortedMatches = sortWith quoteDstamp matches 
-    sqLast = last sortedMatches
+    sortedMatches = sortWith quoteDstamp matches
+    sq [] = Nothing
+    sq xs = Just $ quotePrice $ last xs
+    sqLast = sq sortedMatches
 
 
 mkGoogle :: [String] -> StockQuote
@@ -199,6 +201,10 @@ mkGoogle ["P", dstamp, tstamp, sym, priceStr, unit] =
       "FGF"   -> ("GB0003860789.L", rox1)
       "FGSS"  -> ("GB00B196XG23.L", rox1)
       "FSS"   -> ("GB0003875100.L", rox1)
+      "CRC"   -> ("CRC", rox1)
+      "HYH"   -> ("HYH", rox1)
+      "KEYS"  -> ("KEYS", rox1)
+      "SHOS"  -> ("SHOS", rox1)
       s       -> (s ++ ".L", 1.0)
     priceF = priceRaw * scale
       

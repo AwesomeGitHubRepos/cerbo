@@ -5,10 +5,12 @@ import Data.List
 import Data.Maybe
 import Data.Ord
 import GHC.Exts
+import System.IO
 import Text.Printf
 
 import Ssah.Aggregate
---import Ssah.Flow -- FIXME Schedule module for destruction
+import Ssah.Comm
+import Ssah.Flow 
 import Ssah.Nacc
 import Ssah.Ntran
 import Ssah.Post
@@ -16,7 +18,7 @@ import Ssah.Ssah
 import Ssah.Utils
 import Ssah.Yahoo
 
-
+{-
 showEtbAcc :: Nacc -> [Ntran] -> Maybe (String, Nacc, Pennies)
 showEtbAcc nacc ntrans =
   if (length ntrans > 0) then Just (unlines lines, nacc, last runningTotal) else Nothing
@@ -25,11 +27,13 @@ showEtbAcc nacc ntrans =
     pennies = map ntranP sortedNtrans
     runningTotal = cumPennies pennies
     display ntran tot =
-      printf "%s %4s %-25.25s %s %s" dstamp cr desc (show pennies) (show tot)
+      printf "%s %4s %-25.25s %s %s" dstamp dr desc (show pennies) (show tot)
       where (dstamp, dr, cr, pennies, clear, desc) = ntranTuple ntran
 
     ntranLines = map2 display sortedNtrans runningTotal
     lines = [show nacc ] ++ ntranLines ++ ["\n\n"]
+
+-}
 
 {-
 etbLine :: Nacc -> Pennies -> String
@@ -61,20 +65,35 @@ printEtbAcc naccs posts =
 --createEtb :: Ledger
 createEtb  = do
   ledger <- readLedger
-  let naccs  = ledgerNaccs ledger
-  let ntrans = ledgerNtrans ledger
-  let (start, end) = ledgerPeriod ledger
-  let posts = postingsFromNtrans ntrans
+  let (comms, etrans, ntrans, naccs, period, quotes) = ledgerTuple ledger
+  let (start, end) = period
+  let derivedQuotes = synthSQuotes comms etrans
+  let allQuotes = quotes ++ derivedQuotes
+  let derivedComms = deriveComms start end allQuotes comms
+  let posts = createPostings start derivedComms ntrans etrans
   let reordPosts = sortBy (comparing $ postDr) posts
   let grps = groupBy ((==) `on`  postDr) reordPosts
   let pea = printEtbAcc naccs
-  putAll (map pea grps)
+  let detailOutput = concatMap pea grps
 
-  
-  --printAll posts
-  --let flows = genFlows ledger
+
+  -- now create etb
+  let pennies = map (map postPennies) grps
+  let pennyTots = map countPennies pennies
+  --let theNacc grp = find (postDr $ head grp
+  let summaryLine grp tot = (show $ head grp) ++ (show tot)
+  let summaryLines = map2 summaryLine grps pennyTots
+  let etbOut = unlines summaryLines
+
+  let output = detailOutput ++ "\n\n" ++ etbOut
+  writeFile "/home/mcarter/.ssa/hssa-etb.txt" output
+  putStrLn output
+
   -- FIXME ignore transactions after period end
-  --let flows = generateFlows ledger
+
+
+
+--let flows = generateFlows ledger
       {-
   let remap (Ntran dstamp dr cr pennies clear desc) =
         (n1, n2)

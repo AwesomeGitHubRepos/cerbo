@@ -61,3 +61,20 @@ qtys :: [Etran] -> Float
 qtys es = sum $ map qty es
 
 getEtrans = makeTypes mkEtran "etran"
+
+-- | See data.c line 495
+deriveEtran start comms etran =
+  Etran  dstamp way acc sym qty amount derived
+  where
+    (dstamp, way, acc, sym, qty, amount, _) = etranTuple etran
+    comm = findComm comms sym -- FIXME I think etran should already have Comm(?)
+    value f =
+      let p = fromMaybe 0.0 (f comm) in  enPennies (0.01 * qty * p)
+    (odstamp, flow, startValue) =
+      if dstamp < start then (start, Pennies 0, value commStartPrice)
+      else (dstamp, amount, Pennies 0)   
+    endValue = value commEndPrice
+    profit = endValue |-| startValue |-| flow
+    derived = Just (EtranDerived odstamp startValue flow profit endValue comm)
+
+deriveEtrans start comms etrans = map (deriveEtran start comms) etrans

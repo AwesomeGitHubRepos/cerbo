@@ -29,7 +29,11 @@ Pennies a |+| Pennies b = Pennies (a+b)
 
 infixl 6 |-|
 Pennies a |-| Pennies b = Pennies (a-b)
-  
+
+{-
+infixl 7 0-|
+(0-|) Pennies a = Pennies (-a)
+  -}
 --(-) :: Pennies -> Pennies
 negPennies :: Pennies -> Pennies -- unary negate pennies
 negPennies p = (Pennies 0) |-| p
@@ -38,6 +42,8 @@ negPennies p = (Pennies 0) |-| p
     negp (Pennies posp ) = -posp
 -}
 
+negp = negPennies
+    
 cumPennies :: [Pennies] -> [Pennies]
 --cumPennies (p:[]) = p
 --cumPennies (p:ps) = p: |+| (cumPennies ps)
@@ -52,7 +58,12 @@ cumPennies ps =
       
 testCumPennies = cumPennies [Pennies 3, Pennies 4, Pennies 5]
   
+countPennies :: [Pennies] -> Pennies
+countPennies (p:[]) = p
+countPennies (p:ps) = p |+| (countPennies ps)
 
+testCountPennies = countPennies [(Pennies 3), (Pennies 4)]
+  
 matchHeads str = filter (\x -> head x == str)
 
 makeTypes maker match  inputs = map maker $ matchHeads match inputs

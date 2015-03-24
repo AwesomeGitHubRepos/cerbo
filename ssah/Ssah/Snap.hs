@@ -9,6 +9,8 @@ import Text.Printf
 
 --import Ssah.Ntran
 import Ssah.Aggregate
+import Ssah.Comm
+import Ssah.Etran
 import Ssah.Ssah
 import Ssah.Utils
 import Ssah.Yahoo

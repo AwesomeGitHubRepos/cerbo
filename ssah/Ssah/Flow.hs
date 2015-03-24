@@ -3,15 +3,18 @@ module Ssah.Flow where
 import Data.Maybe
 import Text.Printf
 
+import Ssah.Comm
+import Ssah.Etran
 import Ssah.Ntran
 import Ssah.Ssah
 import Ssah.Utils
 import Ssah.Yahoo
 
-
+{-
 data Flow = Flow String Acc Ticker Pennies Pennies Pennies Pennies Pennies Pennies
 flowTuple (Flow folio sym ticker costBefore profitBefore valueStart flowDuring profitDuring valueTo)
   = (folio, sym, ticker, costBefore, profitBefore, valueStart, flowDuring, profitDuring, valueTo)
+-}
 
 etranToSQuote :: [Comm] -> Etran -> StockQuote
 etranToSQuote comms e =
@@ -34,7 +37,7 @@ testSynth = do
   let sqs = synthSQuotes comms etrans
   printAll sqs
 
-
+{-
 genTrip :: Dstamp -> Dstamp -> [Comm] -> [StockQuote] -> Etran -> (Maybe Ntran, Maybe Ntran, Maybe Ntran)
 genTrip start end  comms quotes etran =
   (Just n1,  n2, Just n3)
@@ -112,3 +115,4 @@ testFlows = do -- FIXME NOW
   --let oner = "FIXME NOW"
   --putStrLn oner
   printAll valids
+-}

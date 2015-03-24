@@ -66,7 +66,8 @@ foldLine str = foldLine' [] str
 readInputs = do
   files1 <- glob "/home/mcarter/redact/docs/accts2014/data/*.txt"
   files2 <- glob "/home/mcarter/.ssa/yahoo/*.txt"
-  let files = files1 ++ files2
+  files3 <- glob "/home/mcarter/.ssa/gofi/*.txt"
+  let files = files1 ++ files2 ++ files3
   contents <- mapM readFile files
   let allLines = filterInputs contents
   let commands = map foldLine allLines
@@ -169,8 +170,10 @@ readLedger = do
 
 printQuotes = do
   inputs <- readInputs
-  let quotes =  getQuotes inputs
-  printAll quotes
+  let quotesYahoo =  getQuotes inputs
+  printAll quotesYahoo
+  let quotesGoogle = getGoogles inputs
+  printAll quotesGoogle
 
 ledgerTuple (Ledger comms etrans ntrans naccs period quotes) =
   (comms, etrans, ntrans, naccs, period, quotes)
@@ -199,3 +202,9 @@ allComms = do
   let comms = getComms inputs
   return comms
   
+withLedger f = do
+  inputs <- readInputs
+  let result = f inputs
+  printAll result
+
+ntrans = withLedger getNtrans
