@@ -35,11 +35,15 @@ postingsFromEtran etran =
   [n1, n2, n3, n4]
   where
     odstamp = etranOdstamp etran
+    folio = etranFolio etran
     sym = etranSym etran
-    n1 = Post odstamp "opn" "pga" (negp $ etranStartValue etran) sym
-    n2 = Post odstamp (etranFolio etran) "pga" (negp $ etranFlow etran) sym
-    n3 = Post odstamp "pga" "pga" (negp $ etranProfit etran) sym -- FIXME - how can they be the same account ??
-    n4 = Post odstamp "prt" "pga" (etranEndValue etran) sym
+    opn = folio ++ "/b" --"opn"
+    pga = folio ++ "/g" --"pga"
+    prt = folio ++ "/c" --"prt"
+    n1 = Post odstamp opn pga (negp $ etranStartValue etran) sym
+    n2 = Post odstamp (etranFolio etran) pga (negp $ etranFlow etran) sym
+    n3 = Post odstamp pga pga (negp $ etranProfit etran) sym -- FIXME - how can they be the same account ??
+    n4 = Post odstamp prt pga (etranEndValue etran) sym
 
 postingsFromEtrans etrans =
   concatMap postingsFromEtran etrans

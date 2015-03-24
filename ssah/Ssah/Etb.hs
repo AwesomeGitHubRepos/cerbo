@@ -4,6 +4,7 @@ import Data.Function (on)
 import Data.List
 import Data.Maybe
 import Data.Ord
+import Data.String.Utils
 import GHC.Exts
 import System.IO
 import Text.Printf
@@ -18,32 +19,24 @@ import Ssah.Ssah
 import Ssah.Utils
 import Ssah.Yahoo
 
-{-
-showEtbAcc :: Nacc -> [Ntran] -> Maybe (String, Nacc, Pennies)
-showEtbAcc nacc ntrans =
-  if (length ntrans > 0) then Just (unlines lines, nacc, last runningTotal) else Nothing
+makeEtbField totalTab nacc =
+  unspaced
   where
-    sortedNtrans = sortBy (comparing  ntranDstamp) ntrans
-    pennies = map ntranP sortedNtrans
-    runningTotal = cumPennies pennies
-    display ntran tot =
-      printf "%s %4s %-25.25s %s %s" dstamp dr desc (show pennies) (show tot)
-      where (dstamp, dr, cr, pennies, clear, desc) = ntranTuple ntran
+    sym = naccAcc nacc
+    entry = lookup sym  totalTab
+    total = fromMaybe (Pennies 0) entry
+    pounds = unPennies total
+    p = round $ pounds * 100
+    text1 = sym ++ "!" ++ (show p) ++ "!" ++ (show total)
+    unspaced = replace " " "" text1
+  
+makeEtbFields totalTab naccs = unlines $ map (makeEtbField totalTab) naccs
 
-    ntranLines = map2 display sortedNtrans runningTotal
-    lines = [show nacc ] ++ ntranLines ++ ["\n\n"]
+storeEtb totalTab naccs = do
+  let text = makeEtbFields totalTab naccs
+  writeFile "/home/mcarter/.ssa/hssa-etb.txt" text
 
--}
-
-{-
-etbLine :: Nacc -> Pennies -> String
-etbLine nacc total =
-  printf "%4s %20.20s %s" acc desc totalStr
-  where
-    acc = (naccAcc nacc)::String
-    desc = (naccDesc nacc)::String
-    totalStr = (show total)::String
--}
+  
 
 etbLine :: Post -> Pennies -> String
 etbLine post runningTotal = (showPost post) ++ (show runningTotal)
@@ -52,7 +45,9 @@ printEtbAcc naccs posts =
   text
   where
     dr = postDr $ head posts
-    nacc = fromJust $ find (\n -> dr == (naccAcc n)) naccs
+    nacc = case find (\n -> dr == (naccAcc n)) naccs of
+      Just n -> n
+      Nothing -> error ("Couldn't locate account:" ++ dr)
     runningTotals = cumPennies $ map postPennies posts
     hdr = (showNacc nacc) ++ "\n"
     body = map2 etbLine posts runningTotals    
@@ -61,7 +56,7 @@ printEtbAcc naccs posts =
   --print nacc
 
 
-  
+-- FIXME ignore transactions after period end  
 --createEtb :: Ledger
 createEtb  = do
   ledger <- readLedger
@@ -72,12 +67,23 @@ createEtb  = do
   let derivedComms = deriveComms start end allQuotes comms
   let posts = createPostings start derivedComms ntrans etrans
   let reordPosts = sortBy (comparing $ postDr) posts
+      
   let grps = groupBy ((==) `on`  postDr) reordPosts
+  let tabulateGroup grp =
+        (acc, bal)
+        where
+          acc = postDr $ head grp
+          pennies = map postPennies grp
+          bal = countPennies pennies
+        
+        
+  let etbTab = map tabulateGroup grps
+      
   let pea = printEtbAcc naccs
   let detailOutput = concatMap pea grps
 
 
-  -- now create etb
+  -- now create etb -- FIXME would be improved by using etbTab, which has already processed a lot
   let pennies = map (map postPennies) grps
   let pennyTots = map countPennies pennies
   --let theNacc grp = find (postDr $ head grp
@@ -89,32 +95,10 @@ createEtb  = do
   writeFile "/home/mcarter/.ssa/hssa-etb.txt" output
   putStrLn output
 
-  -- FIXME ignore transactions after period end
-
-
-
---let flows = generateFlows ledger
-      {-
-  let remap (Ntran dstamp dr cr pennies clear desc) =
-        (n1, n2)
-        where
-          (drA, crA) = if dstamp < start then (alt dr naccs, alt cr naccs) else (dr, cr)
-          n1 = Ntran dstamp drA crA pennies clear desc
-          n2 = Ntran dstamp crA drA (negPennies pennies) clear desc
-  let (ntrans1, ntrans2) = unzip $ map remap (ntrans ++ flows)
-  let ntrans3 = ntrans1 ++ ntrans2
-  let naccNtrans = strictlyCombineKeys naccAcc ntranDr naccs ntrans3
-  let maybeAccts = map2 showEtbAcc naccs naccNtrans
-  let accts = mapMaybe id maybeAccts
-  let (blocks, properNaccs, balances) = unzip3 accts
-  putStrLn (unlines blocks)
-  -- putStrLn (unlines (map prettyFlow flows))
-
-
-  
-  let etb = map2 etbLine properNaccs balances
-  printAll etb
-  print "FIXME NOW"
--}
+  storeEtb etbTab naccs
+  --print $ head grps
+  --printAll etbTab
+  --print posts
+  putStrLn "Finished"
       
 mainEtb = createEtb
