@@ -11,6 +11,7 @@ import Text.Printf
 
 import Ssah.Aggregate
 import Ssah.Comm
+import Ssah.Financial
 import Ssah.Flow 
 import Ssah.Nacc
 import Ssah.Ntran
@@ -60,13 +61,14 @@ printEtbAcc naccs posts =
 --createEtb :: Ledger
 createEtb  = do
   ledger <- readLedger
-  let (comms, etrans, ntrans, naccs, period, quotes) = ledgerTuple ledger
+  let (comms, etrans, financials, ntrans, naccs, period, quotes) = ledgerTuple ledger
   let (start, end) = period
   let derivedQuotes = synthSQuotes comms etrans
   let allQuotes = quotes ++ derivedQuotes
   let derivedComms = deriveComms start end allQuotes comms
   let posts = createPostings start derivedComms ntrans etrans
   let reordPosts = sortBy (comparing $ postDr) posts
+
       
   let grps = groupBy ((==) `on`  postDr) reordPosts
   let tabulateGroup grp =
@@ -99,6 +101,11 @@ createEtb  = do
   --print $ head grps
   --printAll etbTab
   --print posts
+  print "Financials"
+  let fins = createFinances financials
+  printAll fins
+  --printAll pennyTots
+  printAll etbTab -- need to pass this into createFinances
   putStrLn "Finished"
       
 mainEtb = createEtb

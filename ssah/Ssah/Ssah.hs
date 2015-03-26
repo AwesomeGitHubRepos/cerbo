@@ -10,6 +10,7 @@ import System.Path.Glob
 
 import Ssah.Comm
 import Ssah.Etran
+import Ssah.Financial
 import Ssah.Nacc
 import Ssah.Ntran
 import Ssah.Yahoo
@@ -30,7 +31,7 @@ filterInputs inputs =
 
 
 
-
+-- FIXME I don't think the parser handles "" correctly (see fin with S "" for example)
 
 eatWhite str = snd (span isSpace str)
 
@@ -150,13 +151,22 @@ mkPeriod ["period", start, end] =
   
 getPeriods inputs = makeTypes mkPeriod "period" inputs
 
-data Ledger = Ledger [Comm] [Etran] [Ntran] [Nacc] Period [StockQuote] deriving (Show)
+--getFinancials inputs = makeTypes mkFinancial "FIN" inputs
+
+{-
+mkFinancial :: [[Char]] -> Financial
+mkPeriod ["FIN", action', param1', param2'] =
+  Financial { action = action', param1 = param1', param2 = param2' }
+-}
+
+data Ledger = Ledger [Comm] [Etran] [Financial] [Ntran] [Nacc] Period [StockQuote] deriving (Show)
 
 readLedger :: IO Ledger
 readLedger = do
   inputs <- readInputs
   let comms = getComms inputs
   let etrans = getEtrans inputs
+  let financials = getFinancials inputs
   let ntrans = getNtrans inputs
   let naccs = getNaccs inputs
   let period = last $ getPeriods inputs
@@ -164,7 +174,7 @@ readLedger = do
   let googles = getGoogles inputs
   let quotes = yahoos ++ googles
   --      let period = last periods
-  let ledger = Ledger comms etrans ntrans naccs period quotes
+  let ledger = Ledger comms etrans financials ntrans naccs period quotes
   --printAll quotes
   return ledger
 
@@ -175,8 +185,8 @@ printQuotes = do
   let quotesGoogle = getGoogles inputs
   printAll quotesGoogle
 
-ledgerTuple (Ledger comms etrans ntrans naccs period quotes) =
-  (comms, etrans, ntrans, naccs, period, quotes)
+ledgerTuple (Ledger comms etrans financials ntrans naccs period quotes) =
+  (comms, etrans, financials, ntrans, naccs, period, quotes)
 
 ledgerComms :: Ledger -> [Comm]
 ledgerComms l = sel1 $ ledgerTuple l
@@ -184,17 +194,20 @@ ledgerComms l = sel1 $ ledgerTuple l
 ledgerEtrans :: Ledger -> [Etran]
 ledgerEtrans l = sel2 $ ledgerTuple l
 
+ledgerFinancials :: Ledger -> [Financial]
+ledgerFinancials l = sel3 $ ledgerTuple l
+
 ledgerNtrans :: Ledger -> [Ntran]
-ledgerNtrans l = sel3 $ ledgerTuple l
+ledgerNtrans l = sel4 $ ledgerTuple l
 
 ledgerNaccs :: Ledger -> [Nacc]
-ledgerNaccs l = sel4 $ ledgerTuple l
+ledgerNaccs l = sel5 $ ledgerTuple l
 
 ledgerPeriod :: Ledger -> Period
-ledgerPeriod l = sel5 $ ledgerTuple l
+ledgerPeriod l = sel6 $ ledgerTuple l
 
 ledgerQuotes :: Ledger -> [StockQuote]
-ledgerQuotes l = sel6 $ ledgerTuple l
+ledgerQuotes l = sel7 $ ledgerTuple l
   
 allComms :: IO [Comm]
 allComms = do

@@ -59,7 +59,7 @@ cumPennies ps =
 testCumPennies = cumPennies [Pennies 3, Pennies 4, Pennies 5]
   
 countPennies :: [Pennies] -> Pennies
-countPennies (p:[]) = p
+countPennies ([]) = (Pennies 0)
 countPennies (p:ps) = p |+| (countPennies ps)
 
 testCountPennies = countPennies [(Pennies 3), (Pennies 4)]
