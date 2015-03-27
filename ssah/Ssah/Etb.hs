@@ -101,9 +101,12 @@ createEtb  = do
   --print $ head grps
   --printAll etbTab
   --print posts
+
+  {- -- I should prolly switch to layout
   print "Financials"
   let fins = createFinances financials
   printAll fins
+  -}
   --printAll pennyTots
   printAll etbTab -- need to pass this into createFinances
   putStrLn "Finished"

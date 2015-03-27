@@ -1,7 +1,9 @@
 module Ssah.Financial where
 
+import Data.List.Split
 import Data.Maybe
 
+import Ssah.Parser
 import Ssah.Utils
 
 --data Action = 
@@ -83,3 +85,18 @@ createFinances' (mTextLines, stack) aFinancial =
   
 createFinances financials =
   catMaybes $ fst $ foldl createFinances' ([], []) financials
+
+
+fetchPrecachedEtb = do
+  f <- readFile "/home/mcarter/.ssa/hssa-etb.txt"
+  let  rows= lines f
+  --let res = rows
+  let decode row =
+        let [var, _, p] = splitOn "!" row in
+        (var, enPennies $ asFloat p)
+                      
+  let rows1 = map decode rows
+  inputs <- readInputs
+  let fins = getFinancials inputs
+  print rows1
+  printAll fins

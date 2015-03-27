@@ -29,6 +29,7 @@ library
                        , tuple >= 0.3
 
   exposed-modules:     Ssah.Aggregate, Ssah.Comm, Ssah.Etb, Ssah.Etran
+                       , Ssah.Financial
                        , Ssah.Flow, Ssah.Nacc
                        , Ssah.Ntran, Ssah.Post
                        , Ssah.Ssah, Ssah.Snap
