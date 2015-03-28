@@ -19,11 +19,10 @@ cabal-version:       >=1.10
 
 library
   build-depends:       base >= 4.8
-                       -- base >=4.7 && <4.8                       
+                       -- base >=4.7 && <4.8
+                       
                        , directory >=1.2 && <1.3
                        , async >=2.0 && <2.1
-                       , containers >= 0.3
-                       , IfElse >= 0.85
                        -- , karver >= 0.1.1
                        , split >=0.2 && <0.3, HTTP >=4000.2 && <4000.3
                        , time >= 1.4
@@ -35,8 +34,7 @@ library
   exposed-modules:     Ssah.Aggregate, Ssah.Comm, Ssah.Etb, Ssah.Etran
                        , Ssah.Financial
                        , Ssah.Flow, Ssah.Nacc
-                       , Ssah.Ntran
-                       , Ssah.Parser , Ssah.Post
+                       , Ssah.Ntran, Ssah.Post
                        , Ssah.Ssah, Ssah.Snap
                        , Ssah.Yahoo, Ssah.Utils
   default-language:    Haskell2010

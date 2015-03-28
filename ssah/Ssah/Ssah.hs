@@ -2,6 +2,7 @@ module Ssah.Ssah where
 
 --import Data.Char
 import Data.List
+import Data.String.Utils
 --import Data.Text
 import Data.Tuple.Select
 --import System.Directory
@@ -12,6 +13,7 @@ import Ssah.Etran
 import Ssah.Financial
 import Ssah.Nacc
 import Ssah.Ntran
+import Ssah.Parser
 import Ssah.Yahoo
 import Ssah.Utils
 
@@ -164,3 +166,25 @@ withLedger f = do
   printAll result
 
 ntrans = withLedger getNtrans
+
+
+-----------------------------------------------------------------------
+-- Etb storage and retrieval
+
+etbAsText etb =
+  unlines $ map makeEtbLine etb
+  where
+    makeEtbLine etbEl =
+      replace " " "" text1
+      where
+        (name, total) = etbEl
+        pounds = unPennies total
+        p = round $ pounds * 100
+        text1 = name ++ "!" ++ (show p) ++ "!" ++ (show total)
+
+  
+storeEtb etb = do
+  --let text = makeEtbFields totalTab naccs
+  writeFile "/home/mcarter/.ssa/hssa-etb.txt" (etbAsText etb)
+
+-----------------------------------------------------------------------

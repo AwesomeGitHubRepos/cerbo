@@ -87,7 +87,41 @@ createFinances financials =
   catMaybes $ fst $ foldl createFinances' ([], []) financials
 
 
-fetchPrecachedEtb = do
+
+
+finMP arg1 sgn arg2 etb =
+  (take 26 arg2) ++ (show  p2) ++ (drop 38 arg2)
+  where
+    p1 = getp etb arg1
+    p2 = scalep p1 sgn
+
+sumAccs etb acc lst =
+  etb ++ [(acc, total)]
+  where
+    plist = map (getp etb) lst
+    total = countPennies plist
+    
+
+
+-- | Will usually require augmented etb, as provided by augEtb
+createFinancial etb fin =
+  let (c, p1, p2) = (action fin, param1 fin, param2 fin) in
+  --let etbAug = augEtb etb in
+  case c of
+    'I' -> "TODO I"
+    'M' -> finMP p1  (-1.0) p2 etb
+    'P' -> finMP p1    1.0  p2 etb
+    'R' -> "TODO R"
+    'S' -> p1
+    'T' -> "TODO T"
+    'U' -> "TODO U"
+    'Z' -> "TOSO Z"
+    _   -> error $ "Can't identify financial type: " ++ [c]
+
+createFinancials etb userData = map (createFinancial etb) userData
+  
+
+finDriver = do
   f <- readFile "/home/mcarter/.ssa/hssa-etb.txt"
   let  rows= lines f
   --let res = rows
@@ -95,8 +129,10 @@ fetchPrecachedEtb = do
         let [var, _, p] = splitOn "!" row in
         (var, enPennies $ asFloat p)
                       
-  let rows1 = map decode rows
+  let etb = map decode rows
   inputs <- readInputs
   let fins = getFinancials inputs
-  print rows1
-  printAll fins
+  let rep = createFinancials etb fins
+  --print rows1
+  -- printAll fins
+  putAll rep

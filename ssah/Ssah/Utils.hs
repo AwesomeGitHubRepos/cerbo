@@ -1,5 +1,7 @@
 module Ssah.Utils where
 
+import Data.List
+import Data.Maybe
 import Data.Time
 import System.Locale (defaultTimeLocale)
 import Text.Printf
@@ -21,6 +23,9 @@ enPennies pounds = Pennies (round (pounds * 100.0) :: Int)
 unPennies :: Pennies -> Float
 unPennies (Pennies p) = (fromIntegral p) / 100.0
 
+myTime = Data.Time.defaultTimeLocale
+--myTime = System.Locale.defaultTimeLocale
+
 instance Show Pennies where
   show (Pennies p) = printf "%12.2f" (unPennies (Pennies p)) -- FIXME probable small rounding problems
 
@@ -29,6 +34,12 @@ Pennies a |+| Pennies b = Pennies (a+b)
 
 infixl 6 |-|
 Pennies a |-| Pennies b = Pennies (a-b)
+
+
+--infixl 7 |*|
+--Pennies a |*| scale = enPennies ( scale * (unPennies a))
+scalep :: Pennies -> Float -> Pennies
+scalep p by = enPennies( by * (unPennies p))
 
 {-
 infixl 7 0-|
@@ -84,12 +95,12 @@ asPennies pounds = enPennies (asFloat pounds)
 
 dateString = do
   let now = getCurrentTime
-  dstamp <- fmap (formatTime defaultTimeLocale "%Y-%m-%d") now
+  dstamp <- fmap (formatTime myTime "%Y-%m-%d") now
   return dstamp
 
 timeString = do
   let now = getCurrentTime
-  tstamp <- fmap (formatTime defaultTimeLocale "%H:%M:%S") now
+  tstamp <- fmap (formatTime myTime "%H:%M:%S") now
   return tstamp
     
   
@@ -101,6 +112,23 @@ map2 f list1 list2 =
   map f' (zip list1 list2)
 
 
+
 testMap2 = map2 (+) [10, 11] [12, 13]
 
-putAll alist =  mapM_ putStr alist
+map3 f list1 list2 list3 =
+  let f' (el1, el2, el3) = f el1 el2 el3 in
+  map f' (zip3 list1 list2 list3)
+
+map4 f list1 list2 list3 list4 =
+  let f' (el1, el2, el3, el4) = f el1 el2 el3 el4 in
+  map f' (zip4 list1 list2 list3 list4)  
+
+putAll alist =  mapM_ putStrLn alist
+
+getp etb key = fromMaybe (Pennies 0) (lookup key etb)
+
+
+doOrDie maybeX oops =
+  case maybeX of
+    Just x -> x
+    Nothing -> error oops
