@@ -13,6 +13,8 @@ import Text.Printf
 
 import Ssah.Aggregate
 import Ssah.Comm
+import Ssah.Epics
+import Ssah.Etran
 import Ssah.Financial
 import Ssah.Flow 
 import Ssah.Nacc
@@ -92,7 +94,8 @@ createEtbDoing  options = do
   let derivedQuotes = synthSQuotes comms etrans
   let allQuotes = quotes ++ derivedQuotes
   let derivedComms = deriveComms start end allQuotes comms
-  let posts = createPostings start derivedComms ntrans etrans
+  let derivedEtrans = deriveEtrans start derivedComms etrans
+  let posts = createPostings ntrans derivedEtrans
       
 
   let grp = assemblePosts naccs posts -- FIXME LOW put into order
@@ -116,6 +119,9 @@ createEtbDoing  options = do
   let asxNow = commEndPriceOrDie derivedComms "FTAS"
   let createdReturns = createReturns end etb asxNow returns
   putStrLn createdReturns
+
+  let epicReport = reportEpics derivedComms derivedEtrans
+  putStrLn epicReport
   
   putStrLn "+ OK Finished"
 

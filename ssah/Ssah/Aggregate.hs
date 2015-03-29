@@ -49,6 +49,7 @@ testAgg1 = combine (==)  testLefts testRights
 
 testAgg2 = strictly (combine (==) testLefts testRights)
 
+-- FIXME groupBy doesn't play well with group keys non-adjacent
 groupByKey keyFunc = groupBy (\x y -> keyFunc x == keyFunc y)
 
 groupOn  keyFunc = groupBy (\x y -> keyFunc x == keyFunc y)

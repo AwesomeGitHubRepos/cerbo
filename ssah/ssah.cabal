@@ -36,7 +36,8 @@ library
                        , Ssah.Financial
                        , Ssah.Flow, Ssah.Nacc
                        , Ssah.Ntran
-                       , Ssah.Parser , Ssah.Post
+                       , Ssah.Parser ,Ssah.Portfolio,  Ssah.Post
+                       , Ssah.Returns
                        , Ssah.Ssah, Ssah.Snap
                        , Ssah.Yahoo, Ssah.Utils
   default-language:    Haskell2010

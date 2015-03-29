@@ -149,3 +149,5 @@ testlod2 = lookupOrDie 34 [(30, 31), (32, 33)] "you shall not pass"
 findOrDie what table oopsText =
   case (find (
 -}
+
+true x = True -- function which always returns true

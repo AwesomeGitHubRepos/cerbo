@@ -60,11 +60,11 @@ testPostings = do -- won't work because it doesn't do any derivations
   printAll posts
 
 --createPostings :: [Ntran] -> [Etran] -> [Post]
-createPostings start comms ntrans etrans =
+createPostings ntrans derivedEtrans =
   postings
   where
     ntranPostings = postingsFromNtrans ntrans
-    derivedEtrans = deriveEtrans start comms etrans
+    --derivedEtrans = deriveEtrans start comms etrans
     etranPostings = postingsFromEtrans derivedEtrans
     unsortedPostings = ntranPostings ++ etranPostings
     postings = sortBy (comparing $ postDstamp) unsortedPostings

@@ -52,7 +52,8 @@ readInputs = do
   files1 <- glob "/home/mcarter/redact/docs/accts2014/data/*.txt"
   files2 <- glob "/home/mcarter/.ssa/yahoo/*.txt"
   files3 <- glob "/home/mcarter/.ssa/gofi/*.txt"
-  let files = files1 ++ files2 ++ files3
+  files4 <- glob "/home/mcarter/redact/docs/accts2014/companies/*"
+  let files = files1 ++ files2 ++ files3 ++ files4
   contents <- mapM readFile files
   let allLines = filterInputs contents
   let commands = map foldLine allLines
