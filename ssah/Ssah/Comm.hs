@@ -57,7 +57,7 @@ commTicker = yepic
 
 getComms inputs = makeTypes mkComm "comm" inputs
 
-
+  
 yepics comms = map yepic $ filter fetchRequired comms    
 
 deriveComm :: Dstamp -> Dstamp -> [StockQuote] -> Comm -> Comm
@@ -72,9 +72,32 @@ deriveComm start end quotes comm =
 deriveComms start end quotes comms  =
   map (deriveComm start end quotes) comms
 
-commDerived c = commDerivedTuple $ fromJust $ sel9 $ commTuple c
+commDerived c =
+  commDerivedTuple der
+  where
+    oops = error ("commDerived can't look up: " ++ (show c))
+    der = doOrDie (sel9 $ commTuple c) oops
+
 
 commStartPrice comm =  sel1 $ commDerived comm
+
+commStartPriceOrDie comms sym =
+  doOrDie (commStartPrice comm) ("Can't find start price for:'" ++ sym ++ "'")
+  where
+    comm = findComm comms sym
+  
 commEndPrice comm = sel2 $ commDerived comm
 
-  
+commEndPriceOrDie comms sym =
+  doOrDie (commEndPrice comm) ("Can't find end price for:" ++ sym)
+  where
+    comm = findComm comms sym
+
+{-
+-- FIXME LOW use this function more (esp in the above cases)
+findCommOrDie comms sym =
+  doOrDie comm oops
+  where
+    comm = findComm comms sym
+    oops = "findCommOrDie couldn't find sym:'" ++ sym ++ "'"
+-}

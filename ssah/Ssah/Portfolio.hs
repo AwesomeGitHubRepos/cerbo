@@ -6,6 +6,8 @@ import Text.Printf
 import Ssah.Comm
 import Ssah.Utils
 
+-- FIXME LOW - use calculated values of mine/b ... computed in Etb rather than working them out here
+
 myPorts = ["hal", "hl", "tdn", "tdi"]
 
 fmtName :: String -> String
@@ -53,16 +55,16 @@ createEquityPortfolios etb =
     spacer2 = "===== =========== =========== =========== =========== ======"
     --totalSums = mineSums ++ ut
 
-createIndexLine comms comm =
+createIndexLine comms sym =
   text
   where
-    c = findComm comms comm
+    --c = findComm comms comm
     fmtVal v = (printf "%12.2f" v)::String
-    startPrice = doOrDie (commStartPrice c) ("Can't find start price for:" ++ comm)
-    endPrice = doOrDie (commEndPrice c) ("Can't find end price for:" ++ comm)
+    startPrice = commStartPriceOrDie comms sym
+    endPrice = commEndPriceOrDie comms sym
     profit = endPrice - startPrice
     retStr = fmtRet (profit/startPrice * 100.0)
-    text = (fmtName comm) ++ (concatMap fmtVal [startPrice, 0.0, profit,  endPrice]) ++ retStr
+    text = (fmtName sym) ++ (concatMap fmtVal [startPrice, 0.0, profit,  endPrice]) ++ retStr
     
 createIndices comms =  map (createIndexLine comms) ["FTAS", "FTSE", "FTMC"]
 

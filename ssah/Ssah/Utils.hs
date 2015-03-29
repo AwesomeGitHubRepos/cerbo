@@ -9,6 +9,7 @@ import Text.Printf
 type Acc = String
 type Desc = String -- description
 type Dstamp = String
+type Etb = [(String, Pennies)]
 type Folio = String
 type Period = (Dstamp, Dstamp)
 type Qty = Float
@@ -132,3 +133,19 @@ doOrDie maybeX oops =
   case maybeX of
     Just x -> x
     Nothing -> error oops
+
+ 
+gainpc :: Float -> Float -> Float
+gainpc num denom = 100.0 * num / denom - 100.0   
+
+lookupOrDie what table oopsText =
+  case (lookup what table) of
+    Just v -> v
+    Nothing -> error oopsText
+
+testlod1 = lookupOrDie 30 [(30, 31), (32, 33)] "not printed"
+testlod2 = lookupOrDie 34 [(30, 31), (32, 33)] "you shall not pass"
+{-
+findOrDie what table oopsText =
+  case (find (
+-}

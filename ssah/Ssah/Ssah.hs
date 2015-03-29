@@ -14,6 +14,7 @@ import Ssah.Financial
 import Ssah.Nacc
 import Ssah.Ntran
 import Ssah.Parser
+import Ssah.Returns
 import Ssah.Yahoo
 import Ssah.Utils
 
@@ -104,7 +105,7 @@ mkPeriod ["FIN", action', param1', param2'] =
   Financial { action = action', param1 = param1', param2 = param2' }
 -}
 
-data Ledger = Ledger [Comm] [Etran] [Financial] [Ntran] [Nacc] Period [StockQuote] deriving (Show)
+data Ledger = Ledger [Comm] [Etran] [Financial] [Ntran] [Nacc] Period [StockQuote] [Return] deriving (Show)
 
 readLedger :: IO Ledger
 readLedger = do
@@ -118,8 +119,9 @@ readLedger = do
   let yahoos = getQuotes inputs
   let googles = getGoogles inputs
   let quotes = yahoos ++ googles
+  let returns = getReturns inputs
   --      let period = last periods
-  let ledger = Ledger comms etrans financials ntrans naccs period quotes
+  let ledger = Ledger comms etrans financials ntrans naccs period quotes returns
   --printAll quotes
   return ledger
 
@@ -130,8 +132,8 @@ printQuotes = do
   let quotesGoogle = getGoogles inputs
   printAll quotesGoogle
 
-ledgerTuple (Ledger comms etrans financials ntrans naccs period quotes) =
-  (comms, etrans, financials, ntrans, naccs, period, quotes)
+ledgerTuple (Ledger comms etrans financials ntrans naccs period quotes returns) =
+  (comms, etrans, financials, ntrans, naccs, period, quotes, returns)
 
 ledgerComms :: Ledger -> [Comm]
 ledgerComms l = sel1 $ ledgerTuple l
@@ -188,3 +190,4 @@ storeEtb etb = do
   writeFile "/home/mcarter/.ssa/hssa-etb.txt" (etbAsText etb)
 
 -----------------------------------------------------------------------
+

@@ -19,11 +19,11 @@ import Ssah.Nacc
 import Ssah.Ntran
 import Ssah.Portfolio
 import Ssah.Post
+import Ssah.Returns
 import Ssah.Ssah
 import Ssah.Utils
 import Ssah.Yahoo
 
-type Etb = [(String, Pennies)]
 
 data Option = PrinAccs | PrinFin deriving (Eq)
 
@@ -36,12 +36,15 @@ augEtb etb =
     etb1 = sumAccs etb "inc" ["div", "int", "wag"]
     etb2 = sumAccs etb1 "exp" ["amz", "car", "chr", "cmp", "hol", "isp", "msc", "mum", "tax"]
     etb3 = sumAccs etb2 "ioe" ["inc", "exp"] -- income over expenditure
-    etb4 = sumAccs etb3 "gain" ["hal/g", "hl/g", "tdi/g", "tdn/g", "ut/g"]
+    etb3_1 = sumAccs etb3 "mine/g" ["hal/g", "hl/g", "tdi/g", "tdn/g"]
+    etb4 = sumAccs etb3_1 "gain" ["mine/g", "ut/g"]
     etb5 = sumAccs etb4 "net" ["ioe", "gain"]
-    etb6 = sumAccs etb5 "open" ["opn", "hal/b", "hl/b", "tdi/b", "tdn/b", "ut/b"]
+    etb5_1 = sumAccs etb5 "mine/b" ["hal/b", "hl/b", "tdi/b", "tdn/b"]
+    etb6 = sumAccs etb5_1 "open" ["opn", "mine/b", "ut/b"]
     etb7 = sumAccs etb6 "cd1" ["net", "open"]
     etb8 = sumAccs etb7 "cash" ["hal", "hl", "ut", "rbs", "rbd", "sus", "tdi", "tdn", "tds", "vis"]
-    etb9 = sumAccs etb8 "port" ["hal/c", "hl/c", "tdi/c", "tdn/c", "ut/c"]
+    etb8_1 = sumAccs etb8 "mine/c" ["hal/c", "hl/c", "tdi/c", "tdn/c"]
+    etb9 = sumAccs etb8_1 "port" ["mine/c", "ut/c"]
     etb10 = sumAccs etb9 "nass" ["cash", "msa", "port"]
     res = etb10
     
@@ -84,12 +87,13 @@ assembleEtb es =
 --createEtb :: Ledger
 createEtbDoing  options = do
   ledger <- readLedger
-  let (comms, etrans, financials, ntrans, naccs, period, quotes) = ledgerTuple ledger
+  let (comms, etrans, financials, ntrans, naccs, period, quotes, returns) = ledgerTuple ledger
   let (start, end) = period
   let derivedQuotes = synthSQuotes comms etrans
   let allQuotes = quotes ++ derivedQuotes
   let derivedComms = deriveComms start end allQuotes comms
   let posts = createPostings start derivedComms ntrans etrans
+      
 
   let grp = assemblePosts naccs posts -- FIXME LOW put into order
   --printAll grp
@@ -107,6 +111,11 @@ createEtbDoing  options = do
 
   let portfolios = createPortfolios etb derivedComms
   putAll portfolios
+
+  --let ftas = findComm comms "FTAS"
+  let asxNow = commEndPriceOrDie derivedComms "FTAS"
+  let createdReturns = createReturns end etb asxNow returns
+  putStrLn createdReturns
   
   putStrLn "+ OK Finished"
 
