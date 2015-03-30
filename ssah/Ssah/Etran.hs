@@ -1,5 +1,6 @@
 module Ssah.Etran where
 
+import Data.List
 import Data.Maybe
 import Data.Tuple.Select
 
@@ -78,3 +79,22 @@ deriveEtran start comms etran =
     derived = Just (EtranDerived odstamp startValue flow profit endValue comm)
 
 deriveEtrans start comms etrans = map (deriveEtran start comms) etrans
+
+cerl :: Etran -> String
+cerl etran = -- create etran report line
+  text ++ "\n"
+  where
+    (dstamp, way, acc, sym, qty, amount, _) = etranTuple etran
+    unit = 100.0 * (unPennies amount) / qty
+    wayStr = if qty > 0.0 then "B" else "S"
+    fields = [psr 7 sym, dstamp, wayStr, psr 3 acc
+             , f3 qty, show amount, f4 unit]
+    text = intercalate " " fields
+             
+createEtranReport :: [Etran] -> String
+createEtranReport etrans =
+  "Section: Etrans\n" ++ hdr ++ eLines ++ ".\n"
+  where    
+    hdr = "SYM     DSTAMP     W FOLIO        QTY       AMOUNT         UNIT\n"
+    sortedEtrans = sortOn (\e -> (etranSym e, etranDstamp e)) etrans
+    eLines = concatMap cerl sortedEtrans

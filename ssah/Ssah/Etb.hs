@@ -107,7 +107,9 @@ createEtbDoing  options = do
   let etb = assembleEtb grp
   printAll etb
   --storeEtb etb --FIXME LOW
- 
+
+  putStrLn $ createEtranReport derivedEtrans
+  
   --print etb
   let finStatements = createFinancials etb financials
   putAll $ if (elem PrinFin options)  then finStatements else []

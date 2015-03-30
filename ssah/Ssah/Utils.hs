@@ -151,3 +151,21 @@ findOrDie what table oopsText =
 -}
 
 true x = True -- function which always returns true
+
+-----------------------------------------------------------------------
+-- printing routines
+
+f3 :: Float -> String
+f3 f = -- show a 3dp float as a string
+  printf "%12.3f" f
+
+f4 :: Float -> String
+f4 f = -- show a 4dp float as a string
+  printf "%12.4f" f
+  
+psr :: Int -> String -> String
+psr n str = -- pad string right to length n
+  let fmt = "%-" ++ (show n) ++ "." ++ (show n) ++ "s" in
+  printf fmt str
+
+-----------------------------------------------------------------------
