@@ -93,7 +93,7 @@ cerl etran = -- create etran report line
              
 createEtranReport :: [Etran] -> String
 createEtranReport etrans =
-  "Section: Etrans\n" ++ hdr ++ eLines ++ ".\n"
+  "ETRANS:\n" ++ hdr ++ eLines ++ ".\n"
   where    
     hdr = "SYM     DSTAMP     W FOLIO        QTY       AMOUNT         UNIT\n"
     sortedEtrans = sortOn (\e -> (etranSym e, etranDstamp e)) etrans

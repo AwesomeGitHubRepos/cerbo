@@ -27,7 +27,8 @@ import Ssah.Utils
 import Ssah.Yahoo
 
 
-data Option = PrinAccs | PrinFin deriving (Eq)
+data Option = PrinAccs | PrinEpics | PrinEtb | PrinEtrans
+            | PrinFin | PrinPorts | PrinReturns deriving (Eq)
 
 augEtb:: Etb -> Etb
 augEtb etb =
@@ -79,12 +80,22 @@ assemblePosts naccs posts =
 
 assembleEtb :: [(Acc, Maybe Nacc, [Post])] -> [(Acc,  Pennies)]
 assembleEtb es =
-  lup ++ augs
+  augs
   where
     summate (a, n, posts) = (a, countPennies (map postPennies posts))
     lup = map summate es
     augs = augEtb lup
- 
+
+createEtbReport etb =
+  ["ETB:"] ++  eLines ++  [totalLine, "."]
+  where
+    sorted = sortOn fst etb
+    eLine (acc, pennies) = (psr 6 acc) ++ (show pennies)
+    eLines = map eLine sorted
+    total  = countPennies $ map snd sorted
+    totalLine = eLine ("TOTAL", total)
+
+    
 -- FIXME ignore transactions after period end  
 --createEtb :: Ledger
 createEtbDoing  options = do
@@ -101,35 +112,42 @@ createEtbDoing  options = do
   let grp = assemblePosts naccs posts -- FIXME LOW put into order
   --printAll grp
 
-  let accLines = concatMap printEtbAcc grp
-  putStr $ if (elem PrinAccs options) then accLines else ""
-  --printPostsByNaccs postsByNaccs
+  let putSection sec lines = putStrLn $ if (elem sec options) then lines else ""
+  let printSection sec str = putSection sec $ unlines str
+      
+  --let accLines = concatMap printEtbAcc grp
+  --putStr $ if (elem PrinAccs options) then accLines else ""
+  putSection PrinAccs $ concatMap printEtbAcc grp
+
+  -- let epicReport = reportEpics derivedComms derivedEtrans
+  putSection PrinEpics $ reportEpics derivedComms derivedEtrans
+  
   let etb = assembleEtb grp
-  printAll etb
+  printSection PrinEtb $ createEtbReport etb
   --storeEtb etb --FIXME LOW
 
-  putStrLn $ createEtranReport derivedEtrans
+  putSection PrinEtrans $ createEtranReport derivedEtrans
   
   --print etb
-  let finStatements = createFinancials etb financials
-  putAll $ if (elem PrinFin options)  then finStatements else []
+  -- let finStatements = createFinancials etb financials
+  printSection PrinFin $ createFinancials etb financials
 
-  let portfolios = createPortfolios etb derivedComms
-  putAll portfolios
+  --let portfolios = createPortfolios etb derivedComms
+  printSection PrinPorts $ createPortfolios etb derivedComms
 
   --let ftas = findComm comms "FTAS"
   let asxNow = commEndPriceOrDie derivedComms "FTAS"
   let createdReturns = createReturns end etb asxNow returns
-  putStrLn createdReturns
+  putSection PrinReturns createdReturns
 
-  let epicReport = reportEpics derivedComms derivedEtrans
-  putStrLn epicReport
-  
+
+
   putStrLn "+ OK Finished"
 
 
-optionSet1 = [PrinAccs,  PrinFin]
+optionSet0 = [PrinAccs,  PrinEpics, PrinEtb, PrinEtrans, PrinFin, PrinPorts, PrinReturns]
 optionSet2 = [PrinFin]
+optionSetX = [PrinEtb]
 
-createEtb = createEtbDoing optionSet2
+createEtb = createEtbDoing optionSet0
 mainEtb = createEtb

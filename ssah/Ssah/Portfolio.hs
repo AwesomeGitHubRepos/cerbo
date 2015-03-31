@@ -36,7 +36,8 @@ calcPort getpe port =
 
     
 createEquityPortfolios etb =
-  ["PORTFOLIOS:", hdr] ++ mineLines ++ [spacer1, mineSumsLine, utLine, spacer1, totalLine, spacer2]
+  ["PORTFOLIOS:", hdr] ++ mineLines -- FIXME this part really belongs in createPortfolios
+  ++ [spacer1, mineSumsLine, utLine, spacer1, totalLine, spacer2]
   where
     hdr = "FOLIO     VBEFORE       VFLOW     VPROFIT         VTO   VRET"
     getpe = getp etb
@@ -70,5 +71,5 @@ createIndices comms =  map (createIndexLine comms) ["FTAS", "FTSE", "FTMC"]
 
 
 createPortfolios  etb comms =
-  (createEquityPortfolios etb) ++ (createIndices comms)
+  (createEquityPortfolios etb) ++ (createIndices comms) ++ ["."]
   

@@ -43,7 +43,7 @@ summaryLine minepa asxpa outpa =
 
 createReturns :: Dstamp -> Etb -> Float -> [Return] -> String
 createReturns ds etb asxNow returns =
-  "RETURNS:\n" ++  hdr ++ "\n" ++ createdReturns ++ "\n" ++ summary
+  "RETURNS:\n" ++  hdr ++ "\n" ++ createdReturns ++ "\n" ++ summary ++ "."
   where
     hdr = "IDX      DSTAMP   MINE  MINE%  ASX   ASX%   OUT%"
     ret0 = head returns

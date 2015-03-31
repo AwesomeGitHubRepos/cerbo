@@ -76,6 +76,7 @@ procFin fin stack =
     _   -> error $ "Can't identify financial type: " ++ [c]
 
 
+{-
 createFinances' (mTextLines, stack) aFinancial =
   acc
   where
@@ -84,8 +85,10 @@ createFinances' (mTextLines, stack) aFinancial =
     acc = (mNewTextLines, newStack)
   
 createFinances financials =
-  catMaybes $ fst $ foldl createFinances' ([], []) financials
-
+  ["FINANCES:"] ++ items ++ ["."]
+  where
+    items = catMaybes $ fst $ foldl createFinances' ([], []) financials
+-}
 
 
 
@@ -118,7 +121,11 @@ createFinancial etb fin =
     'Z' -> "TOSO Z"
     _   -> error $ "Can't identify financial type: " ++ [c]
 
-createFinancials etb userData = map (createFinancial etb) userData
+createFinancials etb userData =
+  let res =   map (createFinancial etb) userData in
+  ["FINANCIALS:"] ++ res ++ ["."]
+
+
   
 
 finDriver = do
