@@ -56,18 +56,23 @@ etbLine :: Post -> Pennies -> String
 etbLine post runningTotal = (showPost post) ++ (show runningTotal)
  
 printEtbAcc (dr, nacc, posts) = 
-  text
+  textLines
   where
-    --dr = postDr $ head posts
-    n = case nacc of
+    n = case nacc of -- FIXME LOW Can use an OrDie function
       Just x -> x
       Nothing -> error ("Couldn't locate account:" ++ dr)
     runningTotals = cumPennies $ map postPennies posts
-    hdr = (showNacc n) ++ "\n"
+    (acc, _, desc) = naccTuple n
+    accHdr = "Acc: " ++ acc
     body = map2 etbLine posts runningTotals    
-    text = hdr ++ (unlines body) ++ "\n"
+    textLines = [accHdr, desc] ++ body ++ [";"]
 
 
+reportAccs grp =
+  ["ACCS:"] ++ accs ++ ["."]
+  where
+    accs = concatMap printEtbAcc grp
+  
 assemblePosts :: [Nacc] -> [Post] -> [(Acc, Maybe Nacc, [Post])]
 assemblePosts naccs posts =
   zip3 keys keyedNaccs keyPosts
@@ -115,9 +120,8 @@ createEtbDoing  options = do
   let putSection sec lines = putStrLn $ if (elem sec options) then lines else ""
   let printSection sec str = putSection sec $ unlines str
       
-  --let accLines = concatMap printEtbAcc grp
-  --putStr $ if (elem PrinAccs options) then accLines else ""
-  putSection PrinAccs $ concatMap printEtbAcc grp
+  --printSection PrinAccs $ concatMap printEtbAcc grp
+  printSection PrinAccs $ reportAccs grp
 
   -- let epicReport = reportEpics derivedComms derivedEtrans
   putSection PrinEpics $ reportEpics derivedComms derivedEtrans

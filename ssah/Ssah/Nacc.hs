@@ -37,7 +37,15 @@ alt acc naccs =
       Nothing -> "Error: couldn't find alt nacc"
 
 
+showAcc :: Acc -> String
+showAcc acc = printf "%-6.6s" acc
+
+
+showNaccAcc :: Nacc -> String
+showNaccAcc nacc = showAcc $ naccAcc nacc
+
 showNacc :: Nacc -> String
 showNacc nacc =
   let (acc, _ , desc) = naccTuple nacc in
-  printf "%4.4s  %s" acc desc
+  (showAcc acc) ++ " " ++ desc
+  --printf "%-6.6s  %s" acc desc
