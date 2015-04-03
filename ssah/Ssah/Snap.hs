@@ -11,6 +11,7 @@ import Text.Printf
 import Ssah.Aggregate
 import Ssah.Comm
 import Ssah.Etran
+import Ssah.Ledger
 import Ssah.Ssah
 import Ssah.Utils
 import Ssah.Yahoo
@@ -46,13 +47,13 @@ snapDownloading afresh = do
   let header = ds ++ " " ++ ts
   putStrLn header
   led <- readLedger
-  let comms = ledgerComms led
-  let etrans = ledgerEtrans led
-  fetchedQuotes <- if afresh then precacheCommsUsing comms else loadPrecachedComms
+  let theComms = comms led
+  let theEtrans = etrans led
+  fetchedQuotes <- if afresh then precacheCommsUsing theComms else loadPrecachedComms
   
-  let fetchableComms = filter fetchRequired comms
+  let fetchableComms = filter fetchRequired theComms
 
-  let sortedEtrans = sortBy (comparing $ etranSym) etrans
+  let sortedEtrans = sortBy (comparing $ etranSym) theEtrans
   --let grpEtrans  = groupByKey etranSym etrans
   let grpEtrans = groupBy (\x y -> (etranSym x) == (etranSym y)) sortedEtrans
   --let grpEtrans = groupBy (compare `on` etranSym) etrans
@@ -61,7 +62,7 @@ snapDownloading afresh = do
         where
           qty = qtys etrans
           sym = etranSym $ head etrans
-          comm = find (\c -> commSym c == sym) comms
+          comm = find (\c -> commSym c == sym) theComms
           ctype = fmap commType  comm
           ticker = fmap commTicker comm
           msq = find (\s -> Just (quoteTicker s) == ticker) fetchedQuotes

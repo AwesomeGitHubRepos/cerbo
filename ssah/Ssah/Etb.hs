@@ -16,7 +16,8 @@ import Ssah.Comm
 import Ssah.Epics
 import Ssah.Etran
 import Ssah.Financial
-import Ssah.Flow 
+--import Ssah.Flow
+import Ssah.Ledger
 import Ssah.Nacc
 import Ssah.Ntran
 import Ssah.Portfolio
@@ -105,46 +106,28 @@ createEtbReport etb =
 --createEtb :: Ledger
 createEtbDoing  options = do
   ledger <- readLedger
-  let (comms, etrans, financials, ntrans, naccs, period, quotes, returns) = ledgerTuple ledger
-  let (start, end) = period
-  let derivedQuotes = synthSQuotes comms etrans
-  let allQuotes = quotes ++ derivedQuotes
-  let derivedComms = deriveComms start end allQuotes comms
-  let derivedEtrans = deriveEtrans start derivedComms etrans
-  let posts = createPostings ntrans derivedEtrans
-      
+  let theComms = comms ledger
+  let theEtrans = etrans ledger
+  let posts = createPostings (ntrans ledger) theEtrans      
 
-  let grp = assemblePosts naccs posts -- FIXME LOW put into order
-  --printAll grp
+  let grp = assemblePosts (naccs ledger) posts -- FIXME LOW put into order
 
   let putSection sec lines = putStrLn $ if (elem sec options) then lines else ""
   let printSection sec str = putSection sec $ unlines str
       
-  --printSection PrinAccs $ concatMap printEtbAcc grp
   printSection PrinAccs $ reportAccs grp
-
-  -- let epicReport = reportEpics derivedComms derivedEtrans
-  putSection PrinEpics $ reportEpics derivedComms derivedEtrans
+  putSection PrinEpics $ reportEpics theComms  theEtrans
   
   let etb = assembleEtb grp
   printSection PrinEtb $ createEtbReport etb
-  --storeEtb etb --FIXME LOW
 
-  putSection PrinEtrans $ createEtranReport derivedEtrans
-  
-  --print etb
-  -- let finStatements = createFinancials etb financials
-  printSection PrinFin $ createFinancials etb financials
+  putSection PrinEtrans $ createEtranReport theEtrans
+  printSection PrinFin $ createFinancials etb (financials ledger)
+  printSection PrinPorts $ createPortfolios etb theComms
 
-  --let portfolios = createPortfolios etb derivedComms
-  printSection PrinPorts $ createPortfolios etb derivedComms
-
-  --let ftas = findComm comms "FTAS"
-  let asxNow = commEndPriceOrDie derivedComms "FTAS"
-  let createdReturns = createReturns end etb asxNow returns
+  let asxNow = commEndPriceOrDie theComms "FTAS"
+  let createdReturns = createReturns (end ledger) etb asxNow (returns ledger)
   putSection PrinReturns createdReturns
-
-
 
   putStrLn "+ OK Finished"
 

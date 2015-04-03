@@ -35,7 +35,9 @@ library
   exposed-modules:     Ssah.Aggregate, Ssah.Comm
                        , Ssah.Epics, Ssah.Etb, Ssah.Etran
                        , Ssah.Financial
-                       , Ssah.Flow, Ssah.Nacc
+                       -- , Ssah.Flow
+                       , Ssah.Ledger
+                       , Ssah.Nacc
                        , Ssah.Ntran
                        , Ssah.Parser ,Ssah.Portfolio,  Ssah.Post
                        , Ssah.Returns

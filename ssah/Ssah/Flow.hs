@@ -10,32 +10,23 @@ import Ssah.Ssah
 import Ssah.Utils
 import Ssah.Yahoo
 
+-- FIXME LOW deprecate this module
 {-
 data Flow = Flow String Acc Ticker Pennies Pennies Pennies Pennies Pennies Pennies
 flowTuple (Flow folio sym ticker costBefore profitBefore valueStart flowDuring profitDuring valueTo)
   = (folio, sym, ticker, costBefore, profitBefore, valueStart, flowDuring, profitDuring, valueTo)
 -}
 
-etranToSQuote :: [Comm] -> Etran -> StockQuote
-etranToSQuote comms e =
-  StockQuote ds "08:00:00" ticker 1.0 price 0.0 0.0
-  where
-    ds = etranDstamp e
-    ticker = findTicker comms (etranSym e)
-    amount = unPennies $ etranAmount e
-    qty = etranQty e
-    price = 100.0 * amount / qty
 
-            
-synthSQuotes :: [Comm] -> [Etran] -> [StockQuote] -- create synthetic stock quotes
-synthSQuotes comms etrans =  map  (etranToSQuote comms)  etrans
- 
+
+{-
 testSynth = do
   ledger <- readLedger
   let comms = ledgerComms ledger
   let etrans = ledgerEtrans ledger
   let sqs = synthSQuotes comms etrans
   printAll sqs
+-}
 
 {-
 genTrip :: Dstamp -> Dstamp -> [Comm] -> [StockQuote] -> Etran -> (Maybe Ntran, Maybe Ntran, Maybe Ntran)

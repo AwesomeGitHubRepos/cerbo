@@ -105,25 +105,6 @@ mkPeriod ["FIN", action', param1', param2'] =
   Financial { action = action', param1 = param1', param2 = param2' }
 -}
 
-data Ledger = Ledger [Comm] [Etran] [Financial] [Ntran] [Nacc] Period [StockQuote] [Return] deriving (Show)
-
-readLedger :: IO Ledger
-readLedger = do
-  inputs <- readInputs
-  let comms = getComms inputs
-  let etrans = getEtrans inputs
-  let financials = getFinancials inputs
-  let ntrans = getNtrans inputs
-  let naccs = getNaccs inputs
-  let period = last $ getPeriods inputs
-  let yahoos = getQuotes inputs
-  let googles = getGoogles inputs
-  let quotes = yahoos ++ googles
-  let returns = getReturns inputs
-  --      let period = last periods
-  let ledger = Ledger comms etrans financials ntrans naccs period quotes returns
-  --printAll quotes
-  return ledger
 
 printQuotes = do
   inputs <- readInputs
@@ -132,29 +113,6 @@ printQuotes = do
   let quotesGoogle = getGoogles inputs
   printAll quotesGoogle
 
-ledgerTuple (Ledger comms etrans financials ntrans naccs period quotes returns) =
-  (comms, etrans, financials, ntrans, naccs, period, quotes, returns)
-
-ledgerComms :: Ledger -> [Comm]
-ledgerComms l = sel1 $ ledgerTuple l
-
-ledgerEtrans :: Ledger -> [Etran]
-ledgerEtrans l = sel2 $ ledgerTuple l
-
-ledgerFinancials :: Ledger -> [Financial]
-ledgerFinancials l = sel3 $ ledgerTuple l
-
-ledgerNtrans :: Ledger -> [Ntran]
-ledgerNtrans l = sel4 $ ledgerTuple l
-
-ledgerNaccs :: Ledger -> [Nacc]
-ledgerNaccs l = sel5 $ ledgerTuple l
-
-ledgerPeriod :: Ledger -> Period
-ledgerPeriod l = sel6 $ ledgerTuple l
-
-ledgerQuotes :: Ledger -> [StockQuote]
-ledgerQuotes l = sel7 $ ledgerTuple l
   
 allComms :: IO [Comm]
 allComms = do
@@ -162,13 +120,11 @@ allComms = do
   let comms = getComms inputs
   return comms
   
-withLedger f = do
-  inputs <- readInputs
-  let result = f inputs
-  printAll result
 
+
+{-
 ntrans = withLedger getNtrans
-
+-}
 
 -----------------------------------------------------------------------
 -- Etb storage and retrieval

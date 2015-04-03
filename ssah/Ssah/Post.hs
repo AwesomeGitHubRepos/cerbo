@@ -7,6 +7,7 @@ import Data.Tuple.Select
 
 import Ssah.Aggregate
 import Ssah.Etran
+import Ssah.Ledger
 import Ssah.Ntran
 import Ssah.Ssah
 import Ssah.Utils
@@ -53,11 +54,13 @@ postingsFromEtran etran =
 postingsFromEtrans etrans =
   concatMap postingsFromEtran etrans
 
+{-
 testPostings = do -- won't work because it doesn't do any derivations
   ledger <- readLedger
   let etrans = ledgerEtrans ledger
   let posts = postingsFromEtrans etrans
   printAll posts
+-}
 
 --createPostings :: [Ntran] -> [Etran] -> [Post]
 createPostings ntrans derivedEtrans =
