@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+ROOT=~/info/repos/nokilli/sharelock
+BIN=$ROOT/bin
+PATH=$BIN:$PATH
+DATA=$ROOT/data
+INT=$ROOT/int
+
+function do_help {
+cat <<EOF
+$1 shock-daily
+With no arguments, it will do nothing
+-a do all
+-f fetch
+-h help - this help
+-m do most - i.e. everything except fetching
+-r create cards
+-l perform calcs
+-s translate sc file
+-d do defensives
+EOF
+}
+
+function zap { rm -f $INT/$1/* ; }
+
+function do_fetch { fetch -qr ; }
+function do_cards { echo Creating cards ; zap cards ; card -a ; }
+function do_calcs { zap calcs ; csi -s $BIN/calcs.scm all ; }
+
+function do_scpt {
+    scpt <$DATA/epics.sc | scx2lol >$INT/misc/epics.scm
+}
+
+function do_defensives { csi -q $DATA/defensives.scm ; }
+function do_most { do_cards ; do_calcs ; do_scpt ; do_defensives ; } 
+
+while getopts "adfhlmrs" opt ; do
+    case $opt in
+        a) do_fetch ; do_most  ;;
+        f) do_fetch ;;
+        h) do_help ;;
+        m) do_most ;;
+        r) do_cards ;;
+        l) do_calcs ;;
+        s) do_scpt ;;
+        d) do_defensives ;;
+    esac
+done
+
+if [ $# -eq 0 ]
+then
+    echo "Didn't do anything"
+fi

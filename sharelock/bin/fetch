@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+
+function print_help {
+    cat <<EOF
+$0 - retrieve html files for EPICS from Sharelock Holmes
+
+Options
+-c      - fetch from clean-statslist.csv
+-e EPIC - fetch html for a given epic
+-h      - this help
+-i      - read stdin with one epic per line, fetch html for epic
+-q      - quiet mode
+-r      - refetch all entries in the fetches directory
+EOF
+}
+
+
+#DATA=~/.config/sharelock
+DATA=~/info/repos/nokilli/sharelock/int
+QUIET=-nv
+
+function secho {
+    if [ "$QUIET" != "-q" ]
+    then
+        echo $@
+    fi
+}
+
+function fepic {
+	epic="`echo $1 |tr [a-z] [A-Z]`"
+	secho $epic
+	cfile=$DATA/misc/cookies.txt
+	url="http://www.sharelockholmes.com/GetStats.aspx?EPIC=$epic"
+	ofile=$DATA/fetches/${epic}
+	cmd="wget $QUIET --load-cookies $cfile $url --output-document $ofile"
+	secho $cmd
+	$cmd
+	secho
+}
+
+function psin {
+    while read line
+    do
+	fepic $line
+    done
+}
+
+
+
+function refetch {
+    echo "fetch-refetch"
+    for f in $DATA/fetches/*
+    do
+        #epic="`echo $f |tr [a-z] [A-Z]`"
+        epic=`basename $f`
+        #echo $epic
+        fepic $epic
+    done
+}
+
+# wget --load-cookies ~/.config/sharelock/misc/cookies.txt http://www.sharelockholmes.com/GetStats.aspx?EPIC=ULVR -o ULVR.htm
+
+while getopts "ce:hirq" opt; do
+case $opt in
+    c) csvtool namedcol EPIC $DATA/misc/clean-statslist.csv | sort| xargs -P 10 -r -n 1 fetch -e ;;
+    e) fepic $OPTARG ;;
+    h) print_help ;;
+    i) psin ;;
+    r) refetch ;;
+    q) QUIET=-q
+esac
+done
+
+# fepic ulvr
+
+

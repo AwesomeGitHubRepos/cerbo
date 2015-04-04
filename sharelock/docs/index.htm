@@ -1,0 +1,73 @@
+<html>
+<head>
+  <meta content="text/html; charset=iso-8859-1"  http-equiv="CONTENT-TYPE">
+  <LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+  <title>Sharelock</title>
+</head>
+
+<body>
+
+<h1>Sharelock</h1>
+
+Access to the Sharelock Holmes website. The main utility to use is <code>shock-daily</code>
+
+
+<hr><h2>General Instructions</h2>
+
+
+<h3>Fixing the StatsList.csv file</h3>
+
+Download StatsList.csv to ~/Downloads. Then rectify problems by typing:
+<code>csv2epics</code>
+
+<p>This places a clean CSV file in <code>int/misc/clean-statslist.csv</code>
+
+<h3>Downloading</h3>
+
+<p>To download all the epics in clean-statslist.csv: <code>fetch -c</code>
+
+
+
+<h3>carding</h3>
+
+This is the process whereby downloaded htm files are decoded and turned into "cards": <code>shock-daily -r</code>
+
+<h3>Calcs</h3>
+
+To perform calculations, see <a href="calcs.htm">calcs</a>.
+
+<h3>Tabulate calcs</h3>
+
+Create a single table with all the calculations: 
+<code>python calcs-csv.py</code>
+
+<h3>Filtering</h3>
+
+The Fortran program works out a series of tests. To see all the results for which a certain test is true, execute a command like
+<pre>   cat `grep -l "T001 T" data/calcs/* ` | less</pre>
+Replace <code>T001</code> with whatever test interests you.
+
+
+
+<hr><h2>Recipes</h2>
+
+<p>Download all the epics in StatsList.csv: <code>csv2epics | getit -i</code>
+
+<p>Determine <b>percentiles</b> for a given column:
+<pre>    csvtool namedcol RS_Month `shname` | sort -n | tac| pnl | less
+</pre>
+
+
+<hr><h2>See also</h2>
+
+<li><a href="cookies.htm">cookies</a>
+<li><a href="calcs.htm">calcs</a> - performs calculations on the decoded data
+<li><a href="install.htm">install</a> - how to set up Sharelock
+
+<hr><pre>
+Author:  Mark Carter
+Created: 17-Jun-2011
+Updated: 14-Jul-2013
+</pre>
+</body>
+</html>

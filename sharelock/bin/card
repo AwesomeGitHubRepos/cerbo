@@ -1,0 +1,151 @@
+#!/usr/bin/python
+
+import glob
+import inspect
+import optparse
+import os.path
+import pprint
+import re
+import string
+import sys
+
+
+from BeautifulSoup import BeautifulSoup
+
+#tables to include
+g_inctables = """
+tabIndices
+#tabDates
+tabRatioHistory
+tabForecasts
+tabRatios
+tabResHistFull
+tabTitle
+tabMktCap
+tabNumberShares
+tabFinRatios
+tabBalance
+tabRS
+tabEarnings
+tabCash
+tabResHist
+TableDummy
+tabLastUpdate"""
+
+
+def dird(d):
+    DATA = "~/.config/sharelock/"
+    DATA = "data/"
+    DATA = "~/repos/nokilli/sharelock/int/" # 05-May-2012
+    DATA = os.getenv("NOKILLI") + "/sharelock/int/"
+    return os.path.expanduser(DATA + d)
+
+def dire(d, f):
+    full ="{0}/{1}".format(dird(d), f)
+    return full
+
+
+def type1(reg):
+    global soup
+    v = soup.find('td', attrs = { 'title' : re.compile(reg)})
+    v = v.parent
+    v = v.findAll("td")
+    v = v[1].text
+    try: v = float(v)
+    except: v = 666
+    return v
+
+def get_soup(epic):
+    fin = dire("fetches", epic)
+    html = file(fin).read()
+    #print html
+    soup = BeautifulSoup(html)
+    return soup
+
+def print_tables(epic):
+    epic = epic.upper()
+    soup = get_soup(epic)
+    tables = soup.findAll('table')
+    for table in tables:
+        attrs = table.attrs
+        iid = attrs[0][1]
+        print iid
+
+
+lnum = 0
+
+def process_epic(epic, options):
+    global g_inctables , lnum
+    lnum = 0  # line number
+    epic = epic.upper()
+    if options.debug: print epic
+    fout = file(dire("cards", epic), "w")
+
+    def fwrite(txt): 
+        global lnum
+        #lnum
+        lnum = lnum + 1
+        fout.write( '{0:04} {1}\n'.format(lnum, txt))
+    #print fout
+    fwrite('F "{0}"'.format(epic))
+    soup = get_soup(epic)
+
+    what_tables = g_inctables.split("\n")
+    what_tables = [t for t in what_tables if len(t) > 0]
+    what_tables = [t for t in what_tables if t[0] != '#']
+    #print what_tables
+
+    tables = soup.findAll('table')
+    for table in tables:
+        tid = table.attrs[0][1] # table id attribute
+        if tid not in what_tables: continue
+        cols = table.findAll('td')
+        for col in cols:
+            text = col.text
+            text = str(text.encode('ascii', 'ignore'))
+            if len(text) > 30: text = text[0:30]
+            text = text.translate(None, ',\t\r\n;"')
+
+            try: 
+                f = float(text) ; is_float = "T"
+            except: 
+                is_float = "F"
+                text = '"{0}"'.format(text)
+
+            fwrite(is_float + " " + text)
+            #print "*"
+
+    # current share price
+    price_tag = soup.find("input", attrs={'name' : 'txtPrice'})
+    price = price_tag['value'][:-1] # last character is pence
+    fwrite('T ' + price)
+
+def process_epic_unfailingly(epic, options):
+    try:
+        process_epic(epic, options)
+    except:
+        print "Card: failed for epic: '{0}'. Skipping".format(epic)
+
+if __name__ == "__main__":
+
+    parser = optparse.OptionParser()
+    parser.add_option("-e", dest="epic")
+    parser.add_option("-a", action="store_true", dest="all",
+                      help = "Decode all htm files")
+    parser.add_option("-d", action="store_true", dest="debug",
+                      default = False,
+                      help = "Debug mode")
+    parser.add_option("-t", dest="tables", 
+                      help = "Print the available tables of EPIC. Useful for exploration")
+    (options, args) = parser.parse_args()
+    #print options
+    if options.all:
+        epics = glob.glob(dird("fetches/*"))
+        epics.sort()
+        epics = [os.path.basename(epic) for epic in epics]
+        for epic in epics: process_epic_unfailingly(epic, options)
+    if options.epic is not None: 
+        process_epic_unfailingly(options.epic, options)
+    if options.tables is not None: print_tables(options.tables)
+
+    
