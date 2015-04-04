@@ -1,4 +1,4 @@
-.PHONY : config cookies main
+.PHONY : clean config cookies main
 
 main:
 	@echo Be more specific: make config, cookies
@@ -10,7 +10,13 @@ config:
 	mkdir -p int/misc
 
 cookies: # reduce the size of the cookies file
-	#mv ~/Downloads/cookies.txt  int/misc/cookies.txt
-	fookies | sed -e '/sharelock\|^#/!d' > int/misc/cookies.txt
+	fookies | sed -e '/sharelock\|^#/!d' > ~/.fortran/cookies.txt
+
+
+report01 : report01.c
+	gcc -ggdb -o report01 report01.c -lm -lgsl -lgslcblas
+
+clean :
+	rm -f report01
 
 
