@@ -1,0 +1,36 @@
+.TH "fixcsv" "1" "0.0.0" "Mark Carter" "fix csv"
+.SH "NAME"
+.LP 
+fixcsv \- mcarter's csv fixer of Sharelock Holme's downloads
+.SH SYNOPSIS 
+\fBfixcsv\fP [-h | -d] [--cols COL1,COL2, ...] [-o OUTFILE] FILE
+.SH "DESCRIPTION"
+.LP 
+Reads Sharelock Holme's csv FILE, simplifying some headers, fixing line breaks, and dangling columns. FILE is overwritten unless the -o option is specified. Be careful if using the --cols specifier.
+
+.SH "OPTIONS"
+.TP 
+\fB\-\-cols\fR [COL1,COL2, ...]
+Specify output columns. Default is all of them
+
+.TP
+\fB\-d\fR
+Display arguments and exit. This is for the internal debugging of command line arguments.
+
+.TP
+\fB\-h\fR
+Print summary usage and exit.
+
+.TP
+\fB\-o\fR OUTFILE
+Write to file OUTFILE instead of overwriting FILE
+
+
+
+.SH AUTHOR
+Written by Mark Carter.
+.SH "COPYRIGHT"
+Suit yourself.
+.SH "SEE ALSO"
+.LP 
+mcarter(1) (TODO!)
