@@ -82,7 +82,7 @@ deriveEtrans start comms etrans = map (deriveEtran start comms) etrans
 
 cerl :: Etran -> String
 cerl etran = -- create etran report line
-  text ++ "\n"
+  text
   where
     (dstamp, way, acc, sym, qty, amount, _) = etranTuple etran
     unit = 100.0 * (unPennies amount) / qty
@@ -91,10 +91,10 @@ cerl etran = -- create etran report line
              , f3 qty, show amount, f4 unit]
     text = intercalate " " fields
              
-createEtranReport :: [Etran] -> String
+createEtranReport :: [Etran] -> [String]
 createEtranReport etrans =
-  "ETRANS:\n" ++ hdr ++ eLines ++ ".\n"
+  [hdr] ++ eLines
   where    
-    hdr = "SYM     DSTAMP     W FOLIO        QTY       AMOUNT         UNIT\n"
+    hdr = "SYM     DSTAMP     W FOLIO        QTY       AMOUNT         UNIT"
     sortedEtrans = sortOn (\e -> (etranSym e, etranDstamp e)) etrans
-    eLines = concatMap cerl sortedEtrans
+    eLines = map cerl sortedEtrans

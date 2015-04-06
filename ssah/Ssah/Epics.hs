@@ -75,7 +75,7 @@ processSymGrp comms etrans =
         
   
 reportOn title comms etrans =
-  (tableStr, zeroStr)
+  (fullTableLines, zeroLines)
   where
     symGrp = groupByKey etranSym etrans
     epics = map (processSymGrp comms) symGrp
@@ -87,8 +87,8 @@ reportOn title comms etrans =
     sumLine = epicSum tCost tValue
 
     fullTitle = "EPICS: " ++ title
-    tableStr = unlines ([fullTitle, epicHdr] ++ tableLines ++ [sumLine, ".", ""])
-    zeroStr = unlines $ map sym zeros 
+    fullTableLines = [fullTitle, epicHdr] ++ tableLines ++ [sumLine]
+    zeroLines = map sym zeros 
     
 
 subEpicsReport comms etrans aFolio =
@@ -104,7 +104,7 @@ reportEpics comms etrans =
   where
     etransBySym = sortOn etranSym etrans --work around apparent groupBy bug
     (nzTab, zTab) = reportOn "ALL" comms etransBySym
-    zTab1 = "EPICS: ZEROS\n" ++ zTab ++ ".\n"
+    zTab1 = ["EPICS: ZEROS"] ++ zTab ++ [";"]
     folios = ["hal", "hl", "tdi", "tdn", "ut"]
     subReports = concatMap (subEpicsReport comms etransBySym) folios
 

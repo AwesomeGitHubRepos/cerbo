@@ -25,11 +25,11 @@ fmtReturn aIdx aDstamp aMine minepc aAsx asxpc out =
   printf "%3d %11s %6.2f %6.2f %4.0f %6.2f %6.2f" aIdx aDstamp aMine minepc aAsx asxpc out
 
 -- final 
-foldReturns :: String -> Return -> [Return] -> String
+foldReturns :: [String] -> Return -> [Return] -> [String]
 foldReturns acc prev ([]) = acc
   
 foldReturns acc prev (r:rs) =
-  foldReturns (acc ++ newReturnStr ++ "\n") r rs
+  foldReturns (acc ++ [newReturnStr]) r rs
   where
     minepc = gainpc (mine r) (mine prev)
     asxpc  = gainpc (asx  r) (asx  prev)
@@ -41,9 +41,9 @@ summaryLine :: Float -> Float -> Float -> String
 summaryLine minepa asxpa outpa =
   printf "%15s %6s %6.2f %4s %6.2f %6.2f\n" "AVG" " " minepa " " asxpa outpa
 
-createReturns :: Dstamp -> Etb -> Float -> [Return] -> String
+createReturns :: Dstamp -> Etb -> Float -> [Return] -> [String]
 createReturns ds etb asxNow returns =
-  "RETURNS:\n" ++  hdr ++ "\n" ++ createdReturns ++ "\n" ++ summary ++ "."
+  [hdr] ++ createdReturns ++ [summary]
   where
     hdr = "IDX      DSTAMP   MINE  MINE%  ASX   ASX%   OUT%"
     ret0 = head returns
@@ -61,7 +61,7 @@ createReturns ds etb asxNow returns =
     finRet = Return { idx = finIdx, dstamp = ds, mine = finMine, asx = asxNow }
 
     augReturns = returns ++ [finRet] 
-    createdReturns = foldReturns "" ret0 augReturns
+    createdReturns = foldReturns [] ret0 augReturns
 
     -- summary line
     gpc v =

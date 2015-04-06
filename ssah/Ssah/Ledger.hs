@@ -1,5 +1,7 @@
 module Ssah.Ledger where
 
+import Control.Monad
+
 import Ssah.Comm
 import Ssah.Etran
 import Ssah.Financial
@@ -31,6 +33,17 @@ withLedger f = do
   --printAll result
   return $ f inputs
 
+
+-- | Read and trim ledger
+ratl = liftM trimLedger readLedger
+
+-- FIXME trim on start, too
+trimLedger ledger =
+  ledger { etrans = trEtrans, ntrans = trNtrans}
+  where
+    trEtrans = filter (\e -> (etranDstamp e) <= (end ledger)) $ etrans ledger
+    trNtrans = filter (\n -> (ntranDstamp n) <= (end ledger)) $ ntrans ledger
+  
 readLedger' inputs =
   let comms = getComms inputs in
   let etrans = getEtrans inputs in
@@ -77,41 +90,3 @@ synthSQuotes :: [Comm] -> [Etran] -> [StockQuote] -- create synthetic stock quot
 synthSQuotes comms etrans =  map  (etranToSQuote comms)  etrans
 
 
-{-
-  do
-  inputs <- readInputs
-
-  return ledger
--}
-
-{-
-ledgerTuple (Ledger comms etrans financials ntrans naccs period quotes returns) =
-  (comms, etrans, financials, ntrans, naccs, period, quotes, returns)
--}
-
-{-
-ledgerComms :: Ledger -> [Comm]
-ledgerComms l = sel1 $ ledgerTuple l
-
-ledgerEtrans :: Ledger -> [Etran]
-ledgerEtrans l = sel2 $ ledgerTuple l
-
-ledgerFinancials :: Ledger -> [Financial]
-ledgerFinancials l = sel3 $ ledgerTuple l
-
-ledgerNtrans :: Ledger -> [Ntran]
-ledgerNtrans l = sel4 $ ledgerTuple l
-
-ledgerNaccs :: Ledger -> [Nacc]
-ledgerNaccs l = sel5 $ ledgerTuple l
-
-ledgerPeriod :: Ledger -> Period
-ledgerPeriod l = sel6 $ ledgerTuple l
-
-ledgerQuotes :: Ledger -> [StockQuote]
-ledgerQuotes l = sel7 $ ledgerTuple l
--}
-
-
-
-  

@@ -68,7 +68,7 @@ printEtbAcc (dr, nacc, posts) =
     body = map2 etbLine posts runningTotals    
     textLines = [accHdr, desc] ++ body ++ [";"]
 
-
+reportAccs :: Foldable t => t ([Char], Maybe Nacc, [Post]) -> [[Char]]
 reportAccs grp =
   ["ACCS:"] ++ accs ++ ["."]
   where
@@ -93,7 +93,7 @@ assembleEtb es =
     augs = augEtb lup
 
 createEtbReport etb =
-  ["ETB:"] ++  eLines ++  [totalLine, "."]
+  eLines ++  [totalLine]
   where
     sorted = sortOn fst etb
     eLine (acc, pennies) = (psr 6 acc) ++ (show pennies)
@@ -102,35 +102,41 @@ createEtbReport etb =
     totalLine = eLine ("TOTAL", total)
 
     
--- FIXME ignore transactions after period end  
 --createEtb :: Ledger
 createEtbDoing  options = do
-  ledger <- readLedger
+  ledger <- ratl
   let theComms = comms ledger
   let theEtrans = etrans ledger
   let posts = createPostings (ntrans ledger) theEtrans      
 
   let grp = assemblePosts (naccs ledger) posts -- FIXME LOW put into order
-
-  let putSection sec lines = putStrLn $ if (elem sec options) then lines else ""
-  let printSection sec str = putSection sec $ unlines str
-      
-  printSection PrinAccs $ reportAccs grp
-  putSection PrinEpics $ reportEpics theComms  theEtrans
-  
   let etb = assembleEtb grp
-  printSection PrinEtb $ createEtbReport etb
-
-  putSection PrinEtrans $ createEtranReport theEtrans
-  printSection PrinFin $ createFinancials etb (financials ledger)
-  printSection PrinPorts $ createPortfolios etb theComms
-
   let asxNow = commEndPriceOrDie theComms "FTAS"
   let createdReturns = createReturns (end ledger) etb asxNow (returns ledger)
-  putSection PrinReturns createdReturns
+    
+  --let putSection sec lines = putStrLn $ if (elem sec options) then lines else ""
+  --let printSection sec str = putSection sec $ unlines str
 
+  let block title option lines = 
+        if (elem option options)
+        then  [title] ++ lines ++ ["."]
+        else []
+  --let section title option lines = putStrLn $ unlines $ block title option lines
+  let sec (title, option, lines) = block title option lines
+      
+  let output = concatMap sec [
+        ("ACCS:",       PrinAccs,    reportAccs grp) ,
+        ("EPICS:",      PrinEpics,   reportEpics theComms  theEtrans) ,
+        ("ETB:",        PrinEtb,     createEtbReport etb) ,
+        ("ETRANS:",     PrinEtrans,  createEtranReport theEtrans),
+        ("FINANCIALS:", PrinFin,     createFinancials etb (financials ledger)),
+        ("PORTFOLIOS:", PrinPorts,   createPortfolios etb theComms),
+        ("RETURNS:",    PrinReturns, createdReturns)]
+
+  let outStr = unlines output
+  putStrLn outStr
   putStrLn "+ OK Finished"
-
+  writeFile "/home/mcarter/.ssa/hssa.txt" outStr
 
 optionSet0 = [PrinAccs,  PrinEpics, PrinEtb, PrinEtrans, PrinFin, PrinPorts, PrinReturns]
 optionSet2 = [PrinFin]
