@@ -1,6 +1,7 @@
 module Ssah.Post where
 
 import Data.List
+import Data.Maybe
 import Data.Ord
 import Text.Printf
 import Data.Tuple.Select
@@ -36,33 +37,57 @@ postingsFromNtran ntran =
     n2 = Post dstamp cr dr (negp pennies) desc
     
 postingsFromNtrans  ntrans = concatMap postingsFromNtran ntrans
-  
-postingsFromEtran etran =
+
+--postingsFromEtran e = []
+
+postingsFromEtran :: Etran -> [Post]
+postingsFromEtran e =
+  posts
+  where
+    --cost = etAmount e
+    folio = etFolio e
+    --de = etranDerived e
+    --(odstamp, startValue, flow, profit, endValue, comm) = de
+    ds = etDstamp e
+    s = etSym e
+    pCost = Post ds folio "pCost" (negp $ etAmount e) ("pCost:" ++ s) -- actual cost
+    pPdp  = Post ds (folio ++ "/g") "pPdp" (negp $ etPdp e) ("pPdp:" ++ s) -- profit during period
+    pVcd  = Post ds (folio ++ "/c") "pVcd" ( etVcd e) ("pVcd:" ++ s) -- value c/d
+    posts1 = [pCost, pPdp, pVcd]
+
+    --pPbd1 = Post ds (folio ++ "/b") "pPdb1" (negp $ etVbd e) ("pPdb1:" ++ s)
+    pPbd2 = Post ds "opn" "pdb2" (negp $ etPbd e) ("pdb2:" ++ s) -- profit b/d
+
+    posts = if etDuring e then posts1 else pPbd2:posts1
+    --posts = posts1
+    
+{-    
+postingsFromEtranXXX etran =
   [n1, n2, n3, n4]
   where
     odstamp = etranOdstamp etran
-    folio = etranFolio etran
-    sym = etranSym etran
+    folio = etFolio etran
+    sym = etSym etran
     opn = folio ++ "/b" --"opn"
     pga = folio ++ "/g" --"pga"
     prt = folio ++ "/c" --"prt"
     n1 = Post odstamp opn pga (negp $ etranStartValue etran) sym
-    n2 = Post odstamp (etranFolio etran) pga (negp $ etranFlow etran) sym
+    n2 = Post odstamp (etFolio etran) pga (negp $ etranFlow etran) sym
     n3 = Post odstamp pga pga (negp $ etranProfit etran) sym -- FIXME - how can they be the same account ??
     n4 = Post odstamp prt pga (etranEndValue etran) sym
-
-postingsFromEtrans etrans =
-  concatMap postingsFromEtran etrans
-
-{-
-testPostings = do -- won't work because it doesn't do any derivations
-  ledger <- readLedger
-  let etrans = ledgerEtrans ledger
-  let posts = postingsFromEtrans etrans
-  printAll posts
 -}
 
---createPostings :: [Ntran] -> [Etran] -> [Post]
+postingsFromEtrans etrans = concatMap postingsFromEtran etrans
+
+
+testPostings = do
+  ledger <- ratl
+  let es = etrans ledger      
+  let ps = postingsFromEtrans es
+  printAll ps
+
+
+createPostings :: [Ntran] -> [Etran] -> [Post]
 createPostings ntrans derivedEtrans =
   postings
   where

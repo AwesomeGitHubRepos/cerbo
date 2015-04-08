@@ -93,6 +93,8 @@ asFloat v =  read clean :: Float   where clean = stripChars "\"%\n+" v
 asPennies :: String -> Pennies -- String of form #0.00
 asPennies pounds = enPennies (asFloat pounds)
 
+noPennies :: Pennies -> Bool
+noPennies p = 0.0 == unPennies p
 
 dateString = do
   let now = getCurrentTime

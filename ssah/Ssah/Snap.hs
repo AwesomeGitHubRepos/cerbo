@@ -1,5 +1,6 @@
 module Ssah.Snap  where
 
+import Data.Either
 import Data.Function
 import Data.List
 import Data.Ord
@@ -49,7 +50,11 @@ snapDownloading afresh = do
   led <- readLedger
   let theComms = comms led
   let theEtrans = etrans led
-  fetchedQuotes <- if afresh then precacheCommsUsing theComms else loadPrecachedComms
+  pres <- fmap partitionEithers $ precacheCommsUsing theComms
+  loaded <- loadPrecachedComms
+  let (errs, fetchedQuotes) = if afresh
+                              then  pres
+                              else ([], loaded)
   
   let fetchableComms = filter fetchRequired theComms
 
@@ -102,6 +107,7 @@ snapDownloading afresh = do
   mapM_ (putStrLn . index) ["^FTSE", "^FTAS", "^FTMC"]
   --putStrLn index "
   putStrLn "\n---\n\n"
+  print errs
 
 
 snap1 = snapDownloading True

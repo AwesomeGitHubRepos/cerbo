@@ -39,26 +39,38 @@ ratl = liftM trimLedger readLedger
 
 -- FIXME trim on start, too
 trimLedger ledger =
-  ledger { etrans = trEtrans, ntrans = trNtrans}
+  ledger { etrans = etrans', ntrans = ntrans'}
   where
-    trEtrans = filter (\e -> (etranDstamp e) <= (end ledger)) $ etrans ledger
-    trNtrans = filter (\n -> (ntranDstamp n) <= (end ledger)) $ ntrans ledger
+    etrans' = filter (\e -> (etDstamp e) <= (end ledger)) $ etrans ledger
+
+    trNtrans :: [Ntran] -> [Ntran] -> [Ntran]
+    trNtrans acc ([]) = reverse acc
+    trNtrans acc (n:ns) =
+      if ntranDstamp n > end ledger
+      then trNtrans acc ns
+      else trNtrans (n':acc) ns
+      where
+        (dstamp, dr, cr, pennies, clear, desc) = ntranTuple n
+        theNaccs = naccs ledger
+        (dr', cr') = if dstamp < (start ledger)
+                     then (alt dr theNaccs, alt cr theNaccs)
+                     else (dr, cr)
+        n' = Ntran dstamp dr' cr' pennies clear desc
+    ntrans' = trNtrans [] $ ntrans ledger
+
+    --trNtrans = filter (\n -> (ntranDstamp n) <= (end ledger)) $ ntrans ledger
   
 readLedger' inputs =
   let comms = getComms inputs in
   let etrans = getEtrans inputs in
-  --let financials = getFinancials inputs in
-  --let ntrans = getNtrans inputs in
-  --let naccs = getNaccs inputs in
   let (start, end) = last $ getPeriods inputs in
   let yahoos = getQuotes inputs in 
   let googles = getGoogles inputs in 
   let synths = synthSQuotes comms etrans in
   let quotes = yahoos ++ googles ++ synths in
+  -- FIXME next 2 lines should prolly be in trim
   let comms1 = deriveComms start end quotes comms in
   let etrans1 = deriveEtrans start comms1 etrans in
-  --let returns =  in
-  --let ledger = Ledger comms etrans financials ntrans naccs period quotes returns
   Ledger
          { comms = comms1
          , etrans = etrans1
@@ -79,10 +91,10 @@ etranToSQuote :: [Comm] -> Etran -> StockQuote
 etranToSQuote comms e =
   StockQuote ds "08:00:00" ticker 1.0 price 0.0 0.0
   where
-    ds = etranDstamp e
-    ticker = findTicker comms (etranSym e)
-    amount = unPennies $ etranAmount e
-    qty = etranQty e
+    ds = etDstamp e
+    ticker = findTicker comms (etSym e)
+    amount = unPennies $ etAmount e
+    qty = etQty e
     price = 100.0 * amount / qty
 
             

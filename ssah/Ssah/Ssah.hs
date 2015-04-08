@@ -1,6 +1,7 @@
 module Ssah.Ssah where
 
 --import Data.Char
+import Data.Either
 import Data.List
 import Data.String.Utils
 --import Data.Text
@@ -27,13 +28,13 @@ ssahTest = "hello from Ssah"
 
 
 
-precacheCommsUsing :: [Comm] -> IO [StockQuote]
+--precacheCommsUsing :: [Comm] -> IO [StockQuote]
 precacheCommsUsing comms = do
   quotes <- fetchCommQuotes comms -- will be filtered automatically
-  saveStockQuotes "/home/mcarter/.ssa/yahoo-cached.txt" quotes
+  saveStockQuotes "/home/mcarter/.ssa/yahoo-cached.txt" $ rights quotes
   ds <- dateString
   let fname = "/home/mcarter/.ssa/yahoo/" ++ ds ++ ".txt"
-  saveStockQuotes fname quotes
+  saveStockQuotes fname $rights quotes
   return quotes
  
 -- | Download the Comms that apparently require fetching, and store to disk
@@ -83,7 +84,7 @@ rox  usd c =
       Just q -> q
 
 -- | Fetch StockQuotes of Comm for which a fetch is required
-fetchCommQuotes :: [Comm] ->  IO [StockQuote]
+--fetchCommQuotes :: [Comm] ->  IO [StockQuote]
 fetchCommQuotes comms = do
   let hitComms = filter fetchRequired comms
   let tickers = map yepic hitComms

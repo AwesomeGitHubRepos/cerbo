@@ -2,6 +2,7 @@ module Ssah.Yahoo where
 
 import Control.Concurrent.Async
 import Control.Monad
+import Data.Either
 import Data.List
 import Data.List.Split
 import Data.String.Utils
@@ -99,21 +100,26 @@ testQuoteAsText = do
   let sq = StockQuote "2015-03-18" "12:59:23" "HYH" 1.0 47.5745 0.5645 1.2008
   print (quoteAsText sq)
 
-decodeFetch :: String -> String -> Float -> String -> StockQuote
-decodeFetch dstamp tstamp rox serverText =
-  StockQuote dstamp tstamp ticker rox   price chg   chgpc
+--decodeFetch :: String -> String -> Float -> String -> StockQuote
+decodeFetch dstamp tstamp rox serverText ticker =
+  ans
   where
-    ticker:priceStr:chgStr:chgpcStr:[] = splitStr "," serverText
+    fields = splitStr "," serverText
+    [_, priceStr, chgStr, chgpcStr] = fields
     price = asFloat(priceStr) * rox
     chg  = asFloat(chgStr) * rox
     chgpc = asFloat(chgpcStr)
+    ans = if length fields  == 4
+          then Right $ StockQuote dstamp tstamp ticker rox   price chg   chgpc
+          else Left $ "Couldn't decipher server response for ticker '" ++ ticker++ "' with response '" ++ serverText ++ "'"
 
-fetchQuote ::  String -> String -> (String, Float)  -> IO StockQuote
+
+-- fetchQuote ::  String -> String -> (String, Float)  -> IO StockQuote
 fetchQuote dstamp tstamp (ticker, rox) =  do
   let url = symUrl $ replace "^" "%5E" ticker
   resp <- getUrl url
   let clean = stripJunk resp
-  let sq =  decodeFetch dstamp tstamp rox clean
+  let sq =  decodeFetch dstamp tstamp rox clean ticker
   return sq
 
 
@@ -121,13 +127,15 @@ testFtas = fetchQuote  "2015-03-18" "12:59:23" ("^FTAS", 1.0)
 testHyh = fetchQuote "2015-03-18" "12:59:23" ("HYH", 1.0)
 
 
-fetchQuotes :: Dstamp -> Tstamp -> [(Ticker, Rox)] -> IO [StockQuote]
+--fetchQuotes :: Dstamp -> Tstamp -> [(Ticker, Rox)] -> IO [StockQuote]
 fetchQuotes dstamp tstamp pairs = do
   let fq = fetchQuote dstamp tstamp
   res <- mapConcurrently fq pairs
+  --let oops = lefts res
+  --let _ = if length oops >0 then error (show oops) else []
   return res
 
-fetchQuotesA :: [Ticker] -> [Rox] -> IO [StockQuote]
+--fetchQuotesA :: [Ticker] -> [Rox] -> IO [StockQuote]
 fetchQuotesA tickers roxs = do
   ds <- dateString
   ts <- timeString
@@ -136,6 +144,7 @@ fetchQuotesA tickers roxs = do
   return quotes
 
 testFqa = fetchQuotesA ["HYH", "^FTAS"] [1.0, 1.0]
+testFqaBad = fetchQuotesA ["AARGH", "^FTAS"] [1.0, 1.0]
 
 testTickers = [ ("AML.L", 1.0), ("ULVR.L", 1.0), ("HYH", 1000.0)]
 testFetches = fetchQuotes "2015-03-18" "12:59:23" testTickers
@@ -156,16 +165,20 @@ saveStockQuotes fname quotes = do
   hFlush h
   hClose h
 
+
 fetchAndSave :: [(Ticker, Rox)] -> IO ()   
 fetchAndSave tickerPairs = do
   dstamp <- dateString
   tstamp <- timeString
   let fname = "/home/mcarter/.ssa/yahoo/" ++ dstamp ++ ".txt"
   quotes <- fetchQuotes  dstamp tstamp tickerPairs
-  saveStockQuotes fname quotes 
+  let errs = lefts quotes
+  if length errs >0 then print errs else print ""
+  saveStockQuotes fname $ rights quotes 
 
 
 testFas = fetchAndSave testTickers
+
 
 
 loadSaves = do
@@ -174,11 +187,11 @@ loadSaves = do
   fmap (liftM decodeFetch) ls
 
 -- | Return the a price for Ticker on or before Dstamp
-getStockQuote :: Dstamp -> Ticker -> [StockQuote] -> Maybe Float
-getStockQuote dstamp ticker sqs =
+getStockQuote :: (Dstamp -> Bool) -> Ticker -> [StockQuote] -> Maybe Float
+getStockQuote accept ticker sqs =
   sqLast
   where
-    f sq = ticker == (quoteTicker sq) && (quoteDstamp sq) <= dstamp
+    f sq = ticker == (quoteTicker sq) && accept (quoteDstamp sq)
     matches = filter f sqs
     sortedMatches = sortWith quoteDstamp matches
     sq [] = Nothing

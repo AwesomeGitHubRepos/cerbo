@@ -65,8 +65,8 @@ deriveComm start end quotes comm =
   Comm sym fetch ctype unit exch gepic yepic name derived
   where
     (sym, fetch, ctype, unit, exch, gepic, yepic, name, _) = commTuple comm
-    startPrice = getStockQuote start yepic quotes
-    endPrice = getStockQuote end yepic quotes
+    startPrice = getStockQuote (\d -> d < start) yepic quotes
+    endPrice = getStockQuote (\d -> d <= end) yepic quotes
     derived = Just (CommDerived startPrice endPrice)
   
 deriveComms start end quotes comms  =

@@ -46,13 +46,11 @@ foldEtrans inQty inCost  ([]) = (inQty, inCost)
 foldEtrans inQty inCost  (e:es) =
   foldEtrans newQty newCost es
   where
-    isBuy = ((qty e) > 0.0)
-    eQty = etranQty e
+    --isBuy = ((qty e) > 0.0)
+    eQty = etQty e
     newQty = inQty + eQty
-    --unitCost = inCost * 
-    --eamount = etranAmount e
-    incCost = if isBuy -- incremental cost
-              then (etranAmount e)
+    incCost = if etIsBuy e -- incremental cost
+              then (etAmount e)
               else (scalep inCost (eQty/ inQty))
     newCost = inCost |+| incCost
 
@@ -64,8 +62,8 @@ processSymGrp comms etrans =
        , cost = theCost, value = theValue, ret = theRet}
 
   where
-    theSym = etranSym $ head etrans
-    sortedEtrans = sortOn etranDstamp etrans
+    theSym = etSym $ head etrans
+    sortedEtrans = sortOn etDstamp etrans
     (theQty, theCost) =  foldEtrans  0.0 (Pennies 0) sortedEtrans
     theUcost = 100.0 * (unPennies theCost) / theQty
     theUvalue = commEndPriceOrDie comms theSym
@@ -77,7 +75,7 @@ processSymGrp comms etrans =
 reportOn title comms etrans =
   (fullTableLines, zeroLines)
   where
-    symGrp = groupByKey etranSym etrans
+    symGrp = groupByKey etSym etrans
     epics = map (processSymGrp comms) symGrp
     (nonzeros, zeros) = partition (\e -> (eqty e) > 0.0) epics
     tableLines = map showEpic nonzeros
@@ -94,7 +92,7 @@ reportOn title comms etrans =
 subEpicsReport comms etrans aFolio =
   nzTab
   where
-    fEtrans = filter (\e -> (etranFolio e) == aFolio) etrans
+    fEtrans = filter (\e -> (etFolio e) == aFolio) etrans
     (nzTab, _) = reportOn aFolio comms fEtrans
     
     
@@ -102,7 +100,7 @@ subEpicsReport comms etrans aFolio =
 reportEpics comms etrans =
   nzTab ++ zTab1 ++ subReports
   where
-    etransBySym = sortOn etranSym etrans --work around apparent groupBy bug
+    etransBySym = sortOn etSym etrans --work around apparent groupBy bug
     (nzTab, zTab) = reportOn "ALL" comms etransBySym
     zTab1 = ["EPICS: ZEROS"] ++ zTab ++ [";"]
     folios = ["hal", "hl", "tdi", "tdn", "ut"]
