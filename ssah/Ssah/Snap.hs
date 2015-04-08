@@ -24,7 +24,7 @@ totalQty ::  [Etran] -> Comm -> Qty
 totalQty etrans comm =
   qtys commEtrans
   where
-    hit e = (commSym comm) == (etranSym e)
+    hit e = (commSym comm) == (etSym e)
     commEtrans = filter hit  etrans
 
 
@@ -58,15 +58,15 @@ snapDownloading afresh = do
   
   let fetchableComms = filter fetchRequired theComms
 
-  let sortedEtrans = sortBy (comparing $ etranSym) theEtrans
+  let sortedEtrans = sortBy (comparing $ etSym) theEtrans
   --let grpEtrans  = groupByKey etranSym etrans
-  let grpEtrans = groupBy (\x y -> (etranSym x) == (etranSym y)) sortedEtrans
+  let grpEtrans = groupBy (\x y -> (etSym x) == (etSym y)) sortedEtrans
   --let grpEtrans = groupBy (compare `on` etranSym) etrans
   let agg etrans =
         (sym , qty, want, price, amount, profit, chgpc, oops)
         where
           qty = qtys etrans
-          sym = etranSym $ head etrans
+          sym = etSym $ head etrans
           comm = find (\c -> commSym c == sym) theComms
           ctype = fmap commType  comm
           ticker = fmap commTicker comm
