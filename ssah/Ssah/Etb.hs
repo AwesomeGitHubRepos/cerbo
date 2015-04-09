@@ -130,7 +130,7 @@ createEtbDoing  options = do
         ("ETB:",        PrinEtb,     createEtbReport etb) ,
         ("ETRANS:",     PrinEtrans,  createEtranReport theEtrans),
         ("FINANCIALS:", PrinFin,     createFinancials etb (financials ledger)),
-        ("PORTFOLIOS:", PrinPorts,   createPortfolios etb theComms),
+        ("PORTFOLIOS:", PrinPorts,   createPortfolios theEtrans theComms),
         ("RETURNS:",    PrinReturns, createdReturns)]
 
   let outStr = unlines output
@@ -139,7 +139,7 @@ createEtbDoing  options = do
   writeFile "/home/mcarter/.ssa/hssa.txt" outStr
 
 optionSet0 = [PrinAccs,  PrinEpics, PrinEtb, PrinEtrans, PrinFin, PrinPorts, PrinReturns]
-optionSet2 = [PrinFin]
+optionSet1 = [PrinPorts]
 optionSetX = [PrinEtb]
 
 createEtb = createEtbDoing optionSet0

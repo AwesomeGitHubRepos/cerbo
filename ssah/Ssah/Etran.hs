@@ -135,10 +135,20 @@ createEtranReport etrans =
 etComm e = deComm $ fromJust $ etDerived e
 etDuring e = deDuring $ fromJust $ etDerived e
 
+-- | Profit during period
 etPdp e = (etVcd e) |-| (if etDuring e then  (etAmount e) else (etVbd e))
 
 etStartPrice e = fromJust $ commStartPrice $ etComm e
+
+-- | value brought down
 etVbd e = if etDuring e then Pennies 0 else enPennies  (etStartPrice e * 0.01 * etQty e)
 etEndPrice e = fromJust $ commEndPrice $ etComm e
+
+-- | value carried down
 etVcd e = enPennies (etEndPrice e * 0.01 * etQty e)
+
+-- | profit brought down
 etPbd e = if etDuring e then Pennies 0 else (etVbd e) |-| (etAmount e)
+
+-- | flow during period
+etFlow e = (etVcd e) |-| (etVbd e) |-| (etPdp e)
