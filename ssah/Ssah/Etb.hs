@@ -112,7 +112,7 @@ createEtbDoing  options = do
   let grp = assemblePosts (naccs ledger) posts -- FIXME LOW put into order
   let etb = assembleEtb grp
   let asxNow = commEndPriceOrDie theComms "FTAS"
-  let createdReturns = createReturns (end ledger) etb asxNow (returns ledger)
+  let createdReturns = createReturns (end ledger) theEtrans asxNow (returns ledger)
     
   --let putSection sec lines = putStrLn $ if (elem sec options) then lines else ""
   --let printSection sec str = putSection sec $ unlines str
@@ -140,7 +140,8 @@ createEtbDoing  options = do
 
 optionSet0 = [PrinAccs,  PrinEpics, PrinEtb, PrinEtrans, PrinFin, PrinPorts, PrinReturns]
 optionSet1 = [PrinPorts]
+optionSet2 = [PrinReturns]
 optionSetX = [PrinEtb]
 
-createEtb = createEtbDoing optionSet0
+createEtb = createEtbDoing optionSet2
 mainEtb = createEtb

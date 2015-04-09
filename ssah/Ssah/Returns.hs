@@ -3,6 +3,7 @@ module Ssah.Returns where
 import Text.Printf
 
 import Ssah.Comm
+import Ssah.Etran
 import Ssah.Utils
 
 data Return = Return { idx::Int
@@ -41,22 +42,26 @@ summaryLine :: Float -> Float -> Float -> String
 summaryLine minepa asxpa outpa =
   printf "%15s %6s %6.2f %4s %6.2f %6.2f\n" "AVG" " " minepa " " asxpa outpa
 
-createReturns :: Dstamp -> Etb -> Float -> [Return] -> [String]
-createReturns ds etb asxNow returns =
+createReturns :: Dstamp -> [Etran] -> Float -> [Return] -> [String]
+createReturns ds etrans asxNow returns =
   [hdr] ++ createdReturns ++ [summary]
   where
     hdr = "IDX      DSTAMP   MINE  MINE%  ASX   ASX%   OUT%"
     ret0 = head returns
     lastRet = last returns
     finIdx = 1 + (idx lastRet)
+    {-
     lup x =
       unPennies f
       where
         msg = "createReturns couldn't lookup etb value:'" ++ x ++ "'"
         f = lookupOrDie x etb msg
-
-    mine_g = lup "mine/g"
-    mine_bd = lup "mine/b"
+-}
+    --mine_g = lup "mine/g"
+    --mine_bd = lup "mine/b"
+    nonUt = filter (\e -> "ut" /= etFolio e) etrans
+    mine_g = unPennies $ countPennies $ map etPdp nonUt
+    mine_bd = unPennies $ countPennies $ map etVbd nonUt
     finMine = (mine lastRet) * (mine_g / mine_bd + 1.0)
     finRet = Return { idx = finIdx, dstamp = ds, mine = finMine, asx = asxNow }
 
