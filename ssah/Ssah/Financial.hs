@@ -109,7 +109,6 @@ sumAccs etb acc lst =
 -- | Will usually require augmented etb, as provided by augEtb
 createFinancial etb fin =
   let (c, p1, p2) = (action fin, param1 fin, param2 fin) in
-  --let etbAug = augEtb etb in
   case c of
     'I' -> "TODO I"
     'M' -> finMP p1  (-1.0) p2 etb
@@ -118,12 +117,11 @@ createFinancial etb fin =
     'S' -> p1
     'T' -> "TODO T"
     'U' -> "TODO U"
-    'Z' -> "TOSO Z"
+    'Z' -> "TODO Z"
     _   -> error $ "Can't identify financial type: " ++ [c]
 
-createFinancials etb userData =
-  let res =   map (createFinancial etb) userData in
-  ["FINANCIALS:"] ++ res ++ ["."]
+createFinancials etb userData = map (createFinancial etb) userData
+
 
 
   
