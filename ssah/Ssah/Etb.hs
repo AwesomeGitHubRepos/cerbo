@@ -143,5 +143,5 @@ optionSet1 = [PrinPorts]
 optionSet2 = [PrinReturns]
 optionSetX = [PrinEtb]
 
-createEtb = createEtbDoing optionSet2
+createEtb = createEtbDoing optionSet0
 mainEtb = createEtb
