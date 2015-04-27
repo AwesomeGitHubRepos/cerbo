@@ -1,7 +1,10 @@
+{-# LANGUAGE DoAndIfThenElse, NoOverloadedStrings, TypeSynonymInstances, GADTs, CPP #-}
+
 module Ssah.Utils where
 
 import Data.List
 import Data.Maybe
+import Data.Ord
 import Data.Time
 import System.Locale (defaultTimeLocale)
 import Text.Printf
@@ -24,8 +27,10 @@ enPennies pounds = Pennies (round (pounds * 100.0) :: Int)
 unPennies :: Pennies -> Float
 unPennies (Pennies p) = (fromIntegral p) / 100.0
 
-myTime = Data.Time.defaultTimeLocale
---myTime = System.Locale.defaultTimeLocale
+--myTime = Data.Time.defaultTimeLocale
+myTime = System.Locale.defaultTimeLocale
+
+
 
 instance Show Pennies where
   show (Pennies p) = printf "%12.2f" (unPennies (Pennies p)) -- FIXME probable small rounding problems
@@ -153,6 +158,11 @@ findOrDie what table oopsText =
 -}
 
 true x = True -- function which always returns true
+
+
+sortOnMc :: Ord b => (a -> b) -> [a] -> [a]
+sortOnMc f =
+  map snd . sortBy (comparing fst) . map (\x -> let y = f x in y `seq` (y, x))
 
 -----------------------------------------------------------------------
 -- printing routines

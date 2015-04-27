@@ -63,7 +63,7 @@ processSymGrp comms etrans =
 
   where
     theSym = etSym $ head etrans
-    sortedEtrans = sortOn etDstamp etrans
+    sortedEtrans = sortOnMc etDstamp etrans
     (theQty, theCost) =  foldEtrans  0.0 (Pennies 0) sortedEtrans
     theUcost = 100.0 * (unPennies theCost) / theQty
     theUvalue = commEndPriceOrDie comms theSym
@@ -100,7 +100,7 @@ subEpicsReport comms etrans aFolio =
 reportEpics comms etrans =
   nzTab ++ zTab1 ++ subReports
   where
-    etransBySym = sortOn etSym etrans --work around apparent groupBy bug
+    etransBySym = sortOnMc etSym etrans --work around apparent groupBy bug
     (nzTab, zTab) = reportOn "ALL" comms etransBySym
     zTab1 = ["EPICS: ZEROS"] ++ zTab ++ [";"]
     folios = ["hal", "hl", "tdi", "tdn", "ut"]

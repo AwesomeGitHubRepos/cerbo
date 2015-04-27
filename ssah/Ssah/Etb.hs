@@ -1,6 +1,6 @@
 module Ssah.Etb where
 
-import Control.Monad.IfElse
+--import Control.Monad.IfElse
 import Data.Function (on)
 import Data.List
 import Data.Maybe
@@ -68,7 +68,7 @@ printEtbAcc (dr, nacc, posts) =
     body = map2 etbLine posts runningTotals    
     textLines = [accHdr, desc] ++ body ++ [";"]
 
-reportAccs :: Foldable t => t ([Char], Maybe Nacc, [Post]) -> [[Char]]
+--reportAccs :: Foldable t => t ([Char], Maybe Nacc, [Post]) -> [[Char]]
 reportAccs grp =
   ["ACCS:"] ++ accs ++ ["."]
   where
@@ -78,7 +78,7 @@ assemblePosts :: [Nacc] -> [Post] -> [(Acc, Maybe Nacc, [Post])]
 assemblePosts naccs posts =
   zip3 keys keyedNaccs keyPosts
   where
-    sPosts = (sortOn postDstamp posts)
+    sPosts = (sortOnMc postDstamp posts)
     keys = uniq $ map postDr sPosts
     keyedNaccs = map (\k -> find (\n -> k == (naccAcc n)) naccs) keys
     keyPosts = map (\k -> filter (\p -> k == (postDr  p)) sPosts) keys
@@ -95,7 +95,7 @@ assembleEtb es =
 createEtbReport etb =
   eLines ++  [totalLine]
   where
-    sorted = sortOn fst etb
+    sorted = sortOnMc fst etb
     eLine (acc, pennies) = (psr 6 acc) ++ (show pennies)
     eLines = map eLine sorted
     total  = countPennies $ map snd sorted

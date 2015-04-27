@@ -110,5 +110,5 @@ aggPosts posts =
   where
     accOrder = sortBy (comparing $ postDr) posts
     grp = groupOn postDr accOrder
-    sortSubGroup = sortOn postDstamp -- (comparing $ postDstamp)
+    sortSubGroup = sortOnMc postDstamp -- (comparing $ postDstamp)
     res = map sortSubGroup grp
