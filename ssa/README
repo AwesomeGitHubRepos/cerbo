@@ -28,5 +28,5 @@ I am using the argp command line parsing program
 depends on the argp library
 
 ## Debian
-sudo apt-get install liblua5.2-dev
+sudo apt-get install libcurl4-openssl-dev
 
