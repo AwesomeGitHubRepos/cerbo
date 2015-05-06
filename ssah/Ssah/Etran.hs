@@ -11,22 +11,10 @@ import Ssah.Utils
 data EtranDerived = EtranDerived
                     { --deDstamp::Dstamp
                     deDuring:: Bool -- was the flow during the period?
-                    --, deCbd::Pennies -- cost b/d
-                    --, dePbd:: Pennies -- profit b/d
-                    --, deVbd::Pennies -- valuation b/d
-                    --, deFdp:: Pennies -- flow during period
-                    --, dePdp::Pennies -- profit during period
-                    --, deVcd::Pennies -- valuation carried down
                     , deComm::Comm
                     } deriving (Show)
-                    --, dePennies Pennies Pennies Comm deriving (Show)
 
-{-
-etranDerivedTuple (EtranDerived odstamp startValue flow profit endValue comm) =
-  (odstamp, startValue, flow, profit, endValue, comm)
--}
 
---data Etran = Etran Dstamp String Folio Sym Qty Pennies (Maybe EtranDerived) deriving (Show)
 
 data Etran = Etran
              { etDstamp::Dstamp
@@ -39,49 +27,26 @@ data Etran = Etran
              } deriving (Show)
 
 mkEtran :: [[Char]] -> Etran
-mkEtran ["etran", dstamp, way, folio, sym, qty, amount] =
+mkEtran fields =
     Etran dstamp etIsBuy folio sym qtyF amountP Nothing
     where
+      ["etran", dstamp, way, folio, sym, qty, amount] = fields
+      getFloat field name = --FIXME this should be abstracted (e.g. also in Yahoo.hs)
+        case asEitherFloat field of
+          Left msg -> error $ unlines ["mkEtran parseError", name, show fields, msg]
+          Right v -> v
       etIsBuy = way == "B"
       sgn1 = if etIsBuy then 1.0 else -1.0
-      qtyF = (asFloat qty) * sgn1
-      amountP = enPennies (sgn1 * (asFloat amount))
+      qtyF = (getFloat qty "qty") * sgn1
+      amountP = enPennies (sgn1 * (getFloat amount "amount"))
 
 
 
 
 etranTuple (Etran dstamp way acc sym qty amount derived) =
   (dstamp, way, acc, sym, qty, amount, derived)
-{-
-etranDstamp :: Etran -> Dstamp
-etranDstamp e = sel1 $ etranTuple e
 
-etranWay :: Etran -> String
-etranWay e = sel2 $ etranTuple e
-
-etranFolio :: Etran -> Folio
-etranFolio e = sel3 $ etranTuple e
-
-etranSym :: Etran -> Sym
-etranSym e = sel4 $ etranTuple e
-
-qty :: Etran -> Qty
-qty e = sel5 $ etranTuple e
-etranQty = qty
-
-etranAmount :: Etran -> Pennies
-etranAmount e = sel6 $ etranTuple e
--}
-
---etranDerived :: Etran -> EtranDerived
---etranDerived e = etranDerivedTuple $ fromJust $ sel7 $ etranTuple e
 etranDerived e = fromJust $ etDerived e
-
---etranOdstamp e = deDstamp $ etranDerived e
---etranStartValue e = deVbd $ etranDerived e
---etranFlow e = sel3 $ etranDerived e
---etranProfit e = sel4 $ etranDerived e
---etranEndValue e = deVcd $ etranDerived e
 
 qtys :: [Etran] -> Float
 qtys es = sum $ map etQty es
@@ -94,22 +59,6 @@ deriveEtran start comms e =
     during = start <= etDstamp e
     theComm = findComm comms (etSym e)
     de = Just $ EtranDerived during theComm
-{-
--- | See data.c line 495
-deriveEtran start comms etran =
-  Etran  dstamp way acc sym qty amount derived
-  where
-    (dstamp, way, acc, sym, qty, amount, _) = etranTuple etran
-    comm = findComm comms sym -- FIXME I think etran should already have Comm(?)
-    value f =
-      let p = fromMaybe 0.0 (f comm) in  enPennies (0.01 * qty * p)
-    (odstamp, flow, startValue) =
-      if dstamp < start then (start, Pennies 0, value commStartPrice)
-      else (dstamp, amount, Pennies 0)   
-    endValue = value commEndPrice
-    profit = endValue |-| startValue |-| flow
-    derived = Just (EtranDerived odstamp startValue flow profit endValue comm)
--}
 
 deriveEtrans start comms etrans = map (deriveEtran start comms) etrans
 

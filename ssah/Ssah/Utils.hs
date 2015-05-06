@@ -1,13 +1,15 @@
 {-# LANGUAGE DoAndIfThenElse, NoOverloadedStrings, TypeSynonymInstances, GADTs, CPP #-}
 
-module Ssah.Utils where
+module Ssah.Utils  where
 
+import Control.Exception
 import Data.List
 import Data.Maybe
 import Data.Ord
 import Data.Time
 import System.Locale (defaultTimeLocale)
 import Text.Printf
+import Text.Read (readMaybe)
 
 type Acc = String
 type Desc = String -- description
@@ -91,9 +93,21 @@ makeTypes maker match  inputs = map maker $ matchHeads match inputs
 stripChars :: String -> String -> String
 stripChars = filter . flip notElem
 
-asFloat :: String -> Float
-asFloat v =  read clean :: Float   where clean = stripChars "\"%\n+" v
+clean = stripChars "\"%\n+"
 
+
+asFloat :: String -> Float
+asFloat v =  read (clean v) :: Float 
+
+--tryAsFloat str = handle (\_ -> Left "WTF") (asFloat str)
+--tryAsFloat str = (Right $ asFloat str) `catch` \e -> "WTF"
+
+-- http://is.gd/4Pzvew "Smarter validation"
+asEitherFloat str =
+  case (readMaybe $ clean str) :: Maybe Float of
+    Just num -> Right num
+    Nothing -> Left $  "Bad float: '" ++ str ++ "'"
+  
 
 asPennies :: String -> Pennies -- String of form #0.00
 asPennies pounds = enPennies (asFloat pounds)

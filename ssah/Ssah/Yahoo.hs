@@ -54,8 +54,19 @@ quoteTuple (StockQuote       dstamp tstamp ticker rox   price chg   chgpc ) =
 
 
 mkQuote :: [String] -> StockQuote
-mkQuote ["yahoo", dstamp, tstamp, ticker, rox, price, chg, chgpc, "P"] =
-  StockQuote dstamp tstamp ticker (asFloat rox) (asFloat price) (asFloat chg) (asFloat chgpc)
+mkQuote fields =
+  StockQuote dstamp tstamp ticker rox' price' chg' chgpc'
+  where
+    ["yahoo", dstamp, tstamp, ticker, rox, price, chg, chgpc, "P"] = fields
+    getFloat field name =
+      case asEitherFloat field of
+        Left msg -> error $ unlines ["mkQuote parse error:", name, show fields, msg]
+        Right v -> v
+    rox' = getFloat rox "rox"
+    price' = getFloat price "price"
+    chg' = getFloat chg "chg"
+    chgpc' = getFloat chgpc "chgpc"
+    
 
 getQuotes = makeTypes mkQuote "yahoo"
 
@@ -84,16 +95,27 @@ quoteAsText sq =
     (dstamp, tstamp, ticker, rox,   price, chg,   chgpc) = quoteTuple sq
     
 
+usdUrl = -- url for USD
+  url1 ++ url2 ++ url3
+  where
+    url1 = "http://download.finance.yahoo.com/d/quotes.csv?s="
+    url2 = "USDGBP"
+    url3 = "=X&f=nl1d1t1"
+
+
 fetchUsd = do
-  let url1 = "http://download.finance.yahoo.com/d/quotes.csv?s="
-  let url2 = "USDGBP"
-  let url3 = "=X&f=nl1d1t1"
-  let url  = url1 ++ url2 ++ url3
-  resp <- getUrl url
+  resp <- getUrl usdUrl
   let clean = stripJunk resp
   let fields = splitStr "," clean
-  let roxStr = (fields !! 1)
-  let rox = 100.0 * (asFloat roxStr)
+  --let roxStr = (fields !! 1)
+  let roxf =
+        case asEitherFloat (fields !! 1)  of
+          Left err -> error $ unlines ["fetchUsd fail", "url:", usdUrl,
+                                     "Response:", resp,
+                                     "ROX Strings (needs 2nd item):", show fields,
+                                     "Reporting Error:", err]
+          Right v -> v
+  let rox = 100.0 * roxf
   return rox
 
 testQuoteAsText = do
@@ -128,26 +150,27 @@ testHyh = fetchQuote "2015-03-18" "12:59:23" ("HYH", 1.0)
 
 
 --fetchQuotes :: Dstamp -> Tstamp -> [(Ticker, Rox)] -> IO [StockQuote]
-fetchQuotes dstamp tstamp pairs = do
+fetchQuotes concurrently dstamp tstamp pairs = do
   let fq = fetchQuote dstamp tstamp
-  res <- mapConcurrently fq pairs
+  let mapper = if concurrently then mapConcurrently else mapM
+  res <- mapper fq pairs
   --let oops = lefts res
   --let _ = if length oops >0 then error (show oops) else []
   return res
 
 --fetchQuotesA :: [Ticker] -> [Rox] -> IO [StockQuote]
-fetchQuotesA tickers roxs = do
+fetchQuotesA concurrently tickers roxs = do
   ds <- dateString
   ts <- timeString
   let pairs = zip tickers roxs
-  quotes <- fetchQuotes ds ts pairs
+  quotes <- fetchQuotes concurrently ds ts pairs
   return quotes
 
-testFqa = fetchQuotesA ["HYH", "^FTAS"] [1.0, 1.0]
-testFqaBad = fetchQuotesA ["AARGH", "^FTAS"] [1.0, 1.0]
+testFqa = fetchQuotesA True ["HYH", "^FTAS"] [1.0, 1.0]
+testFqaBad = fetchQuotesA True ["AARGH", "^FTAS"] [1.0, 1.0]
 
 testTickers = [ ("AML.L", 1.0), ("ULVR.L", 1.0), ("HYH", 1000.0)]
-testFetches = fetchQuotes "2015-03-18" "12:59:23" testTickers
+testFetches = fetchQuotes True "2015-03-18" "12:59:23" testTickers
 
 
 
@@ -166,18 +189,18 @@ saveStockQuotes fname quotes = do
   hClose h
 
 
-fetchAndSave :: [(Ticker, Rox)] -> IO ()   
-fetchAndSave tickerPairs = do
+fetchAndSave :: Bool -> [(Ticker, Rox)] -> IO ()   
+fetchAndSave concurrently tickerPairs = do
   dstamp <- dateString
   tstamp <- timeString
   let fname = "/home/mcarter/.ssa/yahoo/" ++ dstamp ++ ".txt"
-  quotes <- fetchQuotes  dstamp tstamp tickerPairs
+  quotes <- fetchQuotes  concurrently dstamp tstamp tickerPairs
   let errs = lefts quotes
   if length errs >0 then print errs else print ""
   saveStockQuotes fname $ rights quotes 
 
 
-testFas = fetchAndSave testTickers
+testFas = fetchAndSave True testTickers
 
 
 

@@ -29,8 +29,8 @@ ssahTest = "hello from Ssah"
 
 
 --precacheCommsUsing :: [Comm] -> IO [StockQuote]
-precacheCommsUsing comms = do
-  quotes <- fetchCommQuotes comms -- will be filtered automatically
+precacheCommsUsing concurrently comms = do
+  quotes <- fetchCommQuotes concurrently comms -- will be filtered automatically
   saveStockQuotes "/home/mcarter/.ssa/yahoo-cached.txt" $ rights quotes
   ds <- dateString
   let fname = "/home/mcarter/.ssa/yahoo/" ++ ds ++ ".txt"
@@ -38,10 +38,10 @@ precacheCommsUsing comms = do
   return quotes
  
 -- | Download the Comms that apparently require fetching, and store to disk
-precacheComms = do
+precacheComms concurrently = do
   inputs <- readInputs
   let comms = makeTypes mkComm "comm" inputs
-  cache <- precacheCommsUsing comms
+  cache <- precacheCommsUsing concurrently comms
   --print cache
   return cache
 
@@ -51,18 +51,7 @@ loadPrecachedComms = do
   let quotes = getQuotes commands
   return quotes
   
-{-
--- attempt to get around Jupyter crashing when using networking
-makeYahooCsv = do
-  inputs <- readInputs
-  let comms = makeTypes mkComm "comm" inputs
-  let ys = yepics comms
-  fetchAndSave ys
-
-loadYahooCsv = loadSaves
--}
-
-mainSsah = print "TODO!"
+-- mainSsah = print "TODO!"
 
 
 data Price = Price String String Float deriving (Show)
@@ -85,12 +74,13 @@ rox  usd c =
 
 -- | Fetch StockQuotes of Comm for which a fetch is required
 --fetchCommQuotes :: [Comm] ->  IO [StockQuote]
-fetchCommQuotes comms = do
+fetchCommQuotes concurrently comms = do
   let hitComms = filter fetchRequired comms
   let tickers = map yepic hitComms
   usd <- fetchUsd
+  -- let usd = 1.5
   let roxs = map (rox usd) hitComms
-  fetchQuotesA tickers roxs
+  fetchQuotesA concurrently tickers roxs
 
 mkPeriod :: [[Char]] -> Period
 mkPeriod ["period", start, end] =

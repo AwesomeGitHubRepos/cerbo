@@ -41,8 +41,8 @@ mkSnapLine (sq, qty) =
 
 
 -- | False => use cached version, True => download values afresh
-snapDownloading :: Bool -> IO ()
-snapDownloading afresh = do
+snapDownloading :: Bool -> Bool -> IO ()
+snapDownloading concurrently afresh = do
   ds <- dateString
   ts <- timeString
   let header = ds ++ " " ++ ts
@@ -50,7 +50,7 @@ snapDownloading afresh = do
   led <- readLedger
   let theComms = comms led
   let theEtrans = etrans led
-  pres <- fmap partitionEithers $ precacheCommsUsing theComms
+  pres <- fmap partitionEithers $ precacheCommsUsing concurrently theComms
   loaded <- loadPrecachedComms
   let (errs, fetchedQuotes) = if afresh
                               then  pres
@@ -110,9 +110,11 @@ snapDownloading afresh = do
   print errs
 
 
-snap1 = snapDownloading True
+snap1 = snapDownloading True True
 
-snap2 = snapDownloading False
+snap2 = snapDownloading True False
+
+snapSlow = snapDownloading False True -- download syms one at a time (slow for debugging)
 
 hsnap = snap1
 
