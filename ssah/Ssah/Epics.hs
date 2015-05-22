@@ -24,7 +24,7 @@ showEpic epic =
     v = show $ value epic
     r = ret epic
 
-epicHdr = "SYM        QTY      UCOST     UVALUE       COST      VALUE   RET%"  
+epicHdr = "SYM        QTY    UCOST   UVALUE         COST        VALUE   RET%"  
 every e = True
 
 epicSum :: Pennies -> Pennies -> String
@@ -89,28 +89,27 @@ reportOn title comms etrans =
     zeroLines = map sym zeros 
     
 
-subEpicsReport comms etrans aFolio =
+subEpicsReportXXX comms etrans aFolio =
   nzTab
   where
     fEtrans = filter (\e -> (etFolio e) == aFolio) etrans
     (nzTab, _) = reportOn aFolio comms fEtrans
+
+subEpicsReportWithTitle title comms etrans cmp aFolio =   
+  fst $ reportOn title comms fEtrans
+  where
+    fEtrans = filter (\e -> aFolio `cmp` etFolio e) etrans
     
+subEpicsReport comms etrans cmp aFolio =
+  subEpicsReportWithTitle aFolio comms etrans cmp aFolio
     
 --matchFolio name = 
 reportEpics comms etrans =
-  nzTab ++ zTab1 ++ subReports
+  nzTab ++ nonUts ++ zTab1 ++ subReports
   where
     etransBySym = sortOnMc etSym etrans --work around apparent groupBy bug
     (nzTab, zTab) = reportOn "ALL" comms etransBySym
     zTab1 = ["EPICS: ZEROS"] ++ zTab ++ [";"]
     folios = ["hal", "hl", "tdi", "tdn", "ut"]
-    subReports = concatMap (subEpicsReport comms etransBySym) folios
-
-    
-    --sortedEtrans = sortOn etranDstamp etrans
-  {-
-  map reportBy folios
-  where
-    group etranFolio 
-    folios = [true] ++ (map matchFolio 
-    -}                  
+    nonUts = subEpicsReportWithTitle "NON-UT" comms etransBySym (/=) "ut" -- not the Unit Trusts
+    subReports = concatMap (subEpicsReport comms etransBySym (==)) folios
