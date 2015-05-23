@@ -101,9 +101,15 @@ createEtbReport etb =
     total  = countPennies $ map snd sorted
     totalLine = eLine ("TOTAL", total)
 
-    
+
+printNow = do
+  ds <- dateString
+  ts <- timeString
+  putStrLn $ intercalate " " ["DTSTAMP:", ds, ts]
+  
 --createEtb :: Ledger
 createEtbDoing  options = do
+  printNow
   ledger <- ratl
   let theComms = comms ledger
   let theEtrans = etrans ledger
@@ -143,5 +149,6 @@ optionSet1 = [PrinPorts]
 optionSet2 = [PrinReturns]
 optionSetX = [PrinEtb]
 
+createSection opt = createEtbDoing [opt] -- e.g. createSection PrinReturns
 createEtb = createEtbDoing optionSet0
 mainEtb = createEtb

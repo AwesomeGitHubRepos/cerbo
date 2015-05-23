@@ -17,7 +17,14 @@ filterInputs inputs =
 
 -- FIXME I don't think the parser handles "" correctly (see fin with S "" for example)
 
-eatWhite str = snd (span isSpace str)
+eatWhiteXXX str = snd (span isSpace str)
+
+eatWhite "" = ""
+eatWhite ('#':xs) = ""
+eatWhite (x:xs) = if isSpace x then eatWhite xs else x:xs
+
+       
+
 
 -- TODO fix bug where this is not a termination by a "
 getQuoted str =
