@@ -78,8 +78,8 @@ createEtranReport etrans =
   [hdr] ++ eLines
   where    
     hdr = "SYM     DSTAMP     W FOLIO        QTY       AMOUNT         UNIT"
-    sortedEtrans = sortOnMc (\e -> (etSym e, etDstamp e)) etrans
-    eLines = map cerl sortedEtrans
+    -- sortedEtrans = sortOnMc (\e -> (etSym e, etDstamp e)) etrans
+    eLines = map cerl etrans
 
 etComm e = deComm $ fromJust $ etDerived e
 etDuring e = deDuring $ fromJust $ etDerived e

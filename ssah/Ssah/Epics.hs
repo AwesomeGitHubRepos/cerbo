@@ -6,6 +6,7 @@ import Text.Printf
 import Ssah.Aggregate
 import Ssah.Comm
 import Ssah.Etran
+import Ssah.Portfolio
 import Ssah.Utils
 
 data Epic = Epic { sym::Sym, eqty::Float , ucost::Float, uvalue::Float
@@ -31,15 +32,6 @@ epicSum :: Pennies -> Pennies -> String
 epicSum inCost inValue =
   printf "%32s %s %s" " " (show inCost) (show inValue)
 
-{-
-foldEtrans aSym aQty aUcost aUvalue aCost aValue  ([]) =
-  Epic { sym=aSym, eqty= aQty, ucost = aUcost , uvalue = aUvalue
-       , cost = aCost, value = aValue  }
-
-foldEtrans aSym aQty aUcost aUvalue aCost aValue  (e:es) =
-  foldEtrans aSym newQty newUcost newUvalue newCost newValue
-  where
--}
 
 foldEtrans inQty inCost  ([]) = (inQty, inCost)
 
@@ -71,13 +63,22 @@ processSymGrp comms etrans =
     theRet = gainpc (unPennies theValue)  (unPennies theCost)
 
         
-  
-reportOn title comms etrans =
-  (fullTableLines, zeroLines)
+reduceEtrans comms etrans =
+  (nonzeros, zeros)
   where
     symGrp = groupByKey etSym etrans
     epics = map (processSymGrp comms) symGrp
     (nonzeros, zeros) = partition (\e -> (eqty e) > 0.0) epics
+                        
+reportOn title comms etrans =
+  (fullTableLines, zeroLines)
+  where
+    {-
+    symGrp = groupByKey etSym etrans
+    epics = map (processSymGrp comms) symGrp
+    (nonzeros, zeros) = partition (\e -> (eqty e) > 0.0) epics
+-}
+    (nonzeros, zeros) = reduceEtrans comms etrans
     tableLines = map showEpic nonzeros
     
     tCost = countPennies $ map cost nonzeros
@@ -87,23 +88,20 @@ reportOn title comms etrans =
     fullTitle = "EPICS: " ++ title
     fullTableLines = [fullTitle, epicHdr] ++ tableLines ++ [sumLine]
     zeroLines = map sym zeros 
-    
 
-subEpicsReportXXX comms etrans aFolio =
-  nzTab
-  where
-    fEtrans = filter (\e -> (etFolio e) == aFolio) etrans
-    (nzTab, _) = reportOn aFolio comms fEtrans
-
-subEpicsReportWithTitle title comms etrans cmp aFolio =   
+subEpicsReportWithTitleXXX title comms etrans cmp aFolio =   
   fst $ reportOn title comms fEtrans
   where
     fEtrans = filter (\e -> aFolio `cmp` etFolio e) etrans
+
+subEpicsReportWithTitle title comms etrans cmp aFolio =   
+  fst $ reportOn title comms $ feopn aFolio cmp etrans
+
     
 subEpicsReport comms etrans cmp aFolio =
   subEpicsReportWithTitle aFolio comms etrans cmp aFolio
     
---matchFolio name = 
+
 reportEpics comms etrans =
   nzTab ++ nonUts ++ zTab1 ++ subReports
   where
@@ -111,5 +109,6 @@ reportEpics comms etrans =
     (nzTab, zTab) = reportOn "ALL" comms etransBySym
     zTab1 = ["EPICS: ZEROS"] ++ zTab ++ [";"]
     folios = ["hal", "hl", "tdi", "tdn", "ut"]
-    nonUts = subEpicsReportWithTitle "NON-UT" comms etransBySym (/=) "ut" -- not the Unit Trusts
+    --nonUts = subEpicsReportWithTitle "NON-UT" comms etransBySym (/=) "ut" -- not the Unit Trusts
+    (nonUts, _) =  reportOn "NON-UT" comms $ myFolio etrans
     subReports = concatMap (subEpicsReport comms etransBySym (==)) folios

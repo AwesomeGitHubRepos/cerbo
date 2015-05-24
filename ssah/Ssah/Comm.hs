@@ -93,11 +93,3 @@ commEndPriceOrDie comms sym =
   where
     comm = findComm comms sym
 
-{-
--- FIXME LOW use this function more (esp in the above cases)
-findCommOrDie comms sym =
-  doOrDie comm oops
-  where
-    comm = findComm comms sym
-    oops = "findCommOrDie couldn't find sym:'" ++ sym ++ "'"
--}

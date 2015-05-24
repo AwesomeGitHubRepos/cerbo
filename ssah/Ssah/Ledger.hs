@@ -3,6 +3,7 @@ module Ssah.Ledger where
 import Control.Monad
 
 import Ssah.Comm
+import Ssah.Dps
 import Ssah.Etran
 import Ssah.Financial
 import Ssah.Nacc
@@ -17,6 +18,7 @@ import Ssah.Yahoo
 
 data Ledger = Ledger
     { comms :: [Comm]
+    , dpss :: [Dps]
     , etrans :: [Etran]
     , financials :: [Financial]
     , ntrans :: [Ntran]
@@ -73,6 +75,7 @@ readLedger' inputs =
   let etrans1 = deriveEtrans start comms1 etrans in
   Ledger
          { comms = comms1
+         , dpss = getDpss inputs
          , etrans = etrans1
          , financials = getFinancials inputs
          , ntrans = getNtrans inputs

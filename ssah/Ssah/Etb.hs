@@ -13,6 +13,7 @@ import Text.Printf
 
 import Ssah.Aggregate
 import Ssah.Comm
+import Ssah.Dps
 import Ssah.Epics
 import Ssah.Etran
 import Ssah.Financial
@@ -28,7 +29,7 @@ import Ssah.Utils
 import Ssah.Yahoo
 
 
-data Option = PrinAccs | PrinEpics | PrinEtb | PrinEtrans
+data Option = PrinAccs | PrinDpss | PrinEpics | PrinEtb | PrinEtrans
             | PrinFin | PrinPorts | PrinReturns deriving (Eq)
 
 augEtb:: Etb -> Etb
@@ -132,6 +133,7 @@ createEtbDoing  options = do
       
   let output = concatMap sec [
         ("ACCS:",       PrinAccs,    reportAccs grp) ,
+        ("DPSS:",       PrinDpss,    createDpssReport theComms theEtrans (dpss ledger) ), 
         ("EPICS:",      PrinEpics,   reportEpics theComms  theEtrans) ,
         ("ETB:",        PrinEtb,     createEtbReport etb) ,
         ("ETRANS:",     PrinEtrans,  createEtranReport theEtrans),
@@ -144,8 +146,8 @@ createEtbDoing  options = do
   putStrLn "+ OK Finished"
   writeFile "/home/mcarter/.ssa/hssa.txt" outStr
 
-optionSet0 = [PrinAccs,  PrinEpics, PrinEtb, PrinEtrans, PrinFin, PrinPorts, PrinReturns]
-optionSet1 = [PrinPorts]
+optionSet0 = [PrinAccs,  PrinDpss, PrinEpics, PrinEtb, PrinEtrans, PrinFin, PrinPorts, PrinReturns]
+optionSet1 = [PrinDpss]
 optionSet2 = [PrinReturns]
 optionSetX = [PrinEtb]
 

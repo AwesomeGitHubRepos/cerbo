@@ -11,15 +11,33 @@ import System.Locale (defaultTimeLocale)
 import Text.Printf
 import Text.Read (readMaybe)
 
+
+spaces n = replicate n ' '
+
 type Acc = String
 type Desc = String -- description
 type Dstamp = String
 type Etb = [(String, Pennies)]
 type Folio = String
+
+type Percent = Float -- [0, 1]
+--instance Show Percent where
+spacePercent = spaces 7
+showPercent p = printf "%7.2f" $ p * 100.0
+
 type Period = (Dstamp, Dstamp)
+
 type Qty = Float
+spaceQty = spaces 12
+showQty q = printf "%12.3f" (q::Float)
+
 type Rox = Float
+
 type Sym = String
+spaceSym = spaces 4
+showSym s = printf "%4.4s" s
+
+
 type Ticker = String
 type Tstamp = String
 
@@ -28,6 +46,7 @@ enPennies :: Float -> Pennies
 enPennies pounds = Pennies (round (pounds * 100.0) :: Int)
 unPennies :: Pennies -> Float
 unPennies (Pennies p) = (fromIntegral p) / 100.0
+spacePennies = spaces 12
 
 --myTime = Data.Time.defaultTimeLocale
 myTime = System.Locale.defaultTimeLocale
@@ -44,22 +63,12 @@ infixl 6 |-|
 Pennies a |-| Pennies b = Pennies (a-b)
 
 
---infixl 7 |*|
---Pennies a |*| scale = enPennies ( scale * (unPennies a))
 scalep :: Pennies -> Float -> Pennies
 scalep p by = enPennies( by * (unPennies p))
 
-{-
-infixl 7 0-|
-(0-|) Pennies a = Pennies (-a)
-  -}
---(-) :: Pennies -> Pennies
 negPennies :: Pennies -> Pennies -- unary negate pennies
 negPennies p = (Pennies 0) |-| p
-{-  Pennies (negp p)
-  where
-    negp (Pennies posp ) = -posp
--}
+
 
 negp = negPennies
     
