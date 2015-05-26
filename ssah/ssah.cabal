@@ -33,7 +33,9 @@ library
                        , old-locale >= 1.0
                        , tuple >= 0.3
 
-  exposed-modules:     Ssah.Aggregate, Ssah.Comm
+  exposed-modules:     Ssah.Aggregate
+                       , Ssah.Cgt
+                       , Ssah.Comm
                        , Ssah.Dps
                        , Ssah.Epics, Ssah.Etb, Ssah.Etran
                        , Ssah.Financial

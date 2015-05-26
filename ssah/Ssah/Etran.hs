@@ -26,6 +26,27 @@ data Etran = Etran
              , etDerived::Maybe EtranDerived
              } deriving (Show)
 
+etIsSell = not . etIsBuy
+
+etBetween :: Etran -> Bool
+etBetween e =
+  inPeriod
+  where
+    de = etDerived e
+    inPeriod = case de of
+      Nothing -> False
+      (Just x) -> deDuring x
+
+etCommA :: Etran ->  Comm
+etCommA e = c where
+  de = etDerived e
+  oops = "etComm couldn't find Comm of Etran:" ++ (show e)
+  c = case de of
+    Nothing -> error oops
+    (Just x) -> deComm x
+
+
+
 mkEtran :: [[Char]] -> Etran
 mkEtran fields =
     Etran dstamp etIsBuy folio sym qtyF amountP Nothing

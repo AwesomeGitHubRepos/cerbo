@@ -18,6 +18,7 @@ import Ssah.Epics
 import Ssah.Etran
 import Ssah.Financial
 --import Ssah.Flow
+import Ssah.Cgt
 import Ssah.Ledger
 import Ssah.Nacc
 import Ssah.Ntran
@@ -29,7 +30,7 @@ import Ssah.Utils
 import Ssah.Yahoo
 
 
-data Option = PrinAccs | PrinDpss | PrinEpics | PrinEtb | PrinEtrans
+data Option = PrinAccs | PrinCgt | PrinDpss | PrinEpics | PrinEtb | PrinEtrans
             | PrinFin | PrinPorts | PrinReturns deriving (Eq)
 
 augEtb:: Etb -> Etb
@@ -143,14 +144,19 @@ createEtbDoing  options = do
 
   let outStr = unlines output
   putStrLn outStr
+  if (elem PrinCgt options) then createCgtReport theEtrans else putStr ""
+    
   putStrLn "+ OK Finished"
   writeFile "/home/mcarter/.ssa/hssa.txt" outStr
 
-optionSet0 = [PrinAccs,  PrinDpss, PrinEpics, PrinEtb, PrinEtrans, PrinFin, PrinPorts, PrinReturns]
+optionSet0 = [PrinAccs,  PrinCgt, PrinDpss, PrinEpics, PrinEtb, PrinEtrans, PrinFin, PrinPorts, PrinReturns]
 optionSet1 = [PrinDpss]
 optionSet2 = [PrinReturns]
 optionSetX = [PrinEtb]
 
 createSection opt = createEtbDoing [opt] -- e.g. createSection PrinReturns
+
+createCgt = createSection PrinCgt
+
 createEtb = createEtbDoing optionSet0
 mainEtb = createEtb
