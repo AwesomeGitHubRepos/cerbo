@@ -53,18 +53,21 @@ readConfNice = do
   r <- tryJust (guard . isDoesNotExistError) $ readFile rcFile
   print $ show r
 
+readConf :: IO [String]
 readConf = do
 -- FIXME NOW
   cfg <- load [Optional rcFile]
 
   --display cfg
   batch <- lookupDefault "" cfg "prefix"
-  putStrLn batch
+  -- putStrLn batch
   let globname = pack $ strapp batch  "globs"
-  globs <- lookupDefault [""] cfg globname :: IO ([String])
+  globs <- lookupDefault ["*"] cfg globname :: IO ([String])
+  return globs
   --globs <- lup cfg  "globs" -- :: Maybe Text
+  {-
   print globs
   files <- glob $ head globs
   print files
   putStrLn "."
-
+-}

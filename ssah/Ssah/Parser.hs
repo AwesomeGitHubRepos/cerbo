@@ -1,9 +1,12 @@
 module Ssah.Parser where
 
+import Control.Monad
+--import Control.Monad.IO.Class
 import Data.Char
 import System.Directory
 import System.Path.Glob
 
+import Ssah.Config
 
 filterInputs inputs =
   filter (\x -> isAlpha (x !! 0)) nonblanks
@@ -52,15 +55,34 @@ foldLine' acc str
     
 foldLine str = foldLine' [] str
 
-
-
-
-readInputs = do
+{-
+fileListXXX :: IO [[Char]]
+fileListXXX = do
   files1 <- glob "/home/mcarter/redact/docs/accts2014/data/*.txt"
   files2 <- glob "/home/mcarter/.ssa/yahoo/*.txt"
   files3 <- glob "/home/mcarter/.ssa/gofi/*.txt"
   files4 <- glob "/home/mcarter/redact/docs/accts2014/companies/*"
-  let files = files1 ++ files2 ++ files3 ++ files4
+  --let files = files1 ++ files2 ++ files3 ++ files4
+  --let files = liftM concat [files1, files2, files3, files4]
+  let files = concat [files1, files2, files3, files4]
+  -- print files
+  --files <- liftM concat [files1, files2, files3, files4]
+  return files
+-}
+
+fileList :: IO [String]
+fileList = do
+  globs <- readConf
+  let files = mapM glob globs
+  g <- files
+  let h = concat g
+  return h
+
+
+readInputs = do
+  -- let globs = readConf
+  --contents <- mapM readFile fileList
+  files <- fileList
   contents <- mapM readFile files
   let allLines = filterInputs contents
   let commands = map foldLine allLines

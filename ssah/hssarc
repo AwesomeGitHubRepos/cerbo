@@ -2,11 +2,19 @@
 # ln -s `pwd`/hssarc ~/.hssarc
 
 prefix = "p2014_"
-#prefix = "p2015_"
+prefix = "p2015_"
 
 p2014_globs = [
-  "/home/mcarter/redact/docs/accts2014/data/*.txt" ,
+  "/home/mcarter/redact/docs/accts2014/data/*.txt",
   "/home/mcarter/.ssa/yahoo/*.txt", 
   "/home/mcarter/.ssa/gofi/*.txt" ,
   "/home/mcarter/redact/docs/accts2014/companies/*"
+]
+
+p2015_globs = [
+  "/home/mcarter/redact/docs/accts2014/data/*.txt",
+  "/home/mcarter/.ssa/yahoo/*.txt", 
+  "/home/mcarter/.ssa/gofi/*.txt" ,
+  "/home/mcarter/redact/docs/accts2014/companies/*",
+  "/home/mcarter/redact/docs/accts2015/data/*.txt"
 ]
