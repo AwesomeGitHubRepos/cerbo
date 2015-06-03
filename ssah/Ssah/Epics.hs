@@ -103,7 +103,7 @@ subEpicsReport comms etrans cmp aFolio =
     
 
 reportEpics comms etrans =
-  nzTab ++ nonUts ++ zTab1 ++ subReports
+  nonUts ++ nzTab ++ zTab1 ++ subReports
   where
     etransBySym = sortOnMc etSym etrans --work around apparent groupBy bug
     (nzTab, zTab) = reportOn "ALL" comms etransBySym
