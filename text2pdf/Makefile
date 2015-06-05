@@ -7,4 +7,4 @@ clean :
 	rm text2pdf
 
 install : 
-	cp text2pdf ~/.local/bin
+	cp text2pdf /usr/local/bin
