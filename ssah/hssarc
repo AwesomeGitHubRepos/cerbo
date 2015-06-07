@@ -12,8 +12,9 @@ p2014_globs = [
 ]
 
 p2015_globs = [
-  "/home/mcarter/redact/docs/accts2014/data/*.txt"
-  , "/home/mcarter/.ssa/yahoo/*.txt"
+  "/home/mcarter/.ssa/yahoo/*.txt"
+# , "/home/mcarter/redact/docs/accts2014/data/*.txt"
+
 #  "/home/mcarter/.ssa/gofi/*.txt" ,
 #  "/home/mcarter/redact/docs/accts2014/companies/*",
   , "/home/mcarter/redact/docs/accts2015/data/*.txt"
