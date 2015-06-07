@@ -7,6 +7,7 @@ import Data.List
 import Data.Maybe
 import Data.Ord
 import Data.Time
+import GHC.Float
 import System.Locale (defaultTimeLocale)
 import Text.Printf
 import Text.Read (readMaybe)
@@ -41,9 +42,17 @@ showSym s = printf "%4.4s" s
 type Ticker = String
 type Tstamp = String
 
-newtype Pennies = Pennies Int
+newtype Pennies = Pennies Integer
+
 enPennies :: Float -> Pennies
-enPennies pounds = Pennies (round (pounds * 100.0) :: Int)
+enPennies pounds =
+  Pennies i
+  where
+    d = 100.0 * float2Double pounds -- use Double for awkward rounding
+    i = (round d :: Integer)
+
+penTest = enPennies $ asFloat "82301.87"
+
 unPennies :: Pennies -> Float
 unPennies (Pennies p) = (fromIntegral p) / 100.0
 spacePennies = spaces 12
