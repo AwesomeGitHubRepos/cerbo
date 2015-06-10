@@ -1,17 +1,17 @@
 -- Dps - dividend per share
 -- these are ESTIMATED from inputs, not actual
 
-module Ssah.Dps where
+module Dps where
 
 import Data.Char
 import Data.List
 --import Data.Maybe
 
-import Ssah.Comm
-import Ssah.Epics
-import Ssah.Etran
-import Ssah.Portfolio
-import Ssah.Utils
+import Comm
+import Epics
+import Etran
+import Portfolio
+import Utils
 
 data Dps = Dps { dpSym::Sym
                , dpDps::Float -- dividend per share in PENCE

@@ -1,4 +1,4 @@
-module Ssah.Parser where
+module Parser where
 
 import Control.Monad
 --import Control.Monad.IO.Class
@@ -6,7 +6,7 @@ import Data.Char
 import System.Directory
 import System.Path.Glob
 
-import Ssah.Config
+import Config
 
 filterInputs inputs =
   filter (\x -> isAlpha (x !! 0)) nonblanks

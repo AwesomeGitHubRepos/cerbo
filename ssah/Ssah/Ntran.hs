@@ -1,8 +1,8 @@
-module Ssah.Ntran where
+module Ntran where
 
 import Data.Tuple.Select
 
-import Ssah.Utils
+import Utils
 
 data Ntran = Ntran Dstamp Acc Acc Pennies String String deriving (Show)
 

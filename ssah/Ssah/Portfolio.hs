@@ -1,11 +1,11 @@
-module Ssah.Portfolio where
+module Portfolio where
 
 import Data.List
 import Text.Printf
 
-import Ssah.Comm
-import Ssah.Etran
-import Ssah.Utils
+import Comm
+import Etran
+import Utils
 
 -- FIXME LOW - use calculated values of mine/b ... computed in Etb rather than working them out here
 

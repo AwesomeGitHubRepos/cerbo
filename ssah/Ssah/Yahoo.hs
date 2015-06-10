@@ -1,4 +1,4 @@
-module Ssah.Yahoo where
+module Yahoo where
 
 import Control.Concurrent.Async
 import Control.Monad
@@ -13,7 +13,7 @@ import System.IO
 import Text.Printf
 
 --import Ssah.Ssah
-import Ssah.Utils
+import Utils
 
 
 --import Network.Wreq

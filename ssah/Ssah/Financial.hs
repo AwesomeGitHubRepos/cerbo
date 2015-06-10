@@ -1,10 +1,10 @@
-module Ssah.Financial where
+module Financial where
 
 import Data.List.Split
 import Data.Maybe
 
-import Ssah.Parser
-import Ssah.Utils
+import Parser
+import Utils
 
 --data Action = 
 data Financial =

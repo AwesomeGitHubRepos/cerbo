@@ -1,5 +1,5 @@
 -- Calculate CGT for 2014/5
-module Ssah.Cgt where
+module Cgt where
 
 import Data.List
 import Data.List.Split
@@ -8,10 +8,10 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 import Text.Printf
 
-import Ssah.Comm  
-import Ssah.Etran
-import Ssah.Portfolio
-import Ssah.Utils
+import Comm  
+import Etran
+import Portfolio
+import Utils
 
 
 commSymSold :: [Etran] -> [Sym]

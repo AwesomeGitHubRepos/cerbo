@@ -1,5 +1,7 @@
 module Main where
 
+-- probably delete this file
+
 --import qualified Ssah.Snap as MySnap
 
 --main :: IO ()

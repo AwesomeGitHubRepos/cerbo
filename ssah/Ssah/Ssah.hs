@@ -1,4 +1,4 @@
-module Ssah.Ssah where
+module Ssah where
 
 --import Data.Char
 import Data.Either
@@ -9,15 +9,15 @@ import Data.Tuple.Select
 --import System.Directory
 --import System.Path.Glob
 
-import Ssah.Comm
-import Ssah.Etran
-import Ssah.Financial
-import Ssah.Nacc
-import Ssah.Ntran
-import Ssah.Parser
-import Ssah.Returns
-import Ssah.Yahoo
-import Ssah.Utils
+import Comm
+import Etran
+import Financial
+import Nacc
+import Ntran
+import Parser
+import Returns
+import Yahoo
+import Utils
 
 ssahTest :: String
 ssahTest = "hello from Ssah"

@@ -1,10 +1,10 @@
-module Ssah.Returns where
+module Returns where
 
 import Text.Printf
 
-import Ssah.Comm
-import Ssah.Etran
-import Ssah.Utils
+import Comm
+import Etran
+import Utils
 
 data Return = Return { idx::Int
                      , dstamp::Dstamp

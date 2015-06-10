@@ -1,10 +1,10 @@
-module Ssah.Nacc where
+module Nacc where
 
 import Data.List
 import Data.Tuple.Select
 import Text.Printf
 
-import Ssah.Utils
+import Utils
 
 data Nacc = Nacc Acc Acc String deriving (Show)
 

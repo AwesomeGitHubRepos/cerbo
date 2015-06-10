@@ -1,4 +1,4 @@
-module Ssah.Snap  where
+module Snap  where
 
 import Data.Either
 import Data.Function
@@ -9,13 +9,13 @@ import GHC.Exts
 import Text.Printf
 
 --import Ssah.Ntran
-import Ssah.Aggregate
-import Ssah.Comm
-import Ssah.Etran
-import Ssah.Ledger
-import Ssah.Ssah
-import Ssah.Utils
-import Ssah.Yahoo
+import Aggregate
+import Comm
+import Etran
+import Ledger
+import Ssah
+import Utils
+import Yahoo
 
 
 -- FIXME LOW Handle cases of etrans not in comms

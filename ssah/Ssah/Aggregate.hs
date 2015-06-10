@@ -1,8 +1,8 @@
-module Ssah.Aggregate where
+module Aggregate where
 
 import Data.List
 
-import Ssah.Utils
+import Utils
 
 
 --combine p (left:[]) rights = partition (p left) rights

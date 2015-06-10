@@ -1,11 +1,11 @@
-module Ssah.Etran where
+module Etran where
 
 import Data.List
 import Data.Maybe
 import Data.Tuple.Select
 
-import Ssah.Comm
-import Ssah.Utils
+import Comm
+import Utils
 
 
 data EtranDerived = EtranDerived

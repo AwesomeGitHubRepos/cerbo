@@ -1,7 +1,7 @@
 -- {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Ssah.Config where
+module Config where
 
 import Control.Exception
 import Control.Monad

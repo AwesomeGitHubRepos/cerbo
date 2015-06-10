@@ -1,11 +1,11 @@
-module Ssah.Comm where
+module Comm where
 
 import Data.List
 import Data.Maybe
 import Data.Tuple.Select
 
-import Ssah.Utils
-import Ssah.Yahoo
+import Utils
+import Yahoo
 
 
 data CommDerived = CommDerived (Maybe Float) (Maybe Float) deriving (Show)

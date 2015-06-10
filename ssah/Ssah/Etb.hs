@@ -1,4 +1,4 @@
-module Ssah.Etb where
+module Etb where
 
 --import Control.Monad.IfElse
 import Data.Function (on)
@@ -11,24 +11,22 @@ import GHC.Exts
 import System.IO
 import Text.Printf
 
-import Ssah.Aggregate
-import Ssah.Comm
--- import Ssah.Config
-import Ssah.Dps
-import Ssah.Epics
-import Ssah.Etran
-import Ssah.Financial
---import Ssah.Flow
-import Ssah.Cgt
-import Ssah.Ledger
-import Ssah.Nacc
-import Ssah.Ntran
-import Ssah.Portfolio
-import Ssah.Post
-import Ssah.Returns
-import Ssah.Ssah
-import Ssah.Utils
-import Ssah.Yahoo
+import Aggregate
+import Comm
+import Dps
+import Epics
+import Etran
+import Financial
+import Cgt
+import Ledger
+import Nacc
+import Ntran
+import Portfolio
+import Post
+import Returns
+import Ssah
+import Utils
+import Yahoo
 
 
 data Option = PrinAccs | PrinCgt | PrinDpss | PrinEpics | PrinEtb | PrinEtrans

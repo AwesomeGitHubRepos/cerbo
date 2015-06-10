@@ -1,5 +1,5 @@
 --module Ssah.Stack (Stack, empty, isEmpty, push, top, pop) where
-module Ssah.Stack where
+module Stack where
 
 -- https://wiki.haskell.org/Abstract_data_type#Stack
 

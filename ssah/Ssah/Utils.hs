@@ -1,6 +1,6 @@
 {-# LANGUAGE DoAndIfThenElse, NoOverloadedStrings, TypeSynonymInstances, GADTs, CPP #-}
 
-module Ssah.Utils  where
+module Utils  where
 
 import Control.Exception
 import Data.List

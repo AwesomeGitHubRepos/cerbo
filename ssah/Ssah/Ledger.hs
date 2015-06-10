@@ -1,18 +1,18 @@
-module Ssah.Ledger where
+module Ledger where
 
 import Control.Monad
 
-import Ssah.Comm
-import Ssah.Dps
-import Ssah.Etran
-import Ssah.Financial
-import Ssah.Nacc
-import Ssah.Ntran
-import Ssah.Parser
-import Ssah.Returns
-import Ssah.Ssah
-import Ssah.Utils
-import Ssah.Yahoo
+import Comm
+import Dps
+import Etran
+import Financial
+import Nacc
+import Ntran
+import Parser
+import Returns
+import Ssah
+import Utils
+import Yahoo
 
 --data Ledger = Ledger [Comm] [Etran] [Financial] [Ntran] [Nacc] Period [StockQuote] [Return] deriving (Show)
 

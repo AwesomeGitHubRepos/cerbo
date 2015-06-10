@@ -1,4 +1,4 @@
-module Ssah.Post where
+module Post where
 
 import Data.List
 import Data.Maybe
@@ -6,12 +6,12 @@ import Data.Ord
 import Text.Printf
 import Data.Tuple.Select
 
-import Ssah.Aggregate
-import Ssah.Etran
-import Ssah.Ledger
-import Ssah.Ntran
-import Ssah.Ssah
-import Ssah.Utils
+import Aggregate
+import Etran
+import Ledger
+import Ntran
+import Ssah
+import Utils
 
 data Post = Post Dstamp Acc Acc Pennies Desc deriving (Show)
 

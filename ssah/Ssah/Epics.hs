@@ -1,13 +1,13 @@
-module Ssah.Epics where
+module Epics where
 
 import Data.List
 import Text.Printf
 
-import Ssah.Aggregate
-import Ssah.Comm
-import Ssah.Etran
-import Ssah.Portfolio
-import Ssah.Utils
+import Aggregate
+import Comm
+import Etran
+import Portfolio
+import Utils
 
 data Epic = Epic { sym::Sym, eqty::Float , ucost::Float, uvalue::Float
                  , cost::Pennies, value::Pennies, ret::Float} deriving (Show)
