@@ -7,11 +7,12 @@ import System.Environment
 
 --data PrimaryAction = Args | Normal | Snap
 
-data ArgFlag = Args | Normal | Snap deriving Show
+data ArgFlag = Args | Epics | Normal | Snap deriving Show
 
 options  :: [OptDescr ArgFlag]
 options =
   [ Option ['a'] ["args"] (NoArg Args) "show arguments passed in"
+  , Option ['e'] ["epics"] (NoArg Epics) "show share price movements for supplied epics"
   , Option ['s'] ["snap"] (NoArg Snap) "show a daily snapshot"
   ]
 

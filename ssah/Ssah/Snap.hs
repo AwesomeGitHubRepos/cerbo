@@ -34,7 +34,7 @@ mkSnapLine :: (StockQuote, Qty) -> (String, Float, Float)
 mkSnapLine (sq, qty) =
   (str, amount, chg1)
   where
-    (_, _, ticker, _, price, chg, chgpc) = quoteTuple sq
+    StockQuote _ _ ticker _ price chg chgpc = sq
     amount = price * qty / 100.0
     chg1 = chg * qty / 100.0
     str = printf snapFmt ticker amount chg1 chgpc    
@@ -70,9 +70,9 @@ snapDownloading concurrently afresh = do
           comm = find (\c -> commSym c == sym) theComms
           ctype = fmap commType  comm
           ticker = fmap commTicker comm
-          msq = find (\s -> Just (quoteTicker s) == ticker) fetchedQuotes
+          msq = find (\s -> Just (sqTicker s) == ticker) fetchedQuotes
           (price, chg, chgpc, oops) = case msq of
-            Just s -> (quotePrice s, quoteChg s, quoteChgPc s, "")
+            Just s -> (sqPrice s, sqChg s, sqChgpc s, "")
             Nothing -> (0.0, 0.0, 0.0, "* ERR")
           --sq (Nothing) = error ("Can't lookup StockQuote for sym" ++ sym)
           --sq (Just msq) = msq
@@ -99,8 +99,8 @@ snapDownloading concurrently afresh = do
   --printAll lines2
   mapM_ putStrLn lines2
 
-  let index idx = case (find (\q -> idx == quoteTicker q) fetchedQuotes) of
-        Just sq -> texy (idx, 0.0, True, 0.0, (quotePrice sq), (quoteChg sq), (quoteChgPc sq), "")
+  let index idx = case (find (\q -> idx == sqTicker q) fetchedQuotes) of
+        Just sq -> texy (idx, 0.0, True, 0.0, (sqPrice sq), (sqChg sq), (sqChgpc sq), "")
         Nothing -> idx ++ " not found"
 
   --purStrLn (map index ["^FTAS", "

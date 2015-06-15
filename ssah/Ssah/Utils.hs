@@ -3,6 +3,7 @@
 module Utils  where
 
 import Control.Exception
+import Data.Char
 import Data.List
 import Data.Maybe
 import Data.Ord
@@ -125,6 +126,9 @@ asEitherFloat str =
   case (readMaybe $ clean str) :: Maybe Float of
     Just num -> Right num
     Nothing -> Left $  "Bad float: '" ++ str ++ "'"
+
+asMaybeFloat :: String -> Maybe Float
+asMaybeFloat str = readMaybe $ clean str 
   
 
 asPennies :: String -> Pennies -- String of form #0.00
@@ -146,6 +150,9 @@ timeString = do
   
 printn n  lst = mapM_ print  (take n lst)
 printAll lst = mapM_ print lst
+
+--putAll [] = putStr ""
+--putAll xs = mapM_ putStrLn xs
 
 map2 f list1 list2 =
   let f' (el1, el2) = f el1 el2 in
@@ -213,3 +220,8 @@ psr n str = -- pad string right to length n
   printf fmt str
 
 -----------------------------------------------------------------------
+-- Misc routines
+
+ones = (1.0::Float)  : ones -- infinited list of 1.0's
+
+upperCase = map toUpper

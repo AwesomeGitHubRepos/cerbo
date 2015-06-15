@@ -2,9 +2,11 @@ module Yahoo where
 
 import Control.Concurrent.Async
 import Control.Monad
+--import Data.Char
 import Data.Either
 import Data.List
 import Data.List.Split
+import Data.Maybe
 import Data.String.Utils
 import Data.Tuple.Select
 import GHC.Exts
@@ -44,13 +46,23 @@ getUrl url = do
 
 stripJunk = stripChars "\"+%\n"
 
---type Price = Float
---type Rox   = Float
+--data StockQuote = StockQuote String String String Float Float Float Float deriving (Show)
+data StockQuote = StockQuote {
+  sqDstamp :: String
+  , sqTstamp :: String
+  , sqTicker :: String
+  , sqRox :: Float
+  , sqPrice :: Float
+  , sqChg :: Float
+  , sqChgpc :: Float
+  } deriving (Show)
 
--- data StockUnit = Raw | Pennies deriving (Show)
-data StockQuote = StockQuote String String String Float Float Float Float deriving (Show)
-quoteTuple (StockQuote       dstamp tstamp ticker rox   price chg   chgpc ) =
-  (dstamp, tstamp, ticker, rox, price, chg, chgpc) 
+
+fmtPrice :: Float -> String
+fmtPrice p = printf "%10.4f" p
+
+--quoteTuple (StockQuote       dstamp tstamp ticker rox   price chg   chgpc ) =
+--  (dstamp, tstamp, ticker, rox, price, chg, chgpc) 
 
 
 mkQuote :: [String] -> StockQuote
@@ -70,16 +82,11 @@ mkQuote fields =
 
 getQuotes = makeTypes mkQuote "yahoo"
 
-quoteDstamp sq = sel1 $ quoteTuple sq
-
-quoteTicker sq = sel3 $ quoteTuple sq
-
---quotePrice :: StockQuote -> Price
-quotePrice sq = sel5 $ quoteTuple sq
---quoteSym   sq = sel1 $ quoteTuple sq
-
-quoteChg sq = sel6 $ quoteTuple sq
-quoteChgPc sq = sel7 $ quoteTuple sq
+--quoteDstamp sq = sel1 $ quoteTuple sq
+--quoteTicker sq = sel3 $ quoteTuple sq
+--quotePrice sq = sel5 $ quoteTuple sq
+--quoteChg sq = sel6 $ quoteTuple sq
+--quoteChgPc sq = sel7 $ quoteTuple sq
 
 str4 :: Float -> String -- TODO promote to Utils
 str4 f = printf "%9.4f" f
@@ -92,7 +99,7 @@ quoteAsText sq =
   where
     --fmt = "yahoo\t%s\t%s\t%s\t%12.4f\tP\n"
     fields = ["yahoo", dstamp, tstamp, (fmtTicker ticker), (str4 rox),   (str4 price), (str4 chg),   (str4 chgpc), "P\n"]
-    (dstamp, tstamp, ticker, rox,   price, chg,   chgpc) = quoteTuple sq
+    StockQuote dstamp tstamp ticker rox price chg chgpc = sq
     
 
 usdUrl = -- url for USD
@@ -123,7 +130,7 @@ testQuoteAsText = do
   print (quoteAsText sq)
 
 --decodeFetch :: String -> String -> Float -> String -> StockQuote
-decodeFetch dstamp tstamp rox serverText ticker =
+decodeFetchXXX dstamp tstamp rox serverText ticker =
   ans
   where
     fields = splitStr "," serverText
@@ -134,6 +141,24 @@ decodeFetch dstamp tstamp rox serverText ticker =
     ans = if length fields  == 4
           then Right $ StockQuote dstamp tstamp ticker rox   price chg   chgpc
           else Left $ "Couldn't decipher server response for ticker '" ++ ticker++ "' with response '" ++ serverText ++ "'"
+
+decodeFetch dstamp tstamp rox serverText ticker =
+  ans
+  where
+    fields = splitStr "," serverText
+    [_, priceStr, chgStr, chgpcStr] = fields
+    mrox str = liftM2 (*) (Just rox) (asMaybeFloat str)
+    --price1 = asEitherFloat priceStr
+    --chg1 = asEitherFloat chStr
+    --chgpc1 = asEitherFloat chgpcStr
+    --[price, chg, chgpc] = if all [price1, chg1, chgpc1] 
+    price = mrox priceStr
+    chg  = mrox chgStr
+    chgpc = asMaybeFloat chgpcStr
+    success = (length fields == 4) && all isJust [price, chg, chgpc]
+    ok = Right $ StockQuote dstamp tstamp ticker rox  (fromJust price) (fromJust chg) (fromJust chgpc)
+    fail = Left $ "Couldn't decipher server response for ticker '" ++ ticker++ "' with response '" ++ serverText ++ "'"
+    ans = if success then ok else fail
 
 
 -- fetchQuote ::  String -> String -> (String, Float)  -> IO StockQuote
@@ -158,7 +183,7 @@ fetchQuotes concurrently dstamp tstamp pairs = do
   --let _ = if length oops >0 then error (show oops) else []
   return res
 
---fetchQuotesA :: [Ticker] -> [Rox] -> IO [StockQuote]
+fetchQuotesA :: Bool -> [[Char]] -> [Float] -> IO [Either [Char] StockQuote]
 fetchQuotesA concurrently tickers roxs = do
   ds <- dateString
   ts <- timeString
@@ -214,11 +239,11 @@ getStockQuote :: (Dstamp -> Bool) -> Ticker -> [StockQuote] -> Maybe Float
 getStockQuote accept ticker sqs =
   sqLast
   where
-    f sq = ticker == (quoteTicker sq) && accept (quoteDstamp sq)
+    f sq = ticker == (sqTicker sq) && accept (sqDstamp sq)
     matches = filter f sqs
-    sortedMatches = sortWith quoteDstamp matches
+    sortedMatches = sortWith sqDstamp matches
     sq [] = Nothing
-    sq xs = Just $ quotePrice $ last xs
+    sq xs = Just $ sqPrice $ last xs
     sqLast = sq sortedMatches
 
 
@@ -247,3 +272,27 @@ mkGoogle ["P", dstamp, tstamp, sym, priceStr, unit] =
 getGoogles = makeTypes mkGoogle "P"
 
 
+testya = yahooEpics ["ulvr.l", "hyh", "azn.l"]
+testya1 = yahooEpics ["ulvr.l", "yikes"]
+
+fmtSqBrief sq =
+  intercalate " " fields
+  where
+    StockQuote _ _ ticker _ price chg chgpc = sq
+    fields = [fmtTicker ticker, fmtPrice price, str4 chg, str4 chgpc]
+
+yahooEpics :: [String] -> IO ()
+yahooEpics epics = do
+  --        "ULVR.L  2787.0000   -1.0000   -0.0359"
+  let hdr = "EPIC        PRICE       CHG      CHG%"
+  putStrLn hdr
+  let epics1 = epics ++ ["^FTSE", "^FTAS", "^FTMC"]
+  let epics2 = map upperCase epics1
+
+  let prin sq = case sq of
+        Left x -> x
+        Right x -> fmtSqBrief x
+        
+  rawStockQuotes <- fetchQuotesA True epics2 ones
+  let rows = map prin rawStockQuotes
+  putAll rows
