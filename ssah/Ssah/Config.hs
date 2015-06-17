@@ -7,6 +7,7 @@ import Control.Exception
 import Control.Monad
 import Data.Text (Text, unpack, pack)
 import System.IO.Error
+import System.Info
 import System.Path.Glob
 
 --import Control.Monad.Error
@@ -16,7 +17,11 @@ import Data.Configurator.Types
 
 
 --rcFile = "/home/mcarter/.hssarc"
-rcFile = "$(HOME)/.hssarc"
+rcFileLinux = "$(HOME)/.hssarc"
+rcFileWin = "FIXME"
+isLinux = os == "linux"
+
+rcFile = if isLinux then rcFileLinux else rcFileWin
 
 -- lup = Data.Configurator.lookup
 
