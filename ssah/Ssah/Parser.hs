@@ -55,20 +55,6 @@ foldLine' acc str
     
 foldLine str = foldLine' [] str
 
-{-
-fileListXXX :: IO [[Char]]
-fileListXXX = do
-  files1 <- glob "/home/mcarter/redact/docs/accts2014/data/*.txt"
-  files2 <- glob "/home/mcarter/.ssa/yahoo/*.txt"
-  files3 <- glob "/home/mcarter/.ssa/gofi/*.txt"
-  files4 <- glob "/home/mcarter/redact/docs/accts2014/companies/*"
-  --let files = files1 ++ files2 ++ files3 ++ files4
-  --let files = liftM concat [files1, files2, files3, files4]
-  let files = concat [files1, files2, files3, files4]
-  -- print files
-  --files <- liftM concat [files1, files2, files3, files4]
-  return files
--}
 
 fileList :: IO [String]
 fileList = do

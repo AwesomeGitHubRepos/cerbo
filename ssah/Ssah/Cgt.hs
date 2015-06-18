@@ -8,7 +8,8 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 import Text.Printf
 
-import Comm  
+import Comm
+import Config
 import Etran
 import Portfolio
 import Utils
@@ -57,5 +58,6 @@ createCgtReport etrans = do
   --let hdr = "B/S,Date,Company,Share,Price,Charges,Tax"
   let trans = mkCgt etrans
   --let rows = [hdr] ++ trans
-  writeFile "/home/mcarter/.ssa/cgt.txt" $ intercalate "\n" trans
+  f <- outFile "cgt.txt"
+  writeFile f $ intercalate "\n" trans
   -- putStrLn $ show $ mkCgt etrans

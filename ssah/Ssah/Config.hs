@@ -6,8 +6,9 @@ module Config where
 import Control.Exception
 import Control.Monad
 import Data.Text (Text, unpack, pack)
+import System.Environment (getEnv)
 import System.IO.Error
-import System.Info
+import System.Info (os)
 import System.Path.Glob
 
 --import Control.Monad.Error
@@ -15,13 +16,70 @@ import System.Path.Glob
 import Data.Configurator
 import Data.Configurator.Types
 
-
---rcFile = "/home/mcarter/.hssarc"
-rcFileLinux = "$(HOME)/.hssarc"
-rcFileWin = "FIXME"
 isLinux = os == "linux"
 
+--data Cfg = Cfg {
+
+iops :: IO String -> String -> IO String
+iops iostr str = do
+  str1 <- iostr
+  return (str1 ++ str)
+
+defaultConfigXXX = 
+  case os of
+  "linux" -> (getEnv "HOME", "", "/", ".hssarc")
+  _ -> (getEnv "USERPROFILE", "\\AppData\\Local\\MarkCarter\\hssa", "\\", "hssa.cfg")
+
+
+outDir :: IO String
+outDir =
+  case os of
+  "linux" -> getEnv "HOME"
+  _ -> iops (getEnv "USERPROFILE") "\\AppData\\Local\\MarkCarter\\hssa"
+  
+  --let (base, d, _, _) = defaultConfig
+  --iops base d
+
+fileSep = if isLinux then "/" else "\\"
+
+rcFile = iops outDir (fileSep ++ cfgFile)
+         where
+           cfgFile = if isLinux then ".hssarc" else "hssa.cfg"
+
+outFile name = iops outDir (fileSep ++ name)
+{-
+outDir =
+  if isLinux then od "HOME" "" else od "APPDATA" "\\AppData\\Local\\MarkCarter\\hssa"
+  where
+    od e d = do
+      root <- getEnv e
+      return (root ++ d)
+-}
+
+
+{-
+rcFile = do
+  let (_, _, sep, cfg) = defaultConfig
+  iops outDir (sep ++ cfg)
+-}
+
+{-
+--rcFile = "/home/mcarter/.hssarc"
+rcFileLinux = do
+  root <- getEnv "HOME"
+  let full = root ++ "/.hssarc"
+  --return "$(HOME)/.hssarc"
+  return full
+
+--rcFileWin = "FIXME"
+
+rcFileWin = do
+  root <- getEnv "USERPROFILE" -- e.g. C:\Users\mcarter
+  let full = root ++ "\\AppData\\Local\\MarkCarter\\hssa\\hssa.cfg"
+  return full
+
 rcFile = if isLinux then rcFileLinux else rcFileWin
+-}
 
 -- lup = Data.Configurator.lookup
 
@@ -54,14 +112,18 @@ readConf = do
 
 -}
 
+{-
+-- FIXME looks like it contains some important information
 readConfNice = do
   r <- tryJust (guard . isDoesNotExistError) $ readFile rcFile
   print $ show r
+-}
 
 readConf :: IO [String]
 readConf = do
 -- FIXME NOW
-  cfg <- load [Optional rcFile]
+  rc <- rcFile
+  cfg <- load [Optional rc]
 
   --display cfg
   batch <- lookupDefault "" cfg "prefix"

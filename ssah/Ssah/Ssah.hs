@@ -10,6 +10,7 @@ import Data.Tuple.Select
 --import System.Path.Glob
 
 import Comm
+import Config
 import Etran
 import Financial
 import Nacc
@@ -31,9 +32,11 @@ ssahTest = "hello from Ssah"
 --precacheCommsUsing :: [Comm] -> IO [StockQuote]
 precacheCommsUsing concurrently comms = do
   quotes <- fetchCommQuotes concurrently comms -- will be filtered automatically
-  saveStockQuotes "/home/mcarter/.ssa/yahoo-cached.txt" $ rights quotes
+  file1 <- outFile "yahoo-cached.txt"
+  saveStockQuotes file1 $ rights quotes
   ds <- dateString
-  let fname = "/home/mcarter/.ssa/yahoo/" ++ ds ++ ".txt"
+  fname <- outFile ("yahoo" ++ fileSep ++ ds ++ ".txt")
+  --let fname = "/home/mcarter/.ssa/yahoo/" ++ ds ++ ".txt"
   saveStockQuotes fname $rights quotes
   return quotes
  
@@ -46,7 +49,8 @@ precacheComms concurrently = do
   return cache
 
 loadPrecachedComms = do
-  contents <- readFile "/home/mcarter/.ssa/yahoo-cached.txt"
+  yf <- yfile
+  contents <- readFile yf
   let commands = map foldLine (lines contents)
   let quotes = getQuotes commands
   return quotes

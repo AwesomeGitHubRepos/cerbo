@@ -13,6 +13,7 @@ import Text.Printf
 
 import Aggregate
 import Comm
+import Config
 import Dps
 import Epics
 import Etran
@@ -146,7 +147,8 @@ createEtbDoing  options = do
   if (elem PrinCgt options) then createCgtReport theEtrans else putStr ""
     
   putStrLn "+ OK Finished"
-  writeFile "/home/mcarter/.ssa/hssa.txt" outStr
+  f <- outFile "hssa.txt"
+  writeFile f outStr
 
 optionSet0 = [PrinAccs,  PrinCgt, PrinDpss, PrinEpics, PrinEtb, PrinEtrans, PrinFin, PrinPorts, PrinReturns]
 optionSet1 = [PrinDpss]

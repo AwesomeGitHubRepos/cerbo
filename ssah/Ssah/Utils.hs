@@ -8,6 +8,7 @@ import Data.List
 import Data.Maybe
 import Data.Ord
 import Data.Time
+import Data.Time.LocalTime
 import GHC.Float
 import System.Locale (defaultTimeLocale)
 import Text.Printf
@@ -58,8 +59,7 @@ unPennies :: Pennies -> Float
 unPennies (Pennies p) = (fromIntegral p) / 100.0
 spacePennies = spaces 12
 
---myTime = Data.Time.defaultTimeLocale
-myTime = System.Locale.defaultTimeLocale
+
 
 
 
@@ -137,15 +137,7 @@ asPennies pounds = enPennies (asFloat pounds)
 noPennies :: Pennies -> Bool
 noPennies p = 0.0 == unPennies p
 
-dateString = do
-  let now = getCurrentTime
-  dstamp <- fmap (formatTime myTime "%Y-%m-%d") now
-  return dstamp
 
-timeString = do
-  let now = getCurrentTime
-  tstamp <- fmap (formatTime myTime "%H:%M:%S") now
-  return tstamp
     
   
 printn n  lst = mapM_ print  (take n lst)
@@ -218,6 +210,55 @@ psr :: Int -> String -> String
 psr n str = -- pad string right to length n
   let fmt = "%-" ++ (show n) ++ "." ++ (show n) ++ "s" in
   printf fmt str
+
+-----------------------------------------------------------------------
+-- date/time functions
+
+now = getZonedTime
+
+{-
+fmtNow fmt = do
+  loc <- System.Locale.defaultTimeLocale
+  n <- now
+  --f1 <- formatTime
+  return formatTime loc n  fmt
+-}
+
+time1 :: IO LocalTime
+time1 = fmap zonedTimeToLocalTime getZonedTime
+
+time2 :: IO (String, String)
+time2 = do
+  t1 <- time1
+  let t2 = show t1
+  let ds = take 10 t2
+  let ts = drop 11 t2
+  return (ds, ts)
+
+dateString :: IO String
+dateString = do
+  (ds, _) <- time2
+  return ds
+
+timeString :: IO String
+timeString = do
+  (_, ts) <- time2
+  return (take 8 ts)
+
+--myTime = Data.Time.defaultTimeLocale
+{- FIXME following needs web page. It rpint UTC time
+myTime = System.Locale.defaultTimeLocale
+
+dateString = do
+  let now = getCurrentTime
+  dstamp <- fmap (formatTime myTime "%Y-%m-%d") now
+  return dstamp
+
+timeString = do
+  let now = getCurrentTime
+  tstamp <- fmap (formatTime myTime "%H:%M:%S") now
+  return tstamp
+-}
 
 -----------------------------------------------------------------------
 -- Misc routines

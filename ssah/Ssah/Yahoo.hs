@@ -15,6 +15,7 @@ import System.IO
 import Text.Printf
 
 --import Ssah.Ssah
+import Config
 import Utils
 
 
@@ -202,8 +203,8 @@ testFetches = fetchQuotes True "2015-03-18" "12:59:23" testTickers
 
 --fetchAndDecode urls = fmap (liftM decodeFetch) (fetchSyms urls)
 
-yfile = "/home/mcarter/.ssa/yahoo-cached.txt"
-
+yfileXXX = "/home/mcarter/.ssa/yahoo-cached.txt"
+yfile = outFile "yahoo-cached.txt"
 
 saveStockQuotes :: FilePath -> [StockQuote] -> IO ()
 saveStockQuotes fname quotes = do
@@ -230,7 +231,8 @@ testFas = fetchAndSave True testTickers
 
 
 loadSaves = do
-  let txt = readFile yfile
+  yf <- yfile
+  let txt = readFile yf
   let ls = (liftM lines) txt
   fmap (liftM decodeFetch) ls
 
