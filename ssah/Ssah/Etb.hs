@@ -108,10 +108,26 @@ printNow = do
   ds <- dateString
   ts <- timeString
   putStrLn $ intercalate " " ["DTSTAMP:", ds, ts]
+
+
+{-
+mkReport options (title, option, lines) =
+  [title] ++ mlines ++ ["."]
+  where
+    mlines = if elem option options then lines else []
+-}
+  --then  [title] ++ lines ++ ["."]
+  --else []
+{-  
+  let block title option lines = 
+        if (elem option options)
+        then  [title] ++ lines ++ ["."]
+        else []
+  let sec (title, option, lines) = block title option lines
+-}
   
 --createEtb :: Ledger
-createEtbDoing  options = do
-  printNow
+mkReports  options = do
   ledger <- ratl
   let theComms = comms ledger
   let theEtrans = etrans ledger
@@ -121,34 +137,53 @@ createEtbDoing  options = do
   let etb = assembleEtb grp
   let asxNow = commEndPriceOrDie theComms "FTAS"
   let createdReturns = createReturns (end ledger) theEtrans asxNow (returns ledger)
-    
-  --let putSection sec lines = putStrLn $ if (elem sec options) then lines else ""
-  --let printSection sec str = putSection sec $ unlines str
 
-  let block title option lines = 
-        if (elem option options)
-        then  [title] ++ lines ++ ["."]
-        else []
-  --let section title option lines = putStrLn $ unlines $ block title option lines
-  let sec (title, option, lines) = block title option lines
-      
-  let output = concatMap sec [
-        ("ACCS:",       PrinAccs,    reportAccs grp) ,
-        ("DPSS:",       PrinDpss,    createDpssReport theComms theEtrans (dpss ledger) ), 
-        ("EPICS:",      PrinEpics,   reportEpics theComms  theEtrans) ,
-        ("ETB:",        PrinEtb,     createEtbReport etb) ,
-        ("ETRANS:",     PrinEtrans,  createEtranReport theEtrans),
-        ("FINANCIALS:", PrinFin,     createFinancials etb (financials ledger)),
-        ("PORTFOLIOS:", PrinPorts,   createPortfolios theEtrans theComms),
-        ("RETURNS:",    PrinReturns, createdReturns)]
+  let mkRep (title, option, lines) = (title, if elem option options then unlines lines else "")
+  let reps = map mkRep [
+        ("accs",       PrinAccs,    reportAccs grp) ,
+        ("cgt",        PrinCgt,     createCgtReport theEtrans),
+        ("dpss",       PrinDpss,    createDpssReport theComms theEtrans (dpss ledger) ), 
+        ("epics",      PrinEpics,   reportEpics theComms  theEtrans) ,
+        ("etb",        PrinEtb,     createEtbReport etb) ,
+        ("etrans",     PrinEtrans,  createEtranReport theEtrans),
+        ("financials", PrinFin,     createFinancials etb (financials ledger)),
+        ("portfolios", PrinPorts,   createPortfolios theEtrans theComms),
+        ("returns",    PrinReturns, createdReturns)]
+  return reps
 
-  let outStr = unlines output
+mkAllReports = mkReports optionSet0
+
+createSingleReport reps = do
+  let single (title, body) = (upperCase title) ++ ":\n"  ++ body ++ "."
+  let outStr = unlines $ map single  reps
+  printNow
+  --let outStr = reps
   putStrLn outStr
-  if (elem PrinCgt options) then createCgtReport theEtrans else putStr ""
-    
+  --if (elem PrinCgt options) then createCgtReport theEtrans else putStr ""    
   putStrLn "+ OK Finished"
   f <- outFile "hssa.txt"
   writeFile f outStr
+
+fileReport :: (String, String) -> IO ()
+fileReport (title, body) = do
+  f <- outFile (fileSep ++ "text" ++ fileSep ++ title ++ ".txt")
+  writeFile f body
+  putStr ""
+
+fileReports :: [(String, String)] -> IO ()
+fileReports [] = putStr ""
+fileReports (x:xs) = do
+  fileReport x
+  fileReports xs
+
+createEtbDoing  options = do
+  reps <- mkReports options
+  createSingleReport reps
+  fileReports reps
+
+
+
+--createEtbDoing options = return ()
 
 optionSet0 = [PrinAccs,  PrinCgt, PrinDpss, PrinEpics, PrinEtb, PrinEtrans, PrinFin, PrinPorts, PrinReturns]
 optionSet1 = [PrinDpss]

@@ -40,7 +40,7 @@ mkRow e =
     priceStr = printf "%0.5f" price
     
 -- | create the CGT spreadsheet
-mkCgt etrans =
+createCgtReport etrans =
   x
   where
     es1 = filter (isJust . etDerived) etrans
@@ -54,10 +54,10 @@ mkCgt etrans =
     eRows = map mkRow es4
     x = eRows
 
-createCgtReport etrans = do
-  --let hdr = "B/S,Date,Company,Share,Price,Charges,Tax"
+{-
+createCgtReportXXX etrans = do
   let trans = mkCgt etrans
-  --let rows = [hdr] ++ trans
   f <- outFile "cgt.txt"
   writeFile f $ intercalate "\n" trans
-  -- putStrLn $ show $ mkCgt etrans
+-}
+--createCgtReport etrans = unlines $ mkCgt etrans
