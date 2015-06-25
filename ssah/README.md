@@ -11,7 +11,5 @@ cabal build
 
 Generate documentation: cabal haddock
 
-FIXME now use perl to generate reports
-
 
 See hhsarc: you will need to install a runcom (rc) file 
