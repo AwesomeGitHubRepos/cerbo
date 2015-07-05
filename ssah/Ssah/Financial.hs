@@ -132,7 +132,7 @@ finDriver = do
   --let res = rows
   let decode row =
         let [var, _, p] = splitOn "!" row in
-        (var, enPennies $ asFloat p)
+        (var, enPennies $ asDouble p)
                       
   let etb = map decode rows
   inputs <- readInputs

@@ -9,8 +9,8 @@ import Etran
 import Portfolio
 import Utils
 
-data Epic = Epic { sym::Sym, eqty::Float , ucost::Float, uvalue::Float
-                 , cost::Pennies, value::Pennies, ret::Float} deriving (Show)
+data Epic = Epic { sym::Sym, eqty::Double , ucost::Double, uvalue::Double
+                 , cost::Pennies, value::Pennies, ret::Double} deriving (Show)
 
 showEpic :: Epic -> String
 showEpic epic =

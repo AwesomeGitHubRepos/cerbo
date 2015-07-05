@@ -14,7 +14,7 @@ import Portfolio
 import Utils
 
 data Dps = Dps { dpSym::Sym
-               , dpDps::Float -- dividend per share in PENCE
+               , dpDps::Double -- dividend per share in PENCE
                } deriving (Show)
 
 mkDps :: [[Char]] -> Dps
@@ -23,8 +23,8 @@ mkDps fields =
   where
     ["dps", esym, dpsStr ] = fields
     dps = --FIXME this should be abstracted (e.g. also in Yahoo.hs)
-      case asEitherFloat dpsStr of
-        Left msg -> error $ unlines ["mkDps float error conversion", show fields]
+      case asEitherDouble dpsStr of
+        Left msg -> error $ unlines ["mkDps double error conversion", show fields]
         Right v -> v
 
 getDpss = makeTypes mkDps "dps"
@@ -32,7 +32,7 @@ getDpss = makeTypes mkDps "dps"
 
 data DpsCalc = DpsCalc {
   dcSym::Sym
-  , dcDps::Float
+  , dcDps::Double
   , dcQty::Qty
   , dcDiv::Pennies
   , dcValue::Pennies

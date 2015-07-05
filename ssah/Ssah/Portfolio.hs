@@ -15,7 +15,7 @@ myPorts = ["hal", "hl", "tdn", "tdi"]
 fmtName :: String -> String
 fmtName name = printf "%5s" name
 
-fmtRet :: Float -> String
+fmtRet :: Double -> String
 fmtRet v = printf "%7.2f" v
 
 getPline :: String -> [Pennies] -> String

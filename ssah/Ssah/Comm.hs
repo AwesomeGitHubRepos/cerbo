@@ -8,7 +8,7 @@ import Utils
 import Yahoo
 
 
-data CommDerived = CommDerived (Maybe Float) (Maybe Float) deriving (Show)
+data CommDerived = CommDerived (Maybe Double) (Maybe Double) deriving (Show)
 
 commDerivedTuple (CommDerived startPrice endPrice) =
   (startPrice, endPrice)

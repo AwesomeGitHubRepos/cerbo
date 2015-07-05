@@ -58,14 +58,14 @@ loadPrecachedComms = do
 -- mainSsah = print "TODO!"
 
 
-data Price = Price String String Float deriving (Show)
+data Price = Price String String Double deriving (Show)
 
 mkPrice :: [[Char]] ->Price
 mkPrice["P", dstamp, _, sym, price, _ ] =
-    Price dstamp sym (asFloat price)
+    Price dstamp sym (asDouble price)
 
 
-rox :: Float -> Comm -> Float
+rox :: Double -> Comm -> Double
 rox  usd c =
   scale
   where
@@ -91,14 +91,6 @@ mkPeriod ["period", start, end] =
   (start, end)
   
 getPeriods inputs = makeTypes mkPeriod "period" inputs
-
---getFinancials inputs = makeTypes mkFinancial "FIN" inputs
-
-{-
-mkFinancial :: [[Char]] -> Financial
-mkPeriod ["FIN", action', param1', param2'] =
-  Financial { action = action', param1 = param1', param2 = param2' }
--}
 
 
 printQuotes = do

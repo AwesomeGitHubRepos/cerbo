@@ -49,17 +49,17 @@ etCommA e = c where
 
 mkEtran :: [[Char]] -> Etran
 mkEtran fields =
-    Etran dstamp etIsBuy folio sym qtyF amountP Nothing
+    Etran dstamp etIsBuy folio sym qtyD amountP Nothing
     where
       ["etran", dstamp, way, folio, sym, qty, amount] = fields
-      getFloat field name = --FIXME this should be abstracted (e.g. also in Yahoo.hs)
-        case asEitherFloat field of
+      getDouble field name = --FIXME this should be abstracted (e.g. also in Yahoo.hs)
+        case asEitherDouble field of
           Left msg -> error $ unlines ["mkEtran parseError", name, show fields, msg]
           Right v -> v
       etIsBuy = way == "B"
-      sgn1 = if etIsBuy then 1.0 else -1.0
-      qtyF = (getFloat qty "qty") * sgn1
-      amountP = enPennies (sgn1 * (getFloat amount "amount"))
+      sgn1 = if etIsBuy then 1.0 else (-1.0) :: Double
+      qtyD = (getDouble qty "qty") * sgn1
+      amountP = enPennies (sgn1 * (getDouble amount "amount"))
 
 
 
@@ -69,7 +69,7 @@ etranTuple (Etran dstamp way acc sym qty amount derived) =
 
 etranDerived e = fromJust $ etDerived e
 
-qtys :: [Etran] -> Float
+qtys :: [Etran] -> Double
 qtys es = sum $ map etQty es
 
 getEtrans = makeTypes mkEtran "etran"

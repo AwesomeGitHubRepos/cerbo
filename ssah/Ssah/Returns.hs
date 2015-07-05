@@ -8,20 +8,19 @@ import Utils
 
 data Return = Return { idx::Int
                      , dstamp::Dstamp
-                     , mine::Float
-                     , asx::Float} deriving (Show)
-
---data AugReturn = AugReturn { src::Return, minepc::Float, asxpc::Float}
+                     , mine::Double
+                     , asx::Double
+                     } deriving (Show)
 
 mkReturn :: [String] -> Return
 mkReturn ["return", arg2, arg3, arg4, arg5] =
   Return { idx = idxInt , dstamp = arg3
-         , mine = (asFloat arg4), asx = (asFloat arg5) }
+         , mine = (asDouble arg4), asx = (asDouble arg5) }
   where idxInt = (read arg2)::Int
 
 getReturns inputs = makeTypes mkReturn "return" inputs
 
-fmtReturn :: Int -> Dstamp -> Float -> Float -> Float -> Float -> Float -> String
+fmtReturn :: Int -> Dstamp -> Double -> Double -> Double -> Double -> Double -> String
 fmtReturn aIdx aDstamp aMine minepc aAsx asxpc out =
   printf "%3d %11s %6.2f %6.2f %4.0f %6.2f %6.2f" aIdx aDstamp aMine minepc aAsx asxpc out
 
@@ -38,11 +37,11 @@ foldReturns acc prev (r:rs) =
     newReturnStr = fmtReturn (idx r) (dstamp r) (mine r) minepc (asx r) asxpc out
 
 
-summaryLine :: Float -> Float -> Float -> String
+summaryLine :: Double -> Double -> Double -> String
 summaryLine minepa asxpa outpa =
   printf "%15s %6s %6.2f %4s %6.2f %6.2f\n" "AVG" " " minepa " " asxpa outpa
 
-createReturns :: Dstamp -> [Etran] -> Float -> [Return] -> [String]
+createReturns :: Dstamp -> [Etran] -> Double -> [Return] -> [String]
 createReturns ds etrans asxNow returns =
   [hdr] ++ createdReturns ++ [summary]
   where
@@ -72,7 +71,7 @@ createReturns ds etrans asxNow returns =
     gpc v =
       gainpc power 1.0
       where
-        fix = (fromIntegral finIdx)::Float
+        fix = (fromIntegral finIdx)::Double
         inv = 1.0/ fix
         power =  v ** inv
         

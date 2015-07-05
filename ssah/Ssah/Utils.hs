@@ -23,18 +23,18 @@ type Dstamp = String
 type Etb = [(String, Pennies)]
 type Folio = String
 
-type Percent = Float -- [0, 1]
+type Percent = Double -- [0, 1]
 --instance Show Percent where
 spacePercent = spaces 7
 showPercent p = printf "%7.2f" $ p * 100.0
 
 type Period = (Dstamp, Dstamp)
 
-type Qty = Float
+type Qty = Double
 spaceQty = spaces 12
-showQty q = printf "%12.3f" (q::Float)
+showQty q = printf "%12.3f" (q::Double)
 
-type Rox = Float
+type Rox = Double
 
 type Sym = String
 spaceSym = spaces 4
@@ -46,16 +46,18 @@ type Tstamp = String
 
 newtype Pennies = Pennies Integer
 
-enPennies :: Float -> Pennies
+-- use doubles instead of floats, as you'd have problems with e.g.: enPennies (-386440.77)
+enPennies :: Double -> Pennies
 enPennies pounds =
   Pennies i
   where
-    d = 100.0 * float2Double pounds -- use Double for awkward rounding
+    --d = 100.0 * float2Double pounds -- use Double for awkward rounding
+    d = 100.0 * pounds
     i = (round d :: Integer)
 
-penTest = enPennies $ asFloat "82301.87"
+--penTest = enPennies $ asDouble "82301.87"
 
-unPennies :: Pennies -> Float
+unPennies :: Pennies -> Double
 unPennies (Pennies p) = (fromIntegral p) / 100.0
 spacePennies = spaces 12
 
@@ -64,7 +66,7 @@ spacePennies = spaces 12
 
 
 instance Show Pennies where
-  show (Pennies p) = printf "%12.2f" (unPennies (Pennies p)) -- FIXME probable small rounding problems
+  show (Pennies p) = printf "%12.2f" (unPennies (Pennies p))
 
 infixl 6 |+|
 Pennies a |+| Pennies b = Pennies (a+b)
@@ -73,7 +75,7 @@ infixl 6 |-|
 Pennies a |-| Pennies b = Pennies (a-b)
 
 
-scalep :: Pennies -> Float -> Pennies
+scalep :: Pennies -> Double -> Pennies
 scalep p by = enPennies( by * (unPennies p))
 
 negPennies :: Pennies -> Pennies -- unary negate pennies
@@ -115,24 +117,38 @@ stripChars = filter . flip notElem
 clean = stripChars "\"%\n+"
 
 
-asFloat :: String -> Float
-asFloat v =  read (clean v) :: Float 
+asDouble :: String -> Double
+asDouble v = read(clean v) :: Double
 
---tryAsFloat str = handle (\_ -> Left "WTF") (asFloat str)
---tryAsFloat str = (Right $ asFloat str) `catch` \e -> "WTF"
+--asFloat :: String -> Float
+--asFloat v =  read (clean v) :: Float 
+
+
 
 -- http://is.gd/4Pzvew "Smarter validation"
+{-
 asEitherFloat str =
   case (readMaybe $ clean str) :: Maybe Float of
     Just num -> Right num
     Nothing -> Left $  "Bad float: '" ++ str ++ "'"
+-}
 
-asMaybeFloat :: String -> Maybe Float
-asMaybeFloat str = readMaybe $ clean str 
-  
+asEitherDouble str =
+  case (readMaybe $ clean str) :: Maybe Double of
+    Just num -> Right num
+    Nothing -> Left $  "Bad Double: '" ++ str ++ "'"
+
+
+--asMaybeFloat :: String -> Maybe Float
+--asMaybeFloat str = readMaybe $ clean str
+
+asMaybeDouble :: String -> Maybe Double
+asMaybeDouble str = readMaybe $ clean str 
+
 
 asPennies :: String -> Pennies -- String of form #0.00
-asPennies pounds = enPennies (asFloat pounds)
+--asPennies pounds = enPennies (asFloat pounds)
+asPennies pounds = enPennies (asDouble pounds)
 
 noPennies :: Pennies -> Bool
 noPennies p = 0.0 == unPennies p
@@ -173,7 +189,7 @@ doOrDie maybeX oops =
     Nothing -> error oops
 
  
-gainpc :: Float -> Float -> Float
+gainpc :: Double -> Double -> Double
 gainpc num denom = 100.0 * num / denom - 100.0   
 
 lookupOrDie what table oopsText =
@@ -198,11 +214,11 @@ sortOnMc f =
 -----------------------------------------------------------------------
 -- printing routines
 
-f3 :: Float -> String
+f3 :: Double -> String
 f3 f = -- show a 3dp float as a string
   printf "%12.3f" f
 
-f4 :: Float -> String
+f4 :: Double -> String
 f4 f = -- show a 4dp float as a string
   printf "%12.4f" f
   
@@ -245,24 +261,10 @@ timeString = do
   (_, ts) <- time2
   return (take 8 ts)
 
---myTime = Data.Time.defaultTimeLocale
-{- FIXME following needs web page. It rpint UTC time
-myTime = System.Locale.defaultTimeLocale
-
-dateString = do
-  let now = getCurrentTime
-  dstamp <- fmap (formatTime myTime "%Y-%m-%d") now
-  return dstamp
-
-timeString = do
-  let now = getCurrentTime
-  tstamp <- fmap (formatTime myTime "%H:%M:%S") now
-  return tstamp
--}
 
 -----------------------------------------------------------------------
 -- Misc routines
 
-ones = (1.0::Float)  : ones -- infinited list of 1.0's
+ones = (1.0::Double)  : ones -- infinited list of 1.0's
 
 upperCase = map toUpper

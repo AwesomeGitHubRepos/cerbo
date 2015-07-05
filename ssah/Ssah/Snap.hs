@@ -30,7 +30,7 @@ totalQty etrans comm =
 
 snapFmt = "%8s %9.2f %8.2f %6.2f"
 
-mkSnapLine :: (StockQuote, Qty) -> (String, Float, Float)
+mkSnapLine :: (StockQuote, Qty) -> (String, Double, Double)
 mkSnapLine (sq, qty) =
   (str, amount, chg1)
   where
@@ -90,9 +90,9 @@ snapDownloading concurrently afresh = do
   let texy (sym, qty, want, price, amount, profit, chgpc, oops) =
         s1 ++ s2 ++ s3
         where
-          s1 = printf "%5s %12.2f " (sym::String) (qty::Float)
-          s2 = printf "%12.2f %12.2f "  (price::Float) (amount::Float)
-          s3 = printf "%12.2f %5.2f %s" (profit::Float) (chgpc::Float) (oops::String)
+          s1 = printf "%5s %12.2f " (sym::String) (qty::Double)
+          s2 = printf "%12.2f %12.2f "  (price::Double) (amount::Double)
+          s3 = printf "%12.2f %5.2f %s" (profit::Double) (chgpc::Double) (oops::String)
 
 
   let lines2 = map texy etrans2
