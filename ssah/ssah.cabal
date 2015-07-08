@@ -2,7 +2,7 @@
 -- see http://haskell.org/cabal/users-guide/
 
 name:                ssah
-version:             1.4.0.0
+version:             1.5.0.0
 synopsis:            Simple set of accounts using Haskell
 -- description:         
 homepage:            http://www.markcarter.me.uk
@@ -39,17 +39,18 @@ executable hssa
                        , tuple >= 0.3
 
   other-modules:       Aggregate, Args
-                       , Cgt, Comm, Config
-                       , Dps
-                       , Epics, Etb, Etran
-                       , Financial
-                       , Ledger
-                       , Nacc, Ntran
-                       , Parser, Portfolio, Post
-                       , Returns
-                       , Ssah, Snap
-                       , Yahoo
-                       , Utils
+                     , Cgt, Comm, Config
+                     , Dps
+                     , Epics, Etb, Etran
+                     , Financial
+                     , Ledger
+                     , Nacc, Ntran
+                     , Parser, Portfolio, Post
+                     , Returns
+                       --, Ssah
+                     , Snap
+                     , Yahoo
+                     , Utils
   default-language:    Haskell2010
 
 

@@ -1,6 +1,7 @@
 module Etb where
 
 --import Control.Monad.IfElse
+import Data.Either
 import Data.Function (on)
 import Data.List
 import Data.Maybe
@@ -25,13 +26,14 @@ import Ntran
 import Portfolio
 import Post
 import Returns
-import Ssah
+import Snap
+--import Ssah
 import Utils
 import Yahoo
 
 
 data Option = PrinAccs | PrinCgt | PrinDpss | PrinEpics | PrinEtb | PrinEtrans
-            | PrinFin | PrinPorts | PrinReturns deriving (Eq)
+            | PrinFin | PrinPorts | PrinReturns | PrinSnap deriving (Eq)
 
 augEtb:: Etb -> Etb
 augEtb etb =
@@ -104,31 +106,8 @@ createEtbReport etb =
     totalLine = eLine ("TOTAL", total)
 
 
-printNow = do
-  ds <- dateString
-  ts <- timeString
-  putStrLn $ intercalate " " ["DTSTAMP:", ds, ts]
 
-
-{-
-mkReport options (title, option, lines) =
-  [title] ++ mlines ++ ["."]
-  where
-    mlines = if elem option options then lines else []
--}
-  --then  [title] ++ lines ++ ["."]
-  --else []
-{-  
-  let block title option lines = 
-        if (elem option options)
-        then  [title] ++ lines ++ ["."]
-        else []
-  let sec (title, option, lines) = block title option lines
--}
-  
---createEtb :: Ledger
-mkReports  options = do
-  ledger <- ratl
+mkReports  ledger options = do
   let theComms = comms ledger
   let theEtrans = etrans ledger
   let posts = createPostings (ntrans ledger) theEtrans      
@@ -151,35 +130,46 @@ mkReports  options = do
         ("returns",    PrinReturns, createdReturns)]
   return reps
 
-mkAllReports = mkReports optionSet0
+-- mkAllReports = mkReports optionSet0
 
-createSingleReport reps = do
+createSingleReport dtStamp reps = do
   let single (title, body) = (upperCase title) ++ ":\n"  ++ body ++ "."
   let outStr = unlines $ map single  reps
-  printNow
-  --let outStr = reps
+  putStrLn dtStamp
   putStrLn outStr
-  --if (elem PrinCgt options) then createCgtReport theEtrans else putStr ""    
   putStrLn "+ OK Finished"
   f <- outFile "hssa.txt"
   writeFile f outStr
 
-fileReport :: (String, String) -> IO ()
-fileReport (title, body) = do
+fileReport :: String -> (String, String) -> IO ()
+fileReport dtStamp (title, body) = do
   f <- outFile (fileSep ++ "text" ++ fileSep ++ title ++ ".txt")
-  writeFile f body
-  putStr ""
+  writeFile f (dtStamp ++ "\n\n" ++ body)
+  -- putStr ""
+  --return ()
 
-fileReports :: [(String, String)] -> IO ()
-fileReports [] = putStr ""
-fileReports (x:xs) = do
-  fileReport x
-  fileReports xs
+fileReports :: String -> [(String, String)] -> IO ()
+fileReports _ [] = putStr ""
+fileReports dtStamp (x:xs) = do
+  fileReport dtStamp x
+  fileReports dtStamp xs
 
-createEtbDoing  options = do
-  reps <- mkReports options
-  createSingleReport reps
-  fileReports reps
+
+freshQuotes :: Ledger -> Bool -> IO [Either String StockQuote]
+freshQuotes ledger downloading = 
+  if downloading then precacheCommsUsing True (comms ledger) else return ([])
+
+
+createEtbDoing  options downloading = do
+  ledger <- ratl
+  --quotes1 <- snapDownloading (comms ledger) True downloading
+  (errs, quotes1) <- fmap partitionEithers $ freshQuotes ledger downloading -- FIXME handle errs
+  let quotes2 = (squotes ledger) ++ quotes1
+  let ledger1 = ledger { squotes = quotes2 }
+  reps <- mkReports ledger1 options
+  dtStamp <- nowStr
+  createSingleReport dtStamp reps
+  fileReports dtStamp reps
 
 
 
@@ -194,5 +184,8 @@ createSection opt = createEtbDoing [opt] -- e.g. createSection PrinReturns
 
 createCgt = createSection PrinCgt
 
-createEtb = createEtbDoing optionSet0
-mainEtb = createEtb
+webYes = True
+webNo = False
+
+createEtb = createEtbDoing optionSet0 webNo
+mainEtb =  createEtbDoing optionSet0

@@ -262,6 +262,17 @@ timeString = do
   return (take 8 ts)
 
 
+nowStr = do
+  ds <- dateString
+  ts <- timeString
+  return $ intercalate " " ["DTSTAMP:", ds, ts]
+
+printNow = do
+  str <- nowStr
+  putStrLn str
+
+
+
 -----------------------------------------------------------------------
 -- Misc routines
 

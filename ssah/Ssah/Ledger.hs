@@ -1,4 +1,4 @@
-module Ledger where
+module Ledger  where
 
 import Control.Monad
 
@@ -10,11 +10,9 @@ import Nacc
 import Ntran
 import Parser
 import Returns
-import Ssah
+--import Ssah
 import Utils
 import Yahoo
-
---data Ledger = Ledger [Comm] [Etran] [Financial] [Ntran] [Nacc] Period [StockQuote] [Return] deriving (Show)
 
 data Ledger = Ledger
     { comms :: [Comm]
@@ -29,15 +27,13 @@ data Ledger = Ledger
     , returns :: [Return]
     }
 
+{-
 withLedger f = do
   inputs <- readInputs
-  --let result = f inputs
-  --printAll result
   return $ f inputs
+-}
 
 
--- | Read and trim ledger
-ratl = liftM trimLedger readLedger
 
 -- FIXME trim on start, too
 trimLedger ledger =
@@ -61,20 +57,17 @@ trimLedger ledger =
     ntrans' = trNtrans [] $ ntrans ledger
 
     --trNtrans = filter (\n -> (ntranDstamp n) <= (end ledger)) $ ntrans ledger
+
+
+mkPeriod :: [[Char]] -> Period
+mkPeriod ["period", start, end] =
+  (start, end)
   
+getPeriods inputs = makeTypes mkPeriod "period" inputs
+
+
 readLedger' inputs =
-  let comms = getComms inputs in
-  let etrans = getEtrans inputs in
-  let (start, end) = last $ getPeriods inputs in
-  let yahoos = getQuotes inputs in 
-  let googles = getGoogles inputs in 
-  let synths = synthSQuotes comms etrans in
-  let quotes = yahoos ++ googles ++ synths in
-  -- FIXME next 2 lines should prolly be in trim
-  let comms1 = deriveComms start end quotes comms in
-  let etrans1 = deriveEtrans start comms1 etrans in
-  Ledger
-         { comms = comms1
+  Ledger { comms = comms1
          , dpss = getDpss inputs
          , etrans = etrans1
          , financials = getFinancials inputs
@@ -85,9 +78,29 @@ readLedger' inputs =
          , squotes = quotes
          , returns = getReturns inputs
          }
+  where
+    comms = getComms inputs
+    etrans = getEtrans inputs
+    (start, end) = last $ getPeriods inputs
+    yahoos = getQuotes inputs 
+    googles = getGoogles inputs
+    synths = synthSQuotes comms etrans
+    quotes = yahoos ++ googles ++ synths
+    -- FIXME next 2 lines should prolly be in trim
+    comms1 = deriveComms start end quotes comms
+    etrans1 = deriveEtrans start comms1 etrans
+
 
 readLedger :: IO Ledger
-readLedger = withLedger readLedger'
+--readLedger = withLedger readLedger'
+readLedger = do
+  inputs <- readInputs
+  return $ readLedger' inputs
+
+-- | Read and trim ledger
+ratl :: IO Ledger
+ratl = liftM trimLedger readLedger
+
 
 
 etranToSQuote :: [Comm] -> Etran -> StockQuote

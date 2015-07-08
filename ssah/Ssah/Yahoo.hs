@@ -130,18 +130,6 @@ testQuoteAsText = do
   let sq = StockQuote "2015-03-18" "12:59:23" "HYH" 1.0 47.5745 0.5645 1.2008
   print (quoteAsText sq)
 
---decodeFetch :: String -> String -> Float -> String -> StockQuote
-decodeFetchXXX dstamp tstamp rox serverText ticker =
-  ans
-  where
-    fields = splitStr "," serverText
-    [_, priceStr, chgStr, chgpcStr] = fields
-    price = asDouble(priceStr) * rox
-    chg  = asDouble(chgStr) * rox
-    chgpc = asDouble(chgpcStr)
-    ans = if length fields  == 4
-          then Right $ StockQuote dstamp tstamp ticker rox   price chg   chgpc
-          else Left $ "Couldn't decipher server response for ticker '" ++ ticker++ "' with response '" ++ serverText ++ "'"
 
 decodeFetch dstamp tstamp rox serverText ticker =
   ans
@@ -194,12 +182,6 @@ testFqaBad = fetchQuotesA True ["AARGH", "^FTAS"] [1.0, 1.0]
 testTickers = [ ("AML.L", 1.0), ("ULVR.L", 1.0), ("HYH", 1000.0)]
 testFetches = fetchQuotes True "2015-03-18" "12:59:23" testTickers
 
-
-
-
---fetchAndDecode urls = fmap (liftM decodeFetch) (fetchSyms urls)
-
-yfileXXX = "/home/mcarter/.ssa/yahoo-cached.txt"
 yfile = outFile "yahoo-cached.txt"
 
 saveStockQuotes :: FilePath -> [StockQuote] -> IO ()
