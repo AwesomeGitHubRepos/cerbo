@@ -22,7 +22,7 @@ commSymSold es =
     -- identify the comms which have sales during the period
     --es2 = filter isJust . etDerived es1
     es3 = filter etBetween $ filter etIsSell es -- sells during period
-    cs1 = map (commSym . etCommA) es3
+    cs1 = map (cmSym . fromJust . etComm) es3
     cs2 = Set.fromList cs1 -- to remove dupes
     cs3 = Set.toList cs2
     cs4 = sort cs3
@@ -43,21 +43,14 @@ mkRow e =
 createCgtReport etrans =
   x
   where
-    es1 = filter (isJust . etDerived) etrans
+    es1 = filter (isJust  . etComm) etrans
     es2 = feopn "tdi" (/=) es1 -- completely ignore the ISA
     cs = commSymSold es2
 
     -- find those etrans which have comms that have sales
-    es3 = filter (\e -> elem (commSym $ etCommA e) cs) es2
+    es3 = filter (\e -> elem (cmSym $ fromJust $ etComm e) cs) es2
 
     es4 = sortOnMc (\e -> (etSym e, etDstamp e)) es3
     eRows = map mkRow es4
     x = eRows
 
-{-
-createCgtReportXXX etrans = do
-  let trans = mkCgt etrans
-  f <- outFile "cgt.txt"
-  writeFile f $ intercalate "\n" trans
--}
---createCgtReport etrans = unlines $ mkCgt etrans

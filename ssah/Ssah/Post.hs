@@ -58,24 +58,10 @@ postingsFromEtran e =
     --pPbd1 = Post ds (folio ++ "/b") "pPdb1" (negp $ etVbd e) ("pPdb1:" ++ s)
     pPbd2 = Post ds "opn" "pdb2" (negp $ etPbd e) ("pdb2:" ++ s) -- profit b/d
 
-    posts = if etDuring e then posts1 else pPbd2:posts1
+    posts = if etBetween e then posts1 else pPbd2:posts1
     --posts = posts1
     
-{-    
-postingsFromEtranXXX etran =
-  [n1, n2, n3, n4]
-  where
-    odstamp = etranOdstamp etran
-    folio = etFolio etran
-    sym = etSym etran
-    opn = folio ++ "/b" --"opn"
-    pga = folio ++ "/g" --"pga"
-    prt = folio ++ "/c" --"prt"
-    n1 = Post odstamp opn pga (negp $ etranStartValue etran) sym
-    n2 = Post odstamp (etFolio etran) pga (negp $ etranFlow etran) sym
-    n3 = Post odstamp pga pga (negp $ etranProfit etran) sym -- FIXME - how can they be the same account ??
-    n4 = Post odstamp prt pga (etranEndValue etran) sym
--}
+
 
 postingsFromEtrans etrans = concatMap postingsFromEtran etrans
 

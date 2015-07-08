@@ -24,7 +24,7 @@ totalQty ::  [Etran] -> Comm -> Qty
 totalQty etrans comm =
   qtys commEtrans
   where
-    hit e = (commSym comm) == (etSym e)
+    hit e = (cmSym comm) == (etSym e)
     commEtrans = filter hit  etrans
 
 
@@ -136,9 +136,9 @@ createSnapReport theComms theEtrans fetchedQuotes = do
         where
           qty = qtys etrans
           sym = etSym $ head etrans
-          comm = find (\c -> commSym c == sym) theComms
-          ctype = fmap commType  comm
-          ticker = fmap commTicker comm
+          comm = find (\c -> cmSym c == sym) theComms
+          ctype = fmap cmType  comm
+          ticker = fmap cmYepic comm
           msq = find (\s -> Just (sqTicker s) == ticker) fetchedQuotes
           (price, chg, chgpc, oops) = case msq of
             Just s -> (sqPrice s, sqChg s, sqChgpc s, "")
@@ -180,6 +180,7 @@ snap2 = snapDownloading True False
 snapSlow = snapDownloading False True -- download syms one at a time (slow for debugging)
 -}
 
+-- FIXME HIGH 08-Jul-2015: hsnap should also create a set of accounts
 hsnap = do
   led <- readLedger
   let theComms = comms led
