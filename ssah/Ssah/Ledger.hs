@@ -1,6 +1,7 @@
 module Ledger  where
 
 import Control.Monad
+import Data.Either
 
 import Comm
 import Dps
@@ -14,6 +15,15 @@ import Returns
 import Utils
 import Yahoo
 
+data StockTrip = StockTrip
+                 { stFile :: [StockQuote] -- from file cache
+                 , stSynth :: [StockQuote] -- synthesised stock quotes
+                 , stWeb :: [StockQuote] -- stock quotes downloaded from web
+                 }
+
+allSt:: StockTrip -> [StockQuote]
+allSt (StockTrip f s w) = f ++ s ++ w
+                 
 data Ledger = Ledger
     { comms :: [Comm]
     , dpss :: [Dps]
@@ -23,21 +33,16 @@ data Ledger = Ledger
     , naccs :: [Nacc]
     , start :: Dstamp
     , end :: Dstamp
-    , squotes :: [StockQuote]
+    , squotes :: StockTrip
     , returns :: [Return]
     }
 
-{-
-withLedger f = do
-  inputs <- readInputs
-  return $ f inputs
--}
+ledgerQuotes ledger = allSt $ squotes ledger
 
 
-
--- FIXME trim on start, too
+trimLedger :: Ledger -> Ledger
 trimLedger ledger =
-  ledger { etrans = etrans', ntrans = ntrans'}
+  ledger { comms = comms', etrans = etrans'', ntrans = ntrans'}
   where
     etrans' = filter (\e -> (etDstamp e) <= (end ledger)) $ etrans ledger
 
@@ -56,6 +61,8 @@ trimLedger ledger =
         n' = Ntran dstamp dr' cr' pennies clear desc
     ntrans' = trNtrans [] $ ntrans ledger
 
+    comms' = deriveComms (start ledger) (end ledger) (ledgerQuotes ledger) (comms ledger)
+    etrans'' = deriveEtrans (start ledger) comms' etrans'
     --trNtrans = filter (\n -> (ntranDstamp n) <= (end ledger)) $ ntrans ledger
 
 
@@ -66,10 +73,13 @@ mkPeriod ["period", start, end] =
 getPeriods inputs = makeTypes mkPeriod "period" inputs
 
 
+
+
+
 readLedger' inputs =
-  Ledger { comms = comms1
+  Ledger { comms = comms
          , dpss = getDpss inputs
-         , etrans = etrans1
+         , etrans = etrans
          , financials = getFinancials inputs
          , ntrans = getNtrans inputs
          , naccs = getNaccs inputs
@@ -85,22 +95,35 @@ readLedger' inputs =
     yahoos = getQuotes inputs 
     googles = getGoogles inputs
     synths = synthSQuotes comms etrans
-    quotes = yahoos ++ googles ++ synths
-    -- FIXME next 2 lines should prolly be in trim
-    comms1 = deriveComms start end quotes comms
-    etrans1 = deriveEtrans start comms1 etrans
+    quotes = StockTrip (yahoos ++ googles)  synths []
 
 
+
+freshQuotes :: Ledger -> Bool -> IO [Either String StockQuote]
+freshQuotes ledger downloading = 
+  if downloading then precacheCommsUsing True (comms ledger) else return ([])
+
+{-
 readLedger :: IO Ledger
 --readLedger = withLedger readLedger'
 readLedger = do
   inputs <- readInputs
   return $ readLedger' inputs
-
+-}
 -- | Read and trim ledger
-ratl :: IO Ledger
-ratl = liftM trimLedger readLedger
+ratl :: Bool -> IO Ledger
+--ratlXXX = liftM trimLedger readLedger -- FIXME NOW do downloading if necessary
+ratl fetch = do
+  inputs <- readInputs
+  let ledger1 = readLedger' inputs
 
+  let squotes1 = squotes ledger1
+  (errs, quotes) <- fmap partitionEithers $ freshQuotes ledger1 fetch -- FIXME handle errs
+  let squotes2 = squotes1 { stWeb = quotes }
+  let ledger2 = ledger1 { squotes = squotes2 }
+  
+  let ledger3 = trimLedger ledger2
+  return ledger3
 
 
 etranToSQuote :: [Comm] -> Etran -> StockQuote

@@ -67,7 +67,7 @@ postingsFromEtrans etrans = concatMap postingsFromEtran etrans
 
 
 testPostings = do
-  ledger <- ratl
+  ledger <- ratl False
   let es = etrans ledger      
   let ps = postingsFromEtrans es
   printAll ps

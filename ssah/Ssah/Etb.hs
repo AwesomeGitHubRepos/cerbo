@@ -1,7 +1,7 @@
 module Etb where
 
 --import Control.Monad.IfElse
-import Data.Either
+--import Data.Either
 import Data.Function (on)
 import Data.List
 import Data.Maybe
@@ -155,18 +155,15 @@ fileReports dtStamp (x:xs) = do
   fileReports dtStamp xs
 
 
-freshQuotes :: Ledger -> Bool -> IO [Either String StockQuote]
-freshQuotes ledger downloading = 
-  if downloading then precacheCommsUsing True (comms ledger) else return ([])
 
 
 createEtbDoing  options downloading = do
-  ledger <- ratl
+  ledger <- ratl downloading
   --quotes1 <- snapDownloading (comms ledger) True downloading
-  (errs, quotes1) <- fmap partitionEithers $ freshQuotes ledger downloading -- FIXME handle errs
-  let quotes2 = (squotes ledger) ++ quotes1
-  let ledger1 = ledger { squotes = quotes2 }
-  reps <- mkReports ledger1 options
+  
+  --let quotes2 = (squotes ledger) ++ quotes1
+  --let ledger1 = ledger { squotes = quotes2 }
+  reps <- mkReports ledger options
   dtStamp <- nowStr
   createSingleReport dtStamp reps
   fileReports dtStamp reps
