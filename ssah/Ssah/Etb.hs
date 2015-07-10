@@ -39,8 +39,6 @@ augEtb:: Etb -> Etb
 augEtb etb =
   res
   where
-    --getpe = getp etb
-    --sumAccs' = sumAccs etb
     etb1 = sumAccs etb "inc" ["div", "int", "wag"]
     etb2 = sumAccs etb1 "exp" ["amz", "car", "chr", "cmp", "hol", "isp", "msc", "mum", "tax"]
     etb3 = sumAccs etb2 "ioe" ["inc", "exp"] -- income over expenditure
@@ -106,7 +104,9 @@ createEtbReport etb =
     totalLine = eLine ("TOTAL", total)
 
 
+data Report = Report { rpTitle :: String, rpPrint :: Bool, rpBody :: String }
 
+mkReports :: Ledger -> [Option] -> IO [Report]
 mkReports  ledger options = do
   let theComms = comms ledger
   let theEtrans = etrans ledger
@@ -116,8 +116,9 @@ mkReports  ledger options = do
   let etb = assembleEtb grp
   let asxNow = commEndPriceOrDie theComms "FTAS"
   let createdReturns = createReturns (end ledger) theEtrans asxNow (returns ledger)
+  let fetchedQuotes = stWeb $ squotes ledger
 
-  let mkRep (title, option, lines) = (title, if elem option options then unlines lines else "")
+  let mkRep (title, option, lines) = Report title (elem option options)  (unlines lines)
   let reps = map mkRep [
         ("accs",       PrinAccs,    reportAccs grp) ,
         ("cgt",        PrinCgt,     createCgtReport theEtrans),
@@ -127,29 +128,36 @@ mkReports  ledger options = do
         ("etrans",     PrinEtrans,  createEtranReport theEtrans),
         ("financials", PrinFin,     createFinancials etb (financials ledger)),
         ("portfolios", PrinPorts,   createPortfolios theEtrans theComms),
-        ("returns",    PrinReturns, createdReturns)]
+        ("returns",    PrinReturns, createdReturns),
+        ("snap",       PrinSnap,    createSnapReport theComms theEtrans fetchedQuotes)]
+             
   return reps
 
 -- mkAllReports = mkReports optionSet0
 
 createSingleReport dtStamp reps = do
-  let single (title, body) = (upperCase title) ++ ":\n"  ++ body ++ "."
-  let outStr = unlines $ map single  reps
+  let single rep =
+        if rpPrint rep
+        then Just $ (upperCase $ rpTitle rep) ++ ":\n"  ++ (rpBody rep) ++ "."
+        else Nothing
+  let outStr = unlines $ mapMaybe single  reps
   putStrLn dtStamp
   putStrLn outStr
   putStrLn "+ OK Finished"
   f <- outFile "hssa.txt"
   writeFile f outStr
 
-fileReport :: String -> (String, String) -> IO ()
-fileReport dtStamp (title, body) = do
-  f <- outFile (fileSep ++ "text" ++ fileSep ++ title ++ ".txt")
-  writeFile f (dtStamp ++ "\n\n" ++ body)
+fileReport :: String -> Report -> IO ()
+fileReport dtStamp rep = do
+  let fileName = fileSep ++ "text" ++ fileSep ++ (rpTitle rep) ++ ".txt"
+  f <- outFile fileName -- (fileSep ++ "text" ++ fileSep ++ title ++ ".txt")
+  let contents = dtStamp ++ "\n\n" ++ (rpBody rep)
+  writeFile f contents -- (dtStamp ++ "\n\n" ++ body)
   -- putStr ""
   --return ()
 
-fileReports :: String -> [(String, String)] -> IO ()
-fileReports _ [] = putStr ""
+fileReports :: String -> [Report] -> IO ()
+fileReports _ [] = return () -- putStr ""
 fileReports dtStamp (x:xs) = do
   fileReport dtStamp x
   fileReports dtStamp xs
@@ -159,10 +167,6 @@ fileReports dtStamp (x:xs) = do
 
 createEtbDoing  options downloading = do
   ledger <- ratl downloading
-  --quotes1 <- snapDownloading (comms ledger) True downloading
-  
-  --let quotes2 = (squotes ledger) ++ quotes1
-  --let ledger1 = ledger { squotes = quotes2 }
   reps <- mkReports ledger options
   dtStamp <- nowStr
   createSingleReport dtStamp reps
@@ -183,6 +187,8 @@ createCgt = createSection PrinCgt
 
 webYes = True
 webNo = False
+
+hsnap = createEtbDoing [PrinSnap] webYes
 
 createEtb = createEtbDoing optionSet0 webNo
 mainEtb =  createEtbDoing optionSet0

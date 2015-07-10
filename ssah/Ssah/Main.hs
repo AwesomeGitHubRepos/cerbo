@@ -6,8 +6,8 @@ module Main where
 --main = MySnap.snap
 
 import Args
-import Etb (mainEtb, webYes, webNo)
-import Snap (hsnap)
+import Etb (hsnap, mainEtb, webYes, webNo)
+--import Snap (hsnap)
 import Yahoo (yahooEpics)
 
 --main = mainEtb
@@ -19,5 +19,5 @@ main = do
     Args -> print (opts, n)
     Epics -> yahooEpics n
     Normal -> mainEtb webNo
-    Snap -> hsnap
+    Snap ->  hsnap
     Web -> mainEtb webYes

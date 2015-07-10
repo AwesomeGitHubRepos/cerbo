@@ -55,11 +55,13 @@ snapDownloading theComms concurrently afresh = do
   
   --let fetchableComms = filter fetchRequired theComms
 
-createSnapReport :: [Comm] -> [Etran] -> [StockQuote] -> IO [String]
-createSnapReport theComms theEtrans fetchedQuotes = do
-  let sortedEtrans = sortBy (comparing $ etSym) theEtrans
-  let grpEtrans = groupBy (\x y -> (etSym x) == (etSym y)) sortedEtrans
-  let agg etrans =
+createSnapReport :: [Comm] -> [Etran] -> [StockQuote] -> [String]
+createSnapReport theComms theEtrans fetchedQuotes =
+  lines2 ++ indexLines
+  where
+    sortedEtrans = sortBy (comparing $ etSym) theEtrans
+    grpEtrans = groupBy (\x y -> (etSym x) == (etSym y)) sortedEtrans
+    agg etrans =
         (sym , qty, want, price, amount, profit, chgpc, oops)
         where
           qty = qtys etrans
@@ -75,14 +77,14 @@ createSnapReport theComms theEtrans fetchedQuotes = do
           amount = qty * price / 100.0
           profit = qty * chg  /100.0
 
-  let aggEtrans = map agg  grpEtrans
-  let hitEtrans = filter sel3 aggEtrans
-  let etrans1 = sortBy (comparing $ sel1) hitEtrans
-  let tAmount = sum $ map sel5 etrans1
-  let tProfit = sum $ map sel6 etrans1
-  let tPc = tProfit/(tAmount - tProfit) * 100.0
-  let etrans2 = etrans1 ++ [ ("TOTAL", 0.0, True, 0.0, tAmount, tProfit, tPc, "")]
-  let texy (sym, qty, want, price, amount, profit, chgpc, oops) =
+    aggEtrans = map agg  grpEtrans
+    hitEtrans = filter sel3 aggEtrans
+    etrans1 = sortBy (comparing $ sel1) hitEtrans
+    tAmount = sum $ map sel5 etrans1
+    tProfit = sum $ map sel6 etrans1
+    tPc = tProfit/(tAmount - tProfit) * 100.0
+    etrans2 = etrans1 ++ [ ("TOTAL", 0.0, True, 0.0, tAmount, tProfit, tPc, "")]
+    texy (sym, qty, want, price, amount, profit, chgpc, oops) =
         s1 ++ s2 ++ s3
         where
           s1 = printf "%5s %12.2f " (sym::String) (qty::Double)
@@ -90,14 +92,14 @@ createSnapReport theComms theEtrans fetchedQuotes = do
           s3 = printf "%12.2f %5.2f %s" (profit::Double) (chgpc::Double) (oops::String)
 
 
-  let lines2 = map texy etrans2
+    lines2 = map texy etrans2
 
-  let index idx = case (find (\q -> idx == sqTicker q) fetchedQuotes) of
+    index idx = case (find (\q -> idx == sqTicker q) fetchedQuotes) of
         Just sq -> texy (idx, 0.0, True, 0.0, (sqPrice sq), (sqChg sq), (sqChgpc sq), "")
         Nothing -> idx ++ " not found"
 
-  let indexLines = map index ["^FTSE", "^FTAS", "^FTMC"]
-  return (lines2 ++ indexLines)
+    indexLines = map index ["^FTSE", "^FTAS", "^FTMC"]
+  
 
 
 {-
@@ -108,8 +110,9 @@ snap2 = snapDownloading True False
 snapSlow = snapDownloading False True -- download syms one at a time (slow for debugging)
 -}
 
+{-
 -- FIXME HIGH 08-Jul-2015: hsnap should also create a set of accounts
-hsnap = do
+hsnapXXX = do
   led <- ratl True
   let theComms = comms led
   let theEtrans = etrans led
@@ -118,3 +121,4 @@ hsnap = do
   output <- createSnapReport theComms theEtrans fetchedQuotes
   mapM_ putStrLn output
   printNow
+-}

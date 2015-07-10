@@ -1,11 +1,7 @@
 module Scratch where
 
-data Foo = Foo { f1::Int , f2 :: DerBar} deriving Show
-data Bar = Bar { b ::Int } deriving Show
+data FooBase = FooBase { b :: Int } deriving Show
+data FooAug = FooAug { a :: Int } deriving Show
 
+data Foo = Foo { c:: FooBase,  q::FooAug} deriving  Show
 
-data DerBar = Underived | Found Bar | Failed deriving Show
-
-f = Foo 12 Underived
-
---newtype Baz = Foo | Bar
