@@ -7,6 +7,7 @@ import Aggregate
 import Comm
 import Etran
 import Portfolio
+import Types
 import Utils
 
 data Epic = Epic { sym::Sym, eqty::Double , ucost::Double, uvalue::Double

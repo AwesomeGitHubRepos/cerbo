@@ -27,7 +27,7 @@ import Portfolio
 import Post
 import Returns
 import Snap
---import Ssah
+import Types
 import Utils
 import Yahoo
 
@@ -65,7 +65,7 @@ printEtbAcc (dr, nacc, posts) =
       Just x -> x
       Nothing -> error ("Couldn't locate account:" ++ dr)
     runningTotals = cumPennies $ map postPennies posts
-    (acc, _, desc) = naccTuple n
+    Nacc acc  _ desc = n
     accHdr = "Acc: " ++ acc
     body = map2 etbLine posts runningTotals    
     textLines = [accHdr, desc] ++ body ++ [";"]
@@ -82,7 +82,7 @@ assemblePosts naccs posts =
   where
     sPosts = (sortOnMc postDstamp posts)
     keys = uniq $ map postDr sPosts
-    keyedNaccs = map (\k -> find (\n -> k == (naccAcc n)) naccs) keys
+    keyedNaccs = map (\k -> find (\n -> k == (ncAcc n)) naccs) keys
     keyPosts = map (\k -> filter (\p -> k == (postDr  p)) sPosts) keys
     
 

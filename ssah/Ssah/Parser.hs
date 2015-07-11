@@ -7,6 +7,8 @@ import System.Directory
 import System.Path.Glob
 
 import Config
+import Types
+import Utils
 
 filterInputs inputs =
   filter (\x -> isAlpha (x !! 0)) nonblanks
@@ -74,4 +76,69 @@ readInputs = do
   let commands = map foldLine allLines
   return commands
 
+
+matchHeads str = filter (\x -> head x == str)
+
+makeTypes maker match  inputs = map maker $ matchHeads match inputs
+
+
+mkComm :: [[Char]] -> Comm
+mkComm ["comm", sym, fetch, ctype, unit, exch, gepic, yepic, name] = 
+    Comm sym bfetch ctype unit exch gepic yepic name Nothing Nothing
+    where bfetch = (fetch == "W")
+
+getComms inputs = makeTypes mkComm "comm" inputs
+
+
+mkDps :: [[Char]] -> Dps
+mkDps fields =
+  Dps (map toUpper esym) dps
+  where
+    ["dps", esym, dpsStr ] = fields
+    dps = --FIXME this should be abstracted (e.g. also in Yahoo.hs)
+      case asEitherDouble dpsStr of
+        Left msg -> error $ unlines ["mkDps double error conversion", show fields]
+        Right v -> v
+
+getDpss = makeTypes mkDps "dps"
+
+
+mkEtran :: [[Char]] -> Etran
+mkEtran fields =
+    Etran dstamp etIsBuy folio sym qtyD amountP Nothing Nothing
+    where
+      ["etran", dstamp, way, folio, sym, qty, amount] = fields
+      getDouble field name = --FIXME this should be abstracted (e.g. also in Yahoo.hs)
+        case asEitherDouble field of
+          Left msg -> error $ unlines ["mkEtran parseError", name, show fields, msg]
+          Right v -> v
+      etIsBuy = way == "B"
+      sgn1 = if etIsBuy then 1.0 else (-1.0) :: Double
+      qtyD = (getDouble qty "qty") * sgn1
+      amountP = enPennies (sgn1 * (getDouble amount "amount"))
+
+getEtrans = makeTypes mkEtran "etran"
+
+
+-- | alt is the alternative account to use if the transaction is before the start date
+mkNacc :: [String] -> Nacc
+mkNacc ["nacc", acc, alt, desc] = Nacc acc alt desc 
+
+getNaccs = makeTypes mkNacc "nacc"
+
+
+mkNtran :: [String] -> Ntran
+mkNtran ["ntran", dstamp, dr, cr, pennies, clear, desc] =
+  Ntran dstamp dr cr (asPennies pennies) clear desc
+
+getNtrans = makeTypes mkNtran "ntran"
+
+
+mkReturn :: [String] -> Return
+mkReturn ["return", arg2, arg3, arg4, arg5] =
+  Return { idx = idxInt , dstamp = arg3
+         , mine = (asDouble arg4), asx = (asDouble arg5) }
+  where idxInt = (read arg2)::Int
+
+getReturns inputs = makeTypes mkReturn "return" inputs
 

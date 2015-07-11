@@ -5,6 +5,7 @@ import Text.Printf
 
 import Comm
 import Etran
+import Types
 import Utils
 
 -- FIXME LOW - use calculated values of mine/b ... computed in Etb rather than working them out here

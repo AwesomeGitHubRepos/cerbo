@@ -14,15 +14,13 @@ import Network.HTTP
 import System.IO
 import Text.Printf
 
---import Ssah.Ssah
+
 import Config
+import Parser
+import Types
 import Utils
 
 
---import Network.Wreq
---import Control.Applicative
---import Control.Lens
---import Data.ByteString.Lazy.Char8
 
 
 
@@ -249,7 +247,7 @@ mkGoogle ["P", dstamp, tstamp, sym, priceStr, unit] =
       s       -> (s ++ ".L", 1.0)
     priceF = priceRaw * scale
       
-getGoogles = makeTypes mkGoogle "P"
+getGoogles = makeTypes mkGoogle "P" -- FIXME should this really be here?
 
 
 testya = yahooEpics ["ulvr.l", "hyh", "azn.l"]

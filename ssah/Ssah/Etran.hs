@@ -5,81 +5,24 @@ import Data.Maybe
 --import Data.Tuple.Select
 
 import Comm
+import Types
 import Utils
 
-
-{-
-data EtranDerived = EtranDerived
-                    { --deDstamp::Dstamp
-                    deDuring:: Bool -- was the flow during the period?
-                    , deComm::Comm
-                    } deriving (Show)
--}
-
-
-data Etran = Etran
-             { etDstamp::Dstamp
-             , etIsBuy::Bool
-             , etFolio::Folio
-             , etSym::Sym
-             , etQty::Qty
-             , etAmount::Pennies
-             --, etDerived::Maybe EtranDerived
-             , etDuring :: Maybe Bool
-             , etComm :: Maybe Comm
-             } deriving (Show)
 
 etIsSell = not . etIsBuy
 
 etBetween :: Etran -> Bool
 etBetween e = fromMaybe False (etDuring e)
-{-
-  inPeriod
-  where
-    de = etDerived e
-    inPeriod = case de of
-      Nothing -> False
-      (Just x) -> deDuring x
--}
-
-{-
-etCommA :: Etran ->  Comm
-etCommA e = c where
-  de = etDerived e
-  oops = "etComm couldn't find Comm of Etran:" ++ (show e)
-  c = case de of
-    Nothing -> error oops
-    (Just x) -> deComm x
--}
-
-
-mkEtran :: [[Char]] -> Etran
-mkEtran fields =
-    Etran dstamp etIsBuy folio sym qtyD amountP Nothing Nothing
-    where
-      ["etran", dstamp, way, folio, sym, qty, amount] = fields
-      getDouble field name = --FIXME this should be abstracted (e.g. also in Yahoo.hs)
-        case asEitherDouble field of
-          Left msg -> error $ unlines ["mkEtran parseError", name, show fields, msg]
-          Right v -> v
-      etIsBuy = way == "B"
-      sgn1 = if etIsBuy then 1.0 else (-1.0) :: Double
-      qtyD = (getDouble qty "qty") * sgn1
-      amountP = enPennies (sgn1 * (getDouble amount "amount"))
 
 
 
-{-
-etranTuple (Etran dstamp way acc sym qty amount derived) =
-  (dstamp, way, acc, sym, qty, amount, derived)
--}
 
---etranDerived e = fromJust $ etDerived e
+
 
 qtys :: [Etran] -> Double
 qtys es = sum $ map etQty es
 
-getEtrans = makeTypes mkEtran "etran"
+
 
 deriveEtran start comms e =
   e { etDuring = Just during, etComm = Just theComm }

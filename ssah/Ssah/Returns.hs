@@ -4,21 +4,12 @@ import Text.Printf
 
 import Comm
 import Etran
+import Types
 import Utils
 
-data Return = Return { idx::Int
-                     , dstamp::Dstamp
-                     , mine::Double
-                     , asx::Double
-                     } deriving (Show)
 
-mkReturn :: [String] -> Return
-mkReturn ["return", arg2, arg3, arg4, arg5] =
-  Return { idx = idxInt , dstamp = arg3
-         , mine = (asDouble arg4), asx = (asDouble arg5) }
-  where idxInt = (read arg2)::Int
 
-getReturns inputs = makeTypes mkReturn "return" inputs
+
 
 fmtReturn :: Int -> Dstamp -> Double -> Double -> Double -> Double -> Double -> String
 fmtReturn aIdx aDstamp aMine minepc aAsx asxpc out =

@@ -11,23 +11,12 @@ import Comm
 import Epics
 import Etran
 import Portfolio
+import Types
 import Utils
 
-data Dps = Dps { dpSym::Sym
-               , dpDps::Double -- dividend per share in PENCE
-               } deriving (Show)
 
-mkDps :: [[Char]] -> Dps
-mkDps fields =
-  Dps (map toUpper esym) dps
-  where
-    ["dps", esym, dpsStr ] = fields
-    dps = --FIXME this should be abstracted (e.g. also in Yahoo.hs)
-      case asEitherDouble dpsStr of
-        Left msg -> error $ unlines ["mkDps double error conversion", show fields]
-        Right v -> v
 
-getDpss = makeTypes mkDps "dps"
+
 
 
 data DpsCalc = DpsCalc {

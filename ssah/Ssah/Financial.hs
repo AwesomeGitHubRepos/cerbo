@@ -3,7 +3,8 @@ module Financial where
 import Data.List.Split
 import Data.Maybe
 
-import Parser
+import Parser -- FIXME I'm not happy about this being required here
+import Types
 import Utils
 
 --data Action = 
@@ -76,19 +77,6 @@ procFin fin stack =
     _   -> error $ "Can't identify financial type: " ++ [c]
 
 
-{-
-createFinances' (mTextLines, stack) aFinancial =
-  acc
-  where
-    (mText, newStack) = procFin aFinancial stack
-    mNewTextLines = mTextLines ++ [mText]
-    acc = (mNewTextLines, newStack)
-  
-createFinances financials =
-  ["FINANCES:"] ++ items ++ ["."]
-  where
-    items = catMaybes $ fst $ foldl createFinances' ([], []) financials
--}
 
 
 
@@ -138,6 +126,4 @@ finDriver = do
   inputs <- readInputs
   let fins = getFinancials inputs
   let rep = createFinancials etb fins
-  --print rows1
-  -- printAll fins
   putAll rep

@@ -4,49 +4,15 @@ import Data.Either
 import Data.List
 import Data.Maybe
 import Data.String.Utils
--- import Data.Tuple.Select
 
 import Config
-import Parser
+import Parser -- FIXME: shouldn't be REALLY required in this module
+import Types
 import Utils
 import Yahoo
 
 
-{-
-data CommDerived = CommDerived (Maybe Double) (Maybe Double) deriving (Show)
 
-commDerivedTuple (CommDerived startPrice endPrice) =
-  (startPrice, endPrice)
-  
-data Comm = Comm Sym Bool String String String String Ticker String (Maybe CommDerived) deriving (Show)
--}
-
-data Comm = Comm
-            { cmSym :: Sym
-            , cmFetch :: Bool
-            , cmType :: String
-            , cmUnit :: String -- currency as string, e.g. USD P GBP NIL
-            , cmExch :: String
-            , cmGepic :: String
-            , cmYepic :: Ticker
-            , cmName :: String
-            , cmStartPrice :: Maybe Double
-            , cmEndPrice :: Maybe Double
-            }deriving (Show)
-
-
-
-mkComm :: [[Char]] -> Comm
-mkComm ["comm", sym, fetch, ctype, unit, exch, gepic, yepic, name] = 
-    Comm sym bfetch ctype unit exch gepic yepic name Nothing Nothing
-    where bfetch = (fetch == "W")
-
-
---commTuple (Comm sym fetch ctype unit exch gepic yepic name derived) =
---  (sym, fetch, ctype, unit, exch, gepic, yepic, name, derived)
-
---commSym :: Comm -> Sym
---commSym c = sel1 $ commTuple c
 
 
 
@@ -61,48 +27,24 @@ findComm comms sym =
 findTicker :: [Comm] -> Sym -> Ticker
 findTicker comms sym = cmYepic $ findComm comms sym
                
---fetchRequired :: Comm -> Bool
---fetchRequired c = sel2 $ commTuple c
 
---commType c = sel3 $ commTuple c
 
---commCurrency :: Comm -> String
---commCurrency c = sel4 $ commTuple c
-
---yepic :: Comm -> String
---yepic c = sel7 $ commTuple c
-
---commTicker = yepic
-
-getComms inputs = makeTypes mkComm "comm" inputs
 
   
 yepics comms = map cmYepic $ filter cmFetch comms    
 
 deriveComm :: Dstamp -> Dstamp -> [StockQuote] -> Comm -> Comm
 deriveComm start end quotes comm =
-  --Comm sym fetch ctype unit exch gepic yepic name startPrice endPrice
   comm'
   where
-    --(sym, fetch, ctype, unit, exch, gepic, yepic, name, _, _) = comm
     yepic = cmYepic comm
     startPrice = getStockQuote (\d -> d < start) yepic quotes
     endPrice = getStockQuote (\d -> d <= end) yepic quotes
     comm' = comm { cmStartPrice = startPrice, cmEndPrice = endPrice }
-    --derived = Just (CommDerived startPrice endPrice)
   
 deriveComms start end quotes comms  =
   map (deriveComm start end quotes) comms
 
-{-
-commDerived c =
-  commDerivedTuple der
-  where
-    oops = error ("commDerived can't look up: " ++ (show c))
-    der = doOrDie (sel9 $ commTuple c) oops
--}
-
---commStartPrice comm =  sel1 $ commDerived comm
 
 commStartPriceOrDie comms sym =
   doOrDie (cmStartPrice comm) ("Can't find start price for:'" ++ sym ++ "'")

@@ -10,7 +10,7 @@ import Aggregate
 import Etran
 import Ledger
 import Ntran
---import Ssah
+import Types
 import Utils
 
 data Post = Post Dstamp Acc Acc Pennies Desc deriving (Show)
@@ -32,7 +32,7 @@ postDesc p = sel5 $ postTuple p
 postingsFromNtran ntran =
   [n1, n2]
   where
-    (dstamp, dr, cr, pennies, _, desc) = ntranTuple ntran
+    Ntran dstamp dr cr pennies _ desc =  ntran
     n1 = Post dstamp dr cr pennies desc
     n2 = Post dstamp cr dr (negp pennies) desc
     

@@ -11,7 +11,7 @@ import Nacc
 import Ntran
 import Parser
 import Returns
---import Ssah
+import Types
 import Utils
 import Yahoo
 
@@ -49,11 +49,11 @@ trimLedger ledger =
     trNtrans :: [Ntran] -> [Ntran] -> [Ntran]
     trNtrans acc ([]) = reverse acc
     trNtrans acc (n:ns) =
-      if ntranDstamp n > end ledger
+      if ntDstamp n > end ledger
       then trNtrans acc ns
       else trNtrans (n':acc) ns
       where
-        (dstamp, dr, cr, pennies, clear, desc) = ntranTuple n
+        Ntran dstamp dr cr pennies clear desc = n
         theNaccs = naccs ledger
         (dr', cr') = if dstamp < (start ledger)
                      then (alt dr theNaccs, alt cr theNaccs)
