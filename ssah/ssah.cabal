@@ -2,7 +2,7 @@
 -- see http://haskell.org/cabal/users-guide/
 
 name:                ssah
-version:             1.9.0.0
+version:             1.10.0.0
 synopsis:            Simple set of accounts using Haskell
 -- description:         
 homepage:            http://www.markcarter.me.uk
@@ -44,10 +44,9 @@ executable hssa
                      , Epics, Etb, Etran
                      , Financial
                      , Ledger
-                     , Nacc, Ntran
+                     , Nacc
                      , Parser, Portfolio, Post
                      , Returns
-                       --, Ssah
                      , Snap
                      , Yahoo
                      , Utils

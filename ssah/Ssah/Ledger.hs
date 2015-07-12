@@ -8,7 +8,7 @@ import Dps
 import Etran
 import Financial
 import Nacc
-import Ntran
+--import Ntran
 import Parser
 import Returns
 import Types
@@ -35,6 +35,7 @@ data Ledger = Ledger
     , end :: Dstamp
     , squotes :: StockTrip
     , returns :: [Return]
+    , xaccs :: [Xacc]
     }
 
 ledgerQuotes ledger = allSt $ squotes ledger
@@ -87,6 +88,7 @@ readLedger' inputs =
          , end = end
          , squotes = quotes
          , returns = getReturns inputs
+         , xaccs = getXaccs inputs
          }
   where
     comms = getComms inputs

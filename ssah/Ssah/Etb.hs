@@ -22,7 +22,7 @@ import Financial
 import Cgt
 import Ledger
 import Nacc
-import Ntran
+--import Ntran
 import Portfolio
 import Post
 import Returns
@@ -35,8 +35,8 @@ import Yahoo
 data Option = PrinAccs | PrinCgt | PrinDpss | PrinEpics | PrinEtb | PrinEtrans
             | PrinFin | PrinPorts | PrinReturns | PrinSnap deriving (Eq)
 
-augEtb:: Etb -> Etb
-augEtb etb =
+augEtbXXX:: Etb -> Etb
+augEtbXXX etb =
   res
   where
     etb1 = sumAccs etb "inc" ["div", "int", "wag"]
@@ -53,7 +53,10 @@ augEtb etb =
     etb9 = sumAccs etb8_1 "port" ["mine/c", "ut/c"]
     etb10 = sumAccs etb9 "nass" ["cash", "msa", "port"]
     res = etb10
-    
+
+augEtb :: [Xacc] -> Etb ->Etb
+augEtb [] etb = etb
+augEtb (x:xs) etb = augEtb xs $ sumAccs etb (xcTarget x) (xcSources x)
 
 etbLine :: Post -> Pennies -> String
 etbLine post runningTotal = (showPost post) ++ (show runningTotal)
@@ -86,13 +89,13 @@ assemblePosts naccs posts =
     keyPosts = map (\k -> filter (\p -> k == (postDr  p)) sPosts) keys
     
 
-assembleEtb :: [(Acc, Maybe Nacc, [Post])] -> [(Acc,  Pennies)]
-assembleEtb es =
+assembleEtb :: [Xacc] -> [(Acc, Maybe Nacc, [Post])] -> [(Acc,  Pennies)]
+assembleEtb xaccs es =
   augs
   where
     summate (a, n, posts) = (a, countPennies (map postPennies posts))
     lup = map summate es
-    augs = augEtb lup
+    augs = augEtb xaccs lup
 
 createEtbReport etb =
   eLines ++  [totalLine]
@@ -113,7 +116,8 @@ mkReports  ledger options = do
   let posts = createPostings (ntrans ledger) theEtrans      
 
   let grp = assemblePosts (naccs ledger) posts -- FIXME LOW put into order
-  let etb = assembleEtb grp
+  let theXaccs = xaccs ledger
+  let etb = assembleEtb theXaccs grp
   let asxNow = commEndPriceOrDie theComms "FTAS"
   let createdReturns = createReturns (end ledger) theEtrans asxNow (returns ledger)
   let fetchedQuotes = stWeb $ squotes ledger

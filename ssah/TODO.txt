@@ -1,0 +1,4 @@
+* embed html
+* Parser: combine getNaccs, getNtrans, ... and remove external references
+* CGT improvements
+

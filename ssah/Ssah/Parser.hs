@@ -142,3 +142,8 @@ mkReturn ["return", arg2, arg3, arg4, arg5] =
 
 getReturns inputs = makeTypes mkReturn "return" inputs
 
+
+mkXacc :: [String] -> Xacc
+mkXacc ("xacc":target:sources) = Xacc target sources
+
+getXaccs  = makeTypes mkXacc "xacc"

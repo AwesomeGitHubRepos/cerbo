@@ -116,8 +116,9 @@ data Return = Return { idx::Int
                      , asx::Double
                      } deriving (Show)
 
+data Xacc = Xacc { xcTarget :: Acc, xcSources :: [Acc] } deriving Show
 
 -- see Parser.hs for reading these items
 data Record = RecComm Comm | RecDps Dps | RecEtran Etran | RecNacc Nacc | RecNtran Ntran
-            | RecReturn Return
+            | RecReturn Return | RecXacc Xacc
             deriving (Show)
