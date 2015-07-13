@@ -19,6 +19,7 @@ import Dps
 import Epics
 import Etran
 import Financial
+import Html
 import Cgt
 import Ledger
 import Nacc
@@ -35,24 +36,6 @@ import Yahoo
 data Option = PrinAccs | PrinCgt | PrinDpss | PrinEpics | PrinEtb | PrinEtrans
             | PrinFin | PrinPorts | PrinReturns | PrinSnap deriving (Eq)
 
-augEtbXXX:: Etb -> Etb
-augEtbXXX etb =
-  res
-  where
-    etb1 = sumAccs etb "inc" ["div", "int", "wag"]
-    etb2 = sumAccs etb1 "exp" ["amz", "car", "chr", "cmp", "hol", "isp", "msc", "mum", "tax"]
-    etb3 = sumAccs etb2 "ioe" ["inc", "exp"] -- income over expenditure
-    etb3_1 = sumAccs etb3 "mine/g" ["hal/g", "hl/g", "tdi/g", "tdn/g"]
-    etb4 = sumAccs etb3_1 "gain" ["mine/g", "ut/g"]
-    etb5 = sumAccs etb4 "net" ["ioe", "gain"]
-    etb5_1 = sumAccs etb5 "mine/b" ["hal/b", "hl/b", "tdi/b", "tdn/b"]
-    etb6 = sumAccs etb5_1 "open" ["opn", "mine/b", "ut/b"]
-    etb7 = sumAccs etb6 "cd1" ["net", "open"]
-    etb8 = sumAccs etb7 "cash" ["hal", "hl", "ut", "rbs", "rbd", "sus", "tdi", "tdn", "tds", "vis"]
-    etb8_1 = sumAccs etb8 "mine/c" ["hal/c", "hl/c", "tdi/c", "tdn/c"]
-    etb9 = sumAccs etb8_1 "port" ["mine/c", "ut/c"]
-    etb10 = sumAccs etb9 "nass" ["cash", "msa", "port"]
-    res = etb10
 
 augEtb :: [Xacc] -> Etb ->Etb
 augEtb [] etb = etb
@@ -175,6 +158,7 @@ createEtbDoing  options downloading = do
   dtStamp <- nowStr
   createSingleReport dtStamp reps
   fileReports dtStamp reps
+  saveHtml
 
 
 

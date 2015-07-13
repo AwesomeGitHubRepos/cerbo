@@ -46,22 +46,11 @@ rcFile = iops outDir (fileSep ++ cfgFile)
          where
            cfgFile = if isLinux then ".hssarc" else "hssa.cfg"
 
+outFile :: String -> IO String
 outFile name = iops outDir (fileSep ++ name)
-{-
-outDir =
-  if isLinux then od "HOME" "" else od "APPDATA" "\\AppData\\Local\\MarkCarter\\hssa"
-  where
-    od e d = do
-      root <- getEnv e
-      return (root ++ d)
--}
 
 
-{-
-rcFile = do
-  let (_, _, sep, cfg) = defaultConfig
-  iops outDir (sep ++ cfg)
--}
+
 
 {-
 --rcFile = "/home/mcarter/.hssarc"
