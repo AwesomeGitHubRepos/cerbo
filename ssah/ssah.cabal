@@ -19,7 +19,7 @@ cabal-version:       >=1.10
 
 executable hssa
   main-is:             Main.hs     
-  hs-source-dirs:      Ssah    
+  hs-source-dirs:      src    
   build-depends:       base >=4.7 && <4.8
                      , bytestring >= 0.9.2.1
                      , directory >=1.2 && <1.3
