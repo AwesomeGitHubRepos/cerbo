@@ -6,7 +6,7 @@ import Data.Maybe
 import Data.String.Utils
 
 import Config
-import Parser -- FIXME: shouldn't be REALLY required in this module
+import Parser 
 import Types
 import Utils
 import Yahoo
@@ -72,17 +72,18 @@ precacheCommsUsing concurrently comms = do
  
 -- | Download the Comms that apparently require fetching, and store to disk
 precacheComms concurrently = do
-  inputs <- readInputs
-  let comms = makeTypes mkComm "comm" inputs
+  --inputs <- readInputs
+  --let comms = makeTypes mkComm "comm" inputs
+  inputs <- radi
+  let comms = rcComms inputs
   cache <- precacheCommsUsing concurrently comms
-  --print cache
   return cache
 
 loadPrecachedComms = do
   yf <- yfile
   contents <- readFile yf
   let commands = map foldLine (lines contents)
-  let quotes = getQuotes commands
+  let quotes = getYahoos commands
   return quotes
 
 rox :: Double -> Comm -> Double

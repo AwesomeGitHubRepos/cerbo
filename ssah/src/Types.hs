@@ -104,10 +104,19 @@ data Etran = Etran { etDstamp::Dstamp
                    , etComm :: Maybe Comm }
              deriving Show
 
+data Financial =
+  Financial { action::Char
+            , param1::String
+            , param2::String
+            } deriving (Show)
+
+
 data Nacc = Nacc { ncAcc::Acc, ncAlt::Acc, ncDesc::String} deriving Show
 
 data Ntran = Ntran { ntDstamp::Dstamp, ntDr ::Acc, ntCr:: Acc, ntP:: Pennies, ntClear:: String, ntDesc:: String}
              deriving Show
+
+
 
 
 data Return = Return { idx::Int
@@ -116,9 +125,40 @@ data Return = Return { idx::Int
                      , asx::Double
                      } deriving (Show)
 
+
+data StockQuote = StockQuote {
+  sqDstamp :: String
+  , sqTstamp :: String
+  , sqTicker :: String
+  , sqRox :: Double
+  , sqPrice :: Double
+  , sqChg :: Double
+  , sqChgpc :: Double
+  } deriving (Show)
+
+
+
 data Xacc = Xacc { xcTarget :: Acc, xcSources :: [Acc] } deriving Show
 
 -- see Parser.hs for reading these items
-data Record = RecComm Comm | RecDps Dps | RecEtran Etran | RecNacc Nacc | RecNtran Ntran
+data Record = RecComm Comm | RecDps Dps | RecEtran Etran | RecFinancial Financial
+            | RecNacc Nacc | RecNtran Ntran
+            | RecPeriod Period
+            | RecQuote StockQuote
             | RecReturn Return | RecXacc Xacc
             deriving (Show)
+
+data Records = Records {
+  rcComms :: [Comm]
+  , rcDpss :: [Dps]
+  , rcEtrans :: [Etran]
+  , rcFinancials :: [Financial]
+  , rcNtrans :: [Ntran]
+  , rcNaccs :: [Nacc]
+  , rcPeriods :: [Period]
+  , rcQuotes :: [StockQuote]
+  , rcReturns :: [Return]
+  , rcXaccs :: [Xacc]
+  } deriving Show
+
+records0 = Records  [] [] [] [] [] [] [] [] [] [] --  (take 10 $ repeat [])::Records

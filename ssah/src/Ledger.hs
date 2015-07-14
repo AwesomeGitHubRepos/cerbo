@@ -19,31 +19,42 @@ data StockTrip = StockTrip
                  { stFile :: [StockQuote] -- from file cache
                  , stSynth :: [StockQuote] -- synthesised stock quotes
                  , stWeb :: [StockQuote] -- stock quotes downloaded from web
-                 }
+                 } deriving Show
 
 allSt:: StockTrip -> [StockQuote]
 allSt (StockTrip f s w) = f ++ s ++ w
                  
-data Ledger = Ledger
-    { comms :: [Comm]
-    , dpss :: [Dps]
-    , etrans :: [Etran]
-    , financials :: [Financial]
-    , ntrans :: [Ntran]
-    , naccs :: [Nacc]
+data Ledger = Ledger -- FIXME should derive from Records
+    {
+      ldRecords :: Records
+--      comms :: [Comm]
+--    , dpss :: [Dps]
+--    , etrans :: [Etran]
+--    , financials :: [Financial]
+--    , ntrans :: [Ntran]
+--    , naccs :: [Nacc]
     , start :: Dstamp
     , end :: Dstamp
     , squotes :: StockTrip
-    , returns :: [Return]
-    , xaccs :: [Xacc]
-    }
+--    , returns :: [Return]
+--    , xaccs :: [Xacc]
+    } deriving Show
+
+comms = rcComms . ldRecords
+dpss  = rcDpss . ldRecords
+etrans = rcEtrans . ldRecords
+financials = rcFinancials . ldRecords
+ntrans = rcNtrans . ldRecords
+naccs = rcNaccs . ldRecords
+returns = rcReturns . ldRecords
+xaccs = rcXaccs . ldRecords
 
 ledgerQuotes ledger = allSt $ squotes ledger
 
 
 trimLedger :: Ledger -> Ledger
 trimLedger ledger =
-  ledger { comms = comms', etrans = etrans'', ntrans = ntrans'}
+  ledger { ldRecords = recs' }
   where
     etrans' = filter (\e -> (etDstamp e) <= (end ledger)) $ etrans ledger
 
@@ -64,19 +75,23 @@ trimLedger ledger =
 
     comms' = deriveComms (start ledger) (end ledger) (ledgerQuotes ledger) (comms ledger)
     etrans'' = deriveEtrans (start ledger) comms' etrans'
+
+    recs = ldRecords ledger
+    --recs1 = recs { rcComms = (rcComms recs ++ comms') }
+    --recs2 = recs1 { rcEtrans = (rcEtrans recs ++ etrans'') }
+    --recs3 = recs2 { rcNtrans = (rcNtrans recs ++ ntrans') }
+    recs' = recs { rcComms = comms', rcEtrans = etrans'', rcNtrans = ntrans' }
+
+
     --trNtrans = filter (\n -> (ntranDstamp n) <= (end ledger)) $ ntrans ledger
 
 
-mkPeriod :: [[Char]] -> Period
-mkPeriod ["period", start, end] =
-  (start, end)
-  
-getPeriods inputs = makeTypes mkPeriod "period" inputs
 
 
 
 
 
+{-
 readLedger' inputs =
   Ledger { comms = comms
          , dpss = getDpss inputs
@@ -98,27 +113,44 @@ readLedger' inputs =
     googles = getGoogles inputs
     synths = synthSQuotes comms etrans
     quotes = StockTrip (yahoos ++ googles)  synths []
+-}
 
+readLedger' :: Records -> Ledger
+readLedger' recs =
+  Ledger {
+    ldRecords = recs
+    , start = start
+    , end = end
+    , squotes = quotes
+    }
+  where
+    --comms = getComms inputs
+    --etrans = getEtrans inputs
+    (start, end) = last (rcPeriods recs)
+    --yahoos = getQuotes inputs 
+    --googles = getGoogles inputs
+    synths = synthSQuotes (rcComms recs) (rcEtrans recs)
+    quotes = StockTrip (rcQuotes recs)  synths []
 
 
 freshQuotes :: Ledger -> Bool -> IO [Either String StockQuote]
 freshQuotes ledger downloading = 
   if downloading then precacheCommsUsing True (comms ledger) else return ([])
 
-{-
-readLedger :: IO Ledger
---readLedger = withLedger readLedger'
-readLedger = do
-  inputs <- readInputs
-  return $ readLedger' inputs
--}
+
+ratl' = do
+  recs <- radi
+  return $ readLedger' recs
+
 -- | Read and trim ledger
 ratl :: Bool -> IO Ledger
 --ratlXXX = liftM trimLedger readLedger -- FIXME NOW do downloading if necessary
 ratl fetch = do
-  inputs <- readInputs
-  let ledger1 = readLedger' inputs
+  --inputs <- readInputs
 
+  --recs <- radi
+  --let ledger1 = readLedger' recs
+  ledger1 <- ratl'
   let squotes1 = squotes ledger1
   (errs, quotes) <- fmap partitionEithers $ freshQuotes ledger1 fetch -- FIXME handle errs
   let squotes2 = squotes1 { stWeb = quotes }
@@ -127,6 +159,7 @@ ratl fetch = do
   let ledger3 = trimLedger ledger2
   return ledger3
 
+ratlf = ratl False
 
 etranToSQuote :: [Comm] -> Etran -> StockQuote
 etranToSQuote comms e =

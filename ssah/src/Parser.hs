@@ -1,8 +1,9 @@
-module Parser where
+module Parser (radi, foldLine, getYahoos) where
 
 import Control.Monad
 --import Control.Monad.IO.Class
 import Data.Char
+import Data.Maybe
 import System.Directory
 import System.Path.Glob
 
@@ -120,6 +121,58 @@ mkEtran fields =
 getEtrans = makeTypes mkEtran "etran"
 
 
+
+
+mkFinancial :: [[Char]] -> Financial
+mkFinancial ["fin", action', param1', param2'] =
+  f
+  where
+    act = if (length action') > 0 then head action' else
+            error ("Can't have 0 length action:" ++ action' ++ param1' ++ param2')
+    f = Financial {action = act, param1 = param1'
+                  , param2 = param2' }
+
+mkFinancial ["fin", "S"] =
+  Financial {action = 'S', param1 = "", param2 = ""}
+  
+mkFinancial ["fin", "S", param1'] =
+  Financial {action = 'S', param1 = param1', param2 = ""}
+  
+mkFinancial oops =
+  error ("Didn't understand financial:" ++ (show oops))
+
+getFinancials inputs = makeTypes mkFinancial "fin" inputs
+
+
+
+mkGoogle :: [String] -> StockQuote
+mkGoogle ["P", dstamp, tstamp, sym, priceStr, unit] =
+  StockQuote dstamp tstamp ticker 1.0 priceF 0.0 0.0
+  where
+    priceRaw = (asDouble priceStr)
+    rox1 = 1.0
+    (ticker, scale) = case sym of
+      "FTAS"  -> ("^FTAS", 1.0)
+      "FTSE"  -> ("^FTSE", 1.0)
+      "AUG"   -> ("AUG?", rox1)
+      "AUS"   -> ("AUS?", rox1)
+      "AFUSO" -> ("AFUSO?", rox1)
+      "FGF"   -> ("GB0003860789.L", rox1)
+      "FGSS"  -> ("GB00B196XG23.L", rox1)
+      "FSS"   -> ("GB0003875100.L", rox1)
+      "CRC"   -> ("CRC", rox1)
+      "HYH"   -> ("HYH", rox1)
+      "KEYS"  -> ("KEYS", rox1)
+      "SHOS"  -> ("SHOS", rox1)
+      s       -> (s ++ ".L", 1.0)
+    priceF = priceRaw * scale
+
+
+
+
+getGoogles = makeTypes mkGoogle "P" -- FIXME should this really be here?
+
+
 -- | alt is the alternative account to use if the transaction is before the start date
 mkNacc :: [String] -> Nacc
 mkNacc ["nacc", acc, alt, desc] = Nacc acc alt desc 
@@ -132,6 +185,33 @@ mkNtran ["ntran", dstamp, dr, cr, pennies, clear, desc] =
   Ntran dstamp dr cr (asPennies pennies) clear desc
 
 getNtrans = makeTypes mkNtran "ntran"
+
+
+mkPeriod :: [[Char]] -> Period
+mkPeriod ["period", start, end] =
+  (start, end)
+  
+getPeriods inputs = makeTypes mkPeriod "period" inputs
+
+
+mkYahoo :: [String] -> StockQuote
+mkYahoo fields =
+  StockQuote dstamp tstamp ticker rox' price' chg' chgpc'
+  where
+    ["yahoo", dstamp, tstamp, ticker, rox, price, chg, chgpc, "P"] = fields
+    getDouble field name =
+      case asEitherDouble field of
+        Left msg -> error $ unlines ["mkQuote parse error:", name, show fields, msg]
+        Right v -> v
+    rox' = getDouble rox "rox"
+    price' = getDouble price "price"
+    chg' = getDouble chg "chg"
+    chgpc' = getDouble chgpc "chgpc"
+    
+
+getYahoos = makeTypes mkYahoo "yahoo"
+
+
 
 
 mkReturn :: [String] -> Return
@@ -147,3 +227,39 @@ mkXacc :: [String] -> Xacc
 mkXacc ("xacc":target:sources) = Xacc target sources
 
 getXaccs  = makeTypes mkXacc "xacc"
+
+
+
+createRecs :: Records -> [[String]] -> Records
+createRecs recs [] = recs
+createRecs recs ([]:xs) = recs
+createRecs recs (fields:xs) =
+  createRecs recs' xs
+  where
+    cmd:_ = fields
+    recs' = case cmd of 
+      "comm" -> recs { rcComms = (rcComms recs ++ [mkComm fields]) }
+      "dps"  -> recs { rcDpss  = (rcDpss  recs ++ [mkDps fields]) }
+      "etran" -> recs { rcEtrans = (rcEtrans recs ++ [mkEtran fields]) }
+      "fin" -> recs { rcFinancials = (rcFinancials recs ++ [mkFinancial fields]) }
+      "nacc" -> recs { rcNaccs = (rcNaccs recs ++ [mkNacc fields]) }
+      "ntran" -> recs { rcNtrans = (rcNtrans recs ++ [mkNtran fields]) }
+      "P" -> recs { rcQuotes = (rcQuotes recs ++ [mkGoogle fields]) }
+      "period" -> recs { rcPeriods = (rcPeriods recs ++ [mkPeriod fields]) }
+      "return" -> recs { rcReturns = (rcReturns recs ++ [mkReturn fields]) }
+      "xacc" -> recs { rcXaccs = (rcXaccs recs ++ [mkXacc fields]) }
+      "yahoo" -> recs { rcQuotes = (rcQuotes recs ++ [mkYahoo fields]) }
+      _ -> recs
+
+--  where
+--    make fn1 fn2 = Just $ fn1 $ fn2 (x:xs)
+
+--createRecords recs (x:xs)
+
+-- | read and decode inputs
+
+radi = do
+  inputs <- readInputs
+  let recs = createRecs records0 inputs
+  return recs
+

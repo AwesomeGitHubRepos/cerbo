@@ -16,14 +16,8 @@ import Text.Printf
 
 
 import Config
-import Parser
 import Types
 import Utils
-
-
-
-
-
 
 
 splitStr = Data.String.Utils.split -- alias a function
@@ -45,47 +39,11 @@ getUrl url = do
 
 stripJunk = stripChars "\"+%\n"
 
---data StockQuote = StockQuote String String String Float Float Float Float deriving (Show)
-data StockQuote = StockQuote {
-  sqDstamp :: String
-  , sqTstamp :: String
-  , sqTicker :: String
-  , sqRox :: Double
-  , sqPrice :: Double
-  , sqChg :: Double
-  , sqChgpc :: Double
-  } deriving (Show)
 
 
 fmtPrice :: Double -> String
 fmtPrice p = printf "%10.4f" p
 
---quoteTuple (StockQuote       dstamp tstamp ticker rox   price chg   chgpc ) =
---  (dstamp, tstamp, ticker, rox, price, chg, chgpc) 
-
-
-mkQuote :: [String] -> StockQuote
-mkQuote fields =
-  StockQuote dstamp tstamp ticker rox' price' chg' chgpc'
-  where
-    ["yahoo", dstamp, tstamp, ticker, rox, price, chg, chgpc, "P"] = fields
-    getDouble field name =
-      case asEitherDouble field of
-        Left msg -> error $ unlines ["mkQuote parse error:", name, show fields, msg]
-        Right v -> v
-    rox' = getDouble rox "rox"
-    price' = getDouble price "price"
-    chg' = getDouble chg "chg"
-    chgpc' = getDouble chgpc "chgpc"
-    
-
-getQuotes = makeTypes mkQuote "yahoo"
-
---quoteDstamp sq = sel1 $ quoteTuple sq
---quoteTicker sq = sel3 $ quoteTuple sq
---quotePrice sq = sel5 $ quoteTuple sq
---quoteChg sq = sel6 $ quoteTuple sq
---quoteChgPc sq = sel7 $ quoteTuple sq
 
 str4 :: Double -> String -- TODO promote to Utils
 str4 d = printf "%9.4f" d
@@ -225,29 +183,7 @@ getStockQuote accept ticker sqs =
     sqLast = sq sortedMatches
 
 
-mkGoogle :: [String] -> StockQuote
-mkGoogle ["P", dstamp, tstamp, sym, priceStr, unit] =
-  StockQuote dstamp tstamp ticker 1.0 priceF 0.0 0.0
-  where
-    priceRaw = (asDouble priceStr)
-    rox1 = 1.0
-    (ticker, scale) = case sym of
-      "FTAS"  -> ("^FTAS", 1.0)
-      "FTSE"  -> ("^FTSE", 1.0)
-      "AUG"   -> ("AUG?", rox1)
-      "AUS"   -> ("AUS?", rox1)
-      "AFUSO" -> ("AFUSO?", rox1)
-      "FGF"   -> ("GB0003860789.L", rox1)
-      "FGSS"  -> ("GB00B196XG23.L", rox1)
-      "FSS"   -> ("GB0003875100.L", rox1)
-      "CRC"   -> ("CRC", rox1)
-      "HYH"   -> ("HYH", rox1)
-      "KEYS"  -> ("KEYS", rox1)
-      "SHOS"  -> ("SHOS", rox1)
-      s       -> (s ++ ".L", 1.0)
-    priceF = priceRaw * scale
-      
-getGoogles = makeTypes mkGoogle "P" -- FIXME should this really be here?
+
 
 
 testya = yahooEpics ["ulvr.l", "hyh", "azn.l"]

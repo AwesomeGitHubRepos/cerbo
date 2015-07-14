@@ -3,45 +3,20 @@ module Financial where
 import Data.List.Split
 import Data.Maybe
 
-import Parser -- FIXME I'm not happy about this being required here
 import Types
 import Utils
 
---data Action = 
-data Financial =
-  Financial { action::Char
-            , param1::String
-            , param2::String
-            } deriving (Show)
 
 
-getFinancials inputs = makeTypes mkFinancial "fin" inputs
 
-mkFinancial :: [[Char]] -> Financial
-mkFinancial ["fin", action', param1', param2'] =
-  f
-  where
-    act = if (length action') > 0 then head action' else
-            error ("Can't have 0 length action:" ++ action' ++ param1' ++ param2')
-    f = Financial {action = act, param1 = param1'
-                  , param2 = param2' }
 
-mkFinancial ["fin", "S"] =
-  Financial {action = 'S', param1 = "", param2 = ""}
-  
-mkFinancial ["fin", "S", param1'] =
-  Financial {action = 'S', param1 = param1', param2 = ""}
-  
-mkFinancial oops =
-  error ("Didn't understand financial:" ++ (show oops))
-
+{-
 testFin =
   action f
   where
     f = Financial { action = 'Z', param1 = "dunno", param2 = "yet" }
+-}
 
-
--- accStack (x:xs) p = (p |+| x):xs
 
 
 type PennyStack = [Pennies]
@@ -113,7 +88,7 @@ createFinancials etb userData = map (createFinancial etb) userData
 
 
   
-
+{-
 finDriver = do
   f <- readFile "/home/mcarter/.ssa/hssa-etb.txt"
   let  rows= lines f
@@ -127,3 +102,4 @@ finDriver = do
   let fins = getFinancials inputs
   let rep = createFinancials etb fins
   putAll rep
+-}
