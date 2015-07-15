@@ -37,18 +37,20 @@ cerl :: Etran -> String
 cerl etran = -- create etran report line
   text
   where
-    Etran dstamp way acc sym qty amount _ _ = etran
+    Etran dstamp taxable way acc sym qty amount _ _ = etran
+    taxStr = if taxable then "T" else "-"
     unit = 100.0 * (unPennies amount) / qty
     wayStr = if qty > 0.0 then "B" else "S" -- FIXME use isBuy rather than qty > 0.0
-    fields = [psr 7 sym, dstamp, wayStr, psr 3 acc
+    fields = [psr 7 sym, dstamp, taxStr, wayStr, psr 3 acc
              , f3 qty, show amount, f4 unit]
     text = intercalate " " fields
              
 createEtranReport :: [Etran] -> [String]
 createEtranReport etrans =
   [hdr] ++ eLines
-  where    
-    hdr = "SYM     DSTAMP     W FOLIO        QTY       AMOUNT         UNIT"
+  where
+    --     AFUSO   2010-12-30 T B ut      1707.590     20337.40    1191.0002
+    hdr = "SYM     DSTAMP     T W FOLIO        QTY       AMOUNT         UNIT"
     sortedEtrans = sortOnMc (\e -> (etSym e, etDstamp e)) etrans
     eLines = map cerl sortedEtrans
 

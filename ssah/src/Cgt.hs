@@ -45,7 +45,8 @@ createCgtReport etrans =
   x
   where
     es1 = filter (isJust  . etComm) etrans
-    es2 = feopn "tdi" (/=) es1 -- completely ignore the ISA
+    --es2 = feopn "tdi" (/=) es1 -- completely ignore the ISA
+    es2 = filter etTaxable es1
     cs = commSymSold es2
 
     -- find those etrans which have comms that have sales

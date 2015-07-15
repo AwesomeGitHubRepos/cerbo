@@ -106,9 +106,9 @@ getDpss = makeTypes mkDps "dps"
 
 mkEtran :: [[Char]] -> Etran
 mkEtran fields =
-    Etran dstamp etIsBuy folio sym qtyD amountP Nothing Nothing
+    Etran dstamp True etIsBuy folio sym qtyD amountP Nothing Nothing
     where
-      ["etran", dstamp, way, folio, sym, qty, amount] = fields
+      [_, dstamp, way, folio, sym, qty, amount] = fields
       getDouble field name = --FIXME this should be abstracted (e.g. also in Yahoo.hs)
         case asEitherDouble field of
           Left msg -> error $ unlines ["mkEtran parseError", name, show fields, msg]
@@ -120,7 +120,11 @@ mkEtran fields =
 
 getEtrans = makeTypes mkEtran "etran"
 
-
+mkEtranx :: [String] ->Etran
+mkEtranx fields =
+  et { etTaxable = False }
+  where
+    et = mkEtran fields
 
 
 mkFinancial :: [[Char]] -> Financial
@@ -241,6 +245,7 @@ createRecs recs (fields:xs) =
       "comm" -> recs { rcComms = (rcComms recs ++ [mkComm fields]) }
       "dps"  -> recs { rcDpss  = (rcDpss  recs ++ [mkDps fields]) }
       "etran" -> recs { rcEtrans = (rcEtrans recs ++ [mkEtran fields]) }
+      "etranx" -> recs { rcEtrans = (rcEtrans recs ++ [mkEtranx fields]) }
       "fin" -> recs { rcFinancials = (rcFinancials recs ++ [mkFinancial fields]) }
       "nacc" -> recs { rcNaccs = (rcNaccs recs ++ [mkNacc fields]) }
       "ntran" -> recs { rcNtrans = (rcNtrans recs ++ [mkNtran fields]) }

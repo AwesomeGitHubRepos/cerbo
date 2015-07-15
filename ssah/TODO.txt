@@ -1,2 +1,1 @@
-* CGT improvements
 * create a resources folder to store htm and resource files in

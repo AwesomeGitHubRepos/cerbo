@@ -95,6 +95,7 @@ data Dps = Dps { dpSym::Sym
                } deriving (Show)
 
 data Etran = Etran { etDstamp::Dstamp
+                   , etTaxable::Bool
                    , etIsBuy::Bool
                    , etFolio::Folio
                    , etSym::Sym
