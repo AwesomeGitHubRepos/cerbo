@@ -8,7 +8,6 @@ import Data.Tuple.Select
 import GHC.Exts
 import Text.Printf
 
---import Ssah.Ntran
 import Aggregate
 import Comm
 import Etran
@@ -99,26 +98,3 @@ createSnapReport theComms theEtrans fetchedQuotes =
         Nothing -> idx ++ " not found"
 
     indexLines = map index ["^FTSE", "^FTAS", "^FTMC"]
-  
-
-
-{-
-snap1 = snapDownloading True True
-
-snap2 = snapDownloading True False
-
-snapSlow = snapDownloading False True -- download syms one at a time (slow for debugging)
--}
-
-{-
--- FIXME HIGH 08-Jul-2015: hsnap should also create a set of accounts
-hsnapXXX = do
-  led <- ratl True
-  let theComms = comms led
-  let theEtrans = etrans led
-  --fetchedQuotes <- snapDownloading theComms True False
-  let fetchedQuotes = stWeb $ squotes led
-  output <- createSnapReport theComms theEtrans fetchedQuotes
-  mapM_ putStrLn output
-  printNow
--}

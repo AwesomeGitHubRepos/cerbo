@@ -73,12 +73,7 @@ reduceEtrans comms etrans =
                         
 reportOn title comms etrans =
   (fullTableLines, zeroLines)
-  where
-    {-
-    symGrp = groupByKey etSym etrans
-    epics = map (processSymGrp comms) symGrp
-    (nonzeros, zeros) = partition (\e -> (eqty e) > 0.0) epics
--}
+  where    
     (nonzeros, zeros) = reduceEtrans comms etrans
     tableLines = map showEpic nonzeros
     
@@ -89,11 +84,6 @@ reportOn title comms etrans =
     fullTitle = "EPICS: " ++ title
     fullTableLines = [fullTitle, epicHdr] ++ tableLines ++ [sumLine]
     zeroLines = map sym zeros 
-
-subEpicsReportWithTitleXXX title comms etrans cmp aFolio =   
-  fst $ reportOn title comms fEtrans
-  where
-    fEtrans = filter (\e -> aFolio `cmp` etFolio e) etrans
 
 subEpicsReportWithTitle title comms etrans cmp aFolio =   
   fst $ reportOn title comms $ feopn aFolio cmp etrans
@@ -110,6 +100,5 @@ reportEpics comms etrans =
     (nzTab, zTab) = reportOn "ALL" comms etransBySym
     zTab1 = ["EPICS: ZEROS"] ++ zTab ++ [";"]
     folios = ["hal", "hl", "tdi", "tdn", "ut"]
-    --nonUts = subEpicsReportWithTitle "NON-UT" comms etransBySym (/=) "ut" -- not the Unit Trusts
     (nonUts, _) =  reportOn "NON-UT" comms $ myFolio etrans
     subReports = concatMap (subEpicsReport comms etransBySym (==)) folios

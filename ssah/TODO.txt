@@ -1,1 +1,2 @@
-* create a resources folder to store htm and resource files in
+* print currencies with commas
+* make it so that the output is printed to screen is mostly empty
