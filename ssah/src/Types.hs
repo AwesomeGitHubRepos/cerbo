@@ -1,5 +1,7 @@
 module Types where
 
+import Data.Graph.Inductive.Query.Monad (mapFst)
+import Data.List
 import Text.Printf
 
 type Acc = String
@@ -30,7 +32,17 @@ enPennies pounds =
 unPennies :: Pennies -> Double
 unPennies (Pennies p) = (fromIntegral p) / 100.0
 
+formatDecimal d
+    | d < 0.0   = "-" ++ (formatPositiveDecimal (-d))
+    | otherwise = formatPositiveDecimal d
+    where formatPositiveDecimal = uncurry (++) . mapFst addCommas . span (/= '.') . printf "%0.2f"
+          addCommas = reverse . concat . intersperse "," . unfoldr splitIntoBlocksOfThree . reverse
+          splitIntoBlocksOfThree l = case splitAt 3 l of ([], _) -> Nothing; p-> Just p
 
+
+instance Show Pennies where
+  --show (Pennies p) = printf "%12.2f" (unPennies (Pennies p))
+  show (Pennies p) = printf "%12s" $ formatDecimal (unPennies (Pennies p))
 
 
 
@@ -73,8 +85,13 @@ countPennies (p:ps) = p |+| (countPennies ps)
 testCountPennies = countPennies [(Pennies 3), (Pennies 4)]
 
 
-instance Show Pennies where
-  show (Pennies p) = printf "%12.2f" (unPennies (Pennies p))
+
+noPennies :: Pennies -> Bool
+noPennies p = 0.0 == unPennies p
+
+
+
+
 
 
 data Comm = Comm { cmSym :: Sym

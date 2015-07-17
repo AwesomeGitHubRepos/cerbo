@@ -20,6 +20,12 @@ import Types
 spaces n = replicate n ' '
 spacePennies = spaces 12
 
+asPennies :: String -> Pennies -- String of form #0.00
+--asPennies pounds = enPennies (asFloat pounds)
+asPennies pounds = enPennies (asDouble pounds)
+
+
+
 --instance Show Percent where
 spacePercent = spaces 7
 showPercent p = printf "%7.2f" $ p * 100.0
@@ -45,18 +51,6 @@ clean = stripChars "\"%\n+"
 asDouble :: String -> Double
 asDouble v = read(clean v) :: Double
 
---asFloat :: String -> Float
---asFloat v =  read (clean v) :: Float 
-
-
-
--- http://is.gd/4Pzvew "Smarter validation"
-{-
-asEitherFloat str =
-  case (readMaybe $ clean str) :: Maybe Float of
-    Just num -> Right num
-    Nothing -> Left $  "Bad float: '" ++ str ++ "'"
--}
 
 asEitherDouble str =
   case (readMaybe $ clean str) :: Maybe Double of
@@ -64,19 +58,9 @@ asEitherDouble str =
     Nothing -> Left $  "Bad Double: '" ++ str ++ "'"
 
 
---asMaybeFloat :: String -> Maybe Float
---asMaybeFloat str = readMaybe $ clean str
 
 asMaybeDouble :: String -> Maybe Double
 asMaybeDouble str = readMaybe $ clean str 
-
-
-asPennies :: String -> Pennies -- String of form #0.00
---asPennies pounds = enPennies (asFloat pounds)
-asPennies pounds = enPennies (asDouble pounds)
-
-noPennies :: Pennies -> Bool
-noPennies p = 0.0 == unPennies p
 
 
     
@@ -84,8 +68,7 @@ noPennies p = 0.0 == unPennies p
 printn n  lst = mapM_ print  (take n lst)
 printAll lst = mapM_ print lst
 
---putAll [] = putStr ""
---putAll xs = mapM_ putStrLn xs
+
 
 map2 f list1 list2 =
   let f' (el1, el2) = f el1 el2 in
@@ -152,18 +135,15 @@ psr n str = -- pad string right to length n
   let fmt = "%-" ++ (show n) ++ "." ++ (show n) ++ "s" in
   printf fmt str
 
+
+
+
+
 -----------------------------------------------------------------------
 -- date/time functions
 
 now = getZonedTime
 
-{-
-fmtNow fmt = do
-  loc <- System.Locale.defaultTimeLocale
-  n <- now
-  --f1 <- formatTime
-  return formatTime loc n  fmt
--}
 
 time1 :: IO LocalTime
 time1 = fmap zonedTimeToLocalTime getZonedTime

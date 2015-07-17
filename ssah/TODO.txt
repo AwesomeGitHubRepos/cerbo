@@ -1,3 +1,3 @@
-* print currencies with commas
 * cope with non-existent config file
 * make it so that the output is printed to screen is mostly empty
+* html reports should include headings, just like reports types to console
