@@ -2,7 +2,7 @@
 -- see http://haskell.org/cabal/users-guide/
 
 name:                ssah
-version:             1.16.0.0
+version:             1.17.0.0
 synopsis:            Simple set of accounts using Haskell
 -- description:         
 homepage:            http://www.markcarter.me.uk
@@ -28,7 +28,9 @@ executable hssa
                      , containers >= 0.3
                      , file-embed >= 0.0.8.2
                      , fgl >= 5.5.1.0
+                     , hint >= 0.4.2.3
                      , HTTP >=4000.2 && <4000.3
+                     , parsec >= 3.1.5
                      , split >=0.2 && <0.3
                      , time >= 1.4
                      , MissingH >= 1.3
@@ -37,7 +39,9 @@ executable hssa
                      , tuple >= 0.3
 
   other-modules:       Aggregate, Args
-                     , Cgt, Comm, Config
+                     , Cgt, Comm
+                     --, Config
+                     , ConfigParser
                      , Dps
                      , Epics, Etb, Etran
                      , Financial

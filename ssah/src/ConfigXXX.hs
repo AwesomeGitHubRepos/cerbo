@@ -1,3 +1,5 @@
+-- FIXME obsolete module
+
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -27,9 +29,9 @@ iops iostr str = do
   return (str1 ++ str)
 
 dcb :: ByteString
-dcb = $(embedFile "resources/hssa.cfg")
-defaultConfig :: String
-defaultConfig = B.unpack dcb
+dcb = $(embedFile "resources/hssa1.cfg")
+defaultConfig :: IO String
+defaultConfig = do return $  B.unpack dcb
   
 
 
@@ -44,6 +46,7 @@ outDir =
 
 fileSep = if isLinux then "/" else "\\"
 
+rcFile :: IO String
 rcFile = iops outDir (fileSep ++ cfgFile)
          where
            cfgFile = if isLinux then ".hssarc" else "hssa.cfg"
@@ -56,12 +59,20 @@ outFile name = iops outDir (fileSep ++ name)
 strapp :: String -> String -> String
 strapp a b = a ++ b
 
+noRcFile :: IOError -> IO String
+noRcFile e = return $  B.unpack dcb
+--noRcFile e = return "yuk"
+
+getRcFile :: IO String
+getRcFile = rcFile `catch` noRcFile
+--getRcFile = try $ rcFile
 
 readConf :: IO [String]
 readConf = do
-  rc <- rcFile
+  rc <- getRcFile
   cfg <- load [Optional rc]
   batch <- lookupDefault "" cfg "prefix"
   let globname = T.pack $ strapp batch  "globs"
   globs <- lookupDefault ["*"] cfg globname :: IO ([String])
   return globs
+

@@ -15,7 +15,7 @@ import System.IO
 import Text.Printf
 
 
-import Config
+-- import ConfigParser
 import Types
 import Utils
 

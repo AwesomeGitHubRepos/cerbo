@@ -6,7 +6,8 @@ module Html where
 import Data.ByteString.Char8 (unpack)
 import Data.FileEmbed
 
-import Config
+--import Config
+import Utils
 
 htmlDoc = $(embedFile "resources/hssa.htm")
 

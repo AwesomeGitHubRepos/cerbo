@@ -1,7 +1,24 @@
 module Scratch where
 
-data FooBase = FooBase { b :: Int } deriving Show
-data FooAug = FooAug { a :: Int } deriving Show
+import Control.Exception (catch)
+import Language.Haskell.Interpreter
 
-data Foo = Foo { c:: FooBase,  q::FooAug} deriving  Show
+main = toTry `catch` handler
 
+toTry :: IO ()
+toTry = do
+  s <- readFile "README.txt"
+  putStrLn s
+
+handler :: IOError -> IO ()
+handler e = putStrLn "no can do"
+
+
+--foo = interpret (as :: Bool) :: IO Bool
+code =  "head [True,False]"
+code1 = "True"
+--foo = runInterpreter code
+foo = do
+  let resIO = eval code1 :: Interpreter String
+  res <- runInterpreter $ setImports["Prelude"] >> resIO
+  return res

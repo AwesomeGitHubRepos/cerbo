@@ -7,9 +7,9 @@ import Data.Maybe
 import System.Directory
 import System.Path.Glob
 
-import Config
+import ConfigParser
 import Types
-import Utils
+import Utils hiding (spaces)
 
 filterInputs inputs =
   filter (\x -> isAlpha (x !! 0)) nonblanks
@@ -59,8 +59,10 @@ foldLine str = foldLine' [] str
 
 fileList :: IO [String]
 fileList = do
-  globs <- readConf
-  let files = mapM glob globs
+  globs1 <- readConf
+  yglobs <- yahooGlobs
+  let globs2 = globs1 ++ [yglobs]
+  let files = mapM glob globs2
   g <- files
   let h = concat g
   return h

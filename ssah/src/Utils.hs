@@ -10,6 +10,8 @@ import Data.Ord
 import Data.Time
 import Data.Time.LocalTime
 import GHC.Float
+import System.Environment (getEnv)
+import System.Info (os)
 import System.Locale (defaultTimeLocale)
 import Text.Printf
 import Text.Read (readMaybe)
@@ -176,7 +178,35 @@ printNow = do
   str <- nowStr
   putStrLn str
 
+-----------------------------------------------------------------------
+-- Files and directories
 
+
+isLinux = os == "linux"
+
+iops :: IO String -> String -> IO String
+iops iostr str = do
+  str1 <- iostr
+  return (str1 ++ str)
+
+
+outDir :: IO String
+outDir =
+  case os of
+  "linux" -> getEnv "HOME"
+  _ -> iops (getEnv "USERPROFILE") "\\AppData\\Local\\MarkCarter\\hssa"
+  
+  --let (base, d, _, _) = defaultConfig
+  --iops base d
+
+fileSep = if isLinux then "/" else "\\"
+
+outFile :: String -> IO String
+outFile name = iops outDir (fileSep ++ name)
+
+yahooGlobs:: IO String
+yahooGlobs = outFile $ "yahoo" ++ fileSep ++  "*.txt"
+  
 
 -----------------------------------------------------------------------
 -- Misc routines

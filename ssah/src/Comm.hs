@@ -5,7 +5,7 @@ import Data.List
 import Data.Maybe
 import Data.String.Utils
 
-import Config
+--import Config
 import Parser 
 import Types
 import Utils

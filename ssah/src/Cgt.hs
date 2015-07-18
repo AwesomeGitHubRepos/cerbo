@@ -9,7 +9,7 @@ import qualified Data.Set as Set
 import Text.Printf
 
 import Comm
-import Config
+--import Config
 import Etran
 import Portfolio
 import Types
