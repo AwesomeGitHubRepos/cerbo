@@ -8,17 +8,6 @@ import Utils
 
 
 
-
-
-{-
-testFin =
-  action f
-  where
-    f = Financial { action = 'Z', param1 = "dunno", param2 = "yet" }
--}
-
-
-
 type PennyStack = [Pennies]
 
 accStack :: Pennies -> PennyStack -> PennyStack
@@ -73,33 +62,9 @@ sumAccs etb acc lst =
 createFinancial etb fin =
   let (c, p1, p2) = (action fin, param1 fin, param2 fin) in
   case c of
-    'I' -> "TODO I"
     'M' -> finMP p1  (-1.0) p2 etb
     'P' -> finMP p1    1.0  p2 etb
-    'R' -> "TODO R"
     'S' -> p1
-    'T' -> "TODO T"
-    'U' -> "TODO U"
-    'Z' -> "TODO Z"
     _   -> error $ "Can't identify financial type: " ++ [c]
 
 createFinancials etb userData = map (createFinancial etb) userData
-
-
-
-  
-{-
-finDriver = do
-  f <- readFile "/home/mcarter/.ssa/hssa-etb.txt"
-  let  rows= lines f
-  --let res = rows
-  let decode row =
-        let [var, _, p] = splitOn "!" row in
-        (var, enPennies $ asDouble p)
-                      
-  let etb = map decode rows
-  inputs <- readInputs
-  let fins = getFinancials inputs
-  let rep = createFinancials etb fins
-  putAll rep
--}

@@ -105,7 +105,8 @@ mkReports  ledger options = do
   let createdReturns = createReturns (end ledger) theEtrans asxNow (returns ledger)
   let fetchedQuotes = stWeb $ squotes ledger
 
-  let mkRep (title, option, lines) = Report title (elem option options)  (unlines lines)
+  let typep option = (option == PrinSnap) && (elem option options)
+  let mkRep (title, option, lines) = Report title (typep option)  (unlines lines)
   let reps = map mkRep [
         ("accs",       PrinAccs,    reportAccs grp) ,
         ("cgt",        PrinCgt,     createCgtReport theEtrans),
@@ -119,8 +120,6 @@ mkReports  ledger options = do
         ("snap",       PrinSnap,    createSnapReport theComms theEtrans fetchedQuotes)]
              
   return reps
-
--- mkAllReports = mkReports optionSet0
 
 createSingleReport dtStamp reps = do
   let single rep =
@@ -137,11 +136,10 @@ createSingleReport dtStamp reps = do
 fileReport :: String -> Report -> IO ()
 fileReport dtStamp rep = do
   let fileName = fileSep ++ "text" ++ fileSep ++ (rpTitle rep) ++ ".txt"
-  f <- outFile fileName -- (fileSep ++ "text" ++ fileSep ++ title ++ ".txt")
+  f <- outFile fileName
   let contents = dtStamp ++ "\n\n" ++ (rpBody rep)
-  writeFile f contents -- (dtStamp ++ "\n\n" ++ body)
-  -- putStr ""
-  --return ()
+  writeFile f contents
+
 
 fileReports :: String -> [Report] -> IO ()
 fileReports _ [] = return () -- putStr ""
