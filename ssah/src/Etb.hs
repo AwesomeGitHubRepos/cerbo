@@ -92,6 +92,15 @@ createEtbReport etb =
 
 data Report = Report { rpTitle :: String, rpPrint :: Bool, rpBody :: String }
 
+
+mkSection:: [Option] -> (String, Option, [String]) -> Report
+mkSection options (title, option, lines) =
+  Report title typep text
+  where
+    typep = (option == PrinSnap) && (elem option options)
+    text = (upperCase title) ++ ":\n"  ++ (unlines lines) ++ "."
+
+
 mkReports :: Ledger -> [Option] -> IO [Report]
 mkReports  ledger options = do
   let theComms = comms ledger
@@ -105,9 +114,9 @@ mkReports  ledger options = do
   let createdReturns = createReturns (end ledger) theEtrans asxNow (returns ledger)
   let fetchedQuotes = stWeb $ squotes ledger
 
-  let typep option = (option == PrinSnap) && (elem option options)
-  let mkRep (title, option, lines) = Report title (typep option)  (unlines lines)
-  let reps = map mkRep [
+  
+  --let mkRep (title, option, lines) = Report title (typep option)  (unlines lines)
+  let reps = map (mkSection options) [
         ("accs",       PrinAccs,    reportAccs grp) ,
         ("cgt",        PrinCgt,     createCgtReport theEtrans),
         ("dpss",       PrinDpss,    createDpssReport theComms theEtrans (dpss ledger) ), 
@@ -122,16 +131,17 @@ mkReports  ledger options = do
   return reps
 
 createSingleReport dtStamp reps = do
-  let single rep =
-        if rpPrint rep
-        then Just $ (upperCase $ rpTitle rep) ++ ":\n"  ++ (rpBody rep) ++ "."
-        else Nothing
-  let outStr = unlines $ mapMaybe single  reps
+  --let outStr = unlines $ mapMaybe single  reps
+  
+  let consoleStr = unlines $ map rpBody $ filter rpPrint reps
   putStrLn dtStamp
-  putStrLn outStr
-  putStrLn "+ OK Finished"
+  putStrLn consoleStr
+
+  let fileStr = unlines $ map rpBody reps
   f <- outFile "hssa.txt"
-  writeFile f outStr
+  writeFile f fileStr
+
+  putStrLn "+ OK Finished"
 
 fileReport :: String -> Report -> IO ()
 fileReport dtStamp rep = do

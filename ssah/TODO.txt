@@ -1,2 +1,1 @@
-* html reports should include headings, just like reports types to console
 * create a separate project: sifi (simple finance)
