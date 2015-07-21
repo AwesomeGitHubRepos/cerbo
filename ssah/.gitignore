@@ -1,7 +1,0 @@
-*.hi
-cabal.sandbox.config
-yahoo.csv
-.cabal-sandbox/
-dist/
-Setup
-
