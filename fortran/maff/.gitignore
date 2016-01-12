@@ -1,3 +1,6 @@
+html/
+latex/
+man/
 xlsm/
 CMakeCache.txt
 CMakeFiles/

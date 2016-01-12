@@ -1,4 +1,6 @@
-! MAFF - Mark's Arithmetic Fortran Formulas
+! MODULE: maff
+! DESCRIPTION:
+!> Mark's Arithmetic Fortran Formulas
 
 module maff
 implicit none
@@ -114,6 +116,8 @@ subroutine str2ymd(str10, y, m, d)
   read (str10(9:10), "(I2)") d
 end subroutine str2ymd
 
+!> Convert YYYY-MM-DD to days since 1900
+!! @param str string of form YYYY-MM-DD
 integer function str2days1900(str)
   !convert YYYY-MM-DD to days since 1900
   !TODO test
@@ -124,7 +128,7 @@ integer function str2days1900(str)
 end function str2days1900
 
 integer function int_date(y, m, d)
-  !convert (y,m,d) into interer YYYYMMDD
+  !convert (y,m,d) into integer YYYYMMDD
   integer, intent(in):: y,m,d
   int_date = (y * 100 + m)*100 +d
 end function int_date
