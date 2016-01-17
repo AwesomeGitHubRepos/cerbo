@@ -9,6 +9,8 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! sundry mathematical routines
 
+  !> @section sundry Sundry Mathematical routines
+  
 function modz(a, b)
   ! does a mod b = 0?
   integer :: a, b
