@@ -1,0 +1,1 @@
+Copy Cygwin-vivo.ico to c:\cygwin
