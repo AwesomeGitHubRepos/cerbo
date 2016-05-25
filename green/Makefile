@@ -1,3 +1,4 @@
+PREFIX = $(HOME)/.local
 
 .PHONY : all clean install
 
@@ -7,7 +8,8 @@ clean :
 	rm -rf *.o green
 
 install :
-	cp green /usr/local/bin
+	mkdir -p $(PREFIX)/bin
+	cp green $(PREFIX)/bin
 
 green : green.c
 	gcc -std=gnu99 -o green green.c
