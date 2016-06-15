@@ -1,6 +1,0 @@
-base - make a base chicken interpreter
-calc - example of using the LALR parser
-cygwin .txt - notes on getting chicken compiled using cygwin
-mingw.txt - notes on getting chicken compiled on win32 natively with mingw
-ncurses - for chicken
-repl - notes on how the repl can be implemented - inc. over tcp

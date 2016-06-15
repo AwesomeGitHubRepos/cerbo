@@ -1,6 +1,0 @@
-Taken from 
-http://wiki.call-cc.org/man/4/Using%20the%20compiler
-
-Compiling chicken itself:
-make PLATFORM=linux PREFIX=/home/mcarter/.local
-make PLATFORM=linux PREFIX=/home/mcarter/.local install

@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=ernst
-Comment=mcarter
-Exec=ssh -p 2222 -X mcarter@ernst
-Icon=/home/mcarter/redact/docs/ernst-desktop/ernst.png
-Terminal=true
-Type=Application
-StartupNotify=true
