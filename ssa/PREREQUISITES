@@ -1,4 +1,0 @@
-DEBIAN/UBUNTU
-=============
-
-sudo apt-get install libcurl4-openssl-dev libcurl4-doc

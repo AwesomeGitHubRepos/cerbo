@@ -1,6 +1,0 @@
-Don't download prices using ssa anymore, It's way too flakey now. Use fabo instead!
----
-Make dump optional. It's probably consuming about 25% of time
----
-
-
