@@ -25,6 +25,7 @@ Version 1.1
 **************************************************************************/
 //#pragma GCC diagnostic ignored "-Wwrite-strings"
 
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -43,11 +44,14 @@ Version 1.1
 #define FF 12            /* formfeed character (^L) */
 
 //using namespace std;
+using std::cerr;
+using std::cout;
+using std::endl;
 using std::string;
 using std::vector;
 
-string appname = "text2pdf v1.1+";
-string progname = "text2pdf";
+const string appname = "text2pdf v1.1+";
+const string progname = "text2pdf";
 
 FILE *infile;
 int pageNo = 0;
@@ -112,7 +116,8 @@ void WriteHeader(char *title){
   writestr("1 0 obj\n");
   writestr("<<\n");
   sprintf(buf, "/CreationDate (%s)\n", datestring); writestr(buf);
-  sprintf(buf, "/Producer (%s (\\251 Phil Smith, 1996))\n", appname); writestr(buf);
+  //sprintf(buf, "/Producer (%s (\\251 Phil Smith, 1996))\n", appname); writestr(buf);
+  writestr("/Producer (" + appname + " (\\251 Phil Smith, 1996))\n");
   if (title) {sprintf(buf, "/Title (%s)\n", title); writestr(buf);}
   writestr(">>\n");
   writestr("endobj\n");
@@ -187,6 +192,10 @@ void WriteHeader(char *title){
   writestr("endobj\n");
 }
 
+void argerr(const string& msg, const string& arg)
+{
+	cerr << progname << ": " << msg << arg << endl;
+}
 long StartPage(){
   long strmPos;
 
@@ -342,9 +351,10 @@ void WriteRest(){
 
 
 void ShowHelp(){
-
-  printf("\n%s [options] [filename]\n\n", progname);
-  printf("  %s makes a 7-bit clean PDF file (version 1.1) from any input file.\n", progname);
+  cout << endl << progname ;;
+  printf(" [options] [filename]\n\n");
+  cout << " " << progname ;
+  printf("  makes a 7-bit clean PDF file (version 1.1) from any input file.\n");
   printf("  It reads from standard input or a named file, and writes the PDF file\n");
   printf("  to standard output.\n");
   printf("\n  There are various options as follows:\n\n");
@@ -365,7 +375,8 @@ void ShowHelp(){
   printf("  -L\t\tlandscape mode\n");
   printf("\n  Note that where one variable is implied by two options, the second option\n  takes precedence for that variable. (e.g. -A4 -y500)\n");
   printf("  In landscape mode, page width and height are simply swapped over before\n  formatting, no matter how or when they were defined.\n");
-  printf("\n%s (c) Phil Smith, 1996\n", appname);
+  cout << endl << appname;
+  printf(" (c) Phil Smith, 1996\n");
 }
 
 int main(int argc, char **argv){
@@ -381,7 +392,8 @@ int main(int argc, char **argv){
     if (*argv[i] != '-') {  /* input filename */
       ifilename = argv[i];
       if (!(infile = fopen(ifilename, "r"))) {
-	fprintf(stderr, "%s: couldn't open input file `%s'\n", progname, ifilename);
+	//fprintf(stderr, "%s: couldn't open input file `%s'\n", progname, ifilename);
+	argerr("couldn't open input file: ", ifilename);
 	exit(0);
       }
     } else {
@@ -433,7 +445,8 @@ int main(int argc, char **argv){
 	  pageHeight = 842;
 	  break;
 	default:
-	  fprintf(stderr, "%s: ignoring unknown paper size: A%s\n", progname, argv[i]);
+	  //fprintf(stderr, "%s: ignoring unknown paper size: A%s\n", progname, argv[i]);
+	  argerr("ignoring unknown paper size: A", argv[i]);
 	}
 	break;
       case 'x':
@@ -448,7 +461,8 @@ int main(int argc, char **argv){
 	landscape = 1;
 	break;
       default:
-	fprintf(stderr, "%s: ignoring invalid switch: -%s\n", progname, argv[i]);
+	//fprintf(stderr, "%s: ignoring invalid switch: -%s\n", progname, argv[i]);
+	argerr("ignoring invalid switch: -", argv[i]);
       }
     }
     i++;
