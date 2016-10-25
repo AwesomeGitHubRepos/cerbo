@@ -1,4 +1,5 @@
 .deps/
+*.exe.stackdump
 *.o
 a.out
 Makefile

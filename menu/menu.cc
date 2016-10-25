@@ -1,3 +1,4 @@
+#include <getopt.h>
 #include <iostream>
 #include <stdlib.h>
 #include <fstream>
@@ -5,12 +6,19 @@
 #include <vector>
 #include <stdexcept>
 
-#include <boost/program_options.hpp>
-namespace po = boost::program_options;
+//#include <boost/program_options.hpp>
+//namespace po = boost::program_options;
 
 
 
 using namespace std;
+
+string help_text=R"hlp(
+Options:
+  -h [ --help ]            produce help message
+  -f [ --file ] arg (=mnu) file FILE as menu descriptor, instead of <mnu>
+  -v [ --version ]         version
+)hlp";
 
 
 std::string slurp(const char *filename)
@@ -81,36 +89,40 @@ bool loop(const menu_t& menu)
 
 int main(int argc, const char *argv[])
 {
-	po::options_description desc("Options");
-	desc.add_options()
-		("help,h", "produce help message")
-		("file,f", po::value<string>()->default_value("mnu"), "file FILE as menu descriptor, instead of <mnu>")
-		("version,v", "version")
-		;
-	po::variables_map vm;
-	po::store(po::parse_command_line(argc, argv, desc), vm);
-	po::notify(vm);
+	// process args:
+	// https://linux.die.net/man/3/getopt_long
+	string cfg_file = "mnu";
+	int c;
+	while(1) {
+		int this_option_optind = optind ? optind : 1;
+		int option_index = 0;
+		static struct option long_options[] = {
+			{"help", no_argument, 0, 'h'},
+			{"file", required_argument, 0, 'f'},
+			{"version", no_argument, 0, 'v'},
+			{0 ,0,0,0}
+		};
+		c = getopt_long(argc, (char* const*)argv, "hf:v",
+				long_options,  &option_index);
+		if(c == -1) break;
 
-	if(vm.count("help")) {
-		std::cout << desc << "\n";
-		exit(EXIT_SUCCESS);
+		switch(c) {
+			case 'h': cout << help_text; exit(EXIT_SUCCESS);
+			case 'f': cfg_file = optarg; break;
+			case 'v': std::cout << "menu (" << PACKAGE_NAME << ") " << VERSION << "\n"; exit(EXIT_FAILURE);
+			default:  cerr << "getopt returned character code " << c << endl; exit(EXIT_FAILURE);
+		}
 	}
-
-	if(vm.count("version")) {
-		std::cout << "shlex (" << PACKAGE_NAME << ") " << VERSION << "\n";
-		exit(EXIT_SUCCESS);
+	if (optind < argc) {
+		printf("non-option ARGV-elements: ");
+		while (optind < argc)
+			printf("%s ", argv[optind++]);
+		printf("\n");
 	}
-
-	string cfg_file = "mnu" ; //<< vm["f"].as<string>();
-	if(vm.count("file")) cfg_file = vm["file"].as<string>();
-	//cout << cfg_file <<endl;
-	//exit(EXIT_FAILURE);
 
 	menu_t menu;
 	read_cfg(menu, cfg_file);
 	while(loop(menu));
-
-
 
 	return EXIT_SUCCESS;
 }
