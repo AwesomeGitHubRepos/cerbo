@@ -1,1 +1,1 @@
-SUBDIRS = green menu text2pdf
+SUBDIRS = green menu text2pdf shlex

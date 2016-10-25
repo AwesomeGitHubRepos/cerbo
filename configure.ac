@@ -8,5 +8,6 @@ AM_INIT_AUTOMAKE([foreign])
 AC_PROG_CXX
 
 # Wrapping it up
-AC_CONFIG_FILES([Makefile green/Makefile menu/Makefile text2pdf/Makefile])
+AC_CONFIG_FILES([Makefile green/Makefile menu/Makefile text2pdf/Makefile \
+		 shlex/Makefile])
 AC_OUTPUT
