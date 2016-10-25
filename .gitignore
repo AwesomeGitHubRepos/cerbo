@@ -9,8 +9,6 @@ config.status
 configure
 depcomp
 green/.deps/
-green/Makefile
-green/Makefile.in
 install-sh
 missing
 *~
