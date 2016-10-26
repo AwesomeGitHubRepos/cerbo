@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>cxxstats</title>
+</head>
+
+<body>
+
+<h1>stats</h1>
+
+Contains both a library and an executable.
+
+<p>The executable is called <code>cxxstats</code>, which you can use for working with your own stats</p>
+
+<hr><h2>Usage</h2>
+<pre>
+COMMANDS
+
+.s print stack
+g go (do calcs)
+q quit
+</pre>
+
+
+
+<hr><h2>Linking</h2>
+
+Assume you have installed it <code>autogen.sh</code> creates the default install dir of <code>~/.local</code>), your
+program should have the include line:
+<pre>
+#include &lt;mcstats.h&gt;
+</pre>
+
+Link against the library
+<pre>
+libcxxstats
+thus: -lcxxstats
+</pre>
+
+<hr><h2>Functions in the library</h2>
+
+You can call the functions from your own program, assuming that you have linked as instructed above.
+
+<h3>sortd</h3>
+
+Sort doubles in place
+
+<h3>quantile</h3>
+
+Caclualtes quantiles according to Excel interpolation formula. Assumed array is sorted.
+
+<h3>basic_stats</h3>
+Returns structure of basic stats: length, mean, sample stdev
+
+<h3>frank</h3>
+
+Fractional rank, as detailed on <a href="https://en.wikipedia.org/wiki/Ranking#Ranking_in_statistics">Wikipedia</a>.
+
+
+  </body>
+</html>
