@@ -23,7 +23,6 @@ doubles g_stack;
 void print_stack()
 {
 	for( auto d: g_stack) { cout << d << endl; }
-	//cout << endl;
 }
 
 void prstat(const char *name, double value)
@@ -49,12 +48,7 @@ void do_calcs()
 class Quit: public std::exception 
 {
 	public:
-		//Quit(const std::string m="quit"):msg(m){};
-		//~Quit();
-		//const char* what(){ return msg.c_str();}
 		virtual const char* what() const throw()  { return "quit"; }
-	//private:
-	//	std::string msg;
 };
 
 
@@ -73,8 +67,6 @@ std::string rmchar(std::string str, char c)
 
 void process_token(std::string token)
 {
-	//print_tokens(tokens);
-	//std::cout << tokens << std::endl;
 	
 	if(token== ".s") { print_stack() ; return; }
 
@@ -95,18 +87,10 @@ void process_token(std::string token)
 void repl()
 {
 	std::string in;
-        //while(std::getline(std::cin, in) ) {
 	char *line;
-	//initialise_readline();
-	//bool done = false;
-	//while(! done)  {
 	while(true) {
 		line = readline("");
 		if(line == NULL)  throw Quit();
-		//	done = true;
-		//	continue;
-		//}
-
 		add_history(line);
 		in = std::string(line);
 		free(line);
@@ -119,9 +103,15 @@ void repl()
 
 main()
 {
+	cout << "readline: ";
+#ifdef HAVE_READLINE
+	cout << "yes";
+#else
+	cout << "no";
+#endif
+
 	try { repl(); }
 	catch(Quit& e) {
-		//cout << "caught quit" << endl;
 		do_calcs();
 	}
 }
