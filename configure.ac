@@ -4,7 +4,9 @@ AC_CONFIG_SRCDIR([green/green.cc])
 #AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([foreign])
 
-#AC_PROG_CC
+AC_CHECK_HEADERS([readline/readline.h])
+AM_CONDITIONAL([HAVE_READLINE], [test x$ac_cv_header_readline_readline_h == xyes])
+
 AC_PROG_CXX
 
 # Wrapping it up
