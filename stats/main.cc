@@ -1,8 +1,11 @@
 #include <stdio.h>
 
-#ifdef HAVE_READLINE
+#ifdef HAVE_READLINE_READLINE_H
 #include <readline/readline.h>
 #include <readline/history.h>
+#define READLINE_TEXT "readline: yes"
+#else
+#define READLINE_TEXT "readline: no"
 #endif
 
 #include <stdlib.h>
@@ -103,12 +106,7 @@ void repl()
 
 main()
 {
-	cout << "readline: ";
-#ifdef HAVE_READLINE
-	cout << "yes";
-#else
-	cout << "no";
-#endif
+	cout << READLINE_TEXT << endl;
 
 	try { repl(); }
 	catch(Quit& e) {
