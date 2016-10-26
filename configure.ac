@@ -9,5 +9,5 @@ AC_PROG_CXX
 
 # Wrapping it up
 AC_CONFIG_FILES([Makefile green/Makefile menu/Makefile text2pdf/Makefile \
-		 shlex/Makefile])
+		 shlex/Makefile stats/Makefile])
 AC_OUTPUT

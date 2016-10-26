@@ -1,1 +1,1 @@
-SUBDIRS = green menu text2pdf shlex
+SUBDIRS = green menu text2pdf shlex stats
