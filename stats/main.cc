@@ -1,6 +1,10 @@
 #include <stdio.h>
+
+#ifdef HAVE_READLINE
 #include <readline/readline.h>
 #include <readline/history.h>
+#endif
+
 #include <stdlib.h>
 #include <iostream>
 #include <string>
