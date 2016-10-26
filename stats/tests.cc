@@ -1,4 +1,4 @@
-#include "mcstats.h"
+#include "stats.hpp"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -131,8 +131,7 @@ void test_basic_stats()
 	ifs >> dummy >> mean >> stdev ;
 	ifs.close();
 
-	stats s;
-	basic_stats(rs1, s);
+	const stats_t s = basic_stats(rs1);
 	bool ok = near4(s.mean, mean ) && near4(s.stdev , stdev);
 	//cout << s.n << " " << s.mean << " " << s.stdev;
 	report(ok, "basic stats");
@@ -150,7 +149,7 @@ void test_frank()
 }
 
 
-int main()
+int run_tests()
 {
 	test_sort();
 

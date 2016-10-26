@@ -1,17 +1,14 @@
-#ifndef MCSTATS_H
-#define MCSTATS_H
-
+#pragma once
 #include <vector>
 
 typedef std::vector<double> doubles;
 
 
-struct stats_s { double n, sxx, mean, stdev /* sample */ /* sample */ /* sample */ /* sample */ /* sample */ /* sample */ /* sample */ /* sample */ ; }; 
-typedef struct stats_s stats;
+typedef struct stats_t { 
+	double n = 0, sxx = 0, mean = 0, sum = 0, stdev =0;
+} stats_t;
 
 void sortd (doubles &xs);
 double quantile(const doubles &arr, double q);
-void basic_stats(const doubles &ds, stats &s);
+stats_t basic_stats(const doubles &ds);
 std::vector<double> frank(const std::vector<double>& arr);
-
-#endif

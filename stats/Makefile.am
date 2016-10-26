@@ -1,5 +1,6 @@
 bin_PROGRAMS = stats
-stats_SOURCES = mcstats.cc parse.cc stats.cc tests.cc
+stats_LDADD = -lreadline
+stats_SOURCES = main.cc parse.cc stats.cc tests.cc
 #EXTRA_DIST = tests-env.sh
 #include_HEADERS = mcstats.h
 

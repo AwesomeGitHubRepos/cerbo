@@ -5,12 +5,8 @@ created 19-Feb-2016
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-//#include <fstream>
-//#include <iostream>
-//#include <math.h>
-//#include <memory>
 
-#include "parse.h"
+#include "parse.hpp"
 
 //using namespace std;
 
