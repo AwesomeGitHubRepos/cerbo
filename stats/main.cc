@@ -1,3 +1,4 @@
+#include <iostream>
 #include <stdio.h>
 #include <string>
 using std::string;
@@ -26,10 +27,17 @@ string rdline()
 
 #else
 #define READLINE_TEXT "readline: no"
+string rdline()
+{
+	string result;
+	std::istream& ret = std::getline(std::cin, result);
+	//if(result.size() == 0 && ret == std::eofbit) throw Quit();
+	if(result.size() == 0 && std::cin.eof()) throw Quit();
+	return result;
+}
 #endif
 
 #include <stdlib.h>
-#include <iostream>
 #include <exception>
 #include <stdexcept> // std::invalid_argument for g++ 4.8.2
 
