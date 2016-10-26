@@ -1,16 +1,35 @@
 #include <stdio.h>
+#include <string>
+using std::string;
+
+
+class Quit: public std::exception 
+{
+	public:
+		virtual const char* what() const throw()  { return "quit"; }
+};
 
 #ifdef HAVE_READLINE_READLINE_H
 #include <readline/readline.h>
 #include <readline/history.h>
 #define READLINE_TEXT "readline: yes"
+string rdline()
+{
+	string result;
+	char *line = readline("");
+	if(line == NULL) throw Quit();
+	add_history(line);
+	result = string(line);
+	free(line);
+	return result;
+}
+
 #else
 #define READLINE_TEXT "readline: no"
 #endif
 
 #include <stdlib.h>
 #include <iostream>
-#include <string>
 #include <exception>
 #include <stdexcept> // std::invalid_argument for g++ 4.8.2
 
@@ -48,11 +67,6 @@ void do_calcs()
 	g_stack.clear();
 }
 
-class Quit: public std::exception 
-{
-	public:
-		virtual const char* what() const throw()  { return "quit"; }
-};
 
 
 void print_tokens(std::vector<std::string> tokens)
