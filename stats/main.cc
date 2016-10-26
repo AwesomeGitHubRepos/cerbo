@@ -103,16 +103,17 @@ void process_token(std::string token)
 
 void repl()
 {
-	std::string in;
-	char *line;
+	//std::string in;
+	//char *line;
 	while(true) {
-		line = readline("");
-		if(line == NULL)  throw Quit();
-		add_history(line);
-		in = std::string(line);
-		free(line);
+		string line = rdline();
+		//line = readline("");
+		//if(line == NULL)  throw Quit();
+		//add_history(line);
+		//in = std::string(line);
+		//free(line);
 
-		std::string no_commas = rmchar(in, ',');
+		std::string no_commas = rmchar(line, ',');
 		std::vector<std::string> tokens = tokenize_line(no_commas);
 		for(auto t: tokens) process_token(t);
 	}
