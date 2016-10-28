@@ -1,0 +1,46 @@
+<html><head>
+  <LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+  <title>Raspberry Pi</title>
+</head>
+<body>
+
+<p><a href="index.html">Home</a></p>
+
+<h1>Raspberry Pi</h1>
+
+
+
+
+<hr><h2>Creating a root image on a USB</h2>
+
+Somewhat incomplete, but should get you much of the way there.
+
+<pre>
+sudo mkfs -t ext4 /dev/sda1 # prolly unnecesary
+sudo dd if=/dev/root of=/dev/sda1 bs=4M
+sudo e2fsck /dev/sda1
+sudo resize2fs /dev/sda1
+</pre>
+
+
+<hr><h2>Power usage</h2>
+
+According to <a href="http://au.answers.yahoo.com/question/index?qid=20120118052015AAbpOSU">Yahoo Answers</a>, USB pen drives consume about 5v @ 145mA (725mW) at their heaviest load, in write mode. On 15-Sep-2013, I estimated that the yearly power consumption of an RPi was about &pound;5 (DB04/89).
+
+<hr><h2>See also</h2>
+
+None
+
+<hr><h2>Links to other sites</h2>
+
+<li><a href="https://www.modmypi.com/raspberry-pi-expansion-boards/berry-clip-raspberry-pi-add-on-board">BerryClip</a> - LED and Buzzer RPi Add-On Board. Also, check out the many other items available at ModMyPi.
+
+<li><a href="http://www.howtogeek.com/167425/how-to-setup-wi-fi-on-your-raspberry-pi-via-the-command-line/">Wi-Fi setup</a>
+
+<hr><pre>
+Author:  Mark Carter
+Created: 11-Aug-2013
+Updated: 16-Sep-2013
+</pre>
+</body>
+</html>

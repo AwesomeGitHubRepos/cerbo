@@ -1,0 +1,75 @@
+<html><head>
+  <LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+  <title>CSV</title>
+</head>
+<body>
+
+<p><a href="index.html">Home</a></p>
+
+<h1>CSV</h1>
+
+
+<hr><h2>csvfix</h2>
+
+Install: <code>yaourt csvfix</code>
+
+<p>Does not seem to be able to extract named columns.</p>
+  
+<p><a href="http://neilb.bitbucket.org/csvfix/">xlink</a><p>
+
+<p>Simple to build on Arch, so you <b>may want it as your first port-of-call</b></p>
+  
+<p><b>SORT</b> by 5th column (numerical/textual):
+<pre>    csvfix sort -f 5 foo.csv</pre>
+</p>
+
+<hr><h2>csvkit</h2>
+
+Install Arch: <code>yaourt csvkit-git</code>
+
+<p><b>EXTRACT</b> by named columns: <code>csvcut -c cola,colb,... infile.csv</code>
+  
+<p>Seems to work well with flakey CSV's like StatsList.csv
+
+
+<p><a href="http://csvkit.readthedocs.org/en/latest/index.html">Docs</a> (external)   -  includes <code>csvsql</code>.
+  
+
+<hr><h2>Unclassified</h2>
+
+Tools for processing comma-separated values
+
+<p><b>EXTRACT</b> by named column:
+<pre>    csvtool namedcol COLNAME foo.csv</pre>
+
+<hr><h2>Convert CSV to ODS</h2>
+
+To convert a CSV file to LibreOffice spreadsheet format:
+<pre>    unoconv -f ods myinput.csv</pre>
+<code>unoconv</code> is debian installable
+
+<hr><h2>Links to other sites</h2>
+
+
+
+
+<li><a href="https://github.com/dbro/csvquote">csvquote</a> - a way to process CSV data with standard UNIX shell commands
+  
+<li><a href="https://code.google.com/p/csvstudio/">csvstudio</a> - pythonic CSV analyser that can perform filters, compute new columns, and more. <a href="http://csvstudio.googlecode.com/hg/csvstudio.pdf">xPDF</a>. I've installed it on mython, so type <code>csvstudio -h</code>
+
+<li>csvtool - I'm using it on Mint 14 (as at 13-Apr-2013). It is available as an Ubuntu package
+
+	<li><a href="https://wiki.haskell.org/Spreadsheet">haskell</a> - some packages, which may also generate stand-alone exe</li>
+
+	<li><a href="https://aur.archlinux.org/packages/mange/">mange</a> - ncurses-based spreadsheet (e.g. csv, tsv) editor. Has an Arch package.</li>
+
+	<li><a href="http://keithsheppard.name/txt-sushi/">txt-sushi</a> - simplifies common tasks like filtering, joing and transformation. Written in Haskell. Also contains links to other projects.</li>
+  
+
+<hr><pre>
+Author:  Mark Carter
+Created: 19-Jan-2011
+Updated: 19-Jun-2016
+</pre>
+</body>
+</html>

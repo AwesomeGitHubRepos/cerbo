@@ -1,0 +1,50 @@
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Hg</title>
+</head>
+
+<body>
+<a href="../index.html">Home</a> : <a href="programming.htm" >Programming</a>
+
+<h1>Hg - Mercurial</h1>
+
+
+Some notes about the Mercurial DVCS
+
+<hr><h2>.hgrc configuration file</h2>
+
+Example <code>vi ~/.hgrc</code> file, with Google in mind:
+<pre>
+[ui]
+username = Mark Carter &lt;mcturra2000@yahoo.co.uk&gt;
+editor = nano
+
+[auth]
+altmcarter-edpath-tweaks.prefix = https://altmcarter-edpath-tweaks.googlecode.com/hg/
+altmcarter-edpath-tweaks.username = alt.mcarter@gmail.com
+altmcarter-edpath-tweaks.password = [whatever]
+</pre>
+
+Set privileges: <code>chmod u=wr,og= ~/.hgrc</code>
+
+<hr><h2>Pulling and merging</h2>
+
+If you have cloned a site, and you want to incorporate upstream changes fully in with your local repo, then issue the command
+<pre>hg pull -u</pre>
+Note: at 08-Nov-2008: not sure if this is the full story, or if "merge" and "commit" is also required.
+
+<hr><h2>Bitbucket</h2>
+
+<pre>hg clone ssh://hg@bitbucket.org/blippy/nokilli</pre>
+
+<hr><h2>Link to other sites</h2>
+
+<a href="http://hgbook.red-bean.com/hgbookch3.html">Merging work</a> - discusses merging 
+
+
+<hr><pre>
+Author:  Mark Carter
+Created: 08-Nov-2008
+Updated: 06-Feb-2013
+</pre>
+</body></html>

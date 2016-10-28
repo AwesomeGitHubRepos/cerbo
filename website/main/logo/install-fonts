@@ -1,0 +1,8 @@
+cp -r ttf-boombox /usr/share/fonts/truetype/ttf-boombox
+fc-cache
+
+On Slackware, it may be better to add to the ~/.fonts directory, and maybe use
+mkfontdir
+
+Mark Carter
+05-Apr-2008

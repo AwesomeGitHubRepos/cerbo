@@ -1,0 +1,24 @@
+# SLACKWARE 14.2
+
+# USER
+useradd -m -u 3003 mcarter
+passwd mcarter
+
+# VBOX
+## Network
+Set MAC
+Bridged adapter
+
+## Screen
+Install vbox guest additions
+/etc/fstab uncomment /dev/cdrom
+mount /dev/cdrom
+cd /mnt/cdrom
+./VBoxLinuxAdditions.run
+
+#SWAP
+fallocate -l 3G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+/etc/fstab: /swapfile none swap defaults 0 0

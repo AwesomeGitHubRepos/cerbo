@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html><head>
+  <LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+  <title>cubietruck</title></head>
+<body>
+
+<a href="index.html">Home</a>
+
+<h1>cubietruck</h1>
+
+<hr><h2>Copying system onto SATA disk</h2>
+
+<pre>
+<b>INITIALISE SATA disk</b>
+fdisk /dev/sda1
+Create a partition
+mkfs.ext4 /dev/sda1
+
+<b>CREATE mount points on nand</b>
+mkdir /mnt/nanda
+mount /dev/nanda /mnt/nanda
+mkdir /mnt/sda1
+mount /dev/sda1 /mnt/sda1
+mkdir /mnt/nandb
+mount /dev/nandb /mnt/nandb
+
+<b>COPY OS from nand to SATA</b>
+cd /mnt/nandb ; tar -c --one-file-system -f - . | (cd /mnt/sda1; tar -xvf -)
+# NB This method is superior to using dd
+
+<b>SET bootloader to boot to SATA</b>
+nano /mnt/nanda/uEnv.txt
+Change 
+nand_root=/dev/nandb
+to 
+nand_root=/dev/sda1
+
+<b>REBOOT to SATA</b>
+umount /mnt/nanda
+umount /mnt/nandb
+umount /mnt/sda1
+sync
+reboot
+
+<b>CONFIRM reboot</b>
+df -h
+You should see a line like:
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/root       459G  1.4G  434G   1% /
+
+The key point is that it is around the size of your hard drive.
+
+</pre>
+
+
+<hr><h2>Links to other sites</h2>
+
+<li><a href="https://archlinuxarm.org/platforms/armv7/allwinner/cubietruck">archlinux</a> - seems to boot fine from flash drive, but has network problems from SATA</li> 
+
+<li><a href="http://linux-sunxi.org/LiveSuit">LiveSuit</a></li>
+
+<li><a href="http://www.linuxquestions.org/questions/linux-general-1/how-to-mount-img-file-882386/">mounting img files</a></li>
+
+<li><a href="http://dyhr.com/2013/11/22/how-to-install-lubuntu-server-on-cubietruck-from-mac-os-x">Source</a> - source document for most of the material
+
+
+<hr><pre>
+Author:  Mark Carter
+Created: 16-Mar-2014
+Updated: 15-May-2016
+</pre>
+</body>
+</html>
