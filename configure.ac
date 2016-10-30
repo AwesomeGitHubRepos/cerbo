@@ -1,7 +1,7 @@
 AC_PREREQ([2.69])
 AC_INIT([cerbo], [0.1], [alt.mcarter@gmail.com])
 AC_CONFIG_SRCDIR([green/green.cc])
-#AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DUR([m4])
 AM_INIT_AUTOMAKE([foreign])
 
 AC_CHECK_HEADERS([readline/readline.h])
@@ -11,5 +11,5 @@ AC_PROG_CXX
 
 # Wrapping it up
 AC_CONFIG_FILES([Makefile green/Makefile menu/Makefile text2pdf/Makefile \
-		 shlex/Makefile stats/Makefile])
+		 shlex/Makefile stats/Makefile cerbo/src/Makefile])
 AC_OUTPUT

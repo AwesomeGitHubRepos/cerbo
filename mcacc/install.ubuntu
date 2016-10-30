@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# works with 16.04
+
+#[ ! -f ~/tmp ] && mkdir ~/tmp
+mkdir -p ~/tmp
+
+sudo apt-get install curl make build-essential autoconf libboost-all-dev gdb

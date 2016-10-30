@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=0.0.0
+Type=Application
+Name=Mca
+GenericName=Mca
+Comment=A money program
+Icon=/home/mcarter/repos/mca/icons/money.png
+Exec=/home/mcarter/repos/mca/mca.tcl
+Terminal=false
+MimeType=text/html;
+Categories=Office;
+#StartupNotify=false
