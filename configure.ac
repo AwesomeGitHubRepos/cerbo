@@ -7,6 +7,7 @@ AM_INIT_AUTOMAKE([foreign])
 AC_CHECK_HEADERS([readline/readline.h])
 AM_CONDITIONAL([HAVE_READLINE], [test x$ac_cv_header_readline_readline_h == xyes])
 
+#CXXFLAGS="$CXXFLAGS -I${srcdir}/supo"
 AC_PROG_CXX
 AC_PROG_RANLIB
 

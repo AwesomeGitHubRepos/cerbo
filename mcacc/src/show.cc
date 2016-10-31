@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cstdlib>
 
+#include <supo.hpp>
+
 #include "common.hpp"
 #include "show.hpp"
 
@@ -10,5 +12,5 @@ void show(const std::string& report_name)
 {
 	string filename = s3(report_name + ".rep");
 	string cmd = "less " + filename;
-	system(cmd.c_str());
+	supo::ssystem(cmd.c_str(), true);
 }

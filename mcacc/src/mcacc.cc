@@ -13,6 +13,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <supo.hpp>
+
 #include "args.hpp"
 #include "common.hpp"
 #include "oven.hpp"
@@ -93,8 +95,7 @@ void clean()
  */
 void preprocess(const char* command)
 {
-	system(command); // TODO LOW check return status
-	
+	supo::ssystem(command, true);
 }
 
 
@@ -124,7 +125,7 @@ int main(int argc, char *argv[])
 	if(vm.at("snap") == "on") ove.fetch();
 	ove.process(do_wiegley);
 
-	system("mcacc-reports.sh");
+	supo::ssystem("mcacc-reports.sh", true);
 	if(vm.count("show") > 0) show(vm.at("show"));
 	return EXIT_SUCCESS;
 }
