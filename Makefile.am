@@ -1,1 +1,1 @@
-SUBDIRS = green menu text2pdf shlex stats mcacc/src
+SUBDIRS = supo green menu text2pdf shlex stats mcacc/src 
