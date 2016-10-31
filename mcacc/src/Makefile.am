@@ -1,7 +1,7 @@
-AM_CXXFLAGS = -std=gnu++14 -ggdb -I../../supo -L../../supo
+AM_CXXFLAGS = -std=gnu++14 -ggdb -I../../supo
 noinst_PROGRAMS = mcacc 
 man1_MANS = mcacc.1
-mcacc_LDADD = -lpthread -lsupo
+mcacc_LDADD = -lpthread -L../../supo -lsupo
 mcacc_SOURCES = args.cc \
 		cgt.cc common.cc \
 		dec.cc \
