@@ -100,3 +100,5 @@ price operator/(const currency& c, const quantity& q);
 currency operator*(const price& p, const quantity& q);
 
 std::string ret_curr(const currency& num, const currency& denom); 
+std::string as_currency(const price& p);
+

@@ -114,7 +114,6 @@ void print_indices(const stend_ts& stends, ostream &pout)
 		const price chg = ep-sp;
 		//const double rat = ep.dbl()/sp.dbl();
 		string rstr = ret_str(ep, sp);
-		auto as_currency = [](const price& p) { return currency(p.dbl()).str(); };
 		pout << pad_ticker(i)
 			<< as_currency(sp)
 			<< nchars(' ', 11)

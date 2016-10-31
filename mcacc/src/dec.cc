@@ -27,3 +27,4 @@ std::string ret_curr(const currency& num, const currency& denom)
 	return ret_str(num.dbl(), denom.dbl());
 }	
 
+std::string as_currency(const price& p) { return currency(p.dbl()).str(); };

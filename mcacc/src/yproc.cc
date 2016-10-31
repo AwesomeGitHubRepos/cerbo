@@ -104,7 +104,7 @@ void mksnap(const inputs_t& inps, const downloads_t& ds)
 		//	profit = y.chg * qty;
 		//}
 		total_profit += profit;
-		cout << "TODO yrpoc(): " << y.ticker << " " << profit.str() << " " << total_profit.str() << endl; // TODO remove
+		//cout << "TODO yrpoc(): " << y.ticker << " " << profit.str() << " " << total_profit.str() << endl; // TODO remove
 
 		string chgpc_str =ret_str(y.chgpc);
 		string price_str = y.yprice.str();
@@ -123,12 +123,17 @@ void mksnap(const inputs_t& inps, const downloads_t& ds)
 		chgpc_str, total_value.str()};
 	sout << intercalate(" ", fields) << endl << endl;
 
-	sout << "TODO HIGH write changes to indices\n";
+	for(auto& y:ds.ys) {
+		if(y.ticker[0] != '^') continue;
+		sout << pad_right(y.ticker, 6)
+			<< " " << as_currency(y.chg)
+			<< " " << ret_str(y.chgpc)
+			<< " " << as_currency(y.yprice)
+			<< endl;
+	}
 
-//		sout << intercalate(" ", fields) << endl;
-
-//	}
-	sout << endl << intercalate(" ", strings {"DSTAMP:", ds.dstamp, ds.tstamp}) << endl;
+	sout << endl << intercalate(" ", 
+			strings {"DSTAMP:", ds.dstamp, ds.tstamp}) << endl;
 	sout.close();
 }
 
