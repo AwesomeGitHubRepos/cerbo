@@ -14,6 +14,7 @@
 #include "reusable.hpp"
 #include "stend.hpp"
 #include "epics.hpp"
+#include "types.hpp"
 
 using namespace std;
 using namespace std::decimal;
@@ -111,11 +112,22 @@ void print_indices(const stend_ts& stends, ostream &pout)
 		const price& sp = s.start_price;
 		const price&  ep = s.end_price;
 		const price chg = ep-sp;
-		const double rat = ep.dbl()/sp.dbl();
+		//const double rat = ep.dbl()/sp.dbl();
+		string rstr = ret_str(ep, sp);
+		auto as_currency = [](const price& p) { return currency(p.dbl()).str(); };
+		pout << pad_ticker(i)
+			<< as_currency(sp)
+			<< nchars(' ', 11)
+			<< as_currency(chg)
+			<< as_currency(ep)
+			<< rstr
+			<< endl;
+		/*
 		auto fields = strings { pad_ticker(i), 
 			sp.str(), pad_gbp(' '), chg.str(), ep.str(), 
 			ret_str(rat)};
 		print_strings(pout, fields);
+		*/
 	}
 }
 
@@ -151,23 +163,23 @@ void folio_c::print_to_epic_file(ofstream& ofs) const
 {
 	ofs << m_name << endl;
 
-	string hdr = "TICKER        COST       VALUE   RET%         QTY"s +
-		"       UCOST      UVALUE"s;
+	string hdr = "TICKER         QTY        COST       VALUE   RET%  "s +
+		"     UCOST      UVALUE"s;
 	ofs << hdr << endl;
 
 	for(const auto& e:reduced_epics)
 	{
 		ofs << pad_left(e.etran.ticker, 6)
+			<< e.etran.qty
 			<< e.etran.cost
 			<< e.vto
 			<< ret_curr(e.vto, e.etran.cost)
-			<< e.etran.qty
 			<< e.ucost
 			<< e.end_price
 			<< endl;
 	}
 
-	ofs << pad_right("Grand:", 6) << cost << value 
+	ofs << pad_right("Grand:", 6) << nchars(' ', 12) << cost << value 
 		<< ret_curr(value, cost) << endl << endl;
 
 	if(m_name != "total") return;
