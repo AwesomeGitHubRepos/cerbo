@@ -11,17 +11,10 @@ created 19-Feb-2016
 #include <math.h>
 #include <memory>
 
-//#include <set>
-//#include <vector>
-
-//#include "parse.h"
 #include "shlex.hpp"
 
 
 namespace shlex {
-
-//using namespace std::string_literals;
-//using namespace std;
 
 typedef std::vector<std::string> strings;
 
@@ -109,52 +102,40 @@ shlexmat read(std::string  &filename, const options& opts)
 }
 
 
-//void prin_vecvec(vecvec_t & vvs, const char *sep = "\t", const char *recsep= "\n", const char *filename = "")
-void prin_vecvec(const shlexmat & vvs, const char *sep, const char *recsep, const char *filename )
+void prin_vecvec(const shlexmat & vvs, const char *sep, 
+		const char *recsep, const char *filename )
 {
-	/*
-	ostream *fp= &cout;
-	ofstream fout ;//= &cout;
-	if(strlen(filename)>0) {
-		fout.open(filename);
-		fp = &fout;
+	using namespace std::string_literals;
+	if(strlen(filename)>0){
+	       	FILE* fp = freopen(filename, "w", stdout);
+		if(!fp) {
+			std::string msg = "freopen() returned NULL on "s
+				+ "filename <"s
+				+ std::string(filename) +">"s;
+			throw std::runtime_error(msg);
+		}
 	}
-	*/
-	if(strlen(filename)>0) freopen(filename, "w", stdout);
 	
 	std::string ssep = std::string(sep);
-	//vecvec_t::iterator it1;
 	int i;
-	//for(it1 = vv.begin() ; it1 != vv.end(); ++it1) {
 	for(i=0; i< vvs.size(); i++) {
-	//cout << "." ;
-		//vector<string> v = *it1;
-		//vector<string>::iterator it2;
 		std::vector<std::string> v = vvs[i];
 		int j, len;
 		len = v.size();
 		if(len == 0) continue;
-		//if(it2.size() ==0) continue;
 		for(j=0; j<len; j++) {
-			//cout << "!";
 			std::cout << v[j];
 			if(j+1<len) std::cout << ssep;
-		//for(it2 = v.begin(); it2 != v.end(); ++it2) {
-		//	fout << *it2 << sep;
 		}
-		//if(len>0) cout << endl ;
 		if(len>0) std::cout << recsep ;
 	}
 
-	//if(strlen(filename)>0) fout.close();
 }
 
 
 void write_m4(const strings& r)
 {
 	if(r.size() ==0) return;
-
-	//		for(auto& r:m) {
 
 	std::cout << r.at(0);
 	if(r.size() > 1) {       
