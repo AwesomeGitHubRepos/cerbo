@@ -17,7 +17,7 @@ using std::endl;
 using std::ofstream;
 using std::string;
 
-string mkrow(const etran_t& e)
+string mkrow(const etran_c& e)
 {
 
 	string y = e.dstamp.substr(0, 4);
@@ -35,7 +35,7 @@ string mkrow(const etran_t& e)
 }
 
 
-void cgt(const etran_ts& es, const period &per)
+void cgt(const etran_cs& es, const period &per)
 {
 	string fname;
 	s3("cgt-1.rep", fname);

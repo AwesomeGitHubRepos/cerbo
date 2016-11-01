@@ -25,7 +25,7 @@
 
 using namespace std;
 
-
+/*
 bool operator<(const etran_t& lhs, const etran_t& rhs)
 {
 	return std::tie(lhs.ticker, lhs.dstamp) < std::tie(rhs.ticker, rhs.dstamp);
@@ -35,6 +35,7 @@ bool operator>(const etran_t &a, const etran_t &b)
 {
 	return std::tie(a.ticker, a.dstamp) > std::tie(b.ticker, b.dstamp);
 }
+*/
 
 
 

@@ -23,7 +23,7 @@ bool sorter(spair a, spair b)
 }
 
 /* Create the ledger.dat file */
-void mkledger(const etran_ts& es, const ntran_ts& ns)
+void mkledger(const etran_cs& es, const ntran_ts& ns)
 {
 	vector<spair> trans;
 
@@ -89,7 +89,7 @@ void mkprices(const yahoo_ts&  ys)
 	spit_strings(fname, prices);
 }
 
-void wiegley(const etran_ts& etrans, const ntran_ts& ntrans, const yahoo_ts& yahoos)
+void wiegley(const etran_cs& etrans, const ntran_ts& ntrans, const yahoo_ts& yahoos)
 {
 	// note that I split this out into two functions for profiling purposes
 	mkledger(etrans, ntrans);

@@ -14,7 +14,7 @@
 using namespace std;
 
 
-detran_c augment(const etran_t& e, const stend_ts& stends, const period& per)
+detran_c augment(const etran_c& e, const stend_ts& stends, const period& per)
 {
 	detran_c aug;
 	aug.etran = e;
@@ -91,7 +91,7 @@ void write_augetran(ofstream& ofs, const detran_c& e)
 	ofs << endl;
 }
 
-detran_cs eaug_main(const etran_ts& etrans, const stend_ts& stends, 
+detran_cs eaug_main(const etran_cs& etrans, const stend_ts& stends, 
 		const period &per)
 {
 	detran_cs augs;
@@ -112,8 +112,8 @@ detran_cs eaug_main(const etran_ts& etrans, const stend_ts& stends,
 }
 
 detran_c& detran_c::operator+=(const detran_c& rhs){
-	etran_t& elhs = this->etran;
-	const etran_t& erhs = rhs.etran;
+	etran_c& elhs = this->etran;
+	const etran_c& erhs = rhs.etran;
 	elhs.ticker = erhs.ticker;
 
 	if(erhs.buy){

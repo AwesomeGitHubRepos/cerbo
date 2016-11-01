@@ -14,7 +14,7 @@
 
 typedef struct inputs_t {
 	comm_ts comms;
-	etran_ts etrans;
+	etran_cs etrans;
 	nacc_ts naccs;
 	ntran_ts ntrans;
 	period p;

@@ -149,9 +149,9 @@ void insert_comm(comm_ts& cs, const strings& fields)
 	cs[c.ticker] = c;
 }
 
-etran_t mketran(const strings& fields)
+etran_c mketran(const strings& fields)
 {
-	etran_t e;
+	etran_c e;
 	e.taxable = fields[8] == "T";
 	e.dstamp = fields[1];
 	e.sgn = fields[7] =="B"? 1 : -1;
@@ -164,9 +164,9 @@ etran_t mketran(const strings& fields)
 	return e;
 }
 
-etran_t mkleak_1(const strings& fields)
+etran_c mkleak_1(const strings& fields)
 {
-	etran_t e = mketran(fields);
+	etran_c e = mketran(fields);
 	e.buy = false;
 	e.typ = leak;
 	return e;
@@ -187,9 +187,9 @@ void insert_LVL03(inputs_t& inputs, const strings& fields)
 {
 	string subtype = fields[4];
 	if(subtype == "ETRAN-1") { 
-		inputs.etrans.push_back(mketran(fields));
+		inputs.etrans.insert(mketran(fields));
 	} else if (subtype == "LEAK-1") {
-		inputs.etrans.push_back(mkleak_1(fields));
+		inputs.etrans.insert(mkleak_1(fields));
 	} else if (subtype == "NTRAN-1") {
 		inputs.ntrans.push_back(mkntran(fields));
 	} else {
@@ -251,7 +251,7 @@ inputs_t read_inputs()
 	inputs_t inputs;
 
 	string fname;
-	s1("derive-2.txt", fname);
+	s1("derive-1.txt", fname);
 	vecvec_t mat = parse::vecvec(fname);
 
 	for(auto& row:mat) {

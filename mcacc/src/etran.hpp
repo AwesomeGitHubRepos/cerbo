@@ -1,17 +1,17 @@
 #pragma once
 
+#include <set>
 #include <string>
-#include <vector>
+//#include <vector>
 
 #include "dec.hpp"
 #include "types.hpp"
-//#include "quantity.hpp"
-//#include "centis.hpp"
-//#include "price.hpp"
 
 enum Etype { unknown, leak, regular };
 
-typedef struct etran_t {
+class etran_c {
+	public:
+
 	bool		taxable = true;
 	dstamp_t	dstamp;
 	double 		sgn;
@@ -22,11 +22,15 @@ typedef struct etran_t {
 	std::string	ticker = "<UNKNOWN>";
 	Etype typ = unknown;
 	std::string	buystr() const { return buy? "B" : "S"; };
-} etran_t ;
+	friend bool operator<(const etran_c& lhs, const etran_c& rhs){
+		return std::tie(lhs.ticker, lhs.dstamp) 
+			< std::tie(rhs.ticker, rhs.dstamp);
+	};
+};
 
 class detran_c {
 	public:
-		etran_t etran;
+		etran_c etran;
 		// derived fields:
 		price		ucost; 
 		dstamp_t	start_dstamp;
@@ -39,13 +43,18 @@ class detran_c {
 		currency	profit;
 		currency	vto;
 		detran_c& operator+=(const detran_c& rhs);
+		friend bool operator<(const detran_c& l, const detran_c& r)
+		{
+			return l.etran < r.etran;
+		}
 
 };
 
 
-bool operator<(const etran_t& lhs, const etran_t& rhs);
+//bool operator<(const etran_t& lhs, const etran_t& rhs);
 
-bool same_ticker(etran_t a, etran_t b);
-typedef std::vector<etran_t> etran_ts;
+bool same_ticker(etran_c a, etran_c b);
+//typedef std::vector<etran_t> etran_ts;
+typedef std::multiset<etran_c> etran_cs;
 
 typedef std::vector<detran_c> detran_cs;

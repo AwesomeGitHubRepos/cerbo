@@ -19,21 +19,13 @@
 using namespace std;
 using namespace std::decimal;
 
-/*
-void underline(ostream &ost, char c)
-{ 
-	auto fields = strings {pad_ticker(c), pad_gbp(c), 
-		pad_gbp(c), pad_gbp(c), pad_gbp(c), ret_str(c) };
-	print_strings(ost, fields);
-}
-*/
-
         
-
+/*
 bool operator<(const detran_c& lhs, const detran_c& rhs)
 {
 	return lhs.etran < rhs.etran;
 }
+*/
 
 detran_cs folio_c::filter(const detran_cs& es) const
 {
@@ -100,33 +92,34 @@ void debug(const detran_c& e, const currency& vto)
 }
 
 
+void print_index(const string& index, const stend& s, ostream& pout)
+{
+	const price& sp = s.start_price;
+	const price&  ep = s.end_price;
+	const price chg = ep-sp;
+	string rstr = ret_str(ep, sp);
+	pout << pad_ticker(index)
+		<< as_currency(sp)
+		<< nchars(' ', 11)
+		<< as_currency(chg)
+		<< as_currency(ep)
+		<< rstr
+		<< endl;
+}
 void print_indices(const stend_ts& stends, ostream &pout)
 {
 	pout << endl;
 	string fname;
 
 	auto indices = strings {"^FTSE", "^FTMC", "^FTAS"};
-	for(string& i:indices){
-		const stend s = stends.at(i, 
-			"epic.cc:print_indices() couldn't find stend with key " + i);
-		const price& sp = s.start_price;
-		const price&  ep = s.end_price;
-		const price chg = ep-sp;
-		//const double rat = ep.dbl()/sp.dbl();
-		string rstr = ret_str(ep, sp);
-		pout << pad_ticker(i)
-			<< as_currency(sp)
-			<< nchars(' ', 11)
-			<< as_currency(chg)
-			<< as_currency(ep)
-			<< rstr
-			<< endl;
-		/*
-		auto fields = strings { pad_ticker(i), 
-			sp.str(), pad_gbp(' '), chg.str(), ep.str(), 
-			ret_str(rat)};
-		print_strings(pout, fields);
-		*/
+	for(string& i:indices) {
+		try {
+			const stend s = stends.at(i);
+			print_index(i, s, pout);
+		}
+		catch(const std::out_of_range& oor) {
+			cerr << "WARN: No stend for " + i << endl;
+		} 
 	}
 }
 
