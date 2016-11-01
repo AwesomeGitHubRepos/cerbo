@@ -62,6 +62,7 @@ vm_t parse_args(int argc, char *argv[])
 			{"clean",   no_argument,       0, 0},
 			{"end",     required_argument, 0, 0},
                         {"help",    no_argument,       0, 'h'},
+                        {"pre",     required_argument, 0, 0},
 			{"root",    no_argument,       0, 'r'},
 			{"show",    required_argument, 0, 0},
                         {"snap",    no_argument,       0, 's'},
