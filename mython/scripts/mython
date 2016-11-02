@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+module=$1
+shift # eliminate the first arg, which is the module
+python3 -m mython.$module "$@"

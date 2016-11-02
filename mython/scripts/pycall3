@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+#echo $1
+#echo ${@:2}
+#echo $0
+#DIR1=`dirname $0`
+#DIR2=`dirname $DIR1`
+python3 -m mython.$1 ${@:2}
+echo You should really copy the style of gofi instead of going via pycall3

@@ -1,0 +1,2 @@
+#PYTHONPATH=/home/mcarter/repos/tacc/python
+python -m mates

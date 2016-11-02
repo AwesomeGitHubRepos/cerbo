@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# FTSE 31-Dec-2010 5899
+# FTSE 05-Apr-2011 6007
+# FTSE 31-Dec-2011 5572
+# yafi --date 2011-04-05 --base 6007 --epic ^FTSE
+yafi --date 2012-04-05 --base 5723 --epic ^FTSE
