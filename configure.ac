@@ -1,5 +1,5 @@
 AC_PREREQ([2.69])
-AC_INIT([cerbo], [0.4444], [alt.mcarter@gmail.com])
+AC_INIT([cerbo], [0.5], [alt.mcarter@gmail.com])
 AC_CONFIG_SRCDIR([green/green.cc])
 #AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign])
