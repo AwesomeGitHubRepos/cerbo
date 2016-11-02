@@ -1,7 +1,10 @@
 #include <math.h>
 #include <map>
 #include <vector>
-#include "stats.hpp"
+
+#include <supo_stats.hpp>
+
+namespace supo {
 
 
 /** sort doubles in place */
@@ -87,4 +90,6 @@ std::vector<double> frank(const std::vector<double>& arr)
 	std::vector<double> res;
 	for(auto x: arr)  res.push_back(m[x]);
 	return res;
-}	
+}
+
+} // namespace supo

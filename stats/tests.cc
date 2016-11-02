@@ -1,20 +1,19 @@
-#include "stats.hpp"
-
 #include <assert.h>
 #include <stdlib.h>
 #include <math.h>
-//#include <stdio>
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
 #include <string>
+
+#include <supo_stats.hpp>
 
 using std::cout;
 using std::endl;
 
 int exit_result = EXIT_SUCCESS; // assume ab initio
 
-doubles rs1, rs2 ; // random numbers
+supo::doubles rs1, rs2 ; // random numbers
 
 
 
@@ -67,7 +66,7 @@ void test_sort()
 	readnd(ifs, n, ress); // read good results
 	ifs.close();
 
-	sortd(ds);
+	supo::sortd(ds);
 	bool ok = true;
 	for(int i=0; i<n; i++){ if(ds[i] != ress[i]) ok = false; }
 	//if(ok) cout << "PASS: "; else cout << "FAIL: ";
@@ -104,15 +103,15 @@ void read_pairs(const std::string& filename, std::vector<double> &vs1, std::vect
 void test_quantile1()
 {
 
-	doubles xs = rs1;
-	sortd(xs);
+	supo::doubles xs = rs1;
+	supo::sortd(xs);
 
-	doubles qs1, qs2;
+	supo::doubles qs1, qs2;
 	std::string  fname =  maff_inp("quantile1.txt");
 	read_pairs(fname, qs1, qs2);
 	bool ok = true;
 	for(int i=0; i< qs1.size(); i++) {
-		double qt = quantile(xs, qs1[i]);
+		double qt = supo::quantile(xs, qs1[i]);
 		if(! near4(qt, qs2[i])) ok = false;
 		//cout << qs1[i] << "\t" << qs2[i] << "\t" <<  qt - qs2[i] << endl;
 	}
@@ -131,7 +130,7 @@ void test_basic_stats()
 	ifs >> dummy >> mean >> stdev ;
 	ifs.close();
 
-	const stats_t s = basic_stats(rs1);
+	const supo::stats_t s = supo::basic_stats(rs1);
 	bool ok = near4(s.mean, mean ) && near4(s.stdev , stdev);
 	//cout << s.n << " " << s.mean << " " << s.stdev;
 	report(ok, "basic stats");
@@ -142,7 +141,7 @@ void test_frank()
 {
 	//auto arr = std::vector<double> { 1.0, 1.0, 2.0, 3.0, 3.0, 4.0, 5.0, 5.0, 5.0 };
 	auto arr = std::vector<double> { 2.0, 5.0, 1.0, 3.0, 4.0, 5.0, 5.0, 1.0, 3.0 };
-	auto res = frank(arr);
+	auto res = supo::frank(arr);
 	auto expected = std::vector<double> { 3.0, 8.0, 1.5, 4.5, 6.0, 8.0, 8.0, 1.5, 4.5 };
 	report(res == expected, "fractional rank");
 	//for(auto r:res) { cout << r << "\n" ; }

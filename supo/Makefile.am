@@ -1,2 +1,2 @@
 noinst_LIBRARIES = libsupo.a
-libsupo_a_SOURCES = supo.cc
+libsupo_a_SOURCES = supo.cc stats.cc

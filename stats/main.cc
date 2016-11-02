@@ -1,6 +1,19 @@
 #include <iostream>
 #include <stdio.h>
 #include <string>
+
+#include <stdlib.h>
+#include <exception>
+#include <stdexcept> // std::invalid_argument for g++ 4.8.2
+
+#include "parse.hpp"
+
+using std::cout;
+using std::endl;
+//using namespace std;
+
+#include <supo_stats.hpp>
+
 using std::string;
 
 
@@ -37,18 +50,7 @@ string rdline()
 }
 #endif
 
-#include <stdlib.h>
-#include <exception>
-#include <stdexcept> // std::invalid_argument for g++ 4.8.2
-
-#include "stats.hpp"
-#include "parse.hpp"
-
-using std::cout;
-using std::endl;
-//using namespace std;
-
-doubles g_stack;
+supo::doubles g_stack;
 
 void print_stack()
 {
@@ -64,14 +66,14 @@ void do_calcs()
 {
 	if(g_stack.size() == 0) { /* cout << "Stack empty" << endl; */ return; }
 	
-	const stats_t s = basic_stats(g_stack);
+	const supo::stats_t s = supo::basic_stats(g_stack);
 	prstat("Size", s.n);
 	prstat("Mean", s.mean);
 	prstat("Sum", s.sum);
 	prstat("Stdev", s.stdev);
 
-	sortd(g_stack);
-	prstat("Median", quantile(g_stack, 0.5));
+	supo::sortd(g_stack);
+	prstat("Median", supo::quantile(g_stack, 0.5));
 	g_stack.clear();
 }
 
