@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# resort raw.dat file
+
+TMP=`mktemp`
+sort raw.dat >$TMP 
+# the sed line moves the header line back from the bottom to the top
+sort raw.dat >$TMP
+sed '1h;1d;$!H;$!d;G' $TMP > raw.dat
+rm $TMP
