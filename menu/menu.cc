@@ -6,10 +6,7 @@
 #include <vector>
 #include <stdexcept>
 
-//#include <boost/program_options.hpp>
-//namespace po = boost::program_options;
-
-
+#include <supo.hpp>
 
 using namespace std;
 
@@ -82,7 +79,7 @@ bool loop(const menu_t& menu)
 
 	if(n==0) return false;
 
-	system(menu[n].cmd.c_str());
+	supo::ssystem(menu[n].cmd.c_str(), true);
 
 	return more;
 }

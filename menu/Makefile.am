@@ -1,4 +1,4 @@
-AM_CXXFLAGS = -std=gnu++14
+AM_CXXFLAGS = -std=gnu++14 -I../supo
 bin_PROGRAMS = menu
-#menu_LDADD = -lboost_program_options
+menu_LDADD = -L../supo -lsupo
 menu_SOURCES = menu.cc
