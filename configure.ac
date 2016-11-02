@@ -19,5 +19,5 @@ AC_PROG_RANLIB
 AC_CONFIG_FILES([Makefile green/Makefile menu/Makefile text2pdf/Makefile \
 		 supo/Makefile \
 		 shlex/Makefile stats/Makefile mcacc/src/Makefile \
-		 h5mc/Makefile])
+		 h5mc/src/Makefile])
 AC_OUTPUT
