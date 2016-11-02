@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-python $MYTHON/unported/csvstudio.py $*
+python2 $MYTHON/unported/csvstudio.py $*
 
