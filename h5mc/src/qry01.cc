@@ -83,8 +83,6 @@ bool rsorter(const result& lhs, const result& rhs)
 
 
 
-//typedef pair<double, string> pear;
-
 void db(double n) 
 { 
 	if(false)
@@ -133,22 +131,16 @@ int main()
 			db(3.4);
 		}
 		db(4);
-		//supo::sortd(ds);
 		result r {supo::median(ds5), supo::median(ds1), s};
-		cout << "+" << endl;
 		outvec.push_back(r);
-		cout <<"-" << endl;
 
-		//cout << quantile(ds, 0.5) << " " << s << endl;
 	}
 
-	//sort(begin(outvec), end(outvec), std::greater<string>());
 	sort(begin(outvec), end(outvec), rsorter);
-	//reverse(begin(outvec), end(outvec));
 	for(const auto& line:outvec)
 		cout << dout(line.m5) 
 			<< " " << dout(line.m1)
-		       << " " << line.sector << endl;
+			<< " " << line.sector << endl;
 
 	return 0;
 }
