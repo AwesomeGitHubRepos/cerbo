@@ -13,13 +13,16 @@
 #include <sys/stat.h>
 #include <map>
 
-#include <boost/format.hpp>
+//#include <boost/format.hpp>
 
-#include <mcstats.h>
+//#include <mcstats.h>
 
 #include "common.hpp"
 
+#include <supo_stats.hpp>
+
 using std::cout;
+using std::endl;
 using std::vector;
 using std::string;
 
@@ -40,10 +43,11 @@ int main()
 			
 		//for(auto e: ey)  cout << e << "\n";
 
-		sortd(ey);
-		double eym = quantile(ey, 0.5);
+		supo::sortd(ey);
+		double eym = supo::quantile(ey, 0.5);
 		double pe = 1 / eym;
-		cout << boost::format("%s %.4f %.4f\n") % idxname % pe % eym;
+		//cout << boost::format("%s %.4f %.4f\n") % idxname % pe % eym;
+		cout << idxname << format(pe, 4) << format(eym, 4) << endl;
 		//cout << idxname << " " << pe << " " 
 	}
 

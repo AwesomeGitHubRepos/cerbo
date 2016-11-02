@@ -1,4 +1,5 @@
-#include <math.h>
+#include <algorithm>
+#include <cmath>
 #include <map>
 #include <vector>
 
@@ -35,6 +36,11 @@ void sortd (doubles &xs)
 	//return res;
 }
 
+double median(const doubles &arr)
+{
+	return quantile(arr, 0.5);
+}
+
 /** 
  calculates quantiles according to Excel interpolation formula
  https://en.wikipedia.org/wiki/Quantile
@@ -43,11 +49,16 @@ void sortd (doubles &xs)
 double quantile(const doubles &arr, double q)
 {
 	double res;
-	int len = arr.size();
+
+	doubles sarr = arr;
+	if(!std::is_sorted(begin(sarr), end(sarr)))
+	       	std::sort(begin(sarr), end(sarr));
+
+	int len = sarr.size();
 	double hd = (len-1) * q ; //+ 1;
 	int hi = floor(hd);	
-	if(q == 1) res = arr[len-1];
-	else res = arr[hi] + (hd - hi) * (arr[hi+1] - arr[hi]);
+	if(q == 1) res = sarr[len-1];
+	else res = sarr[hi] + (hd - hi) * (sarr[hi+1] - sarr[hi]);
 	return res;
 
 }				

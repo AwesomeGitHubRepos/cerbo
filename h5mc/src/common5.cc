@@ -2,7 +2,11 @@
 #include <string.h>
 #include <algorithm>
 
+#include <supo_stats.hpp>
+
 #include "common5.hpp"
+
+
 
 using namespace std;
 
@@ -117,13 +121,13 @@ int main1()
 	for(auto e:epics) cout << "*" << e << "*\n" ;
 
 	vector<double> ds1 = read_doubles_h5(lid, "Gearing");
-	vector<double> rank1 = frank(ds1);
+	vector<double> rank1 = supo::frank(ds1);
 	//for(auto d:rank1) cout << d << "\n" ;
 	
 	vector<double> ds2 = read_doubles_h5(lid, "Yield");
 	vector<double> ds2a;
 	for(auto d:ds2) ds2a.push_back(-d);
-	vector <double> rank2 = frank(ds2a);
+	vector <double> rank2 = supo::frank(ds2a);
 
 	// combine the ranks
 	vector<double> rank;

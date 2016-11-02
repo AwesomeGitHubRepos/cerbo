@@ -14,7 +14,8 @@
 #include <map>
 
 
-#include <mcstats.h>
+//#include <mcstats.h>
+#include <supo_stats.hpp>
 
 #include "common.hpp"
 
@@ -51,9 +52,9 @@ int main()
 
 
 	doubles ds1 = cd.get_doubles("Gearing", 1);
-	doubles rank1 = frank(ds1);
+	doubles rank1 = supo::frank(ds1);
 	doubles ds2 = cd.get_doubles("Yield", -1);
-	doubles rank2 = frank(ds2);
+	doubles rank2 = supo::frank(ds2);
 	strings epics = cd.get_strings("F.EPIC");
 //	for(auto s: epics) cout << s;
 

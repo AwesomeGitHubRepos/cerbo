@@ -1,16 +1,35 @@
 #pragma once
 
 #include <map>
+#include <ostream>
 #include <string>
 #include <vector>
 
-#include "boost/variant.hpp"
+//#include "boost/variant.hpp"
+std::string format(double d, int dp);
 
 using std::map;
 using std::string;
 using std::vector;
 
-typedef boost::variant<double, string> cell;
+class cell {
+	public:
+		cell(const string& s) { set(s);};
+		cell(double d) {set(d);};
+		void set(const string& newstring) { m_doublep = false; s = newstring;};
+		void set(double& newdouble) { m_doublep = false; d = newdouble;};
+		double getd() const { // TODO check that double= is true
+			return d;};
+		std::string gets() const { return s;};
+		bool doublep() const { return m_doublep;};
+	private:
+		bool m_doublep = true;
+		double d = 0;
+		std::string s = "";
+};
+
+std::ostream& operator<<(std::ostream& os, const cell& obj);
+//typedef boost::variant<double, string> cell;
 typedef vector<cell> cells;
 
 typedef vector<double> doubles;

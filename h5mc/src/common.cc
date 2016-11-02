@@ -20,10 +20,19 @@
 
 using std::cout;
 using std::endl;
+using std::ostringstream;
 
 bool is_num(string &s) { return s.size() == 0 || s[0] != '"' ; }
 
-
+std::string format(double d, int dp)
+{
+	ostringstream s;
+	s.precision(dp);
+	s.width(7);
+	s << std::fixed;
+	s << d;
+	return s.str();
+}
 
 // TODO copy next 3 functions as a gist
 string slurp(std::ifstream& in)
@@ -82,6 +91,15 @@ std::vector<std::string> split(const std::string &s, char delim)
 }
 
 
+std::ostream& operator<<(std::ostream& os, const cell& obj)
+{
+	if(obj.doublep()){
+		os << obj.getd();
+	} else {
+		os << obj.gets();
+	}
+	return os;
+}
 void read_csv(vector<col_s> &cvecs)
 {
 
@@ -147,9 +165,9 @@ void coldata::read()
 	for(auto c:cols) {
 		cells vals;
 		if(c.is_num)
-		       	for(auto v: c.ds) {vals.push_back(v); }
+		       	for(auto v: c.ds) {vals.push_back(cell(v)); }
 		else 			
-			for(auto v: c.strs) vals.push_back(v);
+			for(auto v: c.strs) vals.push_back(cell(v));
 		column[c.name] = vals;
 	}
 }
@@ -158,7 +176,7 @@ strings coldata::get_strings(string colname)
 {
 	strings res;
 	cells cs = column[colname];
-	for(auto s: cs) res.push_back(boost::get<string>(s));
+	for(auto c:cs) res.push_back(c.gets());
 	return res;
 }
 
@@ -167,8 +185,8 @@ doubles coldata::get_doubles(string colname, double scale)
 {
 	doubles ds;
 	cells cs = column[colname];
-	for(auto v: cs) {
-		double d = scale * boost::get<double>(v);
+	for(auto c: cs) {
+		double d = scale * c.getd();
 		if(std::isnan(d)) d = std::numeric_limits<double>::infinity();
 		ds.push_back(d);
 	}
