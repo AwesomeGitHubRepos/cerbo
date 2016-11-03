@@ -29,7 +29,6 @@ class cell {
 };
 
 std::ostream& operator<<(std::ostream& os, const cell& obj);
-//typedef boost::variant<double, string> cell;
 typedef vector<cell> cells;
 
 typedef vector<double> doubles;
@@ -54,8 +53,7 @@ class coldata {
 	public:
 		coldata() {};
 		void read();
-		void write_rec();
-		//int num_rows = 0;
+		//void write_rec();
 		doubles get_doubles(string colname, double scale);
 		map<string, cells> column;
 		strings get_strings(string colname);

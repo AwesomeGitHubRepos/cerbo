@@ -3,26 +3,21 @@ AM_CXXFLAGS = -std=gnu++14 -I../../supo -O0 -ggdb
 usual =  -L../../supo -lsupo
 STD = -fcheck=all -ggdb
 
-bin_PROGRAMS = h5query h5rank qry01
+bin_PROGRAMS = h5query h5rank h5sprep qry01
 #bin_SOURCES = common.cc h5query.cc h5rank.cc qry01.cc
 
 if HAVE_HDF5
 h5libs = $(usual) -lhdf5
 bin_PROGRAMS += h5new shsl
-#AM_LDFLAGS += -lhdf5 # probably too general, as it links with the vanilla progs
-#hdf_LDADD = -lhdf5 $(bin_LDADD)
-#bin_SOURCES += common5.cc h5new.cc shsl.cc
-
-#hdf_LDADD = -lhdf5 $(LDADD)
-#hdf_SOURCES = common.cc common5.cc
-
 h5new_LDADD = $(h5libs)
 h5new_SOURCES = h5new.cc common.cc common5.cc 
 
 shsl_LDADD = $(h5libs)
 shsl_SOURCES = shsl.cc common.cc common5.cc
-
 endif
+
+h5sprep_LDADD = $(usual)
+h5sprep_SOURCES = h5sprep.cc common.cc
 
 h5query_LDADD = $(usual)
 h5query_SOURCES = h5query.cc common.cc 

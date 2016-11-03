@@ -24,30 +24,6 @@ using namespace std;
 
 const string root = "/home/mcarter/.fortran/STATSLIST";
 
-// TODO put to a reuasable
-void rectify()
-{
-	string fnout = root + "/StatsList-1.csv";
-	ofstream ofs(fnout.c_str(), std::ofstream::out);
-	string raw = slurp(root + "/StatsList.csv");
-	strings rows = split(raw, 13); // ^M
-	strings::iterator it = begin(rows);
-
-	string hdr_raw = *it;
-	string hdr;
-	for(int i=0; i< hdr_raw.size(); i++) { 
-		if(hdr_raw[i] == 'F' && hdr_raw[i+1] == '.') i+=2;
-		hdr += hdr_raw[i];
-	}
-	ofs << hdr << endl;
-
-	while(++it != end(rows)) {
-		string str = *it; // contains trailing ,
-		ofs << str.substr(0, str.size()-1) << endl;
-	}
-	ofs.close();
-}
-
 
 // reusable
 std::string dout(double d)
@@ -68,13 +44,6 @@ typedef struct {
 	//result(double a_m5, double b, string s
 } result;
 
-/*
-bool operator<<(const result& l, const result& r)
-{
-	return l.m5 < r.m5;
-}
-*/
-
 bool rsorter(const result& lhs, const result& rhs)
 {
 	return lhs.m5 > rhs.m5;
@@ -92,12 +61,10 @@ void db(double n)
 int main()
 {
 	db(0);
-	rectify();
 
 	db(1);
 	coldata cd;
 	cd.read();
-	cd.write_rec();
 
 	strings indices = cd.get_strings("FTSE_Index");
 	cells rs5s = cd.column["RS_5Year"];
@@ -111,7 +78,6 @@ int main()
 	}
 
 	set<string> sectors(sects.begin(), sects.end());
-	//vector<string> outvec;
 	vector<result> outvec;
 	db(3);
 	for(const auto&s: sectors) {

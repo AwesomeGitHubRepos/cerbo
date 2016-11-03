@@ -60,6 +60,7 @@ string slurp(const string &filename)
 
 
 
+// TODO put in supo
 string trim(const string& str, const string &junk)
 {
 	if(str.length() ==0) { return str;} ;
@@ -193,32 +194,3 @@ doubles coldata::get_doubles(string colname, double scale)
 	return ds;
 }
 
-void coldata::write_rec()
-{
-
-	// TODO abstract
-	string filename = "/home/mcarter/.fortran/STATSLIST/StatsList.rec";
-	std::ofstream ofs(filename.c_str(), std::ofstream::out);
-	std::map<string, cells>::iterator it0 = begin(column);
-	int num_rows = it0->second.size();
-	//cout << num_rows  << endl;
-	for(int i=0 ; i< num_rows; ++i) {
-		//cout << "*" ;
-		for(const auto& col: column) {
-			using namespace boost;
-			string fieldname = col.first;
-			//boost::algorithm::replace(fieldname, "F.", "");
-			replace_first(fieldname, "F.", "");
-			ofs << fieldname << ": " ;
-			cells cs = col.second;
-			ofs << cs[i] << endl;
-			//if(col.second.is_num) {
-			//	ofs << col.second.ds[i]	<< endl;
-			//}
-			//cout << "." ;
-		}
-		ofs << endl;
-	}
-	ofs.close();
-
-}
