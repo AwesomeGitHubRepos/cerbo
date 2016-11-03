@@ -7,7 +7,7 @@
 #include <string>
 #include <utility>
 
-#include <supo_stats.hpp>
+#include <supo.hpp>
 
 #include "common.hpp"
 
@@ -77,7 +77,7 @@ int main()
 	ofsc.open(filename.c_str(), std::ofstream::out);
 
 	for(c=0; c<ncols-1; ++c)
-			ofsc << field_names[c] << ",";
+		ofsc << field_names[c] << ",";
 	ofsc << field_names[ncols-1] << endl;
 
 
@@ -87,8 +87,22 @@ int main()
 			//cout << mat[r][c] << " ";
 		}
 		ofsc << mat[r][ncols-1] << endl;
-			//cout << r << endl ;
+		//cout << r << endl ;
 	}
 	ofsc.close();
+
+
+	// create individual columns
+	string outdir = root + "/cols";
+	supo::ssystem("mkdir -p " + outdir + "; rm -f " + outdir + "/*", true);
+	for(c=0; c<ncols; ++c){
+		filename = outdir + "/" + field_names[c];
+		ofs.open(filename.c_str());
+		for(r=0; r<nrows; ++r){
+			ofs << mat[r][c] << endl;
+		}
+		ofs.close();
+	}
+
 	return 0;
 }
