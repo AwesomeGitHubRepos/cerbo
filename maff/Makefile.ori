@@ -1,0 +1,27 @@
+#quantile.o : quantile.f90
+#	gfortran -c $< -o $@ 
+
+FCFLAGS = -ggdb -fcheck=all -fbacktrace
+prefix = /usr/local
+
+.PHONY : all
+all : maff
+
+%.o : %.f90
+	gfortran $(FCFLAGS) -c $< -o $@
+
+maff.mod : maff.o
+	gfortran $(FCFLAGS) -c maff.f90
+
+mafftest.o : mafftest.f90 maff.mod
+	gfortran  $(FCFLAGS) -c mafftest.f90 
+
+#%.mod : %.o
+
+#maff.o : 
+maff : mafftest.o  maff.o
+	gfortran  $(FCFLAGS) $^  -o $@
+
+.PHONY : clean
+clean :
+	rm -f *.o *.mod maff

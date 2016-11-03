@@ -1,0 +1,75 @@
+.TH "maff" 3 "Sun Jan 17 2016" "Maff" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+maff \- Mark's Arithmetic Fortran Formulas\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions/Subroutines"
+
+.in +1c
+.ti -1c
+.RI "logical function \fBmodz\fP (a, b)"
+.br
+.ti -1c
+.RI "subroutine \fBrebase_array\fP (in, out)"
+.br
+.ti -1c
+.RI "double precision function \fBsgn\fP (x)"
+.br
+.ti -1c
+.RI "pure subroutine \fBsortd\fP (a)"
+.br
+.RI "\fIsortd sort doubles in place Referenced from: http://rosettacode.org/wiki/Sorting_algorithms/Insertion_sort#Fortran \fP"
+.ti -1c
+.RI "integer function \fBleapinc\fP (y)"
+.br
+.ti -1c
+.RI "integer function \fBcumdays\fP (y, m, d)"
+.br
+.ti -1c
+.RI "integer function \fBdays1900\fP (y, m, d)"
+.br
+.ti -1c
+.RI "integer function \fBdays_in_month\fP (y, m)"
+.br
+.ti -1c
+.RI "integer function \fBdays_in_year\fP (y)"
+.br
+.ti -1c
+.RI "real function \fByear1900\fP (y, m, d)"
+.br
+.ti -1c
+.RI "subroutine \fBstr2ymd\fP (str10, y, m, d)"
+.br
+.ti -1c
+.RI "integer function \fBstr2days1900\fP (str)"
+.br
+.RI "\fIConvert YYYY-MM-DD to days since 1900\&. \fP"
+.ti -1c
+.RI "integer function \fBint_date\fP (y, m, d)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Mark's Arithmetic Fortran Formulas\&. 
+.SH "Function/Subroutine Documentation"
+.PP 
+.SS "logical function maff::modz (integer a, integer b)"
+
+.SS "integer function maff::str2days1900 (character (len=10) str)"
+
+.PP
+Convert YYYY-MM-DD to days since 1900\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIstr\fP string of form YYYY-MM-DD 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Maff from the source code\&.

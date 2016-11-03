@@ -23,46 +23,31 @@ Install: <code>yaourt csvfix</code>
 <pre>    csvfix sort -f 5 foo.csv</pre>
 </p>
 
+<hr><h2>csvstudio</h2>
 
-<hr><h2>Unclassified</h2>
-
-Tools for processing comma-separated values
-
-<p><b>EXTRACT</b> by named column:
-<pre>    csvtool namedcol COLNAME foo.csv</pre>
-
-<hr><h2>Convert CSV to ODS</h2>
-
-To convert a CSV file to LibreOffice spreadsheet format:
-<pre>    unoconv -f ods myinput.csv</pre>
-<code>unoconv</code> is debian installable
+Available in mython. Doesn't seem that useful, though.
 
 <hr><h2>Disliked tools</h2>
 
 <ul>
 	<li>csvkit - too many python dependencies on Arch</li>
+	<li>csvtool - not available on Arch</li>
 </ul>
 
 <hr><h2>Links to other sites</h2>
 
 
-<li><a href="https://github.com/dbro/csvquote">csvquote</a> - a way to process CSV data with standard UNIX shell commands
+<li><a href="https://github.com/dbro/csvquote">csvquote</a> - a way to process CSV data with standard UNIX shell commands</li>
   
-<li><a href="https://code.google.com/p/csvstudio/">csvstudio</a> - pythonic CSV analyser that can perform filters, compute new columns, and more. <a href="http://csvstudio.googlecode.com/hg/csvstudio.pdf">xPDF</a>. I've installed it on mython, so type <code>csvstudio -h</code>
+<li><a href="https://aur.archlinux.org/packages/mange/">mange</a> - ncurses-based spreadsheet (e.g. csv, tsv) editor. Has an Arch package.</li>
 
-<li>csvtool - I'm using it on Mint 14 (as at 13-Apr-2013). It is available as an Ubuntu package
-
-	<li><a href="https://wiki.haskell.org/Spreadsheet">haskell</a> - some packages, which may also generate stand-alone exe</li>
-
-	<li><a href="https://aur.archlinux.org/packages/mange/">mange</a> - ncurses-based spreadsheet (e.g. csv, tsv) editor. Has an Arch package.</li>
-
-	<li><a href="http://keithsheppard.name/txt-sushi/">txt-sushi</a> - simplifies common tasks like filtering, joing and transformation. Written in Haskell. Also contains links to other projects.</li>
+<li>unoconv - interop with LibreOffice</li>
   
 
 <hr><pre>
 Author:  Mark Carter
 Created: 19-Jan-2011
-Updated: 02-Nov-2016
+Updated: 03-Nov-2016
 </pre>
 </body>
 </html>
