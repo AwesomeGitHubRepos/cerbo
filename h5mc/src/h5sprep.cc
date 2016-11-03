@@ -44,8 +44,8 @@ int main()
 	string mat[nrows][ncols];
 	for(c=0; c< ncols; ++c){
 		string field_name = hdr_fields[c];
-		if(field_name.substr(0,3) == "F.")
-			field_name = field_name.substr(3);
+		if(field_name.substr(0,2) == "F.")
+			field_name = field_name.substr(2);
 		field_names[c] = field_name;
 
 		for(r=0; r<nrows; ++r){
