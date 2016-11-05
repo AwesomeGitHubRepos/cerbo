@@ -19,3 +19,15 @@ mkdir -p $arc/gaap
 DS=`grep END $s3/gaap-0.rep | awk '{print $2}' `
 cp $s3/gaap-0.rep $arc/gaap/$DS.txt
 nass.sh
+
+# archive all the reps
+mkdir -p $arc/reps
+repout=$arc/reps/$DS.txt
+rm $repout
+echo "GENERATED: " `date --rfc-3339=seconds` >> $repout
+while read repin
+do
+	echo "BEGIN-FILE: $repin" >> $repout
+	cat $s3/$repin >> $repout
+	printf "\nEND-FILE: $repin\n" >> $repout
+done < <(cd $s3; ls *.rep)
