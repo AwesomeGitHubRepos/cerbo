@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 #include <map>
 #include <vector>
 
@@ -50,11 +51,14 @@ double quantile(const doubles &arr, double q)
 {
 	double res;
 
-	doubles sarr = arr;
+	doubles sarr;
+	for(auto a:arr) { if(!std::isnan(a)) sarr.push_back(a);}
 	if(!std::is_sorted(begin(sarr), end(sarr)))
 	       	std::sort(begin(sarr), end(sarr));
 
 	int len = sarr.size();
+	if(len == 0) return NAN;
+
 	double hd = (len-1) * q ; //+ 1;
 	int hi = floor(hd);	
 	if(q == 1) res = sarr[len-1];
