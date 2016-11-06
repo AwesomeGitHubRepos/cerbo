@@ -38,10 +38,14 @@ void etb_main(nacc_ts& the_naccs, const post_ts& posts)
 		for(const auto& p:posts){
 			if(p.dr != k) continue;
 			// normal case
-			aout << setw(7) << p.dr;
+			aout << std::left;
+			aout << setw(6) << p.dr;
 			aout << setw(11) << p.dstamp;
-			aout << setw(7) << p.cr;
-			aout << setw(30) << p.desc;
+			aout << setw(6) << p.cr;
+			string desc = p.desc;
+			desc.resize(30, ' ');
+			//desc = pad_right(desc, 30);
+			aout << setw(30) << desc;
 			//write_centis(aout, p.amount);
 			aout << p.amount.str();
 			total += p.amount;
