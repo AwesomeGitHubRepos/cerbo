@@ -86,7 +86,7 @@ void debug(const detran_c& e, const currency& vto)
 	if(n_azn>1) return;
 	if(e.etran.folio != "hal") return;
 
-	cout << pad_right(e.etran.ticker, 6) << e.vto.str() << " ";
+	cout << pad_ticker(e.etran.ticker) << e.vto.str() << " ";
 	cout << e.etran.qty.str() << e.end_price.str();
        cout << vto.str() << endl;
 }
@@ -161,7 +161,7 @@ void folio_c::print_to_epic_file(ofstream& ofs) const
 
 	for(const auto& e:reduced_epics)
 	{
-		ofs << pad_left(e.etran.ticker, 6)
+		ofs << pad_ticker(e.etran.ticker)
 			<< e.etran.qty
 			<< e.etran.cost
 			<< e.vto
@@ -171,7 +171,7 @@ void folio_c::print_to_epic_file(ofstream& ofs) const
 			<< endl;
 	}
 
-	ofs << pad_right("Grand:", 6) << nchars(' ', 12) << cost << value 
+	ofs << pad_ticker("Grand:") << nchars(' ', 12) << cost << value 
 		<< ret_curr(value, cost) << endl << endl;
 
 	if(m_name != "total") return;
@@ -216,15 +216,8 @@ folio_cs epics_main(const detran_cs& es, const stend_ts& stends)
 	filename = s3("portfolios.rep");
 	ofstream pout;
 	pout.open(filename);
-	/*
-	strings fields = strings { pad_ticker("FOLIO"), pad_gbp("VBEFORE"), 
-		pad_gbp("VFLOW"), pad_gbp("VPROFIT"), 
-		pad_gbp("VTO"), ret_str("VRET")};
-		*/
 	const string hdr = 
 		"FOLIO      VBEFORE       VFLOW     VPROFIT         VTO   VRET";
-	//"hal       85336.11    27881.72   -11576.66   101641.17"
-	//print_strings(cout, hdr);
 	pout << hdr << endl;
 	for(const auto& f:folios)
 		f.print_to_portfolio_file(pout);

@@ -30,4 +30,4 @@ do
 	echo "BEGIN-FILE: $repin" >> $repout
 	cat $s3/$repin >> $repout
 	printf "\nEND-FILE: $repin\n" >> $repout
-done < <(cd $s3; ls *.rep)
+done < <(cd $s3; ls *.*)
