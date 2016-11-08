@@ -5,7 +5,6 @@
 #include <string>
 
 #include "common.hpp"
-//#include "cpq.hpp"
 #include "reusable.hpp"
 #include "yproc.hpp"
 
@@ -89,7 +88,6 @@ void mksnap(const inputs_t& inps, const downloads_t& ds)
 
 	currency total_profit, total_value;
 
-	//bool total_written = false;
 	for(auto& y:ds.ys) {
 		if(y.ticker[0] == '^') continue;
 		quantity qty;
@@ -98,13 +96,7 @@ void mksnap(const inputs_t& inps, const downloads_t& ds)
 				qty += e.qty;
 
 		const currency profit = y.chg * qty;
-		//if(is_index) {
-		//	profit = y.chg.dbl() * 100;
-		//} else {
-		//	profit = y.chg * qty;
-		//}
 		total_profit += profit;
-		//cout << "TODO yrpoc(): " << y.ticker << " " << profit.str() << " " << total_profit.str() << endl; // TODO remove
 
 		string chgpc_str =ret_str(y.chgpc);
 		string price_str = y.yprice.str();
