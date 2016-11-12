@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cassert>
 #include <fstream>
+#include <iostream>
 #include <cmath>
 #include <sstream>
 #include <unistd.h>
@@ -8,6 +9,7 @@
 
 #include "reusable.hpp"
 
+using std::cout;
 using std::ifstream;
 using std::ofstream;
 using std::stringstream;
@@ -30,6 +32,17 @@ string slurp(const char *filename)
 }
 
 std::string slurp(const std::string filename) { return slurp(filename.c_str());}
+
+std::vector<std::string> readlines(const std::string& filename)
+{
+	ifstream ifs;
+	ifs.open(filename.c_str(), ifstream::in);
+	string line;
+	vector<string> result;
+	while(getline(ifs, line)) result.push_back(line);
+	ifs.close();
+	return result;
+}
 
 void spit(const char *filename, const char *content)
 {

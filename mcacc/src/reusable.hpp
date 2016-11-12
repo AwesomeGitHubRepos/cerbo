@@ -3,6 +3,7 @@
 #include <vector>
 
 bool file_exists(const std::string &filename);
+std::vector<std::string> readlines(const std::string& filename);
 std::string slurp(const char *filename);
 std::string slurp(const std::string filename);
 void spit(const char *filename, const char *content);

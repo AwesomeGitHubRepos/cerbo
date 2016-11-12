@@ -1,19 +1,38 @@
+//#include <chrono>
 #include <cmath>
 #include <decimal/decimal>
 #include <iostream>
+//#include <regex>
 #include <string>
 #include <type_traits>
 
-//#include "cpq.hpp"
 #include "dec.hpp"
 #include "inputs.hpp"
 #include "reusable.hpp"
 
 
+//using std::regex;
+//using std::regex_token_iterator;
 
 using std::cout;
 using std::endl;
 using std::string;
+
+/*
+class Timer 
+{
+	public:
+		Timer() { start(); };
+		void start() {m_start = std::chrono::high_resolution_clock::now(); };
+		void stop() {m_stop = std::chrono::high_resolution_clock::now(); };
+		double nanos() { std::chrono::duration<double> d = m_stop - m_start; 
+			return std::chrono::duration_cast<std::chrono::nanoseconds>(d).count(); };
+	private:
+		std::chrono::time_point<std::chrono::high_resolution_clock>
+			m_start, m_stop;
+
+};
+*/
 
 void check(bool ok, std::string msg)
 {
@@ -37,46 +56,20 @@ void check_erase_all(std::string src, char c, std::string targ)
 	check(s == targ, msg);
 }
 
+bool operator==(strings lhs, strings rhs)
+{
+	if(lhs.size() != rhs.size()) return false;
+	for(size_t i=0; i< lhs.size(); ++i)
+		if(lhs[i] != rhs[i]) return false;
+	return true;
+}
 void check_tokeniser(std::string str, std::vector<std::string> strs)
 {
-	std::vector<std::string> result = parse::tokenise_line(str);
+	bool ok = parse::tokenise_line(str) == strs;
 	std::string msg = "tokenise_line() <" + str + ">";
-
-	bool ok = strs.size() == result.size();
-	for(int i = 0; i< strs.size() && ok; i++) {
-		if(strs[i] != result[i]) { 
-			//std::cout << strs[i] <<result[i] << strs[i].size() << result[i].size() ; 
-			//std::cout << strs[i].size() << result[i].size();
-			ok = false; 
-		}
-	}
 	check(ok, msg);
 }
 
-void check_fundamentals()
-{	
-	/*
-	price p;
-	p.set("123.45");
-	check_near(p.get(), 123.45, "price 123.45");
-
-
-	centis c;
-	c.set("456.78");
-	check_near(c.get(), 45678, "centis 456.78");
-
-	quantity q;
-	q.set("37.46");
-	check_near(q.get(), 37.46, "quantity 37.46");
-
-	p.reprice(c, q);
-	check_near(p.get(), 1219.3806, "reprice");
-	
-	//recentis(c, p, q);
-	c = p*q;
-	check_near(c.get(), 45678, "recentis");
-	*/
-}
 
 void check_decimals()
 {
@@ -116,6 +109,82 @@ void check_decimals()
 
 }
 
+/*
+strings multi_split(const string& line, char c)
+{
+	strings result;
+	std::size_t prev = 0, pos;
+	while((pos = line.find_first_of(c, prev)) != std::string::npos)
+	{
+		if(pos>prev)
+			result.push_back(line.substr(prev, pos-prev));
+		prev = pos+1;
+	}
+	if (prev<line.length())
+		result.push_back(line.substr(prev, std::string::npos));
+	return result;
+
+}
+*/
+
+// TODO definitely reusable!
+string char_to_string(char c)
+{
+	char cstr[] = {c};
+	return cstr;
+}
+
+/*
+strings tokenise_2(const string& line)
+{
+	constexpr char FS = 0x1C;
+	bool found_quote = false;
+
+	char* line_cs = (char *)line.c_str(); // potentially tricky, I guess
+	for(int i=0; i< line.size(); ++i){
+		char c = line[i];
+		if(c == '"') {
+			found_quote = true ;
+		       	line_cs[i] = FS;
+	       	}
+		if(found_quote) continue;
+		if(c == ' ' || c == '\t') line_cs[i] = FS;
+	}
+	
+	return multi_split(line, FS);
+}
+void check_tokeniser_2(const string& msg, const string& input, const strings& expected_result)
+{
+	strings strs = tokenise_2(input);
+	if(false) { // for debugging purposes
+		for(auto s:strs) cout << "[" << s << "] ";
+		cout << endl;
+	}
+
+	bool ok = strs == expected_result;
+	check(ok, msg);
+}
+void check_tokeniser_2_all()
+{
+	check_tokeniser_2("toke2-01", "  how   now brown cow",
+			{"how", "now", "brown", "cow"});
+	check_tokeniser_2("toke2-02", "how now    \"brown  cow\"",
+			{"how", "now", "brown  cow"});
+
+	string cow = "how now\t \"brown cow\"";
+	Timer time;
+	time.start();
+	for(int i =0; i<1000; ++i) parse::tokenise_line(cow);
+	time.stop();
+	cout << "Elapsed: " << time.nanos() << endl;
+	time.start();
+	for(int i =0; i<1000; ++i) tokenise_2(cow);
+	time.stop();
+	cout << "Elapsed: " << time.nanos() << endl;
+
+}
+*/
+
 void run_all_tests()
 {
 	check_erase_all("", 'a', "");
@@ -128,6 +197,6 @@ void run_all_tests()
        	check_tokeniser("    hello  \"joe blogg\"  world   # just a comment   ", {"hello", "joe blogg", "world"});
 	check_tokeniser("this is \"tricky disco", {"this", "is", "tricky disco"});
 
-	check_fundamentals();
 	check_decimals();
+	//check_tokeniser_2_all();
 }
