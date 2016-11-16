@@ -1,7 +1,8 @@
 AM_CXXFLAGS = -std=gnu++14 -I..
 bin_PROGRAMS = stats
 
-stats_LDADD = -L.. -lsupo
+#stats_LDADD = -L.. -lsupo
+stats_LDADD = -L.. ../libsupo.la
 if HAVE_READLINE
 stats_LDADD += -lreadline
 endif
