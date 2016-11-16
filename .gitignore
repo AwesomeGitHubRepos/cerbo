@@ -12,7 +12,16 @@ config.status
 configure
 depcomp
 green/.deps/
+libsupo.a
 install-sh
 missing
 *~
 *.exe
+.libs/
+config.guess
+config.sub
+*.la
+libtool
+ltmain.sh
+menu/.dirstamp
+*.lo

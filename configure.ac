@@ -13,11 +13,15 @@ AM_CONDITIONAL([HAVE_READLINE], [test x$ac_cv_header_readline_readline_h == xyes
 
 #CXXFLAGS="$CXXFLAGS -I${srcdir}/supo"
 AC_PROG_CXX
-AC_PROG_RANLIB
+#AC_PROG_RANLIB
+AC_PROG_LIBTOOL
+
+AC_PROG_FC
+AM_CONDITIONAL([HAVE_FORTRAN], [test x$FC == xgfortran])
+
 
 # Wrapping it up
 AC_CONFIG_FILES([Makefile green/Makefile menu/Makefile text2pdf/Makefile \
-		 supo/Makefile \
 		 shlex/Makefile stats/Makefile mcacc/src/Makefile \
 		 h5mc/src/Makefile])
 AC_OUTPUT

@@ -254,9 +254,10 @@ def prin_fstats(data, fieldname, step):
 	print()
 
 def mkt():
-	data = mython.csvmc.read_dict(os.path.expanduser('~/.fortran/StatsList.csv'))
+	data = mython.csvmc.read_dict(os.path.expanduser('~/.fortran/STATSLIST/StatsList.csv'))
 	#print("NUM=", len(data))
-	for k in ['mkt', 'rs6mb', 'PBV', 'PER']:
+	#for k in ['mkt', 'rs6mb', 'PBV', 'PER']:
+	for k in ['PBV', 'PER']:
 		prin_fstats(data, k, 10)
 
 #if __name__ == "__main__":
