@@ -47,6 +47,16 @@ pass2 <- pass1[order(pass1$Grank), ]
 pass2
 </pre>
 
+<hr><h2>Filtering and ordering datasets</h2>
+<pre>
+df &lt;- read.csv(&quot;V:/.fortran/STATSLIST/StatsList-1.csv&quot;, header=TRUE)
+df1 &lt;- subset(df, select=c(&quot;EPIC&quot;, &quot;MarketCap&quot;, &quot;RS_Year&quot;, &quot;RS_5Year&quot;))
+df2 &lt;- subset(df1, df1$RS_5Year &lt;0 &amp; df1$RS_Year &gt;0)
+df3 &lt;- df2[order(df2$RS_5Year),]
+
+</pre>
+
+
 <hr><h2>Grouping</h2>
 
 <pre>
@@ -65,6 +75,8 @@ ordered
 
 For GUIs, try rstudio and rkward.
 
+Front-ends: <a href="https://wiki.archlinux.org/index.php/R#Adding_a_graphical_frontend_to_R">xlink</a>.
+
 <hr><h2>Examples</h2>
 
 <li><a href="pes.txt">pes</a> - median, columns to vectors, subsets of vectors
@@ -74,7 +86,7 @@ For GUIs, try rstudio and rkward.
 <hr><pre>
 Author:  Mark Carter
 Created: 13-Nov-2011
-Updated: 08-Dec-2012
+Updated: 18-Nov-2016
 </pre>
 </body>
 </html>
