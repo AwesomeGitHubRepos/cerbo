@@ -1,3 +1,5 @@
+.dirstamp
+stats
 .deps/
 *.exe.stackdump
 *.o
@@ -23,5 +25,4 @@ config.sub
 *.la
 libtool
 ltmain.sh
-menu/.dirstamp
 *.lo

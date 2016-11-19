@@ -1,5 +1,5 @@
 AC_PREREQ([2.69])
-AC_INIT([cerbo], [0.5], [alt.mcarter@gmail.com])
+AC_INIT([cerbo], [0.6], [alt.mcarter@gmail.com])
 AC_CONFIG_SRCDIR([green/green.cc])
 #AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign])
@@ -22,6 +22,6 @@ AM_CONDITIONAL([HAVE_FORTRAN], [test x$FC == xgfortran])
 
 # Wrapping it up
 AC_CONFIG_FILES([Makefile green/Makefile menu/Makefile text2pdf/Makefile \
-		 shlex/Makefile stats/Makefile mcacc/src/Makefile \
+		 shlex/Makefile mcacc/src/Makefile \
 		 h5mc/src/Makefile])
 AC_OUTPUT

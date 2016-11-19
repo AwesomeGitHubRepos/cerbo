@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+rm -f compile config.guess config.log config.status config.sub configure \
+	depcomp install-sh libsupo.la libtool ltmain.sh Makefile \
+	Makefile.in missing *.lo *.o
+
+rm -rf autom4te.cache

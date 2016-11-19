@@ -1,5 +1,6 @@
 AM_CXXFLAGS = -std=gnu++14 -I..
 bin_PROGRAMS = stats
+EXTRA_stats_DEPENDENCIES = ../libsupo.la
 
 #stats_LDADD = -L.. -lsupo
 stats_LDADD = -L.. ../libsupo.la
