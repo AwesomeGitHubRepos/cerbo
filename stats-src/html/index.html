@@ -1,16 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>cxxstats</title>
+	<title>stats</title>
 </head>
 
 <body>
 
 <h1>stats</h1>
-
-Contains both a library and an executable.
-
-<p>The executable is called <code>cxxstats</code>, which you can use for working with your own stats</p>
 
 <hr><h2>Usage</h2>
 <pre>
@@ -24,24 +20,9 @@ q quit
 <hr><h2>TODO</h2>
 
 <ul>
-	<li>readline library existence conditional compile</li>
 	<li>tests: get them running</li>
 </ul>
 
-
-<hr><h2>Linking</h2>
-
-Assume you have installed it <code>autogen.sh</code> creates the default install dir of <code>~/.local</code>), your
-program should have the include line:
-<pre>
-#include &lt;mcstats.h&gt;
-</pre>
-
-Link against the library
-<pre>
-libcxxstats
-thus: -lcxxstats
-</pre>
 
 <hr><h2>Functions in the library</h2>
 
@@ -62,6 +43,9 @@ Returns structure of basic stats: length, mean, sample stdev
 
 Fractional rank, as detailed on <a href="https://en.wikipedia.org/wiki/Ranking#Ranking_in_statistics">Wikipedia</a>.
 
+<hr><h2>Unclassified</h2>
+
+<li><a href="https://gist.github.com/blippy/89f011ba6d4e203e6c7822fc1076c391">stats.txt</a> - gist of former sources, noteworthy because it has a lexer in it.</li>
 
   </body>
 </html>
