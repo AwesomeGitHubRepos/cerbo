@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+FIN=/home/mcarter/repos/redact/docs/accts2016/data/accts2016v4.txt
+
+while read sym
+do
+       	echo "Adding symbol $sym"
+	beancounter addstock $sym
+	beancounter backpopulate --prevdate '10 years ago' $sym
+done < <(grep comm-1 $FIN  | grep -v OEIC | awk -e '{print $2}' | sort | uniq)
+
+echo "WARN: probably couldnt add AML.L CGL.L EMIS.L FCSS.L PIC.L PLE.L THT.L"
+echo "WARN: Not sure what to do with OEICS, either"

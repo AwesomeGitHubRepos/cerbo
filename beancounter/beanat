@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+psql beancounter <<EOF
+select beanat('$1', '$2');
+EOF
