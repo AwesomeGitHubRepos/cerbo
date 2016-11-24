@@ -1,5 +1,39 @@
 #!/usr/bin/env bash
 
-psql beancounter <<EOF
-select beanat('$1', '$2');
+function print_help {
+cat <<EOF
+Get the price of a share at a specified date
+SYNOPSIS
+   beanat [-d DATE] ticker
+DESCRIPTION
+   -d DATE of form YYYY-DD-MM
+   If date is not specified, then today assumed
 EOF
+}
+
+ticker=
+dstamp=`date --iso`
+
+function main {
+#	echo "dstamp = $dstamp"
+psql beancounter <<EOF
+select beanat('$ticker', '$dstamp');
+EOF
+}
+
+while getopts "d:h" opt
+do
+	case $opt in
+		d) dstamp=$OPTARG ;;
+		h) print_help ; exit ;;
+		*) echo "Unrecognised argument: $opt" ; exit 1;;
+	esac
+done
+
+shift $(($OPTIND - 1))
+ticker=$1
+#echo "ticker=$ticker"
+main
+
+
+

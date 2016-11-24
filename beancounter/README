@@ -72,3 +72,20 @@ A good name for a script is fazeolo, which is Esperanto for bean
 #aptitude install finance-yahooquote
 #aptitude install   libfinance-yahooquote-perl
 
+
+beancounter deactivate AML.L APH.L BVC.L CHAR.L CGL.L CRC CSAL CTR.L DOM.L FCCN.L FCSS.L FLYB.L GFM.L HIK.L ICP.L INDV.L IRV.L  HYH KAZ.L KBC.L KEYS LMI.L LRD.L PIC.L PLE.L PLUS.L POL.L PRES.L RBS.L REDD.L  S32.L SHOE.L SHOS SVI.L STVG.L THT.L UTW.L
+
+beancounter fxbackpopulate --prevdate '5 years ago'  --date 'today' USD
+
+# fix currency GBX to GBP:
+psql beancounter -c "insert into fxprices values ('GBX', '2000-01-01', 0.01, 0.01, 0.01, 0.01, 0.01, 0.01)"
+
+#to populate portfolio from data dir:
+./mkbap
+
+# Run a report:
+beancounter dayendreport --prevdate '1 week ago' --date today
+
+# Portfolio on a given date:
+beancounter status --date 2016-04-05 --restriction "type = 'tdi' and date <= '2016-04-05'"
+
