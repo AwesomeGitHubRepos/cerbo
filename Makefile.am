@@ -17,4 +17,4 @@ stats_LDADD += -lreadline
 endif
 stats_SOURCES = stats-src/main.cc stats-src/parse.cc stats-src/tests.cc
 
-SUBDIRS = green text2pdf shlex mcacc/src  h5mc/src menu
+SUBDIRS = green text2pdf shlex mcacc/src  h5mc/src h5mc/scripts menu

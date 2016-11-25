@@ -23,5 +23,5 @@ AM_CONDITIONAL([HAVE_FORTRAN], [test x$FC == xgfortran])
 # Wrapping it up
 AC_CONFIG_FILES([Makefile green/Makefile menu/Makefile text2pdf/Makefile \
 		 shlex/Makefile mcacc/src/Makefile \
-		 h5mc/src/Makefile])
+		 h5mc/src/Makefile h5mc/scripts/Makefile])
 AC_OUTPUT
