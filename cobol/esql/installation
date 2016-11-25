@@ -1,0 +1,11 @@
+sudo pacman -S unixodbc
+
+mkdir -p builds
+
+cd builds
+wget http://www.kiska.net/opencobol/esql/gnu-cobol-sql-2.0.tar.gz
+tar xvfz gnu-cobol-sql-2.0.tar.gz
+
+configure, etc.
+esqlOC now available
+
