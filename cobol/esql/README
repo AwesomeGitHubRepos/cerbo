@@ -1,0 +1,6 @@
+As at 26-Nov-2016, I'm getting:
+esqlOC: ERROR compiling program 'esql.sqb': line 40: variable not found: BUFFER
+
+Discussion link
+https://sourceforge.net/p/open-cobol/discussion/contrib/thread/4057115f/
+

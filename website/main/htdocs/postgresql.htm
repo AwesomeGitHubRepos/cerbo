@@ -26,6 +26,18 @@ Delete database: DROP DATABASE [ IF EXISTS ] name
 
 </pre>
 
+<hr><h2>User database</h2>
+
+<pre>
+sudo su - postgres
+psql
+create user mcarter -d -A;
+create database mcarter;
+grant all privileges on database mcarter to mcarter;
+\q
+
+</pre>
+
 <hr><h2>Unclassified</h2>
 
 
@@ -41,7 +53,7 @@ None
 <hr><pre>
 Author:  Mark Carter
 Created: 26-Oct-2014
-Updated: 25-Nov-2016
+Updated: 26-Nov-2016
 </pre>
 </body>
 </html>

@@ -1,0 +1,74 @@
+       indentification division.
+       program-is. esql.
+
+
+       data division.
+       working-storage section.
+           exec sql
+       begin declare section
+           end-exec.
+       01 hostvars.
+               05 BUFFER pic x(1024).
+               05 the-deptno pic 9(4).
+               05 the-dname pic x(15).
+               05 the-loc pic x(15).
+           exec sql
+       end declare section
+           end-exec.
+
+
+
+
+
+
+       procedure division.
+       main section.
+
+      *  STRING 'DRIVER={MySQL ODBC 5.2w Driver};'
+        STRING 'DRIVER={PostgreSQL};'
+                'SERVER=localhost;'
+      *         'PORT=3306;'
+                'DATABASE=scott;'
+                'USER=scott;'
+                'PASSWORD=tiger;'
+      * example for DB specific ODBC parameter: 
+      *   no compressed MySQL connection (would be the DEFAULT anyway)
+      *         'COMRESSED_PROTO=0;'
+           INTO BUFFER.
+         EXEC SQL 
+           CONNECT TO :BUFFER 
+         END-EXEC.
+         PERFORM SQLSTATE-CHECK.
+
+         EXEC SQL 
+           DECLARE CUR_ALL CURSOR FOR
+           SELECT
+             TESTPERSON.NAME,
+             POINTS
+           FROM
+             TESTPERSON, TESTPOINTS
+           WHERE PERSONID=ID
+         END-EXEC
+         PERFORM SQLSTATE-CHECK
+         EXEC SQL 
+           OPEN CUR_ALL
+         END-EXEC
+         PERFORM SQLSTATE-CHECK
+         PERFORM UNTIL SQLCODE = 100
+           EXEC SQL 
+             FETCH CUR_ALL
+             INTO
+               :the-deptno,
+               :the-dname,
+               :the-loc
+           END-EXEC
+           PERFORM SQLSTATE-CHECK
+           IF SQLCODE NOT = 100
+             DISPLAY 'FETCHED '
+             DISPLAY '  person ' hVarC ' points: ' hVarD
+           ELSE 
+             DISPLAY ' No points found'
+           END-IF
+         END-PERFORM.
+           stop run.
+           .
