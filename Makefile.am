@@ -3,7 +3,7 @@ AM_CXXFLAGS = -std=gnu++14
 AUTOMAKE_OPTIONS = subdir-objects
 #AUTOMAKE_OPTIONS = std-options
 lib_LTLIBRARIES = libsupo.la
-libsupo_la_SOURCES = supo.cc supo_stats.cc
+libsupo_la_SOURCES = supo.cc supo_parse.cc supo_stats.cc
 
 bin_PROGRAMS = stats
 #bin_PROGRAMS = menu
@@ -15,7 +15,7 @@ stats_LDADD = libsupo.la
 if HAVE_READLINE
 stats_LDADD += -lreadline
 endif
-stats_SOURCES = stats-src/main.cc stats-src/parse.cc stats-src/tests.cc
+stats_SOURCES = stats-src/main.cc stats-src/tests.cc
 
 SUBDIRS = green text2pdf shlex mcacc/src  h5mc/src h5mc/scripts menu \
 	  splut

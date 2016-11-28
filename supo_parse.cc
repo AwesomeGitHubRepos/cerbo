@@ -6,10 +6,11 @@ created 19-Feb-2016
 #include <assert.h>
 #include <string.h>
 
-#include "parse.hpp"
+#include <supo_parse.hpp>
 
 //using namespace std;
 
+namespace supo {
 
 const char white[] = " \t\r";
 
@@ -147,3 +148,5 @@ vecvec_t vecvec(const char *fname)
 }
 
 */
+
+} // namespace supo

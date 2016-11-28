@@ -6,7 +6,7 @@
 #include <exception>
 #include <stdexcept> // std::invalid_argument for g++ 4.8.2
 
-#include "parse.hpp"
+#include <supo_parse.hpp>
 
 using std::cout;
 using std::endl;
@@ -124,7 +124,8 @@ void repl()
 		//free(line);
 
 		std::string no_commas = rmchar(line, ',');
-		std::vector<std::string> tokens = tokenize_line(no_commas);
+		std::vector<std::string> tokens = 
+			supo::tokenize_line(no_commas);
 		for(auto t: tokens) process_token(t);
 	}
 }
