@@ -29,6 +29,7 @@ psql
 create user scott with password 'tiger';
 create database scott;
 grant select on all tables in schema public to public;
+grant select on all tables in schema public to scott;
 \q
 exit
 
