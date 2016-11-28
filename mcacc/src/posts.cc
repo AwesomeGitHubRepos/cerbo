@@ -7,10 +7,11 @@
 
 #include "common.hpp"
 #include "inputs.hpp"
-#include "reusable.hpp"
+#include <supo_general.hpp>
 #include "posts.hpp"
 
 using namespace std;
+using namespace supo;
 
 bool operator<(const post_t& a, const post_t& b)
 {

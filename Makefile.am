@@ -3,7 +3,7 @@ AM_CXXFLAGS = -std=gnu++14
 AUTOMAKE_OPTIONS = subdir-objects
 #AUTOMAKE_OPTIONS = std-options
 lib_LTLIBRARIES = libsupo.la
-libsupo_la_SOURCES = supo.cc supo_parse.cc supo_stats.cc
+libsupo_la_SOURCES = supo.cc supo_general.cc supo_parse.cc supo_stats.cc
 
 bin_PROGRAMS = stats
 #bin_PROGRAMS = menu

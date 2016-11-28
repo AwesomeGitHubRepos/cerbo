@@ -8,7 +8,7 @@
 
 #include "dec.hpp"
 #include "inputs.hpp"
-#include "reusable.hpp"
+#include <supo_general.hpp>
 
 
 //using std::regex;
@@ -17,6 +17,7 @@
 using std::cout;
 using std::endl;
 using std::string;
+using namespace supo;
 
 /*
 class Timer 

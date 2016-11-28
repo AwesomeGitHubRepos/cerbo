@@ -7,7 +7,9 @@
 #include <unistd.h>
 #include <vector>
 
-#include "reusable.hpp"
+#include <supo_general.hpp>
+
+namespace supo {
 
 using std::cout;
 using std::ifstream;
@@ -173,3 +175,4 @@ double bround(double x)
 
 double round2(double x) { return bround(x*100)/100; }
 
+} // namespace supo

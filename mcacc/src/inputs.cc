@@ -5,10 +5,11 @@
 #include <stdlib.h>
 
 #include "common.hpp"
-#include "reusable.hpp"
+#include <supo_general.hpp>
 #include "inputs.hpp"
 
 using namespace std;
+using namespace supo;
 
 namespace parse {
 

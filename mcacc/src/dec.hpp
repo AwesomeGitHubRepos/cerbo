@@ -8,7 +8,9 @@
 
 
 //#include "types.hpp"
-#include "reusable.hpp"
+#include <supo_general.hpp>
+
+using namespace supo;
 
 std::decimal::decimal128 dbl_to_dec(double d, int dp);
 std::decimal::decimal128 str_to_dec(const std::string& s, int dp);

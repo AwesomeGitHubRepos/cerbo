@@ -9,9 +9,10 @@
 
 #include "common.hpp"
 #include "types.hpp"
-#include "reusable.hpp"
+#include <supo_general.hpp>
 
 using namespace std;
+using namespace supo;
 
 
 string pad_ticker(string ticker) { return pad_right(ticker, 7); }

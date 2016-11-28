@@ -5,10 +5,11 @@
 #include <string>
 
 #include "common.hpp"
-#include "reusable.hpp"
+#include <supo_general.hpp>
 #include "yproc.hpp"
 
 using namespace std;
+using namespace supo;
 
 
 typedef struct downloads_t {

@@ -11,7 +11,9 @@
 #include "common.hpp"
 #include "dec.hpp"
 //#include "cpq.hpp"
-#include "reusable.hpp"
+#include <supo_general.hpp>
+
+using namespace supo;
 
 using std::endl;
 using std::ofstream;

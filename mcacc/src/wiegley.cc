@@ -9,11 +9,12 @@
 #include <vector>
 
 #include "common.hpp"
-#include "reusable.hpp"
+#include <supo_general.hpp>
 #include "yahoo.hpp"
 #include "wiegley.hpp"
 
 using namespace std;
+using namespace supo;
 
 typedef pair<string, string> spair;
 

@@ -10,12 +10,13 @@
 #include <string.h>
 
 #include "common.hpp"
-#include "reusable.hpp"
+#include <supo_general.hpp>
 #include "gaap.hpp"
 
 
 
 using namespace std;
+using namespace supo;
 
 void ul1(ostream* ofs) { (*ofs) << nchars(' ', 11) << nchars('-', 10) << endl;};
 

@@ -19,11 +19,12 @@
 #include "common.hpp"
 #include "oven.hpp"
 #include "tests.hpp"
-#include "reusable.hpp"
+#include <supo_general.hpp>
 #include "show.hpp"
 
 
 using namespace std;
+using namespace supo;
 
 /*
 bool operator<(const etran_t& lhs, const etran_t& rhs)

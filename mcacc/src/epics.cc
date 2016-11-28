@@ -11,13 +11,14 @@
 
 #include "common.hpp"
 #include "dec.hpp"
-#include "reusable.hpp"
+#include <supo_general.hpp>
 #include "stend.hpp"
 #include "epics.hpp"
 #include "types.hpp"
 
 using namespace std;
 using namespace std::decimal;
+using namespace supo;
 
         
 /*

@@ -44,7 +44,7 @@ loop:
 				trimmed = trimmed.substr(i+1);
 				goto loop;
 			case ' ':
-				token += '_' ; //167 ; // 26; // so that fields work
+				token += ' ' ; //167 ; // 26; // so that fields work
 				break;
 			default :
 				token += trimmed[i];
@@ -71,6 +71,14 @@ fin:
 	return output;
 }
 
+strmat tokenize_stream(std::istream& istr)
+{
+	strmat result;
+	std::string line;
+	while(getline(istr, line))
+		result.push_back(tokenize_line(line));
+	return result;
+}
 /*
 void get_period(string &start, string &end)
 {

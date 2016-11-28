@@ -18,11 +18,11 @@ OUT: s3/stend.dsv
 
 #include "common.hpp"
 #include "types.hpp"
-#include "reusable.hpp"
+#include <supo_general.hpp>
 #include "stend.hpp"
 
 using namespace std;
-
+using namespace supo;
 
 
 stend stend_ts::at(std::string key, std::string oops) const
