@@ -1,0 +1,47 @@
+<html><head>
+    <LINK REL=StyleSheet HREF="../style.css" TYPE="text/css">
+<title>Freepascal</title></head>
+<body>
+
+<a href="../index.html">Home</a> 
+: <a href="programming.htm" >programming</a>
+
+
+<h1>Freepascal</h1>
+
+
+<hr><h2>Database (Postgres)</h2>
+
+<pre>
+  PQConnection1.Params.Add(&#x27;host=vivo&#x27;);
+  PQConnection1.Params.Add(&#x27;dbname=scott&#x27;);
+  PQConnection1.Params.Add(&#x27;user=scott&#x27;);
+  PQConnection1.Params.Add(&#x27;password=tiger&#x27;);
+  PQConnection1.Open;
+  SQLQuery1.SQL.Text := &#x27;select * from dept&#x27;;
+  ListBox1.Clear;
+  SQLQuery1.Open;
+  while not SQLQuery1.EOF do
+  begin
+    ListBox1.Items.Add(SQLQuery1.Fields[1].AsString);
+    SQLQuery1.Next;
+  end;
+  SQLQuery1.Close;
+  PQConnection1.Close;
+
+</pre>
+
+<a href="http://wiki.freepascal.org/MySQLDatabases">xlink</a> - works on Postgres, not just MySQL.
+
+
+<hr><h2>Links to other sites</h2>
+
+None
+
+<hr><pre>
+Author:  Mark Carter
+Created: 29-Nov-2016
+Updated: 29-Nov-2016
+</pre>
+</body>
+</html>
