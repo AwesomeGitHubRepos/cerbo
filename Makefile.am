@@ -1,4 +1,4 @@
-#AM_CXXFLAGS = -std=gnu++14 -I$(top_srcdir)
+AM_CXXFLAGS = -std=gnu++14 
 
 AUTOMAKE_OPTIONS = subdir-objects
 #AUTOMAKE_OPTIONS = std-options
