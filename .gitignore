@@ -1,5 +1,4 @@
 .dirstamp
-stats
 .deps/
 *.exe.stackdump
 *.o
@@ -13,7 +12,6 @@ config.log
 config.status
 configure
 depcomp
-green/.deps/
 libsupo.a
 install-sh
 missing
