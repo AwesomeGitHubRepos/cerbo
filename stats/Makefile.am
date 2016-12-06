@@ -1,7 +1,7 @@
-AM_CXXFLAGS = -std=gnu++14
+AM_CXXFLAGS = -std=gnu++14 -I$(top_srcdir)
 
 bin_PROGRAMS = stats
-stats_LDADD = ../libsupo.la
+stats_LDADD = $(top_builddir)/libsupo.la
 if HAVE_READLINE
 stats_LDADD += -lreadline
 endif

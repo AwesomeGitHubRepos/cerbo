@@ -19,6 +19,7 @@ AC_PROG_LIBTOOL
 AC_PROG_FC
 AM_CONDITIONAL([HAVE_FORTRAN], [test x$FC == xgfortran])
 
+#AC_SUBST(inc_supo,["-I $abs_top_srcdir"])
 
 # Wrapping it up
 AC_CONFIG_FILES([Makefile green/Makefile menu/Makefile text2pdf/Makefile \
