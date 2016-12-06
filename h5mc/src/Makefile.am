@@ -1,6 +1,7 @@
-AM_CXXFLAGS = -std=gnu++14 -I../.. -O0 -ggdb
+#AM_CXXFLAGS = -std=gnu++14 -I../.. -O0 -ggdb
+AM_CXXFLAGS = $(CXXSTD) $(ISUPO)  -O0 -ggdb
 #AM_LDFLAGS = -L../../supo -lsupo
-usual =  -L../.. -lsupo
+usual =  $(LIBSUPO)
 STD = -fcheck=all -ggdb
 
 bin_PROGRAMS = h5query h5rank h5sprep qry01
@@ -14,6 +15,7 @@ endif
 
 if HAVE_HDF5
 h5libs = $(usual) -lhdf5
+#h5libs = $(LIBSUPO) -lhdf5
 bin_PROGRAMS += h5new shsl
 h5new_LDADD = $(h5libs)
 h5new_SOURCES = h5new.cc common.cc common5.cc 

@@ -19,7 +19,9 @@ AC_PROG_LIBTOOL
 AC_PROG_FC
 AM_CONDITIONAL([HAVE_FORTRAN], [test x$FC == xgfortran])
 
-#AC_SUBST(inc_supo,["-I $abs_top_srcdir"])
+AC_SUBST([CXXSTD], ['-std=gnu++14'])
+AC_SUBST([ISUPO],   ['-I$(top_srcdir)'])
+AC_SUBST([LIBSUPO], ['$(top_builddir)/libsupo.la'])
 
 # Wrapping it up
 AC_CONFIG_FILES([Makefile green/Makefile menu/Makefile text2pdf/Makefile \
