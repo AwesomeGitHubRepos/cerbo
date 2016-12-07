@@ -1,3 +1,5 @@
+*.tar.gz
+cerbo-0.6/
 .dirstamp
 .deps/
 *.exe.stackdump
