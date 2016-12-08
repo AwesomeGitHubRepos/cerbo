@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+function print_help() {
+cat <<EOF
+bean-imp-ftn sym
+Import a fortran raw.dat file into postgres
+Options:
+-h  This help
+
+Examples:
+bean-imp-ftn VOD.L
+bean-imp-ftn ^FTAS
+EOF
+}
+
+while getopts "h" opt; do
+	case $opt in
+		h) print_help ; exit 0 ;;
+		*) echo "Invalid option: $opt" ; exit 1 ;;
+	esac
+done
+
+shift $(expr $OPTIND - 1 )
+TICKER=$1
+DIR=$HOME/.fortran/tickers/$TICKER
+
+awk -F, -v TICKER=$TICKER '
+#NR > 1 
+{printf "%s,%s,%s,%s,%s,%s,%s\n", TICKER, $1, $2, $3, $4, $5, $6 }
+' < <(tail -n +2 $DIR/raw.dat) >$DIR/bean-imp-btn.out
+
+psql beancounter <<EOF
+begin transaction;
+\copy stockprices (symbol, date, day_open, day_high, day_low, day_close, volume)  from '$DIR/bean-imp-btn.out' delimiter ',' csv;
+end transaction;
+EOF
+

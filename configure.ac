@@ -24,7 +24,9 @@ AC_SUBST([ISUPO],   ['-I$(top_srcdir)'])
 AC_SUBST([LIBSUPO], ['$(top_builddir)/libsupo.la'])
 
 # Wrapping it up
-AC_CONFIG_FILES([Makefile green/Makefile menu/Makefile text2pdf/Makefile \
+AC_CONFIG_FILES([Makefile \
+		 beancounter/scripts/Makefile \
+		 green/Makefile menu/Makefile text2pdf/Makefile \
 		 shlex/Makefile \
 		 mcacc/scripts/Makefile mcacc/src/Makefile \
 		 h5mc/src/Makefile h5mc/scripts/Makefile \
