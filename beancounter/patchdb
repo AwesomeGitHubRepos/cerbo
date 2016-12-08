@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+psql beancounter <<EOF
+\i hi52w.sql
+EOF

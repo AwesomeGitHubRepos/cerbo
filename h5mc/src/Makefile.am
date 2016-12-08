@@ -8,6 +8,8 @@ bin_PROGRAMS = h5query h5rank h5sprep qry01
 #bin_SOURCES = common.cc h5query.cc h5rank.cc qry01.cc
 
 if HAVE_FORTRAN
+bin_PROGRAMS = hi52w
+hi52w_SOURCES = hi52w.f90
 #bin_PROGRAMS += spikes
 #spikes_SOURCES =  spikes.f90
 endif
