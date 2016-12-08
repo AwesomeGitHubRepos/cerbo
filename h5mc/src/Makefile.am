@@ -1,4 +1,3 @@
-#AM_CXXFLAGS = -std=gnu++14 -I../.. -O0 -ggdb
 AM_CXXFLAGS = $(CXXSTD) $(ISUPO)  -O0 -ggdb
 #AM_LDFLAGS = -L../../supo -lsupo
 usual =  $(LIBSUPO)
@@ -8,7 +7,8 @@ bin_PROGRAMS = h5query h5rank h5sprep qry01
 #bin_SOURCES = common.cc h5query.cc h5rank.cc qry01.cc
 
 if HAVE_FORTRAN
-bin_PROGRAMS = hi52w
+bin_PROGRAMS = daycls hi52w
+daycls_SOURCES = daycls.f90
 hi52w_SOURCES = hi52w.f90
 #bin_PROGRAMS += spikes
 #spikes_SOURCES =  spikes.f90

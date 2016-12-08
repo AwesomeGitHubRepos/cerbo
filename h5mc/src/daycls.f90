@@ -1,7 +1,6 @@
-program hi52w
+program daycls
   !use fgsl
   !use iso_c_binding
-  !TODO this derves some modularisation
   implicit none
 
   type rawtype
@@ -14,7 +13,6 @@ program hi52w
 
   integer  :: i, n, rmax, lo
   character (len=80) :: dummy
-  double precision:: rel
   
 
 !!! inputs
@@ -31,13 +29,10 @@ program hi52w
 
 !!! outputs  
   ! NB there are approx 261 trading days in a year
-  do i = 1, n
-        lo = max(1, i-261)
-        rmax = lo -1 + maxloc(raws(lo:i)%cls, dim =1)
-        rel = raws(rmax)%cls/raws(i)%cls
-        print *, raws(i)%dstamp, raws(i)%cls, ' ', raws(rmax)%dstamp, &
-                & raws(rmax)%cls, rel, (rel.eq.1)
+  do i = 2, n
+        print *, raws(i)%dstamp, raws(i)%cls, &
+                & 100*(raws(i)%cls / raws(i-1)%cls-1)
   enddo
 
 
-end program hi52w
+end program daycls
