@@ -13,6 +13,7 @@ program daycls
 
   integer  :: i, n, rmax, lo
   character (len=80) :: dummy
+  double precision :: pcchg
   
 
 !!! inputs
@@ -30,8 +31,9 @@ program daycls
 !!! outputs  
   ! NB there are approx 261 trading days in a year
   do i = 2, n
-        print *, raws(i)%dstamp, raws(i)%cls, &
-                & 100*(raws(i)%cls / raws(i-1)%cls-1)
+        pcchg = 100*(raws(i)%cls / raws(i-1)%cls-1)
+        write(*, fmt="(A10, X, F10.2, X, F6.2)", advance="no") raws(i)%dstamp, raws(i)%cls, pcchg
+        write(*, fmt="(X, A4, L)") "GAP-", (pcchg < -10)
   enddo
 
 
