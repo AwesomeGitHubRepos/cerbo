@@ -35,9 +35,19 @@ program hi52w
         lo = max(1, i-261)
         rmax = lo -1 + maxloc(raws(lo:i)%cls, dim =1)
         rel = raws(rmax)%cls/raws(i)%cls
-        print *, raws(i)%dstamp, raws(i)%cls, ' ', raws(rmax)%dstamp, &
-                & raws(rmax)%cls, rel, (rel.eq.1)
+        call write_pair(raws(i)%dstamp, raws(i)%cls)
+        call write_pair(raws(rmax)%dstamp, raws(rmax)%cls)
+        write(*, fmt="(F6.3, X, A3, L)") rel,  "HI-", (rel.eq.1)
+
+        !print *, raws(i)%dstamp, raws(i)%cls, ' ', raws(rmax)%dstamp, &
+        !        & raws(rmax)%cls, rel, (rel.eq.1)
   enddo
 
 
-end program hi52w
+end 
+
+subroutine write_pair(dstamp, price)
+        character(len=10), intent(in) :: dstamp
+        double precision, intent(in) :: price
+        write(*, fmt="(A10, X, F7.2, 4X)", advance="no") dstamp, price
+end subroutine
