@@ -3,7 +3,7 @@
 source h5utils.sh
 
 SYM=`basename $PWD`
-FILE=raw.dat
+FILE=
 
 function print_help () {
 cat << EOF
@@ -36,12 +36,15 @@ function sort_file () {
 }
 
 function do_main() {
+	OUTDIR=$HOME/.fortran/tickers/$SYM
+	mkdir -p $OUTDIR/out
+	FILE=$OUTDIR/raw.dat
 	url=$(print_decade_url $SYM)
 	curl -s $url > $FILE
 	sort_file
 }
 
-while getopts "hS:" opt
+while getopts "hs:" opt
 do
 	case $opt in
 		h) print_help ; exit 0 ;;
