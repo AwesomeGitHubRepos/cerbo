@@ -2,9 +2,25 @@
 
 # resort raw.dat file
 
-TMP=`mktemp`
-sort raw.dat >$TMP 
-# the sed line moves the header line back from the bottom to the top
-sort raw.dat >$TMP
-sed '1h;1d;$!H;$!d;G' $TMP > raw.dat
-rm $TMP
+FILE=raw.dat
+
+function print_help () {
+cat <<EOF
+Sort the raw.dat file
+Options:
+-f FILE sort specified file, rather than raw.dat in current directory
+-h      print this help
+EOF
+}
+
+
+while getopts "h" opt
+do
+	case $opt in
+		f) FILE=$OPTAEG ;;
+		h) print_help ; exit 0 ;;
+		*) echo "Unkown option $opt" ; exit 0 ;;
+	esac
+done
+
+do_main

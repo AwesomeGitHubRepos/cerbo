@@ -1,19 +1,52 @@
 #!/usr/bin/env bash 
-exec > >(tee -a h5mc.log)
 
-echo "h5get begin `date`"
+source h5utils.sh
 
-# turn on better logging
-set -x
 SYM=`basename $PWD`
-echo "Symbol to fetch, based on directory name: $SYM"
 
-#mython yahoo "$SYM" > raw.dat
+function print_help () {
+cat << EOF
+Download decade worth of data for a share
+Sym is based on current working directory unless '-s' option used
+Options:
+-h this help
+-s sym  download for ticker (e.g. VOD.L)
+EOF
+}
 
-ydec "$SYM"
-#mv "$SYM" raw.dat
+function logging () {
+	# deprecated function
+	exec > >(tee -a h5mc.log)
+	echo "h5get begin `date`"
+	set -x
+	echo "Symbol to fetch, based on directory name: $SYM"
+	set +x
+	echo "h5get end"
+	echo
+}
 
-set +x
-echo "h5get end"
-echo
-exit 0
+function sort_file () {
+	TMP=`mktemp`
+	sort $FILE >$TMP 
+	# the sed line moves the header line back from the bottom to the top
+	sort $FILE >$TMP
+	sed '1h;1d;$!H;$!d;G' $TMP > $FILE
+	rm $TMP
+}
+
+function do_main() {
+	url=$(print_decade_url $SYM)
+	curl -s $url > $FILE
+	sort_file
+}
+
+while getopts "hS:" opt
+do
+	case $opt in
+		h) print_help ; exit 0 ;;
+		s) SYM=$OPTARG ;;
+		*) echo "Unknown option: $opt" ; exit 0 ;;
+	esac
+done
+
+do_main
