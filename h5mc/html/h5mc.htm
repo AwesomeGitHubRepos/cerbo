@@ -7,12 +7,12 @@
 <body>
 
 <h1>h5mc</h1>
+<a href="../../cerbo.htm">cerbo</a>
 
 <hr><h2>Overview of programs</h2>
 <ul>
 	<li><a href="h5new.htm"><code>h5new</code></a> - create <code>new.h5</code></li>
 	<li><a href="h5rank.htm"><code>h5rank</code></a> - greenblatt-esque screen</li>
-	<li>hi52w -  price vs 52w high - <b>contains good Fortran code on reading raw.dat</b></li>
 
 	<li><a href="qry01.htm"><code>qry01</code></a> - RS5y by sector. Also rectifies CSV file.</li>
 	<li><a href="shsl.htm"><code>shsl</code></a> - update <code>sharelock.h5</code></li>
@@ -28,5 +28,20 @@
 		all cases (applies to F.EPIC, F.Sector, F.Sub_Sector)</li>
 </ol>
 
+
+<hr><h2>tickers</h2>
+<ul>
+	<li><code>daycls</code> - neat output of <code>raw.dat</code>. Also shows percentage change from previous day. 
+		If the change is less than -10%, it output <code>GAP-T</code> instead of <code>GAP-F</code>. It can therefore be used to spot gap downs</li>
+
+	<li><code>h5get</code> - downloads a decade's worth of data on a share into a file called <code>raw.dat</code>. </li>
+	
+	<li><code>h5get-active</code> - performs <code>h5get</code> on all symbols listed in <code>~/.fortran/settings/active</code></li>
+
+
+	<li><code>hi52w</code> -  price vs 52w high - <b>contains good Fortran code on reading raw.dat</b>. Use it to spot
+		52w highs by grepping for <code>HI-T</code></li>
+
+</ul>
   </body>
 </html>
