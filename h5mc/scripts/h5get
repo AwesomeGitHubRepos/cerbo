@@ -3,6 +3,7 @@
 source h5utils.sh
 
 SYM=`basename $PWD`
+FILE=raw.dat
 
 function print_help () {
 cat << EOF
