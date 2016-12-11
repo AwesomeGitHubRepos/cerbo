@@ -33,7 +33,7 @@ program daycls
   do i = 2, n
         pcchg = 100*(raws(i)%cls / raws(i-1)%cls-1)
         write(*, fmt="(A10, X, F10.2, X, F6.2)", advance="no") raws(i)%dstamp, raws(i)%cls, pcchg
-        write(*, fmt="(X, A4, L)") "GAP-", (pcchg < -10)
+        write(*, fmt="(X, A4, L, X, A4, L)") "GUP_", (pcchg > 10), "GDN_", (pcchg < -10)
   enddo
 
 
