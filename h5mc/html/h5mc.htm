@@ -29,6 +29,19 @@
 </ol>
 
 
+Queries are probably best written in R using <code>sqldf</code>. for example:
+<pre>
+#!/usr/bin/env Rscript
+# install.packages(&quot;sqldf&quot;)
+library(&quot;sqldf&quot;)
+df &lt;- read.csv(&quot;StatsList-1.csv&quot;, header = TRUE)
+df2 &lt;- sqldf(&quot;select df.EPIC, df.RS_Year , df.RS_5Year, df.Sector from df
+             where  df.RS_Year&gt;0 and df.RS_5Year &lt; 0
+             order by df.RS_5Year&quot;)
+print(df2)
+
+</pre>
+
 <hr><h2>tickers</h2>
 <ul>
 	<li><code>daycls</code> - neat output of <code>raw.dat</code>. Also shows percentage change from previous day. 
