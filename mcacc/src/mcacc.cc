@@ -101,7 +101,8 @@ void preprocess(const char* command)
 }
 
 
-int main(int argc, char *argv[])
+int 
+main(int argc, char *argv[])
 {
 	feenableexcept(FE_OVERFLOW);
 	const vm_t vm = parse_args(argc, argv);

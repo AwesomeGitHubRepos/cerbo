@@ -17,5 +17,6 @@ mcacc_SOURCES = args.cc \
 		posts.cc \
 		show.cc stend.cc \
 		tests.cc types.cc \
+		uprice.cc \
 		wiegley.cc \
 		yahoo.cc yproc.cc
