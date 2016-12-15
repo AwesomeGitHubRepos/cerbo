@@ -2,4 +2,5 @@
 
 psql beancounter <<EOF
 \i hi52w.sql
+\i qat.sql
 EOF

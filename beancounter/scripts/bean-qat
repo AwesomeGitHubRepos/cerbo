@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+function print_help {
+cat <<EOF
+print stock quantities
+-d YYYY-MM-DD at a given date (default is today)
+-h this help
+EOF
+}
+
+DSTAMP=`date --iso`
+
+function doit {
+#	psql beancounter -c "SELECT * from qat($DSTAMP);"
+#psql -d beancounter -c "SELECT  * from qat('3000-12-12');"
+psql -d beancounter -c "SELECT  * from qat('$DSTAMP');" | egrep -v " 0$"
+}
+
+while getopts "d:h" arg; do
+	case $arg in
+		d) DSTAMP=$OPTARG ;;
+		h) print_help ; exit 0 ;;
+		*) echo "Couldn't understand arg: $arg" ;;
+	esac
+done
+
+
+doit
