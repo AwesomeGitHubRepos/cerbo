@@ -14,7 +14,7 @@ mcacc_SOURCES = args.cc \
 		mcacc.cc \
 		nacc.cc \
 		oven.cc \
-		posts.cc \
+		pgposts.cc posts.cc \
 		show.cc stend.cc \
 		tests.cc types.cc \
 		uprice.cc \
