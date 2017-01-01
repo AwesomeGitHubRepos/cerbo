@@ -28,7 +28,7 @@ AC_CONFIG_FILES([Makefile \
 		 beancounter/scripts/Makefile \
 		 green/Makefile menu/Makefile text2pdf/Makefile \
 		 shlex/Makefile \
-		 mcacc/scripts/Makefile mcacc/src/Makefile \
+		 mcacc/Makefile \
 		 h5mc/src/Makefile h5mc/scripts/Makefile \
 		 splut/Makefile stats/Makefile])
 AC_OUTPUT

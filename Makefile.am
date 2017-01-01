@@ -8,7 +8,7 @@ libsupo_la_SOURCES = supo.cc supo_general.cc supo_parse.cc supo_stats.cc
 
 
 SUBDIRS = . beancounter/scripts green text2pdf shlex \
-	  mcacc/scripts mcacc/src  \
+	  mcacc  \
 	  h5mc/src h5mc/scripts menu \
 	  splut stats
 
