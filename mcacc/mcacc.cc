@@ -128,7 +128,7 @@ main(int argc, char *argv[])
 	if(vm.at("snap") == "on") ove.fetch();
 	ove.process(do_wiegley);
 
-	supo::ssystem("mcacc-reports.sh", true);
+	//supo::ssystem("mcacc-reports.sh", true);
 	if(vm.count("show") > 0) show(vm.at("show"));
 	return EXIT_SUCCESS;
 }
