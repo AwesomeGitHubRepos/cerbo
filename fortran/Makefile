@@ -3,8 +3,7 @@ COPTS=-g -fcheck=all -fbacktrace
 
 .PHONY : all clean
 
-all : maff.mod test
-	echo made all
+all : linreg
 
 clean :
 	rm -f *~ *.o *.mod *.exe examples *.stackdump
@@ -26,6 +25,9 @@ ex03 : ex03.f90 maff.f90 maff.mod
 
 hdf5ex: hdf5ex.f90
 	h5fc $(COPTS) $< -o $@
+
+linreg : linreg.f90
+	gfortran $< -o $@
 
 y2nc : y2nc.f90
 	gfortran $< -o $@ -I/usr/include  -lnetcdff
