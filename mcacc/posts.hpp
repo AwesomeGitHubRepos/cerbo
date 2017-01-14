@@ -21,7 +21,9 @@ typedef std::vector<post_t> post_ts;
 //post_ts posts_main(const inputs_t& inputs, const detran_cs& augetrans);
 //post_ts posts_main(const inputs_t& inputs, const folio_cs& folios);
 //post_ts posts_main(const ntran_ts ntrans, const folio_cs& folios, const period& perd);
-post_ts posts_main(const nacc_ts& naccs, const ntran_ts& ntrans, 
-		const folio_cs& folios, const period& perd);
+//post_ts posts_main(const nacc_ts& naccs, const ntran_ts& ntrans, 
+//		const folio_cs& folios, const period& perd);
 
+post_ts posts_main(const inputs_t& inputs, 
+		const folio_cs& folios, const period& perd);
 bool operator<(const post_t& a, const post_t& b);

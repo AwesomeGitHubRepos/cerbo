@@ -50,13 +50,31 @@ void push_fpost(post_ts& ps, const string& acc, const string& desc,
 }
 
 //post_ts posts_main(const inputs_t& inputs, const folio_cs& folios)
-post_ts posts_main(const nacc_ts& naccs, const ntran_ts& ntrans, 
+//post_ts posts_main(const nacc_ts& naccs, const ntran_ts& ntrans, 
+//		const folio_cs& folios, const period& perd)
+post_ts posts_main(const inputs_t& inputs, 
 		const folio_cs& folios, const period& perd)
 {
 
+	ntran_ts ns = inputs.ntrans;	
+	for(const auto& e: inputs.etrans) {
+		ntran_t n;
+		//etran_c& e = ae.etran;
+		n.dstamp = e.dstamp;
+
+		n.dr = e.folio + "_c"; 
+		n.cr = e.folio ;
+		//if(e.buy) n.dr += "_c";
+		//else      n.cr += "_c";
+
+		n.amount = e.cost;
+		n.desc = "pCost:" + e.ticker;
+
+		ns.push_back(n);
+	}
+
 	post_ts ps;
-	
-	for(auto& n:ntrans) {
+	for(auto& n:ns) {
 		if(n.dstamp > perd.end_date) continue;
 		if(n.amount.zerop()) continue;
 
@@ -65,8 +83,8 @@ post_ts posts_main(const nacc_ts& naccs, const ntran_ts& ntrans,
 		p.dr = n.dr;
 		p.cr = n.cr;
 		if(n.dstamp < perd.start_date) {
-			p.dr = naccs.at(p.dr).alt;
-			p.cr = naccs.at(p.cr).alt;
+			p.dr = inputs.naccs.at(p.dr).alt;
+			p.cr = inputs.naccs.at(p.cr).alt;
 		}
 		p.amount = n.amount;
 		p.desc = n.desc;
@@ -95,6 +113,7 @@ post_ts posts_main(const nacc_ts& naccs, const ntran_ts& ntrans,
 		push_fpost(ps, "opn",           "pPbd",  -1, f.pbd);
 		push_fpost(ps, f.m_name + "_c", "pPcd",   1, f.pdp + f.pbd);
 	}
+
 
 	/*
 	for(const auto& ae: augetrans) {

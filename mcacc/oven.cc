@@ -47,7 +47,8 @@ void oven::process(bool do_wiegley)
 	const detran_cs augetrans = eaug_main(inps.etrans, stends,
 			perd);
 	const folio_cs folios = epics_main(augetrans, stends);
-	const post_ts posts = posts_main(inps.naccs, inps.ntrans, folios, perd);
+	//const post_ts posts = posts_main(inps.naccs, inps.ntrans, folios, perd);
+	const post_ts posts = posts_main(inps, folios, perd);
 	etb_main(user_inputs.naccs, posts);
 	gaap_main(inps.naccs, perd);
 	cgt(inps.etrans, perd);
