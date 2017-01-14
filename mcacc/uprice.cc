@@ -25,9 +25,11 @@ mkuprices(const detran_cs& the_etrans)
 	ofs.open(fname.c_str(), ofstream::out);
 	for(const auto& e:the_etrans) {
 		const etran_c &e1 = e.etran;
-		//string uprice = format_num(
-		strings fields = strings {  pad_right(e1.ticker, 7) , e1.dstamp, e.ucost.str(), e1.buystr() };
-		ofs << intercalate(" ", fields) << endl;
+		strings fields = strings {  
+			supo::pad_right(e1.ticker, 7), 
+				e1.dstamp, e.ucost.str(), e1.buystr() 
+		};
+		ofs << supo::intercalate(" ", fields) << endl;
 	}
 	ofs.close();
 

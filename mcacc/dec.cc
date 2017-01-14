@@ -4,7 +4,7 @@
 using namespace std::decimal;
 
 std::decimal::decimal128 dbl_to_dec(double d, int dp) { 
-	double d1 = bround(d * pow(10, dp));
+	double d1 = supo::bround(d * pow(10, dp));
 	return std::decimal::make_decimal128((long long)d1, -dp); 
 }
 

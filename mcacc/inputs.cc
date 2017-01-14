@@ -12,8 +12,9 @@
 #include "inputs.hpp"
 
 using namespace std;
-using namespace supo;
+//using namespace supo;
 
+// TODO possibly parse functions no longer necessary
 namespace parse {
 
 typedef struct lexer_t {
@@ -196,7 +197,6 @@ void insert_etran_1(inputs_t& inputs, const strings& fields)
 	y.desc = "synthasised from etran";
 	inputs.yahoos.insert(y);
 
-	// TODO NOW insert an ntran
 }
 
 etran_c mkleak_1(const strings& fields)
@@ -236,7 +236,7 @@ void
 insert_ntran(inputs_t& inputs, const strings& fields)
 {
 	const ntran_t n = mkntran(fields);
-	inputs.ntrans.push_back(n); // TODO HIGH - correct insertion order?
+	inputs.ntrans.push_back(n); 
 }
 
 /*
@@ -339,33 +339,8 @@ read_csv_inputs(const string fname,
 	}
 	ifs.close();
 }
-void
-read_inputs_1(inputs_t& inputs)
-{
-	//string fname = s2("comm-1.csv");
 
-	struct csv_t {
-		string fname;
-		int num_fields;
-		infunc f;
-	};
 
-	const vector<csv_t> csvs = {
-		{"comm-1.csv", 5, insert_comm},
-		{"etran-1.csv", 8, insert_etran_1},
-		{"leak-1.csv", 6, insert_leak_1},
-		{"nacc.csv",   5, insert_nacc},
-		{"ntran.csv", 5, insert_ntran},
-		{"period.csv", 2, set_period},
-		{"yahoo-1.csv", 9, insert_yahoo_1}
-	};
-
-	for(const auto& c: csvs)
-		read_csv_inputs(c.fname, c.num_fields, c.f, inputs);
-
-}
-
-// TODO deprecate
 inputs_t read_inputs()
 {
 	inputs_t inputs;
@@ -410,7 +385,25 @@ inputs_t read_inputs()
 
 	//assert(has_ticker(inputs.yahoos, "KCOM.L"));
 	*/
-	read_inputs_1(inputs);
+	//read_inputs_1(inputs);
+	struct csv_t {
+		string fname;
+		int num_fields;
+		infunc f;
+	};
+
+	const vector<csv_t> csvs = {
+		{"comm-1.csv",  5, insert_comm},
+		{"etran-1.csv", 8, insert_etran_1},
+		{"leak-1.csv",  6, insert_leak_1},
+		{"nacc.csv",    5, insert_nacc},
+		{"ntran.csv",   5, insert_ntran},
+		{"period.csv",  2, set_period},
+		{"yahoo-1.csv", 9, insert_yahoo_1}
+	};
+
+	for(const auto& c: csvs)
+		read_csv_inputs(c.fname, c.num_fields, c.f, inputs);
 	return inputs;
 
 }
