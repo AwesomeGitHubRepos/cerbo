@@ -1,8 +1,11 @@
 #include <cstring>
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <string>
 #include <stdlib.h>
+#include <sstream>
+#include <stdexcept>
 
 #include "common.hpp"
 #include <supo_general.hpp>
@@ -127,63 +130,116 @@ vecvec_t vecvec(const char *fname)
 } // namespace parse
 
 
-void insert_nacc(nacc_ts& ns, const strings& fields)
+typedef std::function<void(inputs_t&, const strings&)> infunc;
+
+void insert_nacc(inputs_t& inputs, const strings& fields)
 {	
 	nacc_t n;
-	n.acc = fields[2];
-	n.alt = fields[3];
-	n.typ = fields[4];
-	n.scale = stod(fields[5]);
-	n.desc = fields[5];
+	constexpr int base = 0;
+	n.acc = fields[base];
+	n.alt = fields[base+1];
+	n.typ = fields[base+2];
+	n.scale = stod(fields[base+3]);
+	n.desc = fields[base+4];
+	nacc_ts& ns = inputs.naccs;
 	ns[n.acc] = n;
 }
 
 
-void insert_comm(comm_ts& cs, const strings& fields)
+//void insert_comm(comm_ts& cs, const strings& fields)
+void insert_comm(inputs_t& inputs, const strings& fields)
 {
 	comm_t c;
-	c.ticker = fields[2];
-	c.down =fields[3];
-	c.typ =fields[4];
-	c.unit = fields[5];
-	c.desc = fields[6];
+	constexpr int base = 0;
+	c.ticker = fields[base];
+	c.down =fields[base+1];
+	c.typ =fields[base+2];
+	c.unit = fields[base+3];
+	c.desc = fields[base+4];
+	comm_ts& cs = inputs.comms;
 	cs[c.ticker] = c;
 }
 
 etran_c mketran(const strings& fields)
 {
 	etran_c e;
-	e.taxable = fields[8] == "T";
-	e.dstamp = fields[1];
-	e.sgn = fields[7] =="B"? 1 : -1;
+	constexpr int base = 0;
+	e.dstamp = fields[base];
+	e.folio = fields[base+1];
+	e.ticker = fields[base+2];
+	
+	e.sgn = fields[base+5] =="B"? 1 : -1;
+	e.qty.from_str(e.sgn, fields[base+3]);
+	e.cost.from_str(e.sgn, fields[base+4]);
+
+	e.taxable = fields[base+6] == "T";
 	e.buy = e.sgn == 1;
-	e.folio = fields[2];
-	e.ticker = fields[3];
-	e.qty.from_str(e.sgn, fields[5]);
-	e.cost.from_str(e.sgn, fields[6]);
 	e.typ = regular;
 	return e;
 }
 
+void insert_etran_1(inputs_t& inputs, const strings& fields)
+{
+	const etran_c e = mketran(fields);
+	inputs.etrans.insert(e);
+
+	// insert a synthesised etran
+	yahoo_t y;
+	y.dstamp = e.dstamp;
+	y.tstamp = "12:00:00";
+	y.ticker = e.ticker;
+	const price p = e.cost / e.qty;
+	y.yprice = p;
+	y.chg = price();
+	y.chgpc = 0;
+	y.currency = "P"; // TODO LOW
+	y.desc = "synthasised from etran";
+	inputs.yahoos.insert(y);
+
+	// TODO NOW insert an ntran
+}
+
 etran_c mkleak_1(const strings& fields)
 {
-	etran_c e = mketran(fields);
+	etran_c e;
+	//	= mketran(fields);
+	e.dstamp = fields[0];
+	e.folio = fields[1];
+	e.ticker = fields[2];
+	e.sgn = -1;
+	e.qty.from_str(e.sgn, fields[3]);
+	// e.cost I think we can ignore
+	e.taxable = fields[4] == "T";
 	e.buy = false;
 	e.typ = leak;
 	return e;
 }
-
+void
+insert_leak_1(inputs_t& inputs, const strings& fields)
+{
+	const etran_c e = mkleak_1(fields);
+	inputs.etrans.insert(e);
+}
 ntran_t mkntran(const strings& fields)
 {
 	ntran_t n;
-	n.dstamp=fields[1];
-	n.dr=fields[2];
-	n.cr=fields[3];
-	n.amount.from_str(fields[6]);
-	n.desc=fields[9];
+	constexpr int base = 0;
+	n.dstamp=fields[base];
+	n.dr=fields[base+1];
+	n.cr=fields[base+2];
+	n.amount.from_str(fields[base+3]);
+	n.desc=fields[base+4];
 	return n;
 }
 
+void
+insert_ntran(inputs_t& inputs, const strings& fields)
+{
+	const ntran_t n = mkntran(fields);
+	inputs.ntrans.push_back(n); // TODO HIGH - correct insertion order?
+}
+
+/*
 void insert_LVL03(inputs_t& inputs, const strings& fields)
 {
 	string subtype = fields[4];
@@ -199,30 +255,36 @@ void insert_LVL03(inputs_t& inputs, const strings& fields)
 		exit(EXIT_FAILURE);
 	}
 }
+*/
 
-yahoo_t make_yahoo(inputs_t& inputs, const strings& fields)
+void
+insert_yahoo_1(inputs_t& inputs, const strings& fields)
 {
 	yahoo_t y;
-	y.dstamp = fields[2];
-	y.tstamp = fields[3];
-	y.ticker = fields[4];
+	constexpr int base = 0;
+	y.dstamp = fields[base];
+	y.tstamp = fields[base+1];
+	y.ticker = fields[base+2];
 	//y.rox = stod(fields[5]);
-	y.yprice.from_str(fields[6]);
-	y.chg.from_str(fields[7]);
-	y.chgpc = stod(fields[8]);
-	y.currency = fields[9];
-	y.desc = fields[10];
-	return y;
+	y.yprice.from_str(fields[base+4]);
+	y.chg.from_str(fields[base+5]);
+	y.chgpc = stod(fields[base+6]);
+	y.currency = fields[base+7];
+	y.desc = fields[base+8];
+	inputs.yahoos.insert(y);
+	//return y;
 
 }
 
-
-void insert_yahoo(const yahoo_t& y, inputs_t& inputs)
+/*
+void 
+insert_yahoo(const yahoo_t& y, inputs_t& inputs)
 {
 	inputs.yahoos.insert(y);
 }
+*/
 
-
+/*
 void insert_LVL05(inputs_t& inputs, const strings& fields)
 {
 	string subtype = fields[1];
@@ -240,17 +302,74 @@ void insert_LVL05(inputs_t& inputs, const strings& fields)
 
 	insert_yahoo(y, inputs);
 }
+*/
 
 void set_period(inputs_t& inputs, const strings& fields)
 {
-	inputs.p.start_date = fields[2];
-	inputs.p.end_date = fields[3];
+	constexpr int base = 0;
+	inputs.p.start_date = fields[base];
+	inputs.p.end_date = fields[base+1];
 }
 
+void
+read_csv_inputs(const string fname, 
+		const int num_fields,
+		infunc func,
+		inputs_t& inputs)
+{
+	const string fname1 = s2(fname);
+	ifstream ifs(fname1);
+	string line;
+	while(getline(ifs, line)) {
+		stringstream ss(line);
+		string cell;
+		strings row;
+		while(getline(ss, cell, ','))
+			row.push_back(cell);
+		if(num_fields != row.size()) {
+			string msg = "Error in input:`" + line + "'.\n"
+				+ "Expected " + to_string(num_fields)
+			       	+ " fields, got "
+				+ to_string(row.size());
+			throw std::range_error(msg);
+
+		}
+		func(inputs, row);
+		//cout << line << endl;
+	}
+	ifs.close();
+}
+void
+read_inputs_1(inputs_t& inputs)
+{
+	//string fname = s2("comm-1.csv");
+
+	struct csv_t {
+		string fname;
+		int num_fields;
+		infunc f;
+	};
+
+	const vector<csv_t> csvs = {
+		{"comm-1.csv", 5, insert_comm},
+		{"etran-1.csv", 8, insert_etran_1},
+		{"leak-1.csv", 6, insert_leak_1},
+		{"nacc.csv",   5, insert_nacc},
+		{"ntran.csv", 5, insert_ntran},
+		{"period.csv", 2, set_period},
+		{"yahoo-1.csv", 9, insert_yahoo_1}
+	};
+
+	for(const auto& c: csvs)
+		read_csv_inputs(c.fname, c.num_fields, c.f, inputs);
+
+}
+
+// TODO deprecate
 inputs_t read_inputs()
 {
 	inputs_t inputs;
-
+/*
 	string fname;
 	s1("derive-1.txt", fname);
 	vecvec_t mat = parse::vecvec(fname);
@@ -264,19 +383,24 @@ inputs_t read_inputs()
 				// these are just notes, so we can ignore them
 				break;
 			case 1: // LVL01
-				insert_nacc(inputs.naccs, row);
+				// superceded by read_inputs_1()
+				//insert_nacc(inputs.naccs, row);
 				break;
 			case 2: // LVL02
-				insert_comm(inputs.comms, row);
+				// superceded by read_inputs_1()
+				//insert_comm(inputs.comms, row);
 				break;
 			case 3: // LVL03
-				insert_LVL03(inputs, row);
+				// superceded by read_inputs_1()
+				//insert_LVL03(inputs, row);
 				break;
 			case 4: // LVL04
-				set_period(inputs, row);
+				// superceded by read_inputs_1()
+				//set_period(inputs, row);
 				break;
 			case 5: // LVL05
-				insert_LVL05(inputs, row);
+				// superceded by read_inputs_1()
+				//insert_LVL05(inputs, row);
 				break;
 			default:
 				cerr << "Unhandled level number " << level << " in inputs.cc/read_inputs()\n";
@@ -285,6 +409,9 @@ inputs_t read_inputs()
 	}
 
 	//assert(has_ticker(inputs.yahoos, "KCOM.L"));
+	*/
+	read_inputs_1(inputs);
 	return inputs;
 
 }
+

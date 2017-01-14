@@ -53,14 +53,14 @@ void download(const comm_ts& the_comms, downloads_t& ds)
 /* Create a yahoo cache file */
 void mkyahoos(downloads_t& ds)
 {
-	string yout_name = rootdir() + "/yahoo/" + ds.dstamp + ".txt";
+	string yout_name = rootdir() + "/yahoo-1/" + ds.dstamp + ".txt";
 	ofstream yout;
 	yout.open(yout_name);
 	for(auto& y: ds.ys){
 		string chgpc = format_num(y.chgpc, 2);
-		strings fields = {"yahoo", ds.dstamp, ds.tstamp, 
+		strings fields = {"yahoo-1", ds.dstamp, ds.tstamp, 
 			y.ticker, "1.0000", y.yprice.str(), 
-			y.chg.str(), chgpc, "P"};
+			y.chg.str(), chgpc, "P", "downloaded"};
 		yout << intercalate("\t", fields);
 		yout << endl;
 	}

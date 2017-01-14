@@ -67,6 +67,7 @@ void sn(int n, const char *name, string &outname)
 void s1(const char *name, string &outname) { sn(1, name, outname);}
 void s2(const char *name, string &outname) { sn(2, name, outname);}
 void s3(const char *name, string &outname) { sn(3, name, outname);}
+std::string s2(const std::string& name) { string outname; s2(name.c_str(), outname); return outname; }
 std::string s3(const std::string& name) { string outname; s3(name.c_str(), outname); return outname; }
 
 typedef map<string, vector<string> > msvs_t;
