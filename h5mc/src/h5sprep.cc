@@ -41,6 +41,7 @@ typedef struct {
 	strings cooked_hdr_fields;
 	strmat  datamat;
 	mat_c mat;
+	mat_c matq; // possibly quotes
 	int nrows;
 	int ncols;
 } tbl_s;
@@ -78,12 +79,27 @@ read_bad_csv()
 
 	//string mat[tbl.nrows][tbl.ncols];
 	tbl.mat = mat_c(tbl.nrows, tbl.ncols);
+	tbl.matq = mat_c(tbl.nrows, tbl.ncols);
 	for(c=0; c< tbl.ncols; ++c){
 		for(r=0; r<tbl.nrows; ++r){
-			string s = tbl.datamat.at(r).at(c);
-			s = trim(s, " \r\t\n\"");
-			if(s.size() ==0) s = "nan";
-			tbl.mat.set(r, c,  s);
+			string s1 = tbl.datamat.at(r).at(c);
+			string s2 = trim(s1, " \r\t\n\"");
+
+			// just unquoted
+			string s3 = s2;
+			if(s2.size() ==0) s3 = "nan";
+			tbl.mat.set(r, c,  s3);
+
+			// possibly quoted
+			string s4 = s2;
+			string dq = "\"";
+			//string s0 = s1.substr(0, 1);
+			if(s2.size() == 0) {
+				s4 = "\"nan\"";
+			} else if (s1.substr(0, 1) == dq) {			
+				s4 = "\"" + s4 + "\"";
+			}
+			tbl.matq.set(r, c, s4);
 		}
 	}
 
@@ -154,6 +170,63 @@ create_columns(const tbl_s& tbl)
 	}
 }
 
+
+void
+make_oleo(const tbl_s& tbl)
+{
+
+	ofstream ofs = get_out("StatsList.oleo");
+
+	string hdr = R"(# This file was created by h5sprep
+# format 2.1 (requires Oleo 1.99.9 or higher)
+F;DGFL8
+O;auto;background;noa0;ticks 1
+)";
+	ofs << hdr;
+
+	int nc = tbl.ncols-1;
+	int nr = tbl.nrows-1;
+	for(int c=0; c<nr; ++c) {
+		ofs << "C;c" << c+1 << ";r1;K\"" 
+			<< tbl.cooked_hdr_fields[c] << "\"\n";
+		for(int r=0; r<nr; ++r) {
+			ofs << "C;";
+			ofs << "r" << r+2 << ";K";
+			ofs << tbl.matq.get(r, c) << "\n";
+		}
+	}
+
+	string foot = R"(O;status 2
+W;N1;A5 1;C7 0 7;Ostandout
+GDx""
+GDy""
+Gt0
+Gt1
+Gt2
+Gt3
+Gt4
+Gt5
+Gt6
+Gt7
+Gt8
+Gt9
+Gr000.000000
+Gr010.000000
+Gr100.000000
+Gr110.000000
+Ga01
+Ga11
+Go0
+Gm00(null)
+Gm10(null)
+Dn
+Dh
+Du
+E
+)";
+	ofs << foot;
+	ofs.close();
+}
 int main()
 {
 	tbl_s tbl = read_bad_csv();
@@ -161,6 +234,7 @@ int main()
 	make_recfile(tbl);
 	make_cooked_csv(tbl);
 	create_columns(tbl);
+	make_oleo(tbl);
 
 	return 0;
 }

@@ -22,13 +22,18 @@
 <hr><h2>StatsList workflow</h2>
 
 <ol>
-	<li><code>h5sprep</code> - creates StatsList-1.csv and StatsList.rec,
+	<li><code>h5sprep</code> - creates 
+		<ul>
+			<li>StatsList-1.csv</li>
+			<li>StatsList.oleo</li>
+			<li>StatsList.rec</li>
+		</ul>
 		clears and repopulates the cols dir
 		(for recutils. Prefixes <code>F.</code> are removed in 
 		all cases (applies to F.EPIC, F.Sector, F.Sub_Sector)</li>
 </ol>
 
-
+<p>
 Queries are probably best written in R using <code>sqldf</code>. for example:
 <pre>
 #!/usr/bin/env Rscript
@@ -41,6 +46,7 @@ df2 &lt;- sqldf(&quot;select df.EPIC, df.RS_Year , df.RS_5Year, df.Sector from d
 print(df2)
 
 </pre>
+</p>
 
 <hr><h2>tickers</h2>
 <ul>
