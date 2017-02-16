@@ -29,8 +29,6 @@ class mat_c {
 
 mat_c::mat_c(int nrows, int ncols) : m_rows(nrows), m_cols(ncols)
 {
-	//m_rows = nrows;
-	//m_cols = ncols;
 	m_mat.resize(nrows*ncols);
 	//cout << "num cells: " << m_rows << "x" << m_cols << ": " <<m_mat.size() << endl;
 }
@@ -171,6 +169,21 @@ create_columns(const tbl_s& tbl)
 }
 
 
+/* convert ints to floats for oleo */
+string
+fmt_oleo_val(const string& sin)
+{
+	// if it's a string, then no conversion necessary
+	if(sin.substr(0,1) == "\"") return sin;
+
+
+	bool is_float = sin.find('.') != string::npos;
+	if(is_float) return sin;
+
+	// we have an integer, so make it into a float
+	return sin + ".0";
+}
+
 void
 make_oleo(const tbl_s& tbl)
 {
@@ -179,7 +192,8 @@ make_oleo(const tbl_s& tbl)
 
 	string hdr = R"(# This file was created by h5sprep
 # format 2.1 (requires Oleo 1.99.9 or higher)
-F;DGFL8
+F;DG2R8
+#F;DGFL8 this is the original form
 O;auto;background;noa0;ticks 1
 )";
 	ofs << hdr;
@@ -192,7 +206,7 @@ O;auto;background;noa0;ticks 1
 		for(int r=0; r<nr; ++r) {
 			ofs << "C;";
 			ofs << "r" << r+2 << ";K";
-			ofs << tbl.matq.get(r, c) << "\n";
+			ofs << fmt_oleo_val(tbl.matq.get(r, c)) << "\n";
 		}
 	}
 
