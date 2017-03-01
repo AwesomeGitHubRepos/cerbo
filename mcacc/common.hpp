@@ -16,6 +16,7 @@ void sn(int n, const char *name, std::string &outname);
 void s1(const char *name, std::string &outname);
 void s2(const char *name, std::string &outname);
 void s3(const char *name, std::string &outname);
+std::string s0(const std::string &name);
 std::string s2(const std::string &name);
 std::string s3(const std::string &name);
 
