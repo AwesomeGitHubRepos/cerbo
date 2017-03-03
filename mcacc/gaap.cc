@@ -204,9 +204,12 @@ void gaap_main(const nacc_ts& the_naccs, const period& per)
 
 
 	section inco = section("Income").adds({"div", "int", "wag"}).total1();
-	section exps = section("Expenses").adds( {"amz", "car", "chr", "cmp", "hol", "isp", "msc", "mum"}).total1();
-	section mygains = section("Folio Gain").adds( {"hal_g", "hl_g", "igg_g", "tdi_g", "tdn_g"}).total1();
-	section balcd = section("Bal c/d").add(inco).add(exps).running("Ord profit")
+	section exps = section("Expenses") .adds( {"amz", "car", "chr", 
+			"cmp", "hol", "isp", "msc", "mum"}).total1();
+	section mygains = section("Folio Gain").adds( {"hal_g", "hl_g", 
+			"igg_g", "tdi_g", "tdn_g"}).total1();
+	section balcd = section("Bal c/d").add(inco).add(exps)
+		.running("Ord profit")
 		.add("tax").add(mygains).add("ut_g").running("Net Profit")
 		.add("opn").total1();
 	section folio = section("Folio")
@@ -215,7 +218,8 @@ void gaap_main(const nacc_ts& the_naccs, const period& per)
 		.add("ut_c").total1();
 
 	section nass = section("Net Assets")
-		.adds( {"hal", "hl", "igg", "ut", "rbs", "rbd", "sus", "tdi", "tdn", "tds", "vis"})
+		.adds( {"hal", "hl", "igg", "ut", "rbs", "rbd", "sus", 
+				"tdi", "tdn", "tds", "vis"})
 		.running("Cash equiv")
 		.add(folio)
 		.add("msa").total1();
