@@ -39,8 +39,8 @@ string mkrow(const etran_c& e)
 
 void cgt(const etran_cs& es, const period &per)
 {
-	string fname;
-	s3("cgt-1.rep", fname);
+	// TODO can file opening like this be refactored into a common lib?
+	string fname = s3("cgt-1.rep");
 	ofstream sout;
 	sout.open(fname);
 

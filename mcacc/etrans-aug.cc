@@ -97,13 +97,12 @@ detran_cs eaug_main(const etran_cs& etrans, const stend_ts& stends,
 {
 	detran_cs augs;
 
-	string fname;
 	for(auto& e:etrans) 
 		if(e.dstamp <= per.end_date)
 			augs.push_back(augment(e, stends, per));
 
 	// save
-	s3("etrans-aug.rec", fname);
+	string fname = s3("etrans-aug.rec");
 	ofstream ofs;
 	ofs.open(fname);
 	for(auto& e:augs) write_augetran(ofs, e);

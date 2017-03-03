@@ -69,8 +69,7 @@ stend_ts stend_main(const yahoo_ts& yahoos, const period& per)
 	}
 
 	ofstream ofs;
-	string fname;
-	s3("stend.dsv", fname);
+	string fname = s3("stend.dsv");
 	ofs.open(fname);
 	for(auto& s1:stends) {
 		stend s = s1.second;

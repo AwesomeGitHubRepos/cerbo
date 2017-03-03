@@ -3,9 +3,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-//#include <boost/filesystem.hpp>
-//namespace fsys = boost::filesystem;
-
 #include "common.hpp"
 #include <supo_general.hpp>
 
@@ -57,13 +54,12 @@ std::string sndir(int n)
 }
 
 // create a filename that is based in the stage N directory
-void sn(int n, const char *name, string &outname) 
+std::string sn(int n, const std::string& name) 
 {
-	//outname = workdir();
-	//outname +=  "/s" +  to_string(n)  + "/" + name;
-	outname = sndir(n) + "/" + name;
+	return sndir(n) + "/" + name;
 }
 
+/*
 void s0(const char *name, string &outname) { sn(0, name, outname);}
 void s1(const char *name, string &outname) { sn(1, name, outname);}
 void s2(const char *name, string &outname) { sn(2, name, outname);}
@@ -71,8 +67,14 @@ void s3(const char *name, string &outname) { sn(3, name, outname);}
 std::string s0(const std::string& name) { string outname; s0(name.c_str(), outname); return outname; }
 std::string s2(const std::string& name) { string outname; s2(name.c_str(), outname); return outname; }
 std::string s3(const std::string& name) { string outname; s3(name.c_str(), outname); return outname; }
+*/
 
-typedef map<string, vector<string> > msvs_t;
+std::string s0(const std::string& name) { return sn(0, name); }
+std::string s1(const std::string& name) { return sn(1, name); }
+std::string s2(const std::string& name) { return sn(2, name); }
+std::string s3(const std::string& name) { return sn(3, name); }
+
+//typedef map<string, vector<string> > msvs_t;
 
 
 

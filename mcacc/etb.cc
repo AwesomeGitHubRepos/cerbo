@@ -26,9 +26,9 @@ void etb_main(nacc_ts& the_naccs, const post_ts& posts)
 	int total;
 
 	ofstream aout, eout;
-	s3("accs.rep", fname);
+	fname = s3("accs.rep");
 	aout.open(fname);
-	s3("etb.dsv", fname);
+	fname = s3("etb.dsv");
 	eout.open(fname);
 
 	set<string> keys;

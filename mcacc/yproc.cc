@@ -77,8 +77,7 @@ void write_fields(ofstream& ofs, const strings& values)
 
 void mksnap(const inputs_t& inps, const downloads_t& ds)
 {
-	string fname;
-	s3("snap.rep", fname); 
+	string fname = s3("snap.rep");
 	ofstream sout;
 	sout.open(fname, ofstream::out);
 

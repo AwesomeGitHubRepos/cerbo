@@ -10,6 +10,8 @@
 std::string rootdir();
 std::string workdir();
 std::string sndir(int n);
+
+/*
 // create a filename that is based in the stage N directory
 void sn(int n, const char *name, std::string &outname);
 
@@ -19,8 +21,15 @@ void s3(const char *name, std::string &outname);
 std::string s0(const std::string &name);
 std::string s2(const std::string &name);
 std::string s3(const std::string &name);
+*/
 
-typedef std::map<std::string, std::vector<std::string> > msvs_t;
+
+std::string sn(int n, const std::string& name);
+std::string s0(const std::string& name);
+std::string s1(const std::string& name);
+std::string s2(const std::string& name);
+std::string s3(const std::string& name);
+//typedef std::map<std::string, std::vector<std::string> > msvs_t;
 
 
 void conv(double& d, std::string s);
