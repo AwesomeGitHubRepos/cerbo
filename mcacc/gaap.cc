@@ -27,19 +27,18 @@ strings operator+(strings lhs, const strings& rhs)
 	return lhs;
 }
 
-
-/*
-strings& operator+=(const strings& rhs)
+strings operator+(strings lhs, const string& rhs)
 {
-	return *this;
+	lhs.push_back(rhs);
+	return lhs;
 }
-*/
 
-//void ul1(ostream* ofs) { (*ofs) << nchars(' ', 11) << nchars('-', 10) << endl;};
+strings& operator+=(strings& a, string b)
+{
+	a.push_back(b);
+	return a;
+}
 
-
-// both set by gaap_main()
-//ostream* m_ofs = nullptr;
 nacc_ts m_naccs;
 
 currency get_bal(string key)
@@ -50,41 +49,26 @@ currency get_bal(string key)
 		return currency();
 	}	
 
-	//return bal;
 }	
 
-/*
-void print_lie(const Lie& lie) 
-{ 
-	if(lie.oline) ul1(m_ofs);
-	emit(m_ofs, lie.desc, lie.amount);
-	if(lie.uline) ul1(m_ofs);
-}
-*/
 
+// TODO I'm sure we can do better than this:
 class section {
 	public:
 		struct Lie { 
 			string desc; 
 			currency amount; 
-			//bool oline = false ; 
-			//bool uline = false;
 		}; // line entry
 
 
 		strings the_lines;
-		void enline(string line) { the_lines.push_back(line + rmargin) ; } ;
-		//string ul1 = "           ----------";
-		//string ul2 = "           ==========";
+		void enline(string line) { the_lines += (line + rmargin) ; } ;
 		void underline1() { enline("           ---------- "); };
-		//void underline2() { the_lines.push_back("           =========="); };
 		void blank()      { enline("                     "); };
 
 
 		section(string desc) {
 			total_lie.desc = desc;
-			//total_lie.oline = true;
-			//total_lie.uline = true;
 		}
 
 		section add(string desc) {
@@ -123,7 +107,6 @@ class section {
 		section running(string desc) {
 			struct Lie lie = total_lie;
 			lie.desc = desc;
-			//lie.uline = false;
 			underline1();
 			lies.push_back(lie);
 			enline(get_lie(lie));
@@ -134,17 +117,6 @@ class section {
 		
 		strings lines() {
 			return the_lines;
-			/*
-			strings result;
-			for(auto & lie:lies) result.push_back(get_lie(lie));
-			//result.push_back(ul1);
-			//underline1();
-			result.push_back(get_lie(total_lie));
-			//result.push_back(ul1);
-			//underline1();
-
-			return result;
-			*/
 		}
 	
 
@@ -177,22 +149,12 @@ string section::get_lie(const struct Lie& lie)
 	return emit(lie.desc, lie.amount);
 }
 
-/*
-void subtotal(ostream* ofs, const string& title, currency& value)
-{ 
-	ul1(ofs); emit(ofs, title, value); 
-	ul1(ofs);
-	(*ofs) << endl;
-
-}
-*/
 
 strings period_hdr(const period& p)
 {
 	string s1 = pad_right("START", 11)  + p.start_date + rmargin + " ";
 	string s2 = pad_right("END", 11)  + p.end_date + rmargin + " ";
 	return strings {s1, s2, ""};
-		//nchars(' ', 11) << s << endl;
 }
 
 void write_gaap_files(const strings& lines)
@@ -258,8 +220,9 @@ void gaap_main(const nacc_ts& the_naccs, const period& per)
 		.add(folio)
 		.add("msa").total1();
 
-	//strings lines;
-	strings lines = period_hdr(per) + balcd.lines() + nass.lines() + inco.lines() +	exps.lines() + mygains.lines() + folio.lines();
+	strings lines = period_hdr(per) + balcd.lines() + nass.lines() 
+		+ inco.lines() + exps.lines() + mygains.lines() 
+		+ folio.lines();
 
 
 	write_gaap_files(lines);
