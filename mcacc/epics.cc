@@ -21,12 +21,6 @@ using namespace std::decimal;
 using namespace supo;
 
         
-/*
-bool operator<(const detran_c& lhs, const detran_c& rhs)
-{
-	return lhs.etran < rhs.etran;
-}
-*/
 
 detran_cs folio_c::filter(const detran_cs& es) const
 {
@@ -127,7 +121,11 @@ void print_indices(const stend_ts& stends, ostream &pout)
 currency sum(const detran_cs& es, std::function<currency (detran_c)> f)
 {
 	currency amount;
-	for(const auto& e:es) amount += f(e);
+	for(const auto& e:es) {
+		amount += f(e);
+		//cout << e.etran.ticker << " " << f(e) << " " << amount << endl;
+	}
+	//cout << endl;
 	return amount;
 }
 
