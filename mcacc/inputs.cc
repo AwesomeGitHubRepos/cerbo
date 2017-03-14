@@ -14,6 +14,7 @@
 using namespace std;
 //using namespace supo;
 
+/*
 // TODO possibly parse functions no longer necessary
 namespace parse {
 
@@ -129,7 +130,7 @@ vecvec_t vecvec(const char *fname)
 }
 
 } // namespace parse
-
+*/
 
 typedef std::function<void(inputs_t&, const strings&)> infunc;
 

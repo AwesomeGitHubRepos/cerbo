@@ -46,14 +46,14 @@ vm_t parse_args(int argc, char *argv[])
 	vm["snap"] = "off";
 	vm["wiegley"] = "off";
 
+	/*
 	vecvec_t ini_file = parse::vecvec(rootdir() + "/mcacc2.ini");
 	for(const auto& r: ini_file) {
 		if(r.size() !=2) continue;
 		vm[r[0]] = r[1];
-		//cout << r[0] << "=" << r[1] << endl;
 	}
+	*/
 
-        //options opts;
         int c;
         while(1) {
                 int this_option_optind = optind ? optind : 1;
@@ -100,9 +100,6 @@ vm_t parse_args(int argc, char *argv[])
                 printf("\n");
         }
 
-	//reinsert(vm, "a"s, "1"s);
-	//reinsert(vm, "a"s, "2"s);
-	//cout << vm["a"s] << endl;
 	return vm;
 }
 

@@ -64,12 +64,15 @@ bool operator==(strings lhs, strings rhs)
 		if(lhs[i] != rhs[i]) return false;
 	return true;
 }
+
+/*
 void check_tokeniser(std::string str, std::vector<std::string> strs)
 {
 	bool ok = parse::tokenise_line(str) == strs;
 	std::string msg = "tokenise_line() <" + str + ">";
 	check(ok, msg);
 }
+*/
 
 
 void check_decimals()
@@ -110,23 +113,6 @@ void check_decimals()
 
 }
 
-/*
-strings multi_split(const string& line, char c)
-{
-	strings result;
-	std::size_t prev = 0, pos;
-	while((pos = line.find_first_of(c, prev)) != std::string::npos)
-	{
-		if(pos>prev)
-			result.push_back(line.substr(prev, pos-prev));
-		prev = pos+1;
-	}
-	if (prev<line.length())
-		result.push_back(line.substr(prev, std::string::npos));
-	return result;
-
-}
-*/
 
 // TODO definitely reusable!
 string char_to_string(char c)
@@ -135,56 +121,6 @@ string char_to_string(char c)
 	return cstr;
 }
 
-/*
-strings tokenise_2(const string& line)
-{
-	constexpr char FS = 0x1C;
-	bool found_quote = false;
-
-	char* line_cs = (char *)line.c_str(); // potentially tricky, I guess
-	for(int i=0; i< line.size(); ++i){
-		char c = line[i];
-		if(c == '"') {
-			found_quote = true ;
-		       	line_cs[i] = FS;
-	       	}
-		if(found_quote) continue;
-		if(c == ' ' || c == '\t') line_cs[i] = FS;
-	}
-	
-	return multi_split(line, FS);
-}
-void check_tokeniser_2(const string& msg, const string& input, const strings& expected_result)
-{
-	strings strs = tokenise_2(input);
-	if(false) { // for debugging purposes
-		for(auto s:strs) cout << "[" << s << "] ";
-		cout << endl;
-	}
-
-	bool ok = strs == expected_result;
-	check(ok, msg);
-}
-void check_tokeniser_2_all()
-{
-	check_tokeniser_2("toke2-01", "  how   now brown cow",
-			{"how", "now", "brown", "cow"});
-	check_tokeniser_2("toke2-02", "how now    \"brown  cow\"",
-			{"how", "now", "brown  cow"});
-
-	string cow = "how now\t \"brown cow\"";
-	Timer time;
-	time.start();
-	for(int i =0; i<1000; ++i) parse::tokenise_line(cow);
-	time.stop();
-	cout << "Elapsed: " << time.nanos() << endl;
-	time.start();
-	for(int i =0; i<1000; ++i) tokenise_2(cow);
-	time.stop();
-	cout << "Elapsed: " << time.nanos() << endl;
-
-}
-*/
 
 void run_all_tests()
 {
@@ -193,11 +129,11 @@ void run_all_tests()
 	check_erase_all("alibaba", 'a', "libb");
 	check_erase_all("baad", 'a', "bd");
 
+	/*
 	check_tokeniser("hello world",  { "hello", "world" });
 	check_tokeniser("foo  \"baz shazam\"  bar", {"foo", "baz shazam", "bar"});
        	check_tokeniser("    hello  \"joe blogg\"  world   # just a comment   ", {"hello", "joe blogg", "world"});
 	check_tokeniser("this is \"tricky disco", {"this", "is", "tricky disco"});
-
+*/
 	check_decimals();
-	//check_tokeniser_2_all();
 }
