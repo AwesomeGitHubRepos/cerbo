@@ -1,4 +1,3 @@
-*    vim: syntax on
        identification division.
        program-id. esql.
 
@@ -8,8 +7,7 @@
            exec sql
        begin declare section
            end-exec.
-	01 THEBUFFER PIC X(1024).
-       01 hostvars.
+       01 HOSTVARS.
                05 BUFFER pic x(1024).
                05 the-deptno pic 9(4).
                05 the-dname pic x(15).
@@ -17,11 +15,6 @@
            exec sql
        end declare section
            end-exec.
-
-
-* 01 THEBUFFER pic x(1024).
-
-
 
 
 
@@ -38,9 +31,9 @@
       * example for DB specific ODBC parameter: 
       *   no compressed MySQL connection (would be the DEFAULT anyway)
       *         'COMRESSED_PROTO=0;'
-           INTO :THEBUFFER.
+           INTO BUFFER.
          EXEC SQL 
-           CONNECT TO :THEBUFFER
+           CONNECT TO :BUFFER
          END-EXEC.
          PERFORM SQLSTATE-CHECK.
 
