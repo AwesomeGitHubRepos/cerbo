@@ -7,6 +7,6 @@ AM_CXXFLAGS = -g -Wall -W
 # CXXFLAGS = -O2
 # EXTRA_DIST = OOREDESIGN
 
-LDADD = @CURSES_LIB@
+LDADD = -lncurses
 
 cdargs_SOURCES = cdargs.cc cdargs.h

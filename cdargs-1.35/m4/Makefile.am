@@ -1,1 +1,1 @@
-EXTRA_DIST = mp_with_curses.m4
+#EXTRA_DIST = mp_with_curses.m4
