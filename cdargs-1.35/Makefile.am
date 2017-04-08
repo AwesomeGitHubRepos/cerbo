@@ -1,2 +1,3 @@
 EXTRA_DIST = autogen.sh configure cdargs.spec cdargs.spec.in
-SUBDIRS = contrib doc src m4
+#SUBDIRS = contrib doc src m4
+SUBDIRS = src m4
