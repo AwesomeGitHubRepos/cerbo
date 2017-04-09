@@ -22,3 +22,10 @@ chmod 600 /swapfile
 mkswap /swapfile
 swapon /swapfile
 /etc/fstab: /swapfile none swap defaults 0 0
+
+# SBOPKG
+Download dir: /usr/cach/sbopkg
+
+# SLACKBUILDS
+Contains binary builds for many extras, inc keepassx, sshfs, qt5:
+http://www.slackware.com/~alien/slackbuilds
