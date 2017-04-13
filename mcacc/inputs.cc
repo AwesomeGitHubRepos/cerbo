@@ -1,136 +1,21 @@
+#include <cassert>
 #include <cstring>
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <set>
 #include <string>
 #include <stdlib.h>
 #include <sstream>
 #include <stdexcept>
 
 #include "common.hpp"
-#include <supo_general.hpp>
+#include <supo_parse.hpp>
 #include "inputs.hpp"
 
 using namespace std;
 //using namespace supo;
 
-/*
-// TODO possibly parse functions no longer necessary
-namespace parse {
-
-typedef struct lexer_t {
-	std::string::iterator cursor, end, tok_start, tok_end;
-	std::string token() { 
-		std::string s ; // = "";
-		for(auto& it= tok_start; it != tok_end; it++) s+= *it;
-		return s;
-	}
-	bool is_white() {
-		char c = *cursor;
-		return c == ' ' || c == '\t' || c == '\r';
-	}
-
-	bool more() { 
-		if(cursor == end) return false;
-
-		// eat white
-		while(cursor != end) {
-			if(! is_white()) break;
-			cursor++;
-		}
-		if(*cursor == '#') return false;
-		if(cursor == end) return false;
-
-		tok_start = cursor;
-		bool is_string  = *cursor == '"';
-		if(is_string) {
-			tok_start++;
-			cursor++;
-			while(cursor !=end && *cursor != '"') cursor++;
-			tok_end = cursor;
-			if(cursor !=end) cursor++;
-		} else {
-			while(!is_white() && cursor !=end) cursor++;
-			tok_end = cursor;
-		}
-
-		return true;
-	}
-	lexer_t(std::string& s) {cursor = s.begin(); end = s.end(); }
-} lexer_t;
-
-std::vector<std::string> tokenise_line(std::string& s)
-{
-	std::vector<std::string> result;
-	lexer_t lexer(s);
-
-	while(lexer.more()) {
-		std::string token = lexer.token();
-		result.push_back(token);
-	}
-	return result;
-}
-
-vecvec_t vecvec(istream  &istr)
-{
-	vecvec_t res;
-	string line;
-	while(getline(istr, line)) {
-		vector<string> fields = parse::tokenise_line(line);
-		if(fields.size() >0) res.push_back(fields);
-	}
-	return res;
-}
-
-vecvec_t vecvec(const std::string& filename)
-{
-	ifstream fin;
-	fin.open(filename.c_str(), ifstream::in);
-	auto res  = parse::vecvec(fin);
-	fin.close();
-	return res;
-}
-
-
-
-void prin_vecvec(vecvec_t & vvs, const char *sep, const char *recsep, const char *filename )
-{
-	
-	std::ofstream ofs;
-	bool use_file = strlen(filename);
-	if(use_file) ofs.open(filename, std::ofstream::out);
-	ostream &os = use_file ? ofs : cout ;
-
-	string ssep = string(sep);
-	int i;
-	for(i=0; i< vvs.size(); i++) {
-		vector<string> v = vvs[i];
-		int j, len;
-		len = v.size();
-		if(len == 0) continue;
-		for(j=0; j<len; j++) {
-			os << v[j];
-			if(j+1<len) os << ssep;
-		}
-		if(len>0) os << recsep ;
-	}
-
-	if(use_file) ofs.close();
-}
-
-
-void prin_vecvec1(vecvec_t &vv)
-{
-	prin_vecvec(vv, "\n", "\n", "");
-}
-vecvec_t vecvec(const char *fname)
-{
-	string fn = (fname);
-	return vecvec(fn);
-}
-
-} // namespace parse
-*/
 
 typedef std::function<void(inputs_t&, const strings&)> infunc;
 
@@ -203,7 +88,6 @@ void insert_etran_1(inputs_t& inputs, const strings& fields)
 etran_c mkleak_1(const strings& fields)
 {
 	etran_c e;
-	//	= mketran(fields);
 	e.dstamp = fields[0];
 	e.folio = fields[1];
 	e.ticker = fields[2];
@@ -240,23 +124,6 @@ insert_ntran(inputs_t& inputs, const strings& fields)
 	inputs.ntrans.push_back(n); 
 }
 
-/*
-void insert_LVL03(inputs_t& inputs, const strings& fields)
-{
-	string subtype = fields[4];
-	if(subtype == "ETRAN-1") { 
-		inputs.etrans.insert(mketran(fields));
-	} else if (subtype == "LEAK-1") {
-		inputs.etrans.insert(mkleak_1(fields));
-	} else if (subtype == "NTRAN-1") {
-		inputs.ntrans.push_back(mkntran(fields));
-	} else {
-		cerr << "inputs.cc:insert_LVL03() couldn't understand type ";
-		cerr << subtype << ". Fatal exit." << endl;
-		exit(EXIT_FAILURE);
-	}
-}
-*/
 
 void
 insert_yahoo_1(inputs_t& inputs, const strings& fields)
@@ -277,33 +144,6 @@ insert_yahoo_1(inputs_t& inputs, const strings& fields)
 
 }
 
-/*
-void 
-insert_yahoo(const yahoo_t& y, inputs_t& inputs)
-{
-	inputs.yahoos.insert(y);
-}
-*/
-
-/*
-void insert_LVL05(inputs_t& inputs, const strings& fields)
-{
-	string subtype = fields[1];
-	yahoo_t y = make_yahoo(inputs, fields);	
-	if(subtype == "PRICE-1") {
-		currency c(fields[6]);
-		quantity q(fields[5]);
-		y.yprice = c/q;
-		//y.rox =1;
-	} else if (subtype != "YAHOO-1") {
-		cerr << "inputs.cc:insert_LVL05() couldn't understand type ";
-		cerr << subtype << ". Fatal exit." << endl;
-		exit(EXIT_FAILURE);
-	}
-
-	insert_yahoo(y, inputs);
-}
-*/
 
 void set_period(inputs_t& inputs, const strings& fields)
 {
@@ -312,6 +152,7 @@ void set_period(inputs_t& inputs, const strings& fields)
 	inputs.p.end_date = fields[base+1];
 }
 
+/*
 void
 read_csv_inputs(const string fname, 
 		const int num_fields,
@@ -340,72 +181,52 @@ read_csv_inputs(const string fname,
 	}
 	ifs.close();
 }
+*/
+
 
 
 inputs_t read_inputs()
 {
 	inputs_t inputs;
-/*
-	string fname;
-	s1("derive-1.txt", fname);
-	vecvec_t mat = parse::vecvec(fname);
 
-	for(auto& row:mat) {
-		string cmd = row[0]; // => LVL0?
-		string level_str = cmd.substr(3, 2);
-		int level =stoi(level_str);
-		switch(level) {
-			case 0: //LVL00
-				// these are just notes, so we can ignore them
-				break;
-			case 1: // LVL01
-				// superceded by read_inputs_1()
-				//insert_nacc(inputs.naccs, row);
-				break;
-			case 2: // LVL02
-				// superceded by read_inputs_1()
-				//insert_comm(inputs.comms, row);
-				break;
-			case 3: // LVL03
-				// superceded by read_inputs_1()
-				//insert_LVL03(inputs, row);
-				break;
-			case 4: // LVL04
-				// superceded by read_inputs_1()
-				//set_period(inputs, row);
-				break;
-			case 5: // LVL05
-				// superceded by read_inputs_1()
-				//insert_LVL05(inputs, row);
-				break;
-			default:
-				cerr << "Unhandled level number " << level << " in inputs.cc/read_inputs()\n";
-				exit(EXIT_FAILURE);
-		}
-	}
-
-	//assert(has_ticker(inputs.yahoos, "KCOM.L"));
-	*/
-	//read_inputs_1(inputs);
-	struct csv_t {
-		string fname;
+	struct cmd_t {
+		string name;
 		int num_fields;
 		infunc f;
+		cmd_t(const string &in_name) : name(in_name) {};
+		cmd_t(const string& in_name, int in_num_fields, const infunc& in_f) : name(in_name), num_fields(in_num_fields), f(in_f) {};
+		bool operator<(const cmd_t &rhs) const { return name < rhs.name;};
+		bool operator==(const cmd_t &rhs) const { return name == rhs.name;};
+	};
+	const std::set<cmd_t> cmds = {
+		{"comm-1",  5, insert_comm},
+		{"etran-1", 8, insert_etran_1},
+		{"leak-1",  6, insert_leak_1},
+		{"nacc",    5, insert_nacc},
+		{"ntran",   5, insert_ntran},
+		{"period",  2, set_period},
+		{"yahoo-1", 9, insert_yahoo_1}
 	};
 
-	const vector<csv_t> csvs = {
-		{"comm-1.csv",  5, insert_comm},
-		{"etran-1.csv", 8, insert_etran_1},
-		{"leak-1.csv",  6, insert_leak_1},
-		{"nacc.csv",    5, insert_nacc},
-		{"ntran.csv",   5, insert_ntran},
-		{"period.csv",  2, set_period},
-		{"yahoo-1.csv", 9, insert_yahoo_1}
-	};
+	// TODO abstract and use wherever an input stream is used
+	ifstream ifs(s1("derive-2.txt"));
+	supo::strmat mat = supo::tokenize_stream(ifs);
+	//string line;
+	//while(getline(ifs, line)) lines.push_back(line);
+	ifs.close();
 
-	for(const auto& c: csvs)
-		read_csv_inputs(c.fname, c.num_fields, c.f, inputs);
+	//for(const auto& c: csvs)
+	//	read_csv_inputs(c.fname, c.num_fields, c.f, inputs);
+	for(auto& row: mat) {
+		if(row.size() == 0) continue;
+		//cout << row[0] << endl;
+		auto search = cmds.find(row[0]);
+		if(search == cmds.end()) continue;
+		row.erase(begin(row)); // the fields
+		assert(row.size() == search->num_fields);
+		search->f(inputs, row); // do whatever is required for that field
+	}
+
 	return inputs;
-
 }
 
