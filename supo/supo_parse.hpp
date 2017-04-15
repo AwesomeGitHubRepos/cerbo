@@ -10,6 +10,6 @@ namespace supo {
 	strings tokenize_line(std::string &input);
 	strmat tokenize_stream(std::istream& istr);
 	
-	std::string trim(std::string& str); // TODO should be sometwhere else
+	std::string trim(const std::string& str); // TODO should be sometwhere else
 
 } // namespace supo

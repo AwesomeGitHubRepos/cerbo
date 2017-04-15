@@ -12,6 +12,7 @@
 #include "dec.hpp"
 //#include "cpq.hpp"
 #include <supo_general.hpp>
+#include <supo_parse.hpp>
 
 using namespace supo;
 
@@ -34,8 +35,8 @@ string mkrow(const etran_c& e)
 	//price p = e.cost/e.qty;
 	//string price_str = p.str();
 
-	string q = e.qty.str();
-	string c = e.cost.str();
+	string q = supo::trim(e.qty.str());
+	string c = supo::trim(e.cost.str());
 
 	//return  intercalate("\t", {e.buystr(), dstamp, e.ticker, share_str, 	
 	//		price_str, "0.00", "0.00"});

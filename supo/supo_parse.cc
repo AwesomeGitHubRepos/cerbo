@@ -14,7 +14,7 @@ namespace supo {
 
 const char white[] = " \t\r";
 
-std::string trim(std::string& str)
+std::string trim(const std::string& str)
 {
     if(str.length() ==0) { return str;}
     size_t first = str.find_first_not_of(white);
