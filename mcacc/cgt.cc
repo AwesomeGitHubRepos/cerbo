@@ -40,7 +40,8 @@ string mkrow(const etran_c& e)
 
 	//return  intercalate("\t", {e.buystr(), dstamp, e.ticker, share_str, 	
 	//		price_str, "0.00", "0.00"});
-	return  intercalate(US, {e.buystr(), dstamp, e.ticker, q, c});
+	//return  intercalate(US, {e.buystr(), dstamp, e.ticker, q, c});
+	return  intercalate('\t', {e.buystr(), dstamp, e.ticker, q, c});
 }
 
 
@@ -60,8 +61,8 @@ void cgt(const etran_cs& es, const period &per)
 		if(tickers.find(e.ticker) != end(tickers))
 			sout << mkrow(e) << "\n";
 
-	constexpr char FS = (char) 28; //file separator
-	sout << FS << "\n";
+	//constexpr char FS = (char) 28; //file separator
+	//sout << FS << "\n";
 	sout.close();
 
 }
