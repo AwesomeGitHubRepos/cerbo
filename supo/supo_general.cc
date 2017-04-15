@@ -121,7 +121,8 @@ string format_num(double n, int width, int dp)
 	return s.str();
 }
 
-std::string intercalate(std::string inter, std::vector<std::string> strings)
+std::string intercalate(const std::string& inter, 
+		const std::vector<std::string>& strings)
 {
 	string res = "";
 	for(auto it = strings.begin(); it != strings.end(); it++) {
@@ -130,6 +131,15 @@ std::string intercalate(std::string inter, std::vector<std::string> strings)
 	}
 	return res;
 }
+
+
+std::string intercalate(const char c, 
+		const std::vector<std::string>& strings)
+{
+	string s(1, c); // convert the char to a string
+	return intercalate(s, strings);
+}
+
 
 // http://stackoverflow.com/questions/4891006/how-to-create-a-folder-in-the-home-directory
 std::string expand_user(std::string path) 

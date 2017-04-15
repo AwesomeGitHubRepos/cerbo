@@ -18,7 +18,10 @@ std::string pad_right(std::string s, int n);
 std::string pad_left(std::string s, int n);
 std::string format_num(double n, int dp);
 std::string format_num(double n, int width, int dp);
-std::string intercalate(std::string inter, std::vector<std::string> strings);
+std::string intercalate(const std::string& inter, 
+		const std::vector<std::string>& strings);
+std::string intercalate(const char c, 
+		const std::vector<std::string>& strings);
 
 std::string expand_user(std::string path);
 
