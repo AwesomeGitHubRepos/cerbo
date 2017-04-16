@@ -24,10 +24,20 @@ Control Mod1 Return :ToggleCmd {Maximize} {Restore}
 </pre>
 
 The modifiers above (Ctrl + Alt + Left/Right/Up/Down/Enter) should not conflict with existing modifiers, else they will not work correctly (<a href="https://abchk1234.wordpress.com/2015/02/01/native-window-snapping-window-tiling-with-fluxbox-openbox-and-xfwm4-xfce/">xlink</a>).
+
+<hr><h2>Start menu</h2>
+
+In <code>$HOME/.fluxbox/init</code>, you need to add <code>RootMenu</code>:
+<pre>
+session.screen0.toolbar.tools:  RootMenu, iconbar, systemtray, clock
+</pre>
+
+
+
 <hr><pre>
 Author:  Mark Carter
 Created: 13-Apr-2017
-Updated: 13-Apr-2017
+Updated: 16-Apr-2017
 </pre>
 
 </body></html>
