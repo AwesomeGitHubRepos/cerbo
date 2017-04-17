@@ -1,0 +1,1 @@
+start c:\apps\putty\putty -load vivo

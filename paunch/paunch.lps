@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="9"/>
+    <BuildModes Active="Default"/>
+    <Units Count="2">
+      <Unit0>
+        <Filename Value="paunch.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos Y="23"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Unit1"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="3" Y="55"/>
+        <UsageCount Value="20"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+    </Units>
+    <JumpHistory Count="6" HistoryIndex="5">
+      <Position1>
+        <Filename Value="paunch.lpr"/>
+        <Caret Line="19" Column="28"/>
+      </Position1>
+      <Position2>
+        <Filename Value="paunch.lpr"/>
+        <Caret Line="13"/>
+      </Position2>
+      <Position3>
+        <Filename Value="paunch.lpr"/>
+        <Caret Line="14" Column="12"/>
+      </Position3>
+      <Position4>
+        <Filename Value="paunch.lpr"/>
+        <Caret Line="23" Column="8"/>
+      </Position4>
+      <Position5>
+        <Filename Value="paunch.lpr"/>
+        <Caret Line="21" Column="60"/>
+      </Position5>
+      <Position6>
+        <Filename Value="paunch.lpr"/>
+        <Caret Line="23"/>
+      </Position6>
+    </JumpHistory>
+  </ProjectSession>
+</CONFIG>
