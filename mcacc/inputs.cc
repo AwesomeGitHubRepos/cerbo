@@ -145,12 +145,16 @@ insert_yahoo_1(inputs_t& inputs, const strings& fields)
 }
 
 
-void set_period(inputs_t& inputs, const strings& fields)
+void 
+set_period(inputs_t& inputs, const strings& fields)
 {
 	constexpr int base = 0;
 	inputs.p.start_date = fields[base];
 	inputs.p.end_date = fields[base+1];
 }
+
+void // do nothing!
+skip(inputs_t& inputs, const strings& fields) {}
 
 /*
 void
@@ -203,6 +207,7 @@ inputs_t read_inputs()
 		{"etran-1", 8, insert_etran_1},
 		{"leak-1",  6, insert_leak_1},
 		{"nacc",    5, insert_nacc},
+		{"nb",     -1, skip},
 		{"ntran",   5, insert_ntran},
 		{"period",  2, set_period},
 		{"yahoo-1", 9, insert_yahoo_1}
@@ -210,13 +215,24 @@ inputs_t read_inputs()
 
 	// TODO abstract and use wherever an input stream is used
 	ifstream ifs(s1("derive-2.txt"));
-	supo::strmat mat = supo::tokenize_stream(ifs);
-	//string line;
-	//while(getline(ifs, line)) lines.push_back(line);
-	ifs.close();
+	//supo::strmat mat = supo::tokenize_stream(ifs);
+	string line;
+	while(getline(ifs, line)){
+		strings fields = supo::tokenize_line(line);
+		if(fields.size() ==0) continue;
+		auto search = cmds.find(fields[0]);
+		if(search == cmds.end()){
+			cerr << "ERR: Unrecognised command `" << fields[0] << "' in:" << line << "\n";
+			continue;
+		}
+		fields.erase(begin(fields)); // the fields
+		//assert(fields.size() == search->num_fields);
+		search->f(inputs, fields); // do whatever is required for that field
 
-	//for(const auto& c: csvs)
-	//	read_csv_inputs(c.fname, c.num_fields, c.f, inputs);
+	}
+
+
+	/*
 	for(auto& row: mat) {
 		if(row.size() == 0) continue;
 		//cout << row[0] << endl;
@@ -226,7 +242,9 @@ inputs_t read_inputs()
 		assert(row.size() == search->num_fields);
 		search->f(inputs, row); // do whatever is required for that field
 	}
+	*/
 
+	ifs.close();
 	return inputs;
 }
 
