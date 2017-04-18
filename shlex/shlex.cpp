@@ -3,26 +3,52 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
+#include <vector>
 
-#include "shlex.hpp"
-using namespace shlex;
+//#include "shlex.hpp"
+//using namespace shlex;
 
+#include "supo_parse.hpp"
+using std::cin;
 using std::cout;
 using std::cerr;
 using std::endl;
+using std::getline;
 using std::string;
+using std::vector;
+
+typedef vector<string> strings;
 
 const string help_text = R"hlp(
 Options:
   -h [ --help ]    produce help mesage
-  -4 [ --m4 ]      output in m4 format
   -v [ --version ] version
 )hlp";
 
-
-int main(int argc, const char *argv[])
+void
+process()
 {
-	options opts;
+	string fs = "\t";
+	string rs = "\n";
+
+	string line;
+	while(getline(cin, line))
+	{
+		strings vals = supo::tokenize_line(line);
+		for(int i=0; i< vals.size(); ++i) {
+			cout << vals[i];
+			if( i < vals.size()-1)
+				cout << fs;
+			else
+				cout << rs;
+		}
+	}
+}
+
+int 
+main(int argc, const char *argv[])
+{
+	//options opts;
         int c;
         while(1) {
                 int this_option_optind = optind ? optind : 1;
@@ -39,7 +65,7 @@ int main(int argc, const char *argv[])
 
                 switch(c) {
                         case 'h': cout << help_text; exit(EXIT_SUCCESS);
-                        case '4': opts.ofmt = M4; break;
+                        //case '4': opts.ofmt = M4; break;
                         case 'v': std::cout << "shlex (" << PACKAGE_NAME << ") " << VERSION << "\n"; exit(EXIT_FAILURE);
                         default:  cerr << "getopt returned character code " << c << endl; exit(EXIT_FAILURE);
                 }
@@ -52,7 +78,8 @@ int main(int argc, const char *argv[])
         }
 
 
-	shlex::shlexmat mat = shlex::read(std::cin, opts);
-	shlex::write(mat, opts);
+	//shlex::shlexmat mat = shlex::read(std::cin, opts);
+	//shlex::write(mat, opts);
+	process();
 	return EXIT_SUCCESS;
 }
