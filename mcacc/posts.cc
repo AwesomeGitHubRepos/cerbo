@@ -81,6 +81,31 @@ post_ts posts_main(const inputs_t& inputs,
 		push_fpost(ps, f.m_name + "_c", "pPcd",   1, f.pdp + f.pbd);
 	}
 
-	sort(begin(ps), end(ps));
-	return ps;
+
+	map<string, currency> opening_balances;
+	post_ts ps1;
+	for(const auto& p: ps) {
+		if(p.dstamp < perd.start_date) {
+			auto it = opening_balances.find(p.dr);
+			if(it == end(opening_balances)) opening_balances[p.dr] = 0;
+			opening_balances[p.dr] += p.amount;
+		} else {
+			ps1.push_back(p);
+		}
+	}
+	//puts("TODO opening_balances");
+	for(auto b: opening_balances){
+		if(b.second == 0) continue;
+		post_t p;
+		p.dstamp = perd.start_date;
+		p.dr = b.first;
+		p.cr = "NOOP";
+		p.amount = b.second;
+		p.desc = "Opening balance";
+		ps1.push_back(p);
+		//cout << b.first << "\t" << b.second << endl;
+	}
+
+	sort(begin(ps1), end(ps1));
+	return ps1;
 }
