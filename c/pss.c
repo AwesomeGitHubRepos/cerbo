@@ -1,5 +1,8 @@
 // gcc -o pss pss.c -lprocps
 
+// See discussion about possible segfault here:
+// https://github.com/blippy/cerbo/issues/1#issuecomment-312567296
+
 #include <stdio.h>
 #include <string.h>
 #include <proc/readproc.h>
