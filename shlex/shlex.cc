@@ -35,14 +35,24 @@ process()
 	while(getline(cin, line))
 	{
 		strings vals = supo::tokenize_line(line);
+		if(vals.size() == 0) continue;
+		cout << vals.size() << "\n";
+		for(const string& v:vals) {
+			cout << v << "\n";
+		}
+
+		cout << endl;
+		/*
 		for(int i=0; i< vals.size(); ++i) {
 			cout << vals[i];
 			if( i < vals.size()-1)
 				cout << fs;
 			else
 				cout << rs;
-		}
+		}*/
 	}
+
+	cout << "0" << endl;
 }
 
 int 
@@ -55,7 +65,7 @@ main(int argc, const char *argv[])
                 int option_index = 0;
                 static struct option long_options[] = {
                         {"help", no_argument, 0, 'h'},
-			{"m4", required_argument, 0, '4'},
+			//{"m4", required_argument, 0, '4'},
                         {"version", no_argument, 0, 'v'},
                         {0 ,0,0,0}
                 };

@@ -3,4 +3,4 @@ AM_CXXFLAGS = $(CXXSTD) $(ISUPO)
 bin_PROGRAMS = shlex 
 man1_MANS = shlex.1
 shlex_LDADD = $(LIBSUPO)
-shlex_SOURCES = shlex.cpp
+shlex_SOURCES = shlex.cc
