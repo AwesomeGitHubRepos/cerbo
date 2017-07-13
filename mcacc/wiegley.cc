@@ -10,7 +10,7 @@
 
 #include "common.h"
 #include <supo_general.hpp>
-#include "yahoo.hpp"
+#include "yahoo.h"
 #include "wiegley.h"
 
 using namespace std;

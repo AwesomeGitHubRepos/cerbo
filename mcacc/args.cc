@@ -3,10 +3,10 @@
 #include <map>
 #include <string>
 
-#include "args.hpp"
+#include "args.h"
 #include "common.h"
 #include "inputs.h"
-#include "tests.hpp"
+#include "tests.h"
 
 using std::cerr;
 using std::cout;

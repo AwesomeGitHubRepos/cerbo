@@ -15,32 +15,16 @@
 
 #include <supo.hpp>
 
-#include "args.hpp"
+#include "args.h"
 #include "common.h"
-#include "oven.hpp"
-#include "tests.hpp"
+#include "oven.h"
+#include "tests.h"
 #include <supo_general.hpp>
-#include "show.hpp"
+#include "show.h"
 
 
 using namespace std;
 using namespace supo;
-
-/*
-bool operator<(const etran_t& lhs, const etran_t& rhs)
-{
-	return std::tie(lhs.ticker, lhs.dstamp) < std::tie(rhs.ticker, rhs.dstamp);
-}
-
-bool operator>(const etran_t &a, const etran_t &b)
-{
-	return std::tie(a.ticker, a.dstamp) > std::tie(b.ticker, b.dstamp);
-}
-*/
-
-
-
-
 
 // http://www.linuxquestions.org/questions/programming-9/deleting-a-directory-using-c-in-linux-248696/
 // remove directory recursively

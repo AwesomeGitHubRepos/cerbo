@@ -7,10 +7,9 @@
 
 #include "comm.h"
 #include "etran.h"
-#include "nacc.hpp"
-#include "ntran.hpp"
-//#include "stend.hpp"
-#include "yahoo.hpp"
+#include "nacc.h"
+#include "ntran.h"
+#include "yahoo.h"
 
 typedef struct inputs_t {
 	comm_ts comms;
@@ -18,7 +17,6 @@ typedef struct inputs_t {
 	nacc_ts naccs;
 	ntran_ts ntrans;
 	period p;
-	//stend_ts stends;
 	yahoo_ts yahoos;
 } inputs_t;
 

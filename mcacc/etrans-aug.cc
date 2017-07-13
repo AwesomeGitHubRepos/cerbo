@@ -9,7 +9,7 @@
 #include <supo_general.hpp>
 #include "common.h"
 #include "types.h"
-#include "etrans-aug.hpp"
+#include "etrans-aug.h"
 
 using namespace std;
 using namespace supo;

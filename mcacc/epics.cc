@@ -13,7 +13,7 @@
 #include "dec.h"
 #include <supo_general.hpp>
 #include "stend.h"
-#include "epics.hpp"
+#include "epics.h"
 #include "types.h"
 
 using namespace std;

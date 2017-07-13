@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "yahoo.hpp"
+#include "yahoo.h"
 
 /* This is a self-contained unit. You can use fetch_tickers as the functions to call
 */

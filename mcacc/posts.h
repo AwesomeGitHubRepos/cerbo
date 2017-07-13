@@ -6,7 +6,7 @@
 
 #include "types.h"
 #include "dec.h"
-#include "epics.hpp"
+#include "epics.h"
 
 typedef struct post_t {
 	std::string dstamp;
