@@ -17,10 +17,10 @@ mkuprices(const detran_cs& the_etrans)
 	ofstream ofs;
 	ofs.open(fname.c_str(), ofstream::out);
 	for(const auto& e:the_etrans) {
-		const etran_c &e1 = e.etran;
+		//const etran_c &e1 = e.etran;
 		strings fields = strings {  
-			supo::pad_right(e1.ticker, 7), 
-				e1.dstamp, e.ucost.str(), e1.buystr() 
+			supo::pad_right(e.ticker, 7), 
+				e.dstamp, e.ucost.str(), e.buystr() 
 		};
 		ofs << supo::intercalate(" ", fields) << endl;
 	}

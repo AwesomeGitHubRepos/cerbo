@@ -2,8 +2,9 @@
 
 #include <string>
 
-#include "inputs.h"
+//#include "inputs.h"
 #include "types.h"
+#include "yahoo.h"
 
 
 class stend {

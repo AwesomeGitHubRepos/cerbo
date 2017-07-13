@@ -5,7 +5,7 @@ mcacc_LDADD = -lpthread $(LIBSUPO)
 mcacc_SOURCES = args.cc \
 		cgt.cc common.cc \
 		dec.cc \
-		epics.cc etb.cc etrans-aug.cc \
+		epics.cc etb.cc etran.cc \
 		gaap.cc \
 		inputs.cc \
 		mcacc.cc \

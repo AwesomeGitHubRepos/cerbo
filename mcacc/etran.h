@@ -5,6 +5,7 @@
 //#include <vector>
 
 #include "dec.h"
+#include "stend.h"
 #include "types.h"
 
 enum Etype { unknown, leak, regular };
@@ -28,9 +29,9 @@ class etran_c {
 	};
 };
 
-class detran_c {
+class detran_c : public etran_c {
 	public:
-		etran_c etran;
+		//etran_c etran;
 		// derived fields:
 		price		ucost; 
 		dstamp_t	start_dstamp;
@@ -43,10 +44,12 @@ class detran_c {
 		currency	profit;
 		currency	vto;
 		detran_c& operator+=(const detran_c& rhs);
+		/*
 		friend bool operator<(const detran_c& l, const detran_c& r)
 		{
 			return l.etran < r.etran;
 		}
+		*/
 
 };
 
@@ -58,3 +61,6 @@ bool same_ticker(etran_c a, etran_c b);
 typedef std::multiset<etran_c> etran_cs;
 
 typedef std::vector<detran_c> detran_cs;
+detran_cs eaug_main(const etran_cs& etrans, const stend_ts& stends, 
+		                const period &per);
+

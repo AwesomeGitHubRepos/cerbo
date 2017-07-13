@@ -5,7 +5,7 @@
 #include "cgt.h"
 #include "epics.h"
 #include "etb.h"
-#include "etrans-aug.h"
+#include "etran.h"
 #include "gaap.h"
 #include "pgposts.h"
 #include "posts.h"

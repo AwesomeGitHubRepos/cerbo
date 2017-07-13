@@ -26,7 +26,7 @@ detran_cs folio_c::filter(const detran_cs& es) const
 {
 	detran_cs result;
 	for(const auto& e:es){
-		const string& folio = e.etran.folio;
+		const string& folio = e.folio;
 		bool match = folio == m_name || 
 			(m_name == "mine" && folio != "ut") ||
 			m_name == "total";
@@ -38,8 +38,8 @@ detran_cs folio_c::filter(const detran_cs& es) const
 }
 
 // TODO find better home, and use more often
-string ticker(const detran_c& e) { return e.etran.ticker; }
-currency ecost(const detran_c& e) { return e.etran.cost;}
+string ticker(const detran_c& e) { return e.ticker; }
+currency ecost(const detran_c& e) { return e.cost;}
 currency evto(const detran_c& e) { return e.vto;}
 currency epdp(const detran_c& e) { return e.profit;}
 currency evbefore(const detran_c& e) { return e.vbefore;}
@@ -77,12 +77,12 @@ void debug(const detran_c& e, const currency& vto)
 	static int n_azn = 0;
 	return; // just switch it off for now
 	if(n_azn==0) cout << "epics.cc:debug() output follows\n";
-	if(e.etran.ticker == "AZN.L") n_azn++;
+	if(e.ticker == "AZN.L") n_azn++;
 	if(n_azn>1) return;
-	if(e.etran.folio != "hal") return;
+	if(e.folio != "hal") return;
 
-	cout << pad_ticker(e.etran.ticker) << e.vto.str() << " ";
-	cout << e.etran.qty.str() << e.end_price.str();
+	cout << pad_ticker(e.ticker) << e.vto.str() << " ";
+	cout << e.qty.str() << e.end_price.str();
        cout << vto.str() << endl;
 }
 
@@ -134,8 +134,8 @@ void folio_c::calculate(const detran_cs& all_etrans)
 	const detran_cs by_epics = reduce(filter(all_etrans));
 
 	for(const auto& esum:by_epics){
-		if(esum.etran.qty.zerop()) { 
-			zeros.insert(esum.etran.ticker);
+		if(esum.qty.zerop()) { 
+			zeros.insert(esum.ticker);
 		} else {
 			reduced_epics.push_back(esum);
 		}
@@ -160,11 +160,11 @@ void folio_c::print_to_epic_file(ofstream& ofs) const
 
 	for(const auto& e:reduced_epics)
 	{
-		ofs << pad_ticker(e.etran.ticker)
-			<< e.etran.qty
-			<< e.etran.cost
+		ofs << pad_ticker(e.ticker)
+			<< e.qty
+			<< e.cost
 			<< e.vto
-			<< ret_curr(e.vto, e.etran.cost)
+			<< ret_curr(e.vto, e.cost)
 			<< e.ucost
 			<< e.end_price
 			<< endl;

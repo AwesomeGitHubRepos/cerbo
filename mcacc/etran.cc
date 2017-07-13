@@ -9,7 +9,7 @@
 #include <supo_general.hpp>
 #include "common.h"
 #include "types.h"
-#include "etrans-aug.h"
+#include "etran.h"
 
 using namespace std;
 using namespace supo;
@@ -18,7 +18,8 @@ using namespace supo;
 detran_c augment(const etran_c& e, const stend_ts& stends, const period& per)
 {
 	detran_c aug;
-	aug.etran = e;
+	//aug = e;
+	aug.etran_c::operator=(e);
 	const stend& s = stends.at(e.ticker);
 
 	//aug.ucost.reprice(e.cost, e.qty); 
@@ -34,14 +35,14 @@ detran_c augment(const etran_c& e, const stend_ts& stends, const period& per)
 	aug.flow = 0;
 	aug.prior_year_profit = 0;
 	aug.vto = s.end_price * qty;
-	switch(per.when(aug.etran.dstamp)) {
+	switch(per.when(aug.dstamp)) {
 		case perBefore:
 			aug.vbefore = s.start_price * qty;
 			aug.prior_year_profit = aug.vbefore 
-				- aug.etran.cost;
+				- aug.cost;
 			break;
 		case perDuring:
-			aug.flow = aug.etran.cost;
+			aug.flow = aug.cost;
 			break;
 		case perAfter:
 			aug.vto = 0;
@@ -72,14 +73,14 @@ void write_augetran(ofstream& ofs, const detran_c& e)
 		recline(ofs, s, v);};
 
 	//gout("Tax", e.etran.taxable? "T" : "F"); // 1
-	gout("Dstamp", e.etran.dstamp); // 2
-	gout("Buy", e.etran.buystr()); // 3
-	gout("Folio", e.etran.folio); // 4
-	gout("Eticker", e.etran.ticker); // 5
-	gout("Qty", e.etran.qty.str());
-	gout("Cost", e.etran.cost); // 7
+	gout("Dstamp", e.dstamp); // 2
+	gout("Buy", e.buystr()); // 3
+	gout("Folio", e.folio); // 4
+	gout("Eticker", e.ticker); // 5
+	gout("Qty", e.qty.str());
+	gout("Cost", e.cost); // 7
 	gout("Ucost", e.ucost); //dout(e.ucost, 6); // 8
-	gout("Eticker", e.etran.ticker); // 9
+	gout("Eticker", e.ticker); // 9
 	gout("Start_dstamp", e.start_dstamp); // 10
 	gout("Start_price", e.start_price); //dout(e.start_price, 6); // 11
 	gout("End_dstamp", e.end_dstamp); // 12
@@ -112,20 +113,22 @@ detran_cs eaug_main(const etran_cs& etrans, const stend_ts& stends,
 }
 
 detran_c& detran_c::operator+=(const detran_c& rhs){
+	/*
 	etran_c& elhs = this->etran;
 	const etran_c& erhs = rhs.etran;
 	elhs.ticker = erhs.ticker;
+	*/
 
-	if(erhs.buy){
-		elhs.cost += erhs.cost;
+	if(this->buy){
+		this->cost += rhs.cost;
 	} else {
-		elhs.cost += (elhs.cost/elhs.qty) * erhs.qty;
+		this->cost += (this->cost/this->qty) * rhs.qty;
 	}
-	elhs.qty += erhs.qty;
-	this->ucost = elhs.cost/elhs.qty;
+	this->qty += rhs.qty;
+	this->ucost = this->cost/this->qty;
 	this->end_price = rhs.end_price;
 	this->profit += rhs.profit;
-	this->vto = this->end_price * elhs.qty;
+	this->vto = this->end_price * this->qty;
 	this->vbefore += rhs.vbefore;
 	this->prior_year_profit += rhs.prior_year_profit;
 	return *this;

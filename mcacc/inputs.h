@@ -9,6 +9,7 @@
 #include "etran.h"
 #include "nacc.h"
 #include "ntran.h"
+#include "types.h"
 #include "yahoo.h"
 
 typedef struct inputs_t {
