@@ -4,8 +4,8 @@
 #include <string>
 
 #include "args.hpp"
-#include "common.hpp"
-#include "inputs.hpp"
+#include "common.h"
+#include "inputs.h"
 #include "tests.hpp"
 
 using std::cerr;

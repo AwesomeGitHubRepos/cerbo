@@ -3,7 +3,7 @@
 
 #include <supo.hpp>
 
-#include "common.hpp"
+#include "common.h"
 #include "show.hpp"
 
 using namespace std;

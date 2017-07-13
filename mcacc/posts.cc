@@ -5,10 +5,10 @@
 #include <algorithm>
 #include <stdexcept>
 
-#include "common.hpp"
-#include "inputs.hpp"
+#include "common.h"
+#include "inputs.h"
 #include <supo_general.hpp>
-#include "posts.hpp"
+#include "posts.h"
 
 using namespace std;
 using namespace supo;

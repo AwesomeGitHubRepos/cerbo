@@ -2,17 +2,17 @@
 
 #include "oven.hpp"
 
-#include "cgt.hpp"
+#include "cgt.h"
 #include "epics.hpp"
-#include "etb.hpp"
+#include "etb.h"
 #include "etrans-aug.hpp"
-#include "gaap.hpp"
+#include "gaap.h"
 #include "pgposts.hpp"
-#include "posts.hpp"
-#include "stend.hpp"
-#include "wiegley.hpp"
-#include "uprice.hpp"
-#include "yproc.hpp"
+#include "posts.h"
+#include "stend.h"
+#include "wiegley.h"
+#include "uprice.h"
+#include "yproc.h"
 
 
 using namespace std;

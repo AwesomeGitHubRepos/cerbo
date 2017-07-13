@@ -9,7 +9,6 @@ mcacc_SOURCES = args.cc \
 		gaap.cc \
 		inputs.cc \
 		mcacc.cc \
-		nacc.cc \
 		oven.cc \
 		pgposts.cc posts.cc \
 		show.cc stend.cc \

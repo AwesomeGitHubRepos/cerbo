@@ -1,8 +1,5 @@
 /* calculate the start and end prices for yahoo
 created 16-Feb-2016
-
-OUT: s3/stend.dsv
-
 */
 
 #include <algorithm>
@@ -16,10 +13,10 @@ OUT: s3/stend.dsv
 #include <set>
 #include <stdexcept>
 
-#include "common.hpp"
-#include "types.hpp"
+#include "common.h"
+#include "types.h"
 #include <supo_general.hpp>
-#include "stend.hpp"
+#include "stend.h"
 
 using namespace std;
 using namespace supo;

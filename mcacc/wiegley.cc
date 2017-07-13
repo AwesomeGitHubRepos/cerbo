@@ -8,10 +8,10 @@
 #include <string>
 #include <vector>
 
-#include "common.hpp"
+#include "common.h"
 #include <supo_general.hpp>
 #include "yahoo.hpp"
-#include "wiegley.hpp"
+#include "wiegley.h"
 
 using namespace std;
 using namespace supo;

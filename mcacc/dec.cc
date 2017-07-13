@@ -1,5 +1,5 @@
-#include "dec.hpp"
-#include "types.hpp"
+#include "dec.h"
+#include "types.h"
 
 using namespace std::decimal;
 

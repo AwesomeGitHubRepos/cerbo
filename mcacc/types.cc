@@ -7,8 +7,8 @@
 #include <assert.h>
 #include <algorithm>
 
-#include "common.hpp"
-#include "types.hpp"
+#include "common.h"
+#include "types.h"
 #include <supo_general.hpp>
 
 using namespace std;

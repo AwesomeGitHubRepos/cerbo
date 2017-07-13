@@ -9,12 +9,12 @@
 #include <vector>
 #include <set>
 
-#include "common.hpp"
-#include "dec.hpp"
+#include "common.h"
+#include "dec.h"
 #include <supo_general.hpp>
-#include "stend.hpp"
+#include "stend.h"
 #include "epics.hpp"
-#include "types.hpp"
+#include "types.h"
 
 using namespace std;
 using namespace std::decimal;

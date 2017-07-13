@@ -5,10 +5,10 @@
 #include <typeinfo>
 #include <unordered_map>
 
-#include "inputs.hpp"
+#include "inputs.h"
 #include <supo_general.hpp>
-#include "common.hpp"
-#include "types.hpp"
+#include "common.h"
+#include "types.h"
 #include "etrans-aug.hpp"
 
 using namespace std;
@@ -71,7 +71,7 @@ void write_augetran(ofstream& ofs, const detran_c& e)
 	auto gout = [&ofs](const string& s, const auto& v) {
 		recline(ofs, s, v);};
 
-	gout("Tax", e.etran.taxable? "T" : "F"); // 1
+	//gout("Tax", e.etran.taxable? "T" : "F"); // 1
 	gout("Dstamp", e.etran.dstamp); // 2
 	gout("Buy", e.etran.buystr()); // 3
 	gout("Folio", e.etran.folio); // 4

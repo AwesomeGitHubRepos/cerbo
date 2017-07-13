@@ -1,8 +1,8 @@
 #include <fstream>
 
-#include "common.hpp"
+#include "common.h"
 #include "pgposts.hpp"
-#include "types.hpp"
+#include "types.h"
 
 using namespace std;
 

@@ -8,9 +8,9 @@
 #include <functional>
 #include <stdexcept>
 
-#include "common.hpp"
-#include "types.hpp"
-#include "posts.hpp"
+#include "common.h"
+#include "types.h"
+#include "posts.h"
 #include <supo_general.hpp>
 
 using namespace std;

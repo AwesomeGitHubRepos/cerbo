@@ -1,7 +1,7 @@
 #pragma once
 
 #include "args.hpp"
-#include "inputs.hpp"
+#include "inputs.h"
 
 class oven
 {

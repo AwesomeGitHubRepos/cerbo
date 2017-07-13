@@ -9,9 +9,9 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "common.hpp"
+#include "common.h"
 #include <supo_parse.hpp>
-#include "inputs.hpp"
+#include "inputs.h"
 
 using namespace std;
 //using namespace supo;
@@ -59,13 +59,13 @@ etran_c mketran(const strings& fields)
 	e.qty.from_str(e.sgn, fields[base+3]);
 	e.cost.from_str(e.sgn, fields[base+4]);
 
-	e.taxable = fields[base+6] == "T";
+	//e.taxable = fields[base+6] == "T";
 	e.buy = e.sgn == 1;
 	e.typ = regular;
 	return e;
 }
 
-void insert_etran_1(inputs_t& inputs, const strings& fields)
+void insert_etran_2(inputs_t& inputs, const strings& fields)
 {
 	const etran_c e = mketran(fields);
 	inputs.etrans.insert(e);
@@ -85,7 +85,7 @@ void insert_etran_1(inputs_t& inputs, const strings& fields)
 
 }
 
-etran_c mkleak_1(const strings& fields)
+etran_c mkleak_2(const strings& fields)
 {
 	etran_c e;
 	e.dstamp = fields[0];
@@ -94,15 +94,15 @@ etran_c mkleak_1(const strings& fields)
 	e.sgn = -1;
 	e.qty.from_str(e.sgn, fields[3]);
 	// e.cost I think we can ignore
-	e.taxable = fields[4] == "T";
+	//e.taxable = fields[4] == "T";
 	e.buy = false;
 	e.typ = leak;
 	return e;
 }
 void
-insert_leak_1(inputs_t& inputs, const strings& fields)
+insert_leak_2(inputs_t& inputs, const strings& fields)
 {
-	const etran_c e = mkleak_1(fields);
+	const etran_c e = mkleak_2(fields);
 	inputs.etrans.insert(e);
 }
 ntran_t mkntran(const strings& fields)
@@ -156,37 +156,6 @@ set_period(inputs_t& inputs, const strings& fields)
 void // do nothing!
 skip(inputs_t& inputs, const strings& fields) {}
 
-/*
-void
-read_csv_inputs(const string fname, 
-		const int num_fields,
-		infunc func,
-		inputs_t& inputs)
-{
-	const string fname1 = s2(fname);
-	ifstream ifs(fname1);
-	string line;
-	while(getline(ifs, line)) {
-		stringstream ss(line);
-		string cell;
-		strings row;
-		while(getline(ss, cell, ','))
-			row.push_back(cell);
-		if(num_fields != row.size()) {
-			string msg = "Error in input:`" + line + "'.\n"
-				+ "Expected " + to_string(num_fields)
-			       	+ " fields, got "
-				+ to_string(row.size());
-			throw std::range_error(msg);
-
-		}
-		func(inputs, row);
-		//cout << line << endl;
-	}
-	ifs.close();
-}
-*/
-
 
 
 inputs_t read_inputs()
@@ -204,8 +173,8 @@ inputs_t read_inputs()
 	};
 	const std::set<cmd_t> cmds = {
 		{"comm-1",  5, insert_comm},
-		{"etran-1", 8, insert_etran_1},
-		{"leak-1",  6, insert_leak_1},
+		{"etran-2", 7, insert_etran_2},
+		{"leak-2",  6, insert_leak_2},
 		{"nacc",    5, insert_nacc},
 		{"nb",     -1, skip},
 		{"ntran",   5, insert_ntran},
@@ -215,7 +184,6 @@ inputs_t read_inputs()
 
 	// TODO abstract and use wherever an input stream is used
 	ifstream ifs(s1("derive-2.txt"));
-	//supo::strmat mat = supo::tokenize_stream(ifs);
 	string line;
 	while(getline(ifs, line)){
 		strings fields = supo::tokenize_line(line);
@@ -226,7 +194,6 @@ inputs_t read_inputs()
 			continue;
 		}
 		fields.erase(begin(fields)); // the fields
-		//assert(fields.size() == search->num_fields);
 		search->f(inputs, fields); // do whatever is required for that field
 
 	}

@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#include "comm.hpp"
-#include "etran.hpp"
+#include "comm.h"
+#include "etran.h"
 #include "nacc.hpp"
 #include "ntran.hpp"
 //#include "stend.hpp"

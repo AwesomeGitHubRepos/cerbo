@@ -4,15 +4,15 @@
 #include <string>
 //#include <vector>
 
-#include "dec.hpp"
-#include "types.hpp"
+#include "dec.h"
+#include "types.h"
 
 enum Etype { unknown, leak, regular };
 
 class etran_c {
 	public:
 
-	bool		taxable = true;
+	//bool		taxable = true;
 	dstamp_t	dstamp;
 	double 		sgn;
 	bool		buy = true;

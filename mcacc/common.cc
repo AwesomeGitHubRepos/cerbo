@@ -3,7 +3,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "common.hpp"
+#include "common.h"
 #include <supo_general.hpp>
 
 using namespace supo;

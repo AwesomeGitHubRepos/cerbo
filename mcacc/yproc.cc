@@ -4,9 +4,9 @@
 #include <set>
 #include <string>
 
-#include "common.hpp"
+#include "common.h"
 #include <supo_general.hpp>
-#include "yproc.hpp"
+#include "yproc.h"
 
 using namespace std;
 using namespace supo;

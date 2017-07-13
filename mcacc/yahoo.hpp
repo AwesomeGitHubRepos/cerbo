@@ -5,8 +5,7 @@
 #include <string>
 #include <vector>
 
-//#include "price.hpp"
-#include "dec.hpp"
+#include "dec.h"
 
 typedef struct yahoo_t {
 	std::string dstamp;

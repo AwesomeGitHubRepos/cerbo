@@ -16,7 +16,7 @@
 #include <supo.hpp>
 
 #include "args.hpp"
-#include "common.hpp"
+#include "common.h"
 #include "oven.hpp"
 #include "tests.hpp"
 #include <supo_general.hpp>

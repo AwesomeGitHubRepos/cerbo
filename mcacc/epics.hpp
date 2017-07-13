@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#include "etran.hpp"
-#include "stend.hpp"
+#include "etran.h"
+#include "stend.h"
 
 class folio_c {
 	public:

@@ -9,9 +9,9 @@
 #include <locale.h>
 #include <string.h>
 
-#include "common.hpp"
+#include "common.h"
 #include <supo_general.hpp>
-#include "gaap.hpp"
+#include "gaap.h"
 
 
 

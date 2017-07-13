@@ -1,39 +1,17 @@
-//#include <chrono>
 #include <cmath>
 #include <decimal/decimal>
 #include <iostream>
-//#include <regex>
 #include <string>
 #include <type_traits>
 
-#include "dec.hpp"
-#include "inputs.hpp"
+#include "dec.h"
+#include "inputs.h"
 #include <supo_general.hpp>
-
-
-//using std::regex;
-//using std::regex_token_iterator;
 
 using std::cout;
 using std::endl;
 using std::string;
 using namespace supo;
-
-/*
-class Timer 
-{
-	public:
-		Timer() { start(); };
-		void start() {m_start = std::chrono::high_resolution_clock::now(); };
-		void stop() {m_stop = std::chrono::high_resolution_clock::now(); };
-		double nanos() { std::chrono::duration<double> d = m_stop - m_start; 
-			return std::chrono::duration_cast<std::chrono::nanoseconds>(d).count(); };
-	private:
-		std::chrono::time_point<std::chrono::high_resolution_clock>
-			m_start, m_stop;
-
-};
-*/
 
 void check(bool ok, std::string msg)
 {
@@ -53,7 +31,6 @@ void check_erase_all(std::string src, char c, std::string targ)
 	std::string cstr;
        	cstr	= c;
 	std::string msg = "erase_all() " + cstr + " in " + src;
-	//msg +=	c + " in " + src;
 	check(s == targ, msg);
 }
 
@@ -65,15 +42,6 @@ bool operator==(strings lhs, strings rhs)
 	return true;
 }
 
-/*
-void check_tokeniser(std::string str, std::vector<std::string> strs)
-{
-	bool ok = parse::tokenise_line(str) == strs;
-	std::string msg = "tokenise_line() <" + str + ">";
-	check(ok, msg);
-}
-*/
-
 
 void check_decimals()
 {
@@ -81,7 +49,6 @@ void check_decimals()
 
 	currency d1 = currency(12, 34);
 	static_assert(true, "always works");
-	//assert(d.dp ==2);
 	check(d1==d1, "decimal trivial equality");
 	currency d2 = currency(12, 35);
 	check(d1!=d2, "decimal trivial inequality");
@@ -128,12 +95,5 @@ void run_all_tests()
 	check_erase_all("aaa", 'a', "");
 	check_erase_all("alibaba", 'a', "libb");
 	check_erase_all("baad", 'a', "bd");
-
-	/*
-	check_tokeniser("hello world",  { "hello", "world" });
-	check_tokeniser("foo  \"baz shazam\"  bar", {"foo", "baz shazam", "bar"});
-       	check_tokeniser("    hello  \"joe blogg\"  world   # just a comment   ", {"hello", "joe blogg", "world"});
-	check_tokeniser("this is \"tricky disco", {"this", "is", "tricky disco"});
-*/
 	check_decimals();
 }

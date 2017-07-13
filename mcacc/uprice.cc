@@ -1,6 +1,3 @@
-/*
- * */
-
 #include <cmath>
 #include <map>
 #include <iostream>
@@ -8,14 +5,10 @@
 #include <locale.h>
 #include <string.h>
 
-#include "common.hpp"
-//#include <supo_general.hpp>
-#include "uprice.hpp"
-
-
+#include "common.h"
+#include "uprice.h"
 
 using namespace std;
-//using namespace supo;
 
 void 
 mkuprices(const detran_cs& the_etrans)
