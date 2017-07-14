@@ -5,6 +5,7 @@
 
 <a href="../../index.html">Home</a> 
 : <a href="../programming.htm" >programming</a>
+: <a href="perl6.htm">perl6</a>
 
 
 <h1>strings</h1>
@@ -16,6 +17,17 @@
 <b>Repetitions:</b> "foo " x 3; OUTPUT: foo foo foo
 
 </pre>
+
+
+<hr><h2>Splitting</h2>
+
+Assuming you know that an input can contain at most 2 (or whatever):
+<pre>
+my $d = &quot;goodbye   \&quot;cruel world\&quot;&quot;;
+say split(/\s+/, $d, 2)[0]; # goodbye
+say split(/\s+/, $d, 2)[1]; # &quot;cruel world&quot;
+</pre>
+
 
 <hr><pre>
 Author:  Mark Carter
