@@ -8,12 +8,16 @@ N	GBP
 	Assets	-50	AAPL	@@	$500
 	Assets
 
+2005/01/01	open
+	Cash	GBP10.00
+	Wages	
+
 2005/10/10	buy
-	Assets	30	"VOD.L"	@@	GBP400
-	Assets
+	Assets	30	"VOD.L"	@@	GBP400.00
+	Bank
 
 2005/10/20	sell
-	Assets	-30	"VOD.L"	@@	GBP500
-	Assetys
+	Assets	-30	"VOD.L"	@@	GBP500.00
+	Bank
 
-P	2015-10-15	21:30:02	"VOD.L"	GBP	3.8500000
+P	2005-10-15	21:30:02	"VOD.L"	GBP	3.8500000
