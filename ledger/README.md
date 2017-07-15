@@ -1,5 +1,10 @@
 Notes on Wiegley ledger
 
-# GOTHCAS
+## GOTHCAS
 
 * Lines should terminate with \n, not \r\n.
+
+## See also
+
+* https://github.com/blippy/cerbo/tree/master/ledger
+
