@@ -124,6 +124,7 @@ detran_c& detran_c::operator+=(const detran_c& rhs){
 	} else {
 		this->cost += (this->cost/this->qty) * rhs.qty;
 	}
+	this->ticker = rhs.ticker;
 	this->qty += rhs.qty;
 	this->ucost = this->cost/this->qty;
 	this->end_price = rhs.end_price;
