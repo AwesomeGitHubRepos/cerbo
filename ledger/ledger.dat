@@ -1,0 +1,19 @@
+N	GBP
+
+2004/05/01	Stock purchase
+	Assets	50	AAPL	@@	$400
+	Assets
+
+2004/05/10	Stock sale
+	Assets	-50	AAPL	@@	$500
+	Assets
+
+2005/10/10	buy
+	Assets	30	"VOD.L"	@@	GBP400
+	Assets
+
+2005/10/20	sell
+	Assets	-30	"VOD.L"	@@	GBP500
+	Assetys
+
+P	2015-10-15	21:30:02	"VOD.L"	GBP	3.8500000
