@@ -23,8 +23,8 @@ bool sorter(spair a, spair b)
 	return a.first < b.first;
 }
 
-/* Create the ledger.dat file */
-void mkledger(const etran_cs& es, const ntran_ts& ns)
+// create the transactions
+string mkledger(const etran_cs& es, const ntran_ts& ns)
 {
 	vector<spair> trans;
 
@@ -61,11 +61,14 @@ void mkledger(const etran_cs& es, const ntran_ts& ns)
 	for(auto& p: trans) {
 		dat += p.second;
 	}
-	string fname = rootdir() + "/ledger.dat";
-	spit(fname, dat);
+
+	return dat;
+	//string fname = rootdir() + "/ledger.dat";
+	//spit(fname, dat);
 }
 
 
+/*
 void spit_strings(const string& filename, const multiset<string>& lines)
 {
 	ofstream out;
@@ -74,11 +77,13 @@ void spit_strings(const string& filename, const multiset<string>& lines)
 	out.close();
 
 }
+*/
 
-void mkprices(const yahoo_ts&  ys)
+// create the prices
+string mkprices(const yahoo_ts&  ys)
 {
 	multiset<string> prices;
-	for(auto& y: ys) {
+	for(const auto& y: ys) {
 		string price_str = format_num(y.yprice.dbl()/100, 7);
 		string ticker = "\"" + y.ticker + "\"";
 		strings fields = {"P", y.dstamp, y.tstamp, ticker, 
@@ -87,13 +92,20 @@ void mkprices(const yahoo_ts&  ys)
 		prices.insert(line);
 	}
 
-	string fname = rootdir() + "/prices.dat";
-	spit_strings(fname, prices);
+	string result;
+	for(const auto& p:prices) result += p + "\n";
+
+	return result;
+	//cout << result;
+	//string fname = rootdir() + "/prices.dat";
+	//spit_strings(fname, prices);
 }
 
 void wiegley(const etran_cs& etrans, const ntran_ts& ntrans, const yahoo_ts& yahoos)
 {
 	// note that I split this out into two functions for profiling purposes
-	mkledger(etrans, ntrans);
-	mkprices(yahoos);
+	const string ledger = mkledger(etrans, ntrans);
+	const string prices = mkprices(yahoos);
+	string fname = rootdir() + "/ledger.dat";
+	spit(fname, ledger+prices);
 }
