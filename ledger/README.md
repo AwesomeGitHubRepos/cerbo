@@ -6,5 +6,4 @@ Notes on Wiegley ledger
 
 ## See also
 
-* https://github.com/blippy/cerbo/tree/master/ledger
-
+* http://www.markcarter.me.uk/money/software/software.htm
