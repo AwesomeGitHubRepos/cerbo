@@ -11,7 +11,7 @@
 #include "common.h"
 #include <supo_general.hpp>
 #include "yahoo.h"
-#include "wiegley.h"
+#include "reports.h"
 
 using namespace std;
 using namespace supo;
@@ -37,9 +37,10 @@ void mkledger(const etran_cs& es, const ntran_ts& ns)
 		string t2 = "\tEquity:" + e.folio 
 			+ "\t\"" + e.ticker + "\""
 			+ "\t" + e.qty.str()
-			+ "\t" + at ;
-		//	+ "\tGBP\t" + lcost + "\n"; 
-		string t3 = "\t" + e.folio + "\n\n";
+			+ "\t" + at 
+			+ "\tGBP\t" + abs(e.cost).str(); 
+		string t3 = "\n\t" + e.folio + "\n\n";
+		//string t3 = "\n\n";
 		string t = t1 + t2 + t3;
 		trans.push_back(make_pair(e.dstamp, t));
 	}
@@ -57,10 +58,10 @@ void mkledger(const etran_cs& es, const ntran_ts& ns)
 
 
 	string dat = "N\tGBP\n\n";
-	string fname = rootdir() + "/ledger.dat";
 	for(auto& p: trans) {
 		dat += p.second;
 	}
+	string fname = rootdir() + "/ledger.dat";
 	spit(fname, dat);
 }
 

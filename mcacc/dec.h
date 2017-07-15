@@ -56,6 +56,7 @@ class decn
 		decn_t& operator+=(const decn_t& rhs) { this->dec += rhs.dec;} ;
 		bool zerop() const { return dbl() == 0.0; };
 		void negate() { dec = -dec; } ;
+		friend decn_t abs(decn_t lhs) { lhs.dec = lhs.dec >= 0? lhs.dec : -lhs.dec; return lhs; };
 
 		friend std::ostream& operator<<(std::ostream& os, const decn_t& obj)
 		{

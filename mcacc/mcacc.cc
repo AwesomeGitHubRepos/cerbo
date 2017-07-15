@@ -110,6 +110,8 @@ main(int argc, char *argv[])
 	ove.m_vm = vm;
 	ove.load_inputs();
 	if(vm.at("snap") == "on") ove.fetch();
+
+	do_wiegley = true; // override defaults and just do it anyway
 	ove.process(do_wiegley);
 
 	//supo::ssystem("mcacc-reports.sh", true);

@@ -10,7 +10,7 @@
 #include "pgposts.h"
 #include "posts.h"
 #include "stend.h"
-#include "wiegley.h"
+#include "reports.h"
 #include "uprice.h"
 #include "yproc.h"
 
