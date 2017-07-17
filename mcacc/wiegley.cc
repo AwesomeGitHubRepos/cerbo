@@ -57,7 +57,72 @@ string mkledger(const etran_cs& es, const ntran_ts& ns)
 	sort(begin(trans), end(trans), sorter);
 
 
-	string dat = "N\tGBP\n\n";
+	string dat = R"(
+N	GBP
+
+account	Balance:Msa
+	alias	msa
+	
+account	Balance:Shares
+	alias	Equity
+
+account Balance:Short:Hfax
+	alias	hal
+
+account Balance:Short:Hargreaves
+	alias	hl
+
+account	Balance:Short:IGG
+	alias	igg
+
+account	Balance:Short:Rbd
+	alias	rbd
+
+account	Balance:Short:Rbs
+	alias	rbs
+
+account	Balance:Short:Tdi
+	alias	tdi
+
+account PaL:Income:Dividends
+        alias	div
+
+account	PaL:Income:Interest
+	alias	int
+
+account PaL:Income:Wages
+        alias   wag
+
+account PaL:Expenses:Amazon
+        alias   amz
+
+account	PaL:Expenses:Car
+	alias	car
+
+account PaL:Expenses:Charity
+        alias   chr
+
+account	PaL:Expenses:Computer
+	alias	cmp
+
+account	PaL:Expenses:Holiday
+	alias	hol
+
+account	PaL:Expenses:ISP
+	alias	isp
+
+account	PaL:Expenses:Misc
+	alias	msc
+
+account	PaL:Expenses:Mum
+	alias	mum
+
+account	PaL:Expenses:Taxes
+	alias	tax
+
+
+)";
+
 	for(auto& p: trans) {
 		dat += p.second;
 	}

@@ -1,5 +1,14 @@
 N	GBP
 
+
+2000/07/07	This should be altered by canceller
+	acca	GBP500
+	accb
+
+2000/08/07	canceller
+	acca	= GBP200
+	accb
+
 2004/05/01	Stock purchase
 	Assets	50	AAPL	@@	$400
 	Assets
