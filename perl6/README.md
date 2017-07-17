@@ -1,5 +1,17 @@
 ## Shlex
 
+Example::
+
+```perl6
+use Shlex;
+
+my $str = Q[hellow "new \"old\" world"  to-be-or-not #to be];
+my @fields = shlex-fields $str; 
+say @fields.perl; # OUTPUT ["hellow", "new \\\"old\\\" world", "to-be-or-not"]
+say @fields[1]; # OUTPUT new \"old\" world
+```
+
+
 When I asked on a userlist, I was told to 
 zef install Text::CSV for an example of how this could be done.
 
