@@ -9,7 +9,7 @@ grammar Shlex {
 	token comment { '#' .* }
 	#rule word { <[a..zA..Z0..9\\-]>+ }
 	token word1 { \S+ }
-	rule word { <word1> }
+	token word { <word1> <.ws>? }
 	token ascii_char { <-["\\]> } # anything not a " or \
 	token escaped_char { "\\\"" } # literal \" 
 	token qstr { [<escaped_char>|<ascii_char>]* }
@@ -18,14 +18,6 @@ grammar Shlex {
 }
 
 
-
-
-#my $m = Shlex.parse(Q[goodbye "\"cruel\" world"  ]);
-#say "First  component:$m[0][0].Str()"; # OUTPUT: First  component:goodbye
-#say "Second component:$m[0][1].Str()"; # OUTPUT: Second component:"\"cruel\" world"
-
-#say Shlex.parse("hello \"good fello\" #what say you").gist;
-
 class ShlexActions {
 	has @.fields is rw;
 
@@ -33,12 +25,15 @@ class ShlexActions {
 	method qstring ($/) { @!fields.append: $<qstr>.Str() ; }
 }
 
-#my $shacts = ShlexActions.new;
-#Shlex.parse("hellow \"new world\"  to-be-or-not #to be", :actions($shacts));
 
 sub shlex-fields(Str $str) is export { 
 	my $shacts = ShlexActions.new;
 	Shlex.parse($str, :actions($shacts));
 	return $shacts.fields;
+}
+
+
+sub test-shlex is export {
+	say shlex-fields "hello world";
 }
 
