@@ -4,8 +4,10 @@
 #include <set>
 #include <string>
 
-#include "common.h"
 #include <supo_general.hpp>
+
+#include "common.h"
+#include "types.h"
 #include "yproc.h"
 
 using namespace std;
@@ -57,11 +59,11 @@ void mkyahoos(downloads_t& ds)
 	ofstream yout;
 	yout.open(yout_name);
 	for(auto& y: ds.ys){
-		string chgpc = format_num(y.chgpc, 2);
+		string chgpc = pad_left(format_num(y.chgpc, 2), 6);
 		strings fields = {"yahoo-1", ds.dstamp, ds.tstamp, 
-			y.ticker, "1.0000", y.yprice.str(), 
+			pad_ticker(y.ticker), "1.0000", y.yprice.str(), 
 			y.chg.str(), chgpc, "P", "downloaded"};
-		yout << intercalate("\t", fields);
+		yout << intercalate("  ", fields);
 		yout << endl;
 	}
 	yout.close();
