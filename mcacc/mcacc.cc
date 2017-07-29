@@ -13,7 +13,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <supo.hpp>
+#include <supo.h>
 
 #include "args.h"
 #include "common.h"

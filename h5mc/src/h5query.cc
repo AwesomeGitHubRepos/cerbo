@@ -19,7 +19,7 @@
 
 #include "common.hpp"
 
-#include <supo_stats.hpp>
+#include <supo_stats.h>
 
 using std::cout;
 using std::endl;

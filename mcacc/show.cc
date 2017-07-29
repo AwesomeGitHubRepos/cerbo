@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 
-#include <supo.hpp>
+#include <supo.h>
 
 #include "common.h"
 #include "show.h"

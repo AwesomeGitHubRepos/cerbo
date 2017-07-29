@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "supo.hpp"
+#include "supo.h"
 
 namespace supo {
 void ssystem(const std::string& command, bool report_problem_to_stderr)

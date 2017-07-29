@@ -6,7 +6,7 @@
 #include <vector>
 #include <stdexcept>
 
-#include <supo.hpp>
+#include <supo.h>
 
 using namespace std;
 

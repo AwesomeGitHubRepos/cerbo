@@ -14,8 +14,7 @@
 #include <map>
 
 
-//#include <mcstats.h>
-#include <supo_stats.hpp>
+#include <supo_stats.h>
 
 #include "common.hpp"
 

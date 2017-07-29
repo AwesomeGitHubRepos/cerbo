@@ -7,7 +7,7 @@
 #include <string>
 #include <utility>
 
-#include <supo.hpp>
+#include <supo.h>
 
 #include "common.hpp"
 

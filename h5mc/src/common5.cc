@@ -2,9 +2,9 @@
 #include <string.h>
 #include <algorithm>
 
-#include <supo_stats.hpp>
+#include <supo_stats.h>
 
-#include "common5.hpp"
+#include "common5.h"
 
 
 

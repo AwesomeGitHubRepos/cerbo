@@ -4,7 +4,7 @@
 #include <map>
 #include <vector>
 
-#include <supo_stats.hpp>
+#include <supo_stats.h>
 
 namespace supo {
 

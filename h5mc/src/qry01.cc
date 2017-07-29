@@ -15,7 +15,7 @@
 #include <string>
 #include <utility>
 
-#include <supo_stats.hpp>
+#include <supo_stats.h>
 
 #include "common.hpp"
 

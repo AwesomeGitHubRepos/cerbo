@@ -10,9 +10,8 @@
 
 using std::cout;
 using std::endl;
-//using namespace std;
 
-#include <supo_stats.hpp>
+#include <supo_stats.h>
 
 using std::string;
 
