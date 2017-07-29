@@ -1,3 +1,10 @@
+# Perl6
+
+## Piping
+
+There is a detailed disuccion of bi-directional communication with
+another process on [perl6-users](http://www.nntp.perl.org/group/perl.perl6.users/2017/07/msg4091.html).
+
 ## Shlex
 
 Example::
