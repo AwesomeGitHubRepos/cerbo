@@ -1,4 +1,4 @@
-AM_CXXFLAGS = $(CXXSTD) -ggdb $(ISUPO)
+AM_CXXFLAGS = $(CXXSTD) -O0 -ggdb $(ISUPO)
 bin_PROGRAMS = mcacc 
 man1_MANS = mcacc.1
 mcacc_LDADD = -lpthread $(LIBSUPO)

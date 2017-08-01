@@ -45,7 +45,12 @@ void download(const comm_ts& the_comms, downloads_t& ds)
 		y.tstamp = tstamp;
 		y.ticker = fields[0]; 
 		erase_all(y.ticker, '"');
-		y.yprice.from_str(fields[1]);
+		try {
+			y.yprice.from_str(fields[1]);
+		} catch (const std::invalid_argument&) {
+			throw std::invalid_argument("yproc.cc: Cannot convert downloaded ticker " 
+					+ y.ticker + " price from string:" + fields[1]);
+		}
 		y.chg.from_str(fields[2]);
 		y.chgpc = y.chg.dbl() / (y.yprice.dbl() - y.chg.dbl()) * 100;
 		ds.ys.insert(y);
