@@ -1,3 +1,5 @@
+/Makefile
+Makefile.in
 *.tar.gz
 cerbo-0.6/
 .dirstamp
@@ -6,8 +8,6 @@ cerbo-0.6/
 *.o
 a.out
 compile
-Makefile
-Makefile.in
 aclocal.m4
 autom4te.cache/
 config.log
