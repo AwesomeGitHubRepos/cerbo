@@ -1,18 +1,29 @@
+#include <deque>
+#include <exception>
 #include <iostream>
 #include <string>
 #include <regex>
 #include <iterator>
+#include <stdexcept>
 #include <vector>
 
 using std::cout;
+using std::deque;
 using std::endl;
 using std::string;
 using std::vector;
 
-enum blang_t { T_NUL, T_NUM, T_ID, T_ASS, T_OP };
+enum blang_t { 
+	T_NUL, // represents NULL, or nothing
+	T_EOF, // end of input
+	T_NUM, T_ID, T_ASS, T_OP 
+};
 
-struct token { blang_t type; string value; } token;
-typedef vector<struct token> tokens;
+typedef struct token { blang_t type; string value; } token;
+typedef deque<struct token> tokens;
+
+static tokens g_tokens;
+static token nextsymb;
 
 tokens tokenise(const string& str)
 {
@@ -59,15 +70,86 @@ tokens tokenise(const string& str)
 
 }
 
+token yylex()
+{
+	nextsymb = token{T_EOF, ""};
+	if( g_tokens.size() == 0) return nextsymb;
+	nextsymb = g_tokens[0];
+	g_tokens.pop_front();
+	return nextsymb;
+}
+
+/*
+void syntax_error(const string& expecting, const token& toke, const string& where)
+{
+	string msg = "Syntax error. Expecting " + expecting + ", got " + toke.value + " in " + where;
+	throw std::runtime_error(msg);
+}
+*/
+
+/*
+void checkfor(const string& expecting, const token& toke, const string& where)
+{
+	if(expecting != toke.value)
+		syntax_error(expecting, toke, where);
+}
+*/
+
+void checkfor(const string& expecting)
+{
+	if(expecting != nextsymb.value) {
+		string msg = "Expecting " + expecting + ", found " + nextsymb.value;
+		throw std::runtime_error(msg);
+	}
+	nextsymb = yylex();
+	//checkfor(expecting, get(tokes), where);
+}
+
+void variable()
+{
+	//token toke = get(tokes);
+	cout << "TODO variable\n";
+}
+void expression()
+{
+	//token toke = get(tokes);
+	cout << "TODO expressione\n";
+}
+
+void scanner()
+{
+	nextsymb = yylex();
+	checkfor("print");
+	expression();
+	cout << "Finished parsing\n";
+	/*
+	token toke;
+	checkfor("for");
+	variable();
+	checkfor("=");
+	expression();
+	checkfor("to");
+	expression();
+	*/
+}
+
 int main()
 {
-	std::string str = R"(
+	std::string str1 = R"(
 for i = 1 to 6
 	print i * 2
 next
 )";
-	tokens tokes = tokenise(str);
-	for(const auto& t: tokes) 
+
+string str2 = R"( print 42 )";
+
+	g_tokens = tokenise(str2);
+
+	cout << "=== TOKENISER REPORT ===\n";
+	for(const auto& t: g_tokens) 
 		cout <<  t.type << "\t" << t.value <<"\n";
+	cout << "=== END TOKENISER REPORT ===\n\n";
+
+	scanner();
 	return 0;
 }
