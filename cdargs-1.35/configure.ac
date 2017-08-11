@@ -1,7 +1,7 @@
 AC_PREREQ([2.69])
 AC_INIT([cdargs], [1.35], [alt.mcarter@gmail.com])
 AC_CONFIG_SRCDIR([src/cdargs.cc])
-AC_CONFIG_MACRO_DIR([m4])
+#AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign])
 AC_PROG_CXX
 #AC_STDC_HEADERS
