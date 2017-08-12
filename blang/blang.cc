@@ -10,7 +10,9 @@
 
 using std::unique_ptr;
 using std::make_unique;
+using std::cin;
 using std::cout;
+using std::getline;
 using std::deque;
 using std::endl;
 using std::string;
@@ -216,6 +218,7 @@ void scanner()
 	//vector<std::unique_ptr<BlangCode> > v;
 
 	//vector<BlangCode*> v;
+
 	vector<unique_ptr<BlangCode>> v;
 	nextsymb = yylex();
 	while(nextsymb.type != T_EOF)
@@ -255,7 +258,13 @@ next
 
 string str2 = R"( print (16, 42 )  print( 43, 44 , 45)     )";
 
-	g_tokens = tokenise(str2);
+	// read inputs
+	string line, str3;
+	while(getline(cin, line)) {
+		str3 += line + "\n";
+	}
+
+	g_tokens = tokenise(str3);
 
 	cout << "=== TOKENISER REPORT ===\n";
 	for(const auto& t: g_tokens) 
