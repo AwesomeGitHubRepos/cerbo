@@ -6,4 +6,4 @@ clean :
 	rm -f blang
 
 blang : blang.cc
-	g++ $< -o $@
+	g++ -g -O0 -lefence $< -o $@
