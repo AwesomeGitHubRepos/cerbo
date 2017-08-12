@@ -1,6 +1,7 @@
 #include <deque>
 #include <exception>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <string>
 #include <regex>
@@ -8,6 +9,7 @@
 #include <stdexcept>
 #include <vector>
 
+using std::map;
 using std::runtime_error;
 using std::unique_ptr;
 using std::make_unique;
@@ -18,6 +20,7 @@ using std::deque;
 using std::endl;
 using std::string;
 using std::vector;
+using std::to_string;
 
 // taken from https://github.com/eantcal/nubasic/blob/master/include/nu_eval_expr.h
 //variant_t eval_expr(rt_prog_ctx_t& ctx, std::string data);
@@ -45,6 +48,10 @@ typedef deque<struct token> tokens;
 
 static tokens g_tokens;
 static token nextsymb;
+
+//class BlangExpr;
+//map<string, unique_ptr<BlangExpr>> varmap; // variables and values
+map<string, double> varmap; // variables and values
 
 tokens tokenise(const string& str)
 {
@@ -142,15 +149,44 @@ void variable()
 class BlangExpr: public BlangCode {
 	public:
 		BlangExpr()  {
-			_e = nextsymb.value;
+			type = nextsymb.type;
+			switch(type) {
+				case T_NUM:
+					d = stod(nextsymb.value);					
+					break;
+				case T_ID:
+					varname = nextsymb.value;
+					break;
+				default:
+					throw runtime_error("BlangExpr bad token: " + nextsymb.value);
+			}
+
+
 			nextsymb = yylex();
 		};
-		void eval() {}
+		void eval() { }
 		~BlangExpr() { cout << "Bye from BlangExpr\n" ; };
-		string get_value() const { return _e;}
+		double get_value() const {
+			switch(type) {
+				case T_NUM:
+					return d;
+				case T_ID:
+					{
+						auto it = varmap.find(varname);
+						double val = 0;
+						if(it != varmap.end()) val = varmap[varname];
+						return val;
+					}
+				default:
+					throw runtime_error("BlangExpr didn't handle type " + to_string(type));
+			}
+			return 0;
+			}
 
 	private:
-		string _e;
+		double d;
+		string varname;
+		blang_t type;
 };
 
 class BlangExprList : public BlangCode {
@@ -170,7 +206,10 @@ class BlangExprList : public BlangCode {
 		void eval() {};
 		size_t size() const { return ptrs.size(); }
 		~BlangExprList() {}
-		string get_value(int i) const { return ptrs[i]->get_value(); }
+		string get_value(int i) const { 
+			double d = ptrs[i]->get_value();
+			return to_string(d);
+		}
 
 		//vector<unique_ptr<BlangExpr>> get_values() const { return ptrs;}
 		
@@ -195,7 +234,7 @@ class BlangPrint: public BlangCode {
 		//       	_e{e} {};
 		BlangPrint() {
 			cout << "BlangPrint says hello\n";
-			_e = make_unique<BlangExprList>();
+			ptr = make_unique<BlangExprList>();
 			//checkfor("(");
 			//_e = make_unique<BlangExpr>();
 			//checkfor(")");
@@ -207,9 +246,9 @@ class BlangPrint: public BlangCode {
 			for(const auto& e: _e->get_values())
 				cout << e->get_value() << " ~ ";
 				*/
-			for(int i = 0; i< _e->size(); ++i) {
-				cout << _e->get_value(i);
-				if( i +1 < _e->size()) cout << " ~ ";
+			for(int i = 0; i< ptr->size(); ++i) {
+				cout << ptr->get_value(i);
+				if( i +1 < ptr->size()) cout << " ~ ";
 			}
 
 		       	cout <<  "\n" ; 
@@ -217,7 +256,46 @@ class BlangPrint: public BlangCode {
 
 		~BlangPrint() { cout << "Bye from BlangPrint\n"; }
 	private:
-		unique_ptr<BlangExprList> _e = nullptr;
+		unique_ptr<BlangExprList> ptr = nullptr;
+		//unique_ptr<BlangCode> ptr = nullptr;
+};
+
+class BlangLet: public BlangCode { // assignment statement
+	public:
+		BlangLet() {
+			varname = nextsymb.value;
+			nextsymb = yylex();
+			checkfor(":=");
+			ptr = make_unique<BlangExpr>();
+		}
+
+		void eval() {
+			varmap[varname] = ptr->get_value();
+			//cout << "TODO BlangLet eval on variable " << varname << "\n";
+		}
+
+		private:
+		string varname;
+		unique_ptr<BlangExpr> ptr;
+
+};
+
+class BlangStmt: public BlangCode { // some statement
+	public:
+		BlangStmt() {
+			string sym = nextsymb.value;
+			nextsymb = yylex();
+			if(sym == "print")
+				ptr = make_unique<BlangPrint>();
+			else if(sym == "let")
+				ptr = make_unique<BlangLet>();
+			else
+				throw runtime_error("Statement unknown token: " + sym);
+		}
+
+		void eval() { ptr->eval(); }
+	private:
+		unique_ptr<BlangCode> ptr = nullptr;
 };
 
 void scanner()
@@ -231,12 +309,10 @@ void scanner()
 	while(nextsymb.type != T_EOF)
 	{
 
-		checkfor("print");
-		//BlangExpr expr = expression();
-		//BlangPrint print = BlangPrint(BlangExpr());
-		//v.push_back(&print);
-		//v.push_back(new BlangPrint());
-		v.push_back(make_unique<BlangPrint>());
+
+		v.push_back(make_unique<BlangStmt>());
+		//checkfor("print");
+		//v.push_back(make_unique<BlangPrint>());
 	}
 
 	// Now run the code
