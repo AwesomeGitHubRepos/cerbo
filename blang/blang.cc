@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <vector>
 
+using std::runtime_error;
 using std::unique_ptr;
 using std::make_unique;
 using std::cin;
@@ -23,7 +24,9 @@ using std::vector;
 
 enum blang_t { 
 	T_NUL, // represents NULL, or nothing
+	T_BAD, // non-matching whitespace. Should not happen, as all input should be made into a token
 	T_EOF, // end of input
+
 	T_COM, // comma
 	T_LRB, // left round bracket
 	T_RRB, // right round bracket
@@ -54,11 +57,12 @@ tokens tokenise(const string& str)
 	{
 		{"[0-9]+" , T_NUM} ,
 			{"[a-z]+"	, T_ID},
-			{"="		, T_ASS},
+			{":="		, T_ASS},
 			{"\\("		, T_LRB},
 			{"\\)"		, T_RRB},
 			{"\\,"		, T_COM},
-			{"\\*|\\+", T_OP}
+			{"\\*|\\+"      , T_OP},
+			{"\\S+"	        , T_BAD}
 	};
 
 	std::string reg;
@@ -84,6 +88,9 @@ tokens tokenise(const string& str)
 		//std::cout << it->str() << "\t" << v[index].second << std::endl;
 		//struct token toke = {.type = v[index].second, .value = it->str()};
 		struct token toke{v[index].second, it->str()};
+		if(toke.type == T_BAD)
+			throw runtime_error("Lexical analysis: unhandled token: " + toke.value);
+
 		result.push_back(toke);
 	}
 
