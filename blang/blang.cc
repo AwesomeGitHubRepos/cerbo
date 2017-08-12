@@ -33,7 +33,8 @@ enum blang_t {
 	T_COM, // comma
 	T_LRB, // left round bracket
 	T_RRB, // right round bracket
-	T_NUM, T_ID, T_ASS, T_OP 
+	T_NUM, T_ID, T_ASS, 
+	T_PM   // plus or minus
 };
 
 class BlangCode {
@@ -53,6 +54,14 @@ static token nextsymb;
 //map<string, unique_ptr<BlangExpr>> varmap; // variables and values
 map<string, double> varmap; // variables and values
 
+double var_value(string varname) 
+{
+	auto it = varmap.find(varname);
+	double val = 0;
+	if(it != varmap.end()) val = varmap[varname];
+	return val;
+}
+
 tokens tokenise(const string& str)
 {
 	tokens result;
@@ -68,7 +77,7 @@ tokens tokenise(const string& str)
 			{"\\("		, T_LRB},
 			{"\\)"		, T_RRB},
 			{"\\,"		, T_COM},
-			{"\\*|\\+"      , T_OP},
+			{"\\+|\\-"      , T_PM},
 			{"\\S+"	        , T_BAD}
 	};
 
@@ -146,9 +155,81 @@ void variable()
 	cout << "TODO variable\n";
 }
 
+class BlangOp: public BlangCode {
+	public:
+		BlangOp() {
+			op = nextsymb.value;
+			if(!(nextsymb.value == "+" || nextsymb.value == "-"))
+				throw runtime_error("BlangOp error. Expected '+' or '-', got "
+						+ nextsymb.value);
+			nextsymb = yylex();
+			cout << "BlangOp nextsymb is " << nextsymb.value << endl;
+		}
+		void eval() {}
+		~BlangOp() {}
+		double get_sign() { return op == "+" ? 1 : -1;}
+	private:
+		string op;
+};
+
+class BlangFact: public BlangCode {
+	public:
+		BlangFact() {
+			if(!(nextsymb.type == T_ID || nextsymb.type == T_NUM))
+				throw runtime_error("BlangFact error. Expected number or varname, got "
+						+ nextsymb.value);
+			toke = nextsymb;
+			nextsymb = yylex();
+		}
+		void eval() {}
+		double get_value() {
+			if(toke.type == T_NUM)
+				return stod(toke.value);
+			else
+				return var_value(toke.value);
+		}
+
+		~BlangFact() {}
+	private:
+		token toke;
+};
+
 class BlangExpr: public BlangCode {
 	public:
 		BlangExpr()  {
+			cout << "BlangExpr nextsymb = " << nextsymb.value << endl;
+			add_expr();
+			cout << "BlangExpr nextsymb = " << nextsymb.value << endl;
+			while(nextsymb.type == T_PM) {
+				cout << "BlangExpr found an operator" << endl;
+				ops.push_back(make_unique<BlangOp>());
+				add_expr();
+			}
+		}
+		void eval() { }
+		double get_value() {
+			double d = exprs[0]->get_value();
+			for(int i = 1; i< exprs.size(); i++) {
+				double sgn = ops[i-1]->get_sign();
+				d += sgn * exprs[i]->get_value();
+			}
+			return d;
+		}
+		~BlangExpr() { cout << "Bye from BlangExpr\n" ; };
+	private:
+		void add_expr() { 
+			exprs.push_back(make_unique<BlangFact>()); // Actually the factors s/b terms
+			//nextsymb = yylex();
+		}
+
+		vector<unique_ptr<BlangFact>> exprs;
+		vector<unique_ptr<BlangOp>>   ops;
+
+};
+
+class BlangExprXXX: public BlangCode {
+	public:
+		BlangExprXXX()  {
 			type = nextsymb.type;
 			switch(type) {
 				case T_NUM:
@@ -165,18 +246,13 @@ class BlangExpr: public BlangCode {
 			nextsymb = yylex();
 		};
 		void eval() { }
-		~BlangExpr() { cout << "Bye from BlangExpr\n" ; };
+		~BlangExprXXX() { cout << "Bye from BlangExpr\n" ; };
 		double get_value() const {
 			switch(type) {
 				case T_NUM:
 					return d;
 				case T_ID:
-					{
-						auto it = varmap.find(varname);
-						double val = 0;
-						if(it != varmap.end()) val = varmap[varname];
-						return val;
-					}
+					return var_value(varname);
 				default:
 					throw runtime_error("BlangExpr didn't handle type " + to_string(type));
 			}
@@ -199,7 +275,7 @@ class BlangExprList : public BlangCode {
 				ptrs.push_back(make_unique<BlangExpr>());
 				//add_expr();
 				if(nextsymb.value != ",") break;
-				yylex();
+				nextsymb = yylex();
 			}
 			checkfor(")");
 		}
@@ -266,7 +342,9 @@ class BlangLet: public BlangCode { // assignment statement
 			varname = nextsymb.value;
 			nextsymb = yylex();
 			checkfor(":=");
+			cout << "BlangLet checkpoint nextysmb: " << nextsymb.value << endl;
 			ptr = make_unique<BlangExpr>();
+			cout << "BlangLet checkpoint nextysmb: " << nextsymb.value << endl;
 		}
 
 		void eval() {
