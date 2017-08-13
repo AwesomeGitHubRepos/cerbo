@@ -29,6 +29,7 @@ enum blang_t {
 	T_NUL, // represents NULL, or nothing
 	T_BAD, // non-matching whitespace. Should not happen, as all input should be made into a token
 	T_EOF, // end of input
+	T_REM, // comment
 
 	T_COM, // comma
 	T_LRB, // left round bracket
@@ -80,6 +81,7 @@ tokens tokenise(const string& str)
 			{"\\,"		, T_COM},
 			{"\\+|\\-"      , T_PM},
 			{"\\*|/"        , T_MD},
+			{"'.*\\n"       , T_REM},
 			{"\\S+"	        , T_BAD}
 	};
 
@@ -103,11 +105,10 @@ tokens tokenise(const string& str)
 			if(!it->str(index + 1).empty()) // determine which submatch was matched
 				break;
 
-		//std::cout << it->str() << "\t" << v[index].second << std::endl;
-		//struct token toke = {.type = v[index].second, .value = it->str()};
 		struct token toke{v[index].second, it->str()};
 		if(toke.type == T_BAD)
 			throw runtime_error("Lexical analysis: unhandled token: " + toke.value);
+		if(toke.type == T_REM) continue; // just ignore comments
 
 		result.push_back(toke);
 	}
