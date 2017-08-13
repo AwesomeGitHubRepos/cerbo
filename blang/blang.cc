@@ -162,6 +162,8 @@ class BlangOp: public BlangCode {
 };
 */
 
+///////////////////////////////////////////////////////////////////////////
+// ARITHMETIC
 // Adopt the algorithm at 
 // https://www.engr.mun.ca/~theo/Misc/exp_parsing.htm#classic
 // for computing arithmetic
@@ -288,102 +290,8 @@ double BlangE::get_value(){
 	return d;
 }
 
-/*
-class BlangFact: public BlangCode {
-	public:
-		BlangFact() {
-			if(!(nextsymb.type == T_ID || nextsymb.type == T_NUM))
-				throw runtime_error("BlangFact error. Expected number or varname, got "
-						+ nextsymb.value);
-			toke = nextsymb;
-			nextsymb = yylex();
-		}
-		void eval() {}
-		double get_value() {
-			if(toke.type == T_NUM)
-				return stod(toke.value);
-			else
-				return var_value(toke.value);
-		}
-
-		~BlangFact() {}
-	private:
-		token toke;
-};
-*/
-
-/*
-class BlangExpr: public BlangCode {
-	public:
-		BlangExpr()  {
-			cout << "BlangExpr nextsymb = " << nextsymb.value << endl;
-			add_expr();
-			cout << "BlangExpr nextsymb = " << nextsymb.value << endl;
-			while(nextsymb.type == T_PM) {
-				cout << "BlangExpr found an operator" << endl;
-				ops.push_back(make_unique<BlangOp>());
-				add_expr();
-			}
-		}
-		void eval() { }
-		double get_value() {
-			double d = exprs[0]->get_value();
-			for(int i = 1; i< exprs.size(); i++) {
-				double sgn = ops[i-1]->get_sign();
-				d += sgn * exprs[i]->get_value();
-			}
-			return d;
-		}
-		~BlangExpr() { cout << "Bye from BlangExpr\n" ; };
-	private:
-		void add_expr() { 
-			exprs.push_back(make_unique<BlangFact>()); // Actually the factors s/b terms
-			//nextsymb = yylex();
-		}
-
-		vector<unique_ptr<BlangFact>> exprs;
-		vector<unique_ptr<BlangOp>>   ops;
-
-};
-
-class BlangExprXXX: public BlangCode {
-	public:
-		BlangExprXXX()  {
-			type = nextsymb.type;
-			switch(type) {
-				case T_NUM:
-					d = stod(nextsymb.value);					
-					break;
-				case T_ID:
-					varname = nextsymb.value;
-					break;
-				default:
-					throw runtime_error("BlangExpr bad token: " + nextsymb.value);
-			}
-
-
-			nextsymb = yylex();
-		};
-		void eval() { }
-		~BlangExprXXX() { cout << "Bye from BlangExpr\n" ; };
-		double get_value() const {
-			switch(type) {
-				case T_NUM:
-					return d;
-				case T_ID:
-					return var_value(varname);
-				default:
-					throw runtime_error("BlangExpr didn't handle type " + to_string(type));
-			}
-			return 0;
-			}
-
-	private:
-		double d;
-		string varname;
-		blang_t type;
-};
-*/
+// ARITHMETIC END
+///////////////////////////////////////////////////////////////////////////
 
 class BlangExprList : public BlangCode {
 	public:
@@ -480,67 +388,100 @@ class BlangLet: public BlangCode { // assignment statement
 
 };
 
+///////////////////////////////////////////////////////////////////////////
 class BlangStmt: public BlangCode { // some statement
 	public:
-		BlangStmt() {
-			string sym = nextsymb.value;
+		BlangStmt();
+		void eval();
+	private:
+		unique_ptr<BlangCode> stmt = nullptr;
+};
+
+class BlangProg : BlangCode {
+	public:
+		BlangProg();
+		void eval();
+	private:
+		vector<unique_ptr<BlangStmt>> stmts;
+};
+class BlangFor: public BlangCode { // for loop
+	public:
+		BlangFor() {
+			//variable name required
+			varname = nextsymb.value;
+			if(nextsymb.type != T_ID)
+				throw runtime_error("BlangFor: expecting ID but found " + nextsymb.value);
 			nextsymb = yylex();
-			if(sym == "print")
-				ptr = make_unique<BlangPrint>();
-			else if(sym == "let")
-				ptr = make_unique<BlangLet>();
-			else
-				throw runtime_error("Statement unknown token: " + sym);
+
+			checkfor(":=");
+			from_ptr = make_unique<BlangE>();
+			checkfor("to");
+			to_ptr = make_unique<BlangE>();
+			while(nextsymb.value != "next") {
+				stmts.push_back(make_unique<BlangStmt>());
+			}
+			nextsymb = yylex();
 		}
 
-		void eval() { ptr->eval(); }
+		void eval() {
+			varmap[varname] = from_ptr->get_value();
+			for(int i = from_ptr->get_value(); i <= to_ptr->get_value(); i++) {
+				varmap[varname] = i;
+				for(auto& s: stmts)
+					s->eval();
+			}
+		}
 	private:
-		unique_ptr<BlangCode> ptr = nullptr;
+		string varname;
+		unique_ptr<BlangE> from_ptr, to_ptr;
+		vector<unique_ptr<BlangStmt>> stmts;
 };
+
+
+BlangStmt::BlangStmt() {
+	string sym = nextsymb.value;
+	nextsymb = yylex();
+	if(sym == "print")
+		stmt = make_unique<BlangPrint>();
+	else if(sym == "let")
+		stmt = make_unique<BlangLet>();
+	else if(sym == "for")
+		stmt = make_unique<BlangFor>();
+	else
+		throw runtime_error("Statement unknown token: " + sym);
+}
+
+void BlangStmt::eval()
+{ 
+	stmt->eval(); 
+}
+
+BlangProg::BlangProg()
+{ 
+	while(nextsymb.type != T_EOF)
+	{
+		stmts.push_back(make_unique<BlangStmt>());
+	}
+}
+
+void BlangProg::eval()
+{
+       	for(auto& s: stmts) s->eval();
+}
+
 
 void scanner()
 {
-	//vector<std::unique_ptr<BlangCode> > v;
-
-	//vector<BlangCode*> v;
-
 	vector<unique_ptr<BlangCode>> v;
 	nextsymb = yylex();
-	while(nextsymb.type != T_EOF)
-	{
-
-
-		v.push_back(make_unique<BlangStmt>());
-		//checkfor("print");
-		//v.push_back(make_unique<BlangPrint>());
-	}
-
-	// Now run the code
-	for(auto& c: v)
-		c->eval();
-
-	cout << "Finished parsing\n";
-	/*
-	   token toke;
-	   checkfor("for");
-	   variable();
-	   checkfor("=");
-	   expression();
-	   checkfor("to");
-	   expression();
-	   */
+	BlangProg prog; // scan
+	cout << "Finished scanning\n";
+	prog.eval();
+	cout << "Run finished\n";
 }
 
 int main()
 {
-	std::string str1 = R"(
-for i = 1 to 6
-	print i * 2
-next
-)";
-
-string str2 = R"( print (16, 42 )  print( 43, 44 , 45)     )";
-
 	// read inputs
 	string line, str3;
 	while(getline(cin, line)) {
