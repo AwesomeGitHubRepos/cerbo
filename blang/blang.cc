@@ -34,6 +34,7 @@ enum blang_t {
 	T_COM, // comma
 	T_LRB, // left round bracket
 	T_RRB, // right round bracket
+	T_REL, // relational operator
 	T_NUM, T_ID, T_ASS, 
 	T_MD,  // multiplication or divide
 	T_PM   // plus or minus
@@ -82,6 +83,7 @@ tokens tokenise(const string& str)
 			{"\\+|\\-"      , T_PM},
 			{"\\*|/"        , T_MD},
 			{"'.*\\n"       , T_REM},
+			{"<|<=|>|>=|==|!=", T_REL},
 			{"\\S+"	        , T_BAD}
 	};
 
@@ -169,22 +171,45 @@ class BlangOp: public BlangCode {
 // https://www.engr.mun.ca/~theo/Misc/exp_parsing.htm#classic
 // for computing arithmetic
 //
+// Here's the original derivations
 //  E --> T {( "+" | "-" ) T}
 //  T --> F {( "*" | "/" ) F}
 //  F --> P ["^" F]
+//  P --> v | "(" E ")" | "-" T
+//
+// Here's mine:
+//  E --> R {( "<" | "<=" | ">" | ">=" | "==" | "!=" ) R}
+//  R --> T {( "+" | "-" ) T}
+//  T --> P {( "*" | "/" ) P}
 //  P --> v | "(" E ")" | "-" T
 
 class BlangP;
 
 class BlangT;
 
+class BlangR {
+	public:
+		BlangR();
+		double get_value();
+
+	private:
+		vector<string> ops{"+"};
+		vector<unique_ptr<BlangT>> Ts;
+};
+
 class BlangE {
 	public:
 		BlangE();
 		double get_value();
 	private:
-		vector<unique_ptr<BlangT>> Ts;
-		vector<string> ops{"+"};
+		vector<unique_ptr<BlangR>> Rs;
+		//vector<string> ops{"+"};
+		vector<string> ops;
+		bool match() {
+			string sym = nextsymb.value;
+			return sym == "<" || sym == "<=" || sym == ">" || sym == ">=" 
+				|| sym == "==" || sym == "!=";
+		}
 
 };
 
@@ -250,7 +275,7 @@ class BlangP {
 };
 
 BlangT::BlangT() {
-	//  T --> F {( "*" | "/" ) F}   (but using P instead of F)
+	//  T --> P {( "*" | "/" ) P}
 	Ps.push_back(make_unique<BlangP>());
 	while(nextsymb.value == "*" || nextsymb.value == "/") {
 		ops.push_back(nextsymb.value);
@@ -270,8 +295,8 @@ double BlangT::get_value() {
 }
 
 
-BlangE::BlangE() {
-	//  E --> T {( "+" | "-" ) T}
+BlangR::BlangR() {
+	//  R --> T {( "+" | "-" ) T}
 	Ts.push_back(make_unique<BlangT>());
 	while(nextsymb.value == "+" || nextsymb.value == "-") {
 		ops.push_back(nextsymb.value);
@@ -280,7 +305,7 @@ BlangE::BlangE() {
 	}			
 }
 
-double BlangE::get_value(){
+double BlangR::get_value(){
 	double d = 0;
 	for(int i = 0 ; i<Ts.size(); i++) {
 		double sgn = ops[i] == "+" ? 1 : -1;
@@ -290,6 +315,43 @@ double BlangE::get_value(){
 	}
 	return d;
 }
+
+BlangE::BlangE() {
+	//  E --> R {( "<" | "<=" | ">" | ">=" | "==" | "!=" ) R}
+	Rs.push_back(make_unique<BlangR>());
+	while(match()) {
+		//cout << "BlangE pushing back " << nextsymb.value << "\n";
+		ops.push_back(nextsymb.value);
+		nextsymb = yylex();
+		Rs.push_back(make_unique<BlangR>());
+	}
+}
+
+double BlangE::get_value() {
+	if(Rs.size() == 1) return Rs[0]->get_value();
+
+	// only apply the following if there's an actual relationships
+	double d = 1;
+	for(int i = 0 ; i < Rs.size()-1; i++) {
+		//cout << "BlangE i=" << i << "\n";
+		double lhs = Rs[i]->get_value();
+		double rhs = Rs[i+1]->get_value();
+		string op = ops[i];
+		//cout << "BlangE: lhs, rhs, op = " << lhs << rhs << op << "\n";
+		if(op == "<")        { if(lhs >= rhs) return 0; }
+		else if(op == "<=" ) { if(lhs>rhs) return 0;}
+		else if(op == ">")   {if(lhs<=rhs) return 0;}
+		else if(op == ">=")  {if(lhs<rhs) return 0;}
+		else if(op == "==")  {if(lhs!=rhs) return 0;}
+		else if(op == "!=")  {if(lhs==rhs) return 0;}
+		else {
+			string msg = "BlangR didn't recognise as relation operator: " + op;
+			throw runtime_error(msg);
+		}
+	}
+	return d;
+}
+
 
 // ARITHMETIC END
 ///////////////////////////////////////////////////////////////////////////
@@ -346,14 +408,14 @@ class BlangPrint: public BlangCode {
 		}
 
 		void eval() { 
-			cout << "BlangPrint: ";
+			//cout << "BlangPrint: ";
 			/*
 			for(const auto& e: _e->get_values())
 				cout << e->get_value() << " ~ ";
 				*/
 			for(int i = 0; i< ptr->size(); ++i) {
 				cout << ptr->get_value(i);
-				if( i +1 < ptr->size()) cout << " ~ ";
+				if( i +1 < ptr->size()) cout << " ";
 			}
 
 		       	cout <<  "\n" ; 
@@ -481,6 +543,14 @@ void scanner()
 	cout << "Run finished\n";
 }
 
+void print_tokeniser_report()
+{
+	cout << "=== TOKENISER REPORT ===\n";
+	for(const auto& t: g_tokens) 
+		cout <<  t.type << "\t" << t.value <<"\n";
+	cout << "=== END TOKENISER REPORT ===\n\n";
+}
+
 int main()
 {
 	// read inputs
@@ -490,12 +560,7 @@ int main()
 	}
 
 	g_tokens = tokenise(str3);
-
-	cout << "=== TOKENISER REPORT ===\n";
-	for(const auto& t: g_tokens) 
-		cout <<  t.type << "\t" << t.value <<"\n";
-	cout << "=== END TOKENISER REPORT ===\n\n";
-
+	if(false) print_tokeniser_report();
 	scanner();
 	return 0;
 }

@@ -1,6 +1,6 @@
 # check for existence of libefence
 ifeq ($(shell (ldconfig -p | grep -q libefence) && echo -n yes),yes)
-EFENCE = -lefence
+#EFENCE = -lefence
 endif
 
 .PHONY: all clean

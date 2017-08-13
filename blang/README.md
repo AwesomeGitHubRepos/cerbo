@@ -1,6 +1,18 @@
 # blang
 
-A toy BASIC interpreter
+A toy BASIC interpreter written in C++. Its aims to be:
+* a learning exercise on how to write interpeters
+* simple, one file
+* an experiment for possible integration into the neoleo spreadsheet
+
+## Features/non-features
+
+* keywords: for, let, print
+* relational operators (<, <=, >, >=, ==, !=)
+* logical operators can be faked (`*' for AND, `+` for OR)
+* all variables are doubles, global, and do not have to be pre-declared. No strings
+* comments start with a '
+
 
 ## References
 
