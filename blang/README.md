@@ -9,7 +9,7 @@ A toy BASIC interpreter written in C++. Its aims to be:
 
 * keywords: for, let, print
 * relational operators (<, <=, >, >=, ==, !=)
-* logical operators can be faked (`*' for AND, `+` for OR)
+* logical operators can be faked ( * for AND, + for OR)
 * all variables are doubles, global, and do not have to be pre-declared. No strings
 * comments start with a '
 
