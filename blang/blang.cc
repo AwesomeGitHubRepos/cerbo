@@ -34,6 +34,7 @@ enum blang_t {
 	T_LRB, // left round bracket
 	T_RRB, // right round bracket
 	T_NUM, T_ID, T_ASS, 
+	T_MD,  // multiplication or divide
 	T_PM   // plus or minus
 };
 
@@ -78,6 +79,7 @@ tokens tokenise(const string& str)
 			{"\\)"		, T_RRB},
 			{"\\,"		, T_COM},
 			{"\\+|\\-"      , T_PM},
+			{"\\*|/"        , T_MD},
 			{"\\S+"	        , T_BAD}
 	};
 
@@ -131,14 +133,6 @@ void syntax_error(const string& expecting, const token& toke, const string& wher
 }
 */
 
-/*
-void checkfor(const string& expecting, const token& toke, const string& where)
-{
-	if(expecting != toke.value)
-		syntax_error(expecting, toke, where);
-}
-*/
-
 void checkfor(const string& expecting)
 {
 	if(expecting != nextsymb.value) {
@@ -149,12 +143,7 @@ void checkfor(const string& expecting)
 	//checkfor(expecting, get(tokes), where);
 }
 
-void variable()
-{
-	//token toke = get(tokes);
-	cout << "TODO variable\n";
-}
-
+/*
 class BlangOp: public BlangCode {
 	public:
 		BlangOp() {
@@ -171,7 +160,135 @@ class BlangOp: public BlangCode {
 	private:
 		string op;
 };
+*/
 
+// Adopt the algorithm at 
+// https://www.engr.mun.ca/~theo/Misc/exp_parsing.htm#classic
+// for computing arithmetic
+//
+//  E --> T {( "+" | "-" ) T}
+//  T --> F {( "*" | "/" ) F}
+//  F --> P ["^" F]
+//  P --> v | "(" E ")" | "-" T
+
+class BlangP;
+
+class BlangT;
+
+class BlangE {
+	public:
+		BlangE();
+		double get_value();
+	private:
+		vector<unique_ptr<BlangT>> Ts;
+		vector<string> ops{"+"};
+
+};
+
+class BlangT {
+	public:
+		BlangT();
+		double get_value();
+	private:
+		vector<unique_ptr<BlangP>> Ps;
+		vector<string> ops{"*"};
+
+};
+class BlangP {
+	public:
+		BlangP() {
+		       	//  P --> v | "(" E ")" | "-" T
+			if(nextsymb.type == T_NUM || nextsymb.type == T_ID ) {
+				type = 'V'; // variable name
+				if(nextsymb.type == T_NUM) type = 'N'; // numeric
+				toke = nextsymb;
+				nextsymb = yylex();
+			} else if(nextsymb.value == "(") {
+				type = 'E';
+				nextsymb = yylex();
+				expr.push_back(make_unique<BlangE>());
+				checkfor(")");
+			} else if(nextsymb.value == "-") {
+				type = 'T';
+				nextsymb = yylex();
+				term.push_back(make_unique<BlangT>());
+			} else {
+				string msg = "BlangT syntax error with token " + nextsymb.value;
+				throw runtime_error(msg);
+			}
+		}
+
+		double get_value() {
+			switch(type) {
+				case 'V': return var_value(toke.value);
+				case 'N': return stod(toke.value);
+				case 'E': {
+						  double d = 0;
+						  for(int i = 0; i< expr.size(); i++)
+							  d += expr[i]->get_value();
+						  return d;
+					  }
+				case 'T': {
+						  double d = 0;
+						  for(int i = 0; i < term.size(); i++)
+							  d += term[i]->get_value();
+						  return -d;
+					  }
+				default:
+					  throw runtime_error("BlangP get_value of unrecognised type: " + type);
+			}
+		}
+
+	private:
+		char type = '?';
+		token toke;
+		vector<unique_ptr<BlangE>> expr;
+		vector<unique_ptr<BlangT>> term;
+};
+
+BlangT::BlangT() {
+	//  T --> F {( "*" | "/" ) F}   (but using P instead of F)
+	Ps.push_back(make_unique<BlangP>());
+	while(nextsymb.value == "*" || nextsymb.value == "/") {
+		ops.push_back(nextsymb.value);
+		nextsymb = yylex();
+		Ps.push_back(make_unique<BlangP>());
+	}
+}
+double BlangT::get_value() {
+	double d = 1;
+	for(int i = 0; i < Ps.size(); i++) {
+		if(ops[i] == "*")
+			d = d * Ps[i]->get_value();
+		else
+			d = d / Ps[i]->get_value();
+	}
+	return d;
+}
+
+
+BlangE::BlangE() {
+	//  E --> T {( "+" | "-" ) T}
+	Ts.push_back(make_unique<BlangT>());
+	while(nextsymb.value == "+" || nextsymb.value == "-") {
+		ops.push_back(nextsymb.value);
+		nextsymb = yylex();
+		Ts.push_back(make_unique<BlangT>());
+	}			
+}
+
+double BlangE::get_value(){
+	double d = 0;
+	for(int i = 0 ; i<Ts.size(); i++) {
+		double sgn = ops[i] == "+" ? 1 : -1;
+		double v = Ts[i]->get_value();
+		//cout << "BlangE::get_value i : " << v << "\n";
+		d += sgn * v;
+	}
+	return d;
+}
+
+/*
 class BlangFact: public BlangCode {
 	public:
 		BlangFact() {
@@ -193,7 +310,9 @@ class BlangFact: public BlangCode {
 	private:
 		token toke;
 };
+*/
 
+/*
 class BlangExpr: public BlangCode {
 	public:
 		BlangExpr()  {
@@ -264,6 +383,7 @@ class BlangExprXXX: public BlangCode {
 		string varname;
 		blang_t type;
 };
+*/
 
 class BlangExprList : public BlangCode {
 	public:
@@ -272,7 +392,7 @@ class BlangExprList : public BlangCode {
 			//while( nextsymb.val == "," 
 			while(true) {
 				if(nextsymb.value == ")") break;
-				ptrs.push_back(make_unique<BlangExpr>());
+				ptrs.push_back(make_unique<BlangE>());
 				//add_expr();
 				if(nextsymb.value != ",") break;
 				nextsymb = yylex();
@@ -290,7 +410,7 @@ class BlangExprList : public BlangCode {
 		//vector<unique_ptr<BlangExpr>> get_values() const { return ptrs;}
 		
 	private:
-		vector<unique_ptr<BlangExpr>> ptrs;
+		vector<unique_ptr<BlangE>> ptrs;
 
 };
 /*
@@ -309,7 +429,7 @@ class BlangPrint: public BlangCode {
 		//	_e = 
 		//       	_e{e} {};
 		BlangPrint() {
-			cout << "BlangPrint says hello\n";
+			//cout << "BlangPrint says hello\n";
 			ptr = make_unique<BlangExprList>();
 			//checkfor("(");
 			//_e = make_unique<BlangExpr>();
@@ -330,7 +450,9 @@ class BlangPrint: public BlangCode {
 		       	cout <<  "\n" ; 
 		}
 
-		~BlangPrint() { cout << "Bye from BlangPrint\n"; }
+		~BlangPrint() {
+		       //cout << "Bye from BlangPrint\n"; 
+		}
 	private:
 		unique_ptr<BlangExprList> ptr = nullptr;
 		//unique_ptr<BlangCode> ptr = nullptr;
@@ -342,9 +464,9 @@ class BlangLet: public BlangCode { // assignment statement
 			varname = nextsymb.value;
 			nextsymb = yylex();
 			checkfor(":=");
-			cout << "BlangLet checkpoint nextysmb: " << nextsymb.value << endl;
-			ptr = make_unique<BlangExpr>();
-			cout << "BlangLet checkpoint nextysmb: " << nextsymb.value << endl;
+			//cout << "BlangLet checkpoint nextysmb: " << nextsymb.value << endl;
+			ptr = make_unique<BlangE>();
+			//cout << "BlangLet checkpoint nextysmb: " << nextsymb.value << endl;
 		}
 
 		void eval() {
@@ -354,7 +476,7 @@ class BlangLet: public BlangCode { // assignment statement
 
 		private:
 		string varname;
-		unique_ptr<BlangExpr> ptr;
+		unique_ptr<BlangE> ptr;
 
 };
 
