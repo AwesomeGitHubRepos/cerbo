@@ -22,8 +22,6 @@ using std::string;
 using std::vector;
 using std::to_string;
 
-// taken from https://github.com/eantcal/nubasic/blob/master/include/nu_eval_expr.h
-//variant_t eval_expr(rt_prog_ctx_t& ctx, std::string data);
 
 enum blang_t { 
 	T_NUL, // represents NULL, or nothing
@@ -500,6 +498,38 @@ class BlangFor: public BlangCode { // for loop
 		vector<unique_ptr<BlangStmt>> stmts;
 };
 
+class BlangIf: public BlangCode { // if .. then .. [else ..] fi
+	public:
+		BlangIf() {
+			rel_ptr = make_unique<BlangE>();
+			checkfor("then");
+			bool processing_then = true;
+			while(nextsymb.value != "fi") {
+				if(nextsymb.value == "else") {
+					processing_then = false;
+					nextsymb = yylex();
+					continue;
+				}
+				if(processing_then)
+					then_stmts.push_back(make_unique<BlangStmt>());
+				else
+	 				else_stmts.push_back(make_unique<BlangStmt>());
+			}
+			nextsymb = yylex();
+		}
+
+		void eval() {
+			if(rel_ptr->get_value())
+				for(auto& s: then_stmts) s->eval();
+			else
+				for(auto& s: else_stmts) s->eval();
+
+		}
+	private:
+		unique_ptr<BlangE> rel_ptr;
+		vector<unique_ptr<BlangStmt>> then_stmts, else_stmts;
+};
+
 
 BlangStmt::BlangStmt() {
 	string sym = nextsymb.value;
@@ -510,6 +540,8 @@ BlangStmt::BlangStmt() {
 		stmt = make_unique<BlangLet>();
 	else if(sym == "for")
 		stmt = make_unique<BlangFor>();
+	else if(sym == "if")
+		stmt = make_unique<BlangIf>();
 	else
 		throw runtime_error("Statement unknown token: " + sym);
 }
