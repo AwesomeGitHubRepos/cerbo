@@ -7,8 +7,8 @@ A toy BASIC interpreter written in C++. Its aims to be:
 
 ## Features/non-features
 
-* keywords: if, for, let, print
-* relational operators (<, <=, >, >=, ==, !=)
+* keywords: else, for, if, let, next, print, then, wend, while
+* relational operators (<, <=, >, >=, ==, !=), work like normal operators (e.g. you can say 1 < x < 5)
 * logical operators can be faked ( * for AND, + for OR)
 * all variables are doubles, global, and do not have to be pre-declared. No strings
 * comments start with a '

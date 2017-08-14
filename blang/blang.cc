@@ -81,7 +81,7 @@ tokens tokenise(const string& str)
 			{"\\+|\\-"      , T_PM},
 			{"\\*|/"        , T_MD},
 			{"'.*\\n"       , T_REM},
-			{"<|<=|>|>=|==|!=", T_REL},
+			{"<=|<|>=|>|==|!=", T_REL},
 			{"\\S+"	        , T_BAD}
 	};
 
@@ -126,13 +126,6 @@ token yylex()
 	return nextsymb;
 }
 
-/*
-void syntax_error(const string& expecting, const token& toke, const string& where)
-{
-	string msg = "Syntax error. Expecting " + expecting + ", got " + toke.value + " in " + where;
-	throw std::runtime_error(msg);
-}
-*/
 
 void checkfor(const string& expecting)
 {
@@ -141,27 +134,7 @@ void checkfor(const string& expecting)
 		throw std::runtime_error(msg);
 	}
 	nextsymb = yylex();
-	//checkfor(expecting, get(tokes), where);
 }
-
-/*
-class BlangOp: public BlangCode {
-	public:
-		BlangOp() {
-			op = nextsymb.value;
-			if(!(nextsymb.value == "+" || nextsymb.value == "-"))
-				throw runtime_error("BlangOp error. Expected '+' or '-', got "
-						+ nextsymb.value);
-			nextsymb = yylex();
-			cout << "BlangOp nextsymb is " << nextsymb.value << endl;
-		}
-		void eval() {}
-		~BlangOp() {}
-		double get_sign() { return op == "+" ? 1 : -1;}
-	private:
-		string op;
-};
-*/
 
 ///////////////////////////////////////////////////////////////////////////
 // ARITHMETIC
@@ -382,37 +355,23 @@ class BlangExprList : public BlangCode {
 		vector<unique_ptr<BlangE>> ptrs;
 
 };
-/*
-BlangExpr expression()
-{
-	//token toke = get(tokes);
-	cout << "TODO expressione\n";
-	return BlangExpr();
-}
-*/
 
 class BlangPrint: public BlangCode {
 	public:
-		//BlangPrint(const BlangExpr& e): _e{e} {};
-		//BlangPrint() {
-		//	_e = 
-		//       	_e{e} {};
 		BlangPrint() {
 			//cout << "BlangPrint says hello\n";
 			ptr = make_unique<BlangExprList>();
-			//checkfor("(");
-			//_e = make_unique<BlangExpr>();
-			//checkfor(")");
 		}
 
 		void eval() { 
 			//cout << "BlangPrint: ";
-			/*
-			for(const auto& e: _e->get_values())
-				cout << e->get_value() << " ~ ";
-				*/
 			for(int i = 0; i< ptr->size(); ++i) {
-				cout << ptr->get_value(i);
+				double d = stod(ptr->get_value(i));
+				if(int(d) == d) 
+					cout << int(d);
+				else
+					cout << d;
+
 				if( i +1 < ptr->size()) cout << " ";
 			}
 
@@ -531,6 +490,24 @@ class BlangIf: public BlangCode { // if .. then .. [else ..] fi
 };
 
 
+class BlangWhile: public BlangCode { // while .. wend
+	public:
+		BlangWhile() {
+			rel_ptr = make_unique<BlangE>();
+			while(nextsymb.value != "wend") 
+				stmts.push_back(make_unique<BlangStmt>());
+			nextsymb = yylex();
+		}
+
+		void eval() {
+			while(rel_ptr->get_value())
+				for(auto& s: stmts) s->eval();
+		}
+	public:
+		unique_ptr<BlangE> rel_ptr;
+		vector<unique_ptr<BlangStmt>> stmts;
+};
+
 BlangStmt::BlangStmt() {
 	string sym = nextsymb.value;
 	nextsymb = yylex();
@@ -542,6 +519,8 @@ BlangStmt::BlangStmt() {
 		stmt = make_unique<BlangFor>();
 	else if(sym == "if")
 		stmt = make_unique<BlangIf>();
+	else if(sym == "while")
+		stmt = make_unique<BlangWhile>();
 	else
 		throw runtime_error("Statement unknown token: " + sym);
 }
