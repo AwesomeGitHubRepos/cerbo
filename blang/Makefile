@@ -11,4 +11,4 @@ clean :
 	rm -f blang
 
 blang : blang.cc
-	g++ -std=gnu++14 -ggdb -O0 $(EFENCE) $< -o $@
+	g++ -Wfatal-errors -std=gnu++14 -ggdb -O0 $(EFENCE) $< -o $@
