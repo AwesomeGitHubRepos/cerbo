@@ -16,4 +16,6 @@ A toy BASIC interpreter written in C++. Its aims to be:
 
 ## References
 
+* [Small BSIC Interpreters](https://sites.google.com/site/smallbasicinterpreters/source-code) - some implementations of BASIC, with source code
+
 * [Writing a very simple lexical analyser in C++](https://stackoverflow.com/questions/34229328/writing-a-very-simple-lexical-analyser-in-c)
