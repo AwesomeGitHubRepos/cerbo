@@ -1,22 +1,3 @@
-Lisp interpreter in 90 lines of C++
-
-I've enjoyed reading Peter Norvig's recent articles on Lisp. He implements a Scheme interpreter in 90 lines of Python in the first, and develops it further in the second.
-
-Just for fun I wondered if I could write one in C++. My goals would be
-
-1. A Lisp interpreter that would complete Peter's Lis.py test cases correctly...
-2. ...in no more than 90 lines of C++.
-
-Although I've been thinking about this for a few weeks, as I write this I have not written a line of the code. I'm pretty sure I will achieve 1, and 2 will be... a piece of cake!
-
-In one short line of Python Mr. Norvig implements Lisp functions car, cdr and append. Another line and we've done the four basic mathematical operators on bignums. Gulp.
-
-To give myself any sort of chance I don't intend to support bignums, garbage collection or error handling and I'm only going to implement the bare minimum to pass the test cases.
-
-. . .
-
-OK, I've done it. Here it is:
-
 // Scheme Interpreter in 90 lines of C++ (not counting lines after the first 90).
 // Inspired by Peter Norvig's Lis.py.
 // Copyright (c) 2010 Anthony C. Hay. This program leaks memory.
@@ -353,123 +334,6 @@ int main ()
 
 
 
-With Lis.py to guide me writing this was fairly straight-forward, with two exceptions. The first point I had to stop and think was in eval() when the symbol to be evaluated was "lambda", i.e. at the point of definition of the lambda. In Peter's code he returns a Python lambda; not something available to me. Then I realised that I didn't have to actually do anything with the lambda body, just keep it around until it needs to be executed. That's why I can just change the cell type from Symbol to Lambda and return it as-is.
-
-The second pause for thought was much longer; this time it was at the point of execution of the lambda. Partly because I don't know Python (or Scheme) it wasn't clear to me what was going on with the environment. The problem was that lambdas that returned lambdas didn't work: variables that were defined at the time the lambda was returned were not defined at the time that returned lambda was executed.
-
-It took a little while to work through the problem, but eventually I did. It helped to look at some simple examples to see where things went wrong. Here is my program executing some sample code adapted from an article that appeared in February 1988 Byte magazine:
-
-90> (define multiply-by (lambda (n) (lambda (y) (* y n))))
-<Lambda>
-90> (define doubler (multiply-by 2))
-<Lambda>
-90> (define tripler (multiply-by 3))
-<Lambda>
-90> (doubler 4)
-8
-90> (tripler 4)
-12
-90>
-
-
-Clearly, doubler is not only associated with the procedure (lambda (y) (* y n)) but it must also have access to an environment where the value of n is 2.
-
-I added some code to the start of the eval function to dump out the value of the paramaters x and env each time it is called. Here is the output while executing some of the above sample code.
-
-
-eval("(define multiply-by (lambda (n) (lambda (y) (* y n))))", [global])
-    eval("(lambda (n) (lambda (y) (* y n)))", [global])  -> <Lambda>(lambda (n) (lambda (y) (* y n)))+ref[global]
--> <Lambda>(lambda (n) (lambda (y) (* y n)))+ref[global]
-
-eval("(define doubler (multiply-by 2))", [global])
-    eval("(multiply-by 2)", [global])
-        eval("multiply-by", [global]) -> <Lambda>(lambda (n) (lambda (y) (* y n)))+ref[global]
-        eval("2", [global]) -> 2
-        ; execute the <Lambda>(lambda (n) (lambda (y) (* y n)))+ref[global], which involves
-        ; creating a new environment containing [n->2] with an outer environment of [global]
-        ; and then calling eval with (lambda (y) (* y n)) 
-        eval("(lambda (y) (* y n))", [n->2 [global]]) -> <Lambda>(lambda (y) (* y n))+ref[n->2 [global]]
-    -> <Lambda>(lambda (y) (* y n))+ref[n->2 [global]]
--> <Lambda>(lambda (y) (* y n))+ref[n->2 [global]]
-
- eval("(doubler 4)", [global])
-    eval("doubler", [global]) -> <Lambda>(lambda (y) (* y n))+ref[n->2 [global]]
-    eval("4", [global]) -> 4
-    ; execute the <Lambda>(lambda (y) (* y n))+ref[n->2 [global]], which involves
-    ; creating a new environment containing [y->4] with an outer environment of [n->2 [global]]
-    ; and then calling eval with (* y n) 
-    eval("(* y n)", [y->4 [n->2 [global]]])
-        eval("*", [y->4 [n->2 [global]]]) -> proc_mul
-        eval("y", [y->4 [n->2 [global]]]) -> 4
-        eval("n", [y->4 [n->2 [global]]]) -> 2
-        proc_mul(4, 2) -> 8
-    -> 8
--> 8
-
-
-"[global]" means the global environment where "*" maps to the built-in proc_mul, etc.
-
-"[y->4 [n->2 [global]]]" means an innermost environment where y maps to 4, that environment's outer environment where n maps to 2 and that environemt's outer environment, which is the global environment.
-
-When looking up the value of a variable the code starts with the innermost environment and if the variable is not defined there it tries the next outer environment and so on.
-
-
-I don't know whether I've explained that clearly enough to make sense. The important bit I realised is that a new environment must be created when a lambda is evaluated containing (a) all the paramater->argument associations, and (b) this new environment's outer environment must be the reference to the environment that existed at the time the lambda was defined. I believe this is called a lexical closure.
-
-Here's my program executing a another example I like, this time adapted from that Wikipedia article on lexical closures. It just underlines that the closure captures the variable, not just the value of the variable, and that the captured variable may be changed.
-
-90> (define count-down-from (lambda (n) (lambda () (set! n (- n 1)))))
-<Lambda>
-90> (define count-down-from-3 (count-down-from 3))
-<Lambda>
-90> (define count-down-from-4 (count-down-from 4))
-<Lambda>
-90> (count-down-from-3)
-2
-90> (count-down-from-4)
-3
-90> (count-down-from-3)
-1
-90> (count-down-from-3)
-0
-90> (count-down-from-4)
-2
-90> (count-down-from-4)
-1
-90> (count-down-from-4)
-0
-90>
-
-
-
-
-Here is another example, again adapted from the Wikipedia article on closures. This demonstrates that not only can the closure capture existing variables, it also captures variables created inside the closure (the variable hidden in this case). Also in this example, two procedures are created that share the same closure. (I spread some of the code over several lines to make it more readable; it has to be entered all on one line for my primitive program.)
-
-90> (define set-hidden 0)
-0
-90> (define get-hidden 0)
-0
-90> ((lambda ()
-        (begin
-            (define hidden 0)
-            (set! set-hidden (lambda (n) (set! hidden n)))
-            (set! get-hidden (lambda () hidden)))))
-<Lambda>
-90> (get-hidden)
-0
-90> (set-hidden 1234)
-1234
-90> (get-hidden)
-1234
-90> hidden
-unbound symbol 'hidden'
-
-
-
-Testing
-
-Here are the 29 tests for Lis.py. The main() function in the code above is replaced by all this code to run the tests.
-
 ////////////////////// unit tests
 
 unsigned g_test_count;      // count of number of unit tests executed
@@ -496,7 +360,7 @@ void test_equal_(const T1 & value, const T2 & expected_value, const char * file,
 #define TEST(expr, expected_result) TEST_EQUAL(to_string(eval(read(expr), &global_env)), expected_result)
 
 
-int main ()
+int lispy_test_main ()
 {
     environment global_env; add_globals(global_env);
 
@@ -546,21 +410,3 @@ int main ()
         << "\n";
     return g_fault_count ? EXIT_FAILURE : EXIT_SUCCESS;
 }
-
-
-All 29 tests pass. Goal 1 achieved.
-
-Goal 2: I'm not counting blank lines or comment-only lines, and I'm not counting lines that contain only an opening or closing curly brace, because I'm just not counting them.
-
-bash$ grep -v "^ *$\|^ *//\|^ *[}{] *$" lisp.cpp | wc
-     198     953    8256
-
-
-Not quite 90. But south of 200 isn't bad, is it? (Just to be clear: I'm not claiming I've produced the equivalent of Lis.py in under 200 lines of C++.)
-
-
-Conclusion
-
-Compared with Lis.py my effort is incomplete, inefficient and leaks memory. Unlike some of the code I've presented in other blog posts the end result here is not useful in itself; it was the process of developing it that was useful, if only for me.
-
-Nevertheless, I get a little thrill out of having made something that allows me to type (define cube (lambda (n) (* n n n))) and then (cube 3). It's like magic.
