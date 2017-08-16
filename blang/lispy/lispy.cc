@@ -2,6 +2,7 @@
 // Inspired by Peter Norvig's Lis.py.
 // Copyright (c) 2010 Anthony C. Hay. This program leaks memory.
 
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <string>
