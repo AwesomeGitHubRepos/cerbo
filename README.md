@@ -4,6 +4,7 @@ A brain dump
 
 * blang - toy BASIC interpreter written in C++
 * efence - see C
+* keys - terminal keyboard testing
 
 ## green
 `green` - turn every third line green

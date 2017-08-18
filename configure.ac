@@ -32,5 +32,6 @@ AC_CONFIG_FILES([Makefile \
 		 shlex/Makefile \
 		 mcacc/Makefile \
 		 h5mc/src/Makefile h5mc/scripts/Makefile \
+		 keys/Makefile \
 		 splut/Makefile stats/Makefile])
 AC_OUTPUT
