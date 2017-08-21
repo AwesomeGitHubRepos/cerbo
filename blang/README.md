@@ -16,6 +16,7 @@ A toy BASIC interpreter written in C++. Its aims to be:
 
 ## References
 
+* [Scheme 9 from Empty Space](http://t3x.org/s9fes/) - R4RS scheme implementation, which seems to be regarded highly
 * [Small BSIC Interpreters](https://sites.google.com/site/smallbasicinterpreters/source-code) - some implementations of BASIC, with source code
 
 * [Writing a very simple lexical analyser in C++](https://stackoverflow.com/questions/34229328/writing-a-very-simple-lexical-analyser-in-c)
