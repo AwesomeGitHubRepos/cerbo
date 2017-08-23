@@ -35,7 +35,8 @@ enum blang_t {
 	T_REL, // relational operator
 	T_NUM, T_ID, T_ASS, 
 	T_MD,  // multiplication or divide
-	T_PM   // plus or minus
+	T_PM,  // plus or minus
+	T_STR  // string
 };
 
 class BlangCode {
@@ -45,14 +46,26 @@ class BlangCode {
 		virtual void eval() = 0;
 };
 
+union BlangCell
+{
+	string s;
+	double n;
+};
+
+enum BlangCellType { BCT_NUL, BCT_STR, BCT_DBL };
+
+class blang_cell {
+	public:
+		BlangCellType bct = BCT_NUL;
+		BlangCell bcell;
+};
+
 typedef struct token { blang_t type; string value; } token;
 typedef deque<struct token> tokens;
 
 static tokens g_tokens;
 static token nextsymb;
 
-//class BlangExpr;
-//map<string, unique_ptr<BlangExpr>> varmap; // variables and values
 map<string, double> varmap; // variables and values
 
 double var_value(string varname) 
@@ -72,17 +85,18 @@ tokens tokenise(const string& str)
 	// use std::vector instead, we need to have it in this order
 	std::vector<std::pair<string, blang_t>> v
 	{
-		{"[0-9]+" , T_NUM} ,
-			{"[a-z]+"	, T_ID},
-			{":="		, T_ASS},
-			{"\\("		, T_LRB},
-			{"\\)"		, T_RRB},
-			{"\\,"		, T_COM},
-			{"\\+|\\-"      , T_PM},
-			{"\\*|/"        , T_MD},
-			{"'.*\\n"       , T_REM},
-			{"<=|<|>=|>|==|!=", T_REL},
-			{"\\S+"	        , T_BAD}
+		{"[0-9]+" 			, T_NUM},
+		{"[a-z]+"			, T_ID},
+		{":="				, T_ASS},
+		{"\\("				, T_LRB},
+		{"\\)"				, T_RRB},
+		{"\\,"				, T_COM},
+		{"\\+|\\-"      		, T_PM},
+		{"\\*|/"        		, T_MD},
+		{"'.*\\n"       		, T_REM},
+		{"<=|<|>=|>|==|!="		, T_REL},
+		{"\"(?:[^\"\\\\]|\\\\.)*\""	, T_STR},
+		{"\\S+"	        		, T_BAD}
 	};
 
 	std::string reg;
@@ -172,6 +186,7 @@ class BlangE {
 	public:
 		BlangE();
 		double get_value();
+		string get_str();
 	private:
 		vector<unique_ptr<BlangR>> Rs;
 		//vector<string> ops{"+"};
@@ -287,6 +302,7 @@ double BlangR::get_value(){
 	return d;
 }
 
+
 BlangE::BlangE() {
 	//  E --> R {( "<" | "<=" | ">" | ">=" | "==" | "!=" ) R}
 	Rs.push_back(make_unique<BlangR>());
@@ -324,8 +340,61 @@ double BlangE::get_value() {
 }
 
 
+string BlangE::get_str() 
+{
+	double d = get_value();
+	if(int(d) == d)
+		return to_string(int(d));
+	else
+		return to_string(d);
+}
+
 // ARITHMETIC END
 ///////////////////////////////////////////////////////////////////////////
+
+class BlangExpr {
+	public:
+		BlangExpr() { parse(); }
+		void parse() {
+			type = nextsymb.type;
+			switch(type) {
+				case T_STR:
+					{
+					string s = nextsymb.value;
+					int l = s.size();
+					str = s.substr(1, l-2);
+					nextsymb = yylex();
+					}
+					break;
+				case T_NUM:
+				case T_ID:
+					e = make_unique<BlangE>();
+					break;
+				default:
+					throw std::runtime_error("BlangExpr::parse(): unrecognised symbol: "
+							+ nextsymb.value);
+			}
+		}
+		string get_str() {
+			switch(type) {
+				case T_STR:
+					return str;
+				case T_NUM:
+				case T_ID:
+					return e->get_str();
+					break;
+
+				default:
+					throw std::runtime_error("BlangExpr::get_str(): unrecognised type: "
+							+ to_string(type));
+			}
+		}
+	private:
+		blang_t type = T_NUL;
+		string str;
+		unique_ptr<BlangE> e = nullptr;
+
+};
 
 class BlangExprList : public BlangCode {
 	public:
@@ -334,25 +403,25 @@ class BlangExprList : public BlangCode {
 			//while( nextsymb.val == "," 
 			while(true) {
 				if(nextsymb.value == ")") break;
-				ptrs.push_back(make_unique<BlangE>());
-				//add_expr();
+				//unique_ptr<BlangExpr> e = make_unique<BlangExpr>();
+				//e->parse();
+				exprs.push_back(make_unique<BlangExpr>());
 				if(nextsymb.value != ",") break;
 				nextsymb = yylex();
 			}
 			checkfor(")");
 		}
 		void eval() {};
-		size_t size() const { return ptrs.size(); }
+		size_t size() const { return exprs.size(); }
 		~BlangExprList() {}
-		string get_value(int i) const { 
-			double d = ptrs[i]->get_value();
-			return to_string(d);
+		string get_str(int i) { 
+			return exprs[i]->get_str();
 		}
 
 		//vector<unique_ptr<BlangExpr>> get_values() const { return ptrs;}
 		
 	private:
-		vector<unique_ptr<BlangE>> ptrs;
+		vector<unique_ptr<BlangExpr>> exprs;
 
 };
 
@@ -366,11 +435,14 @@ class BlangPrint: public BlangCode {
 		void eval() { 
 			//cout << "BlangPrint: ";
 			for(int i = 0; i< ptr->size(); ++i) {
+				cout << ptr->get_str(i);
+				/*
 				double d = stod(ptr->get_value(i));
 				if(int(d) == d) 
 					cout << int(d);
 				else
 					cout << d;
+					*/
 
 				if( i +1 < ptr->size()) cout << " ";
 			}
