@@ -13,6 +13,10 @@ A toy BASIC interpreter written in C++. Its aims to be:
 * all variables are doubles, global, and do not have to be pre-declared. No strings
 * comments start with a '
 
+## Subprojects
+
+* v2 - an attempt at a rewrite of a parser based on s-expr
+* lisp - an interpreter for lisp copied from github
 
 ## References
 
