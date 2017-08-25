@@ -8,4 +8,4 @@ clean :
 	rm -f blang2
 
 blang2 : blang2.cc
-	g++ -std=gnu++14 -ggdb -O0 $(ASAN) $< -o $@
+	g++ -std=gnu++1z -ggdb -O0 $(ASAN) $< -o $@
