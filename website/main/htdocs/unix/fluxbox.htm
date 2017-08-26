@@ -25,6 +25,13 @@ Control Mod1 Return :ToggleCmd {Maximize} {Restore}
 
 The modifiers above (Ctrl + Alt + Left/Right/Up/Down/Enter) should not conflict with existing modifiers, else they will not work correctly (<a href="https://abchk1234.wordpress.com/2015/02/01/native-window-snapping-window-tiling-with-fluxbox-openbox-and-xfwm4-xfce/">xlink</a>).
 
+<hr><h2>Background colour</h2>
+
+In <code>~/.fluxbox/startup</code>, add the following line before <code>exec fluxbox</code>:
+<pre>
+/usr/bin/fbsetroot -solid gray30
+</pre>
+
 <hr><h2>Start menu</h2>
 
 In <code>$HOME/.fluxbox/init</code>, you need to add <code>RootMenu</code>:
