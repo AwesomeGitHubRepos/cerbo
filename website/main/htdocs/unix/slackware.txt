@@ -25,6 +25,19 @@ swapon /swapfile
 
 # SBOPKG
 Download dir: /usr/cach/sbopkg
+For dependencies resolution:
+	sqg -a
+is part of sbopkg and will generate files in
+	/var/lib/sbopkg/queues/*.sqf
+It takes a long time to run, but it knows about
+subdependencies. To install, you use a "queue", e.g.
+	sbopkg -i ffmpeg
+or
+	sbopkg -i blender
+which installs into /opt/blender. vlc is also available.
+But perhaps a better way is to use slackbuilds.
+
+
 
 # SLACKBUILDS
 Contains binary builds for many extras, inc keepassx, sshfs, qt5:
