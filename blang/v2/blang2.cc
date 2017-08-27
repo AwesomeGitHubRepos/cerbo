@@ -8,7 +8,6 @@
 using std::cout;
 using std::string;
 
-constexpr bool iswhite(char c) { return c == '\n' || c=='\t' || c==' ' || c=='\r';}
 
 const string gmr = R"(
 (foo (bar baz))
@@ -25,12 +24,14 @@ struct cell_t {
 
 //class cell;
 
+typedef struct Nothing {} Nothing; // not anything
+
 class cell {
 	public:
 		//cell() {}
 		//cell(string s): value{s} {}
 		typedef std::vector<cell> cellvec;
-		std::variant<double, std::string, cellvec> value;
+		std::variant<Nothing, std::string, cellvec, double> value;
 };
 /*
 typedef std::variant<std::string, double> pre_cell;
@@ -41,27 +42,43 @@ typedef std::variant<pre_cell, cell_list> cell;
 std::map<std::string, cell> vars;
 
 std::stringstream ss;
+constexpr bool iswhite(char c) { return c == '\n' || c=='\t' || c==' ' || c=='\r';}
+bool issym(char c) { return !(iswhite(c) || '(' || ')' || ss.eof()); }
 
 int peek() { return ss.peek(); }
 
 int getch() { return ss.get(); }
 
+void
+eat_white()
+{
+	while(iswhite(peek())) 
+		getch();
+}
+
 cell read();
 
 cell::cellvec parse_list()
 {
-	cell::cellvec res;
+	cout << "parse_list()...\n";
+
+	cell::cellvec cells;
 	while(char c = getch()) {
+		//cout << c ;
+		if(ss.eof())
+			throw std::runtime_error("parse_list(): unmatched parenthesis");
 		if(c==')') 
 			break;
 		else {
-			res.push_back(read());
+			ss.unget();
+			cells.push_back(read());
 		}
 	}
 
-
-	cout << "parse_list(): TODO\n";
-	return res;
+	//cell res;
+	//res.value = cells;
+	//cout << "... parse_list(): index= " << res.value.index() << "\n";
+	return cells;
 }
 
 std::string
@@ -70,15 +87,18 @@ parse_symbol()
 	string str;
 	int c;
 	while(c=getch()){
+		if(ss.eof()) break;
 		if(iswhite(c)) break;
-		if(c == '(' || c == ')') break;
+		if(c == '(' || c == ')') {ss.unget(); break;}
 		str +=c;
 	}
+
+	cout << "parse_symbol(): <" + str + ">\n";
 	return str;
 }
 
-void
-eval(std::string s)
+std::string
+eval_string(const std::string& s)
 {
 	cout << "symbol is<" << s << ">\n";
 	auto it = vars.find(s);
@@ -87,6 +107,27 @@ eval(std::string s)
        	} else {
 			cout << "TODO eval string\n";
 	}
+
+	return s; // TODO
+
+}
+void
+eval(const cell& c)
+{
+	//cout << "type is " << c.value.index() << "\n";
+
+	if(std::holds_alternative<std::string>(c.value)) {
+		cout << "eval holds string\n";
+		std::string s = std::get<std::string>(c.value);
+		cout << eval_string(s) << "\n";
+	} else if(std::holds_alternative<double>(c.value)) {
+		cout << "eval holds double\n";
+	} else if(std::holds_alternative<cell::cellvec>(c.value)) {
+		cout << "eval holds cellvec\n";
+	} else {
+		cout << "eval holds unhandled\n";
+	}
+	cout << "eval TODO\n";
 
 }
 
@@ -101,18 +142,19 @@ read()
 	*/
 
 	cell res; // = "TODO";
-	while(char c = getch()) {
-		if(ss.eof()) break;
-		//cout << "c=<" << c << ">\n";
-		if(c=='(') 
-			parse_list();
-		else if(!iswhite(c)){
-			ss.unget();
-			string s = parse_symbol();
-			//res.value.copy<std::string>(parse_symbol());
+	eat_white();
+	char c = getch();
+       	if(ss.eof()) {
+		// nothing
+	} else if(c=='(') 
+		res.value = parse_list();
+	else {
+		ss.unget();
+		string s = parse_symbol();
+		res.value = s;
+		//res.value.copy<std::string>(parse_symbol());
 		}
 
-	}
 
 	return res;
 
@@ -130,7 +172,12 @@ int main()
 
 void run_tests()
 {
-	ss << "(define foo 12) foo   ";
+	ss << "(define (foo  bar) 12) foo   ";
 	
-	read();
+
+	while(!ss.eof()){
+		cout << "=========================\n";
+		cell c = read();
+		eval(c);
+	}
 }
