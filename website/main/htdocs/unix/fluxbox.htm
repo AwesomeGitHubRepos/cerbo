@@ -16,14 +16,20 @@
 In <code>~/.fluxbox/keys</code>:
 <pre>
 # Tiling
-Control Mod1 Left :MacroCmd {ResizeTo 50% 100%} {MoveTo 00 00 Left}
-Control Mod1 Right :MacroCmd {ResizeTo 50% 100%} {MoveTo 00 00 Right}
-Control Mod1 Up :MacroCmd {ResizeTo 100% 50%} {MoveTo 00 00 Up}
-Control Mod1 Down :MacroCmd {ResizeTo 100% 50%} {MoveTo 00 00 Bottom}
-Control Mod1 Return :ToggleCmd {Maximize} {Restore}
+<strike>
+#Control Mod1 Left :MacroCmd {ResizeTo 50% 100%} {MoveTo 00 00 Left}
+</strike>
+Mod4 Left :MacroCmd {ResizeTo 50% 100%} {MoveTo 00 00 Left}
+Mod4 Right :MacroCmd {ResizeTo 50% 100%} {MoveTo 00 00 Right}
+Mod4 Up :MacroCmd {ResizeTo 100% 50%} {MoveTo 00 00 Up}
+Mod4 Down :MacroCmd {ResizeTo 100% 50%} {MoveTo 00 00 Bottom}
+Mod4 Return :ToggleCmd {Maximize} {Restore}
 </pre>
 
-The modifiers above (Ctrl + Alt + Left/Right/Up/Down/Enter) should not conflict with existing modifiers, else they will not work correctly (<a href="https://abchk1234.wordpress.com/2015/02/01/native-window-snapping-window-tiling-with-fluxbox-openbox-and-xfwm4-xfce/">xlink</a>).
+<p>
+`Mod4 ' is the left-window button. These keys may already by used, e.g. by 
+:SendToPrevWorkspace, so you may have to comment out the latter.
+</p>
 
 <hr><h2>Background colour</h2>
 
