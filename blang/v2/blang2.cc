@@ -1,6 +1,9 @@
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
+#include <variant>
+#include <vector>
 
 using std::cout;
 using std::string;
@@ -13,25 +16,57 @@ const string gmr = R"(
 
 //const string gmr = "";
 
+enum cell_e { T_NUL, T_STR, T_DBL };
+
+struct cell_t {
+	cell_e type;
+	void *ptr = nullptr;
+} cell_t;
+
+//class cell;
+
+class cell {
+	public:
+		//cell() {}
+		//cell(string s): value{s} {}
+		typedef std::vector<cell> cellvec;
+		std::variant<double, std::string, cellvec> value;
+};
+/*
+typedef std::variant<std::string, double> pre_cell;
+typedef std::vector<pre_cell> cell_list;
+typedef std::variant<pre_cell, cell_list> cell;
+*/
+
+std::map<std::string, cell> vars;
+
 std::stringstream ss;
 
 int peek() { return ss.peek(); }
 
-int getch()
+int getch() { return ss.get(); }
+
+cell read();
+
+cell::cellvec parse_list()
 {
-	return ss.get();
+	cell::cellvec res;
+	while(char c = getch()) {
+		if(c==')') 
+			break;
+		else {
+			res.push_back(read());
+		}
+	}
+
+
+	cout << "parse_list(): TODO\n";
+	return res;
 }
 
-void reader();
-
-void parse_list()
+std::string
+parse_symbol()
 {
-	// TODO
-}
-
-void parse_symbol()
-{
-	cout << "parse_symbol() ...\n";
 	string str;
 	int c;
 	while(c=getch()){
@@ -39,10 +74,24 @@ void parse_symbol()
 		if(c == '(' || c == ')') break;
 		str +=c;
 	}
-	cout << "symbol is<" << str << ">\n";
+	return str;
 }
 
-void reader()
+void
+eval(std::string s)
+{
+	cout << "symbol is<" << s << ">\n";
+	auto it = vars.find(s);
+	if(it == vars.end()) {
+			cout << ("Ouch: couldn't find value for variable `" + s + "'\n");
+       	} else {
+			cout << "TODO eval string\n";
+	}
+
+}
+
+cell
+read()
 {
 	/*
 	while(char c = getch()  ) {
@@ -51,6 +100,7 @@ void reader()
 	}
 	*/
 
+	cell res; // = "TODO";
 	while(char c = getch()) {
 		if(ss.eof()) break;
 		//cout << "c=<" << c << ">\n";
@@ -58,10 +108,13 @@ void reader()
 			parse_list();
 		else if(!iswhite(c)){
 			ss.unget();
-			parse_symbol();
+			string s = parse_symbol();
+			//res.value.copy<std::string>(parse_symbol());
 		}
 
 	}
+
+	return res;
 
 }
 
@@ -77,7 +130,7 @@ int main()
 
 void run_tests()
 {
-	ss << "foo bar baz   ";
+	ss << "(define foo 12) foo   ";
 	
-	reader();
+	read();
 }
