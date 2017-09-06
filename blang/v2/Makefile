@@ -1,4 +1,6 @@
-ASAN = -no-pie -fsanitize=address
+AM_CXXFLAGS =
+AM_CXXFLAGS += -Wfatal-errors
+AM_CXXFLAGS += -no-pie -fsanitize=address
 
 .PHONY: all clean
 
@@ -8,4 +10,4 @@ clean :
 	rm -f blang2 *.o
 
 blang2 : blang2.cc
-	g++ -std=gnu++1z -ggdb -O0 $(ASAN) $< -o $@
+	g++ -std=gnu++1z -ggdb -O0 $(AM_CXXFLAGS) $< -o $@
