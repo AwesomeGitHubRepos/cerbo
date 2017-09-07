@@ -3,7 +3,6 @@
 #include <map>
 #include <sstream>
 #include <string>
-#include <variant>
 #include <vector>
 
 using std::cerr;
@@ -35,6 +34,7 @@ typedef struct Nothing {} Nothing; // not anything
 // http://students.washington.edu/levistod/wordpress/2016/09/14/variants-in-c/
 class cell;
 typedef std::vector<cell> cellvec;
+cell eval(const cell& c);
 
 //void blang_assign(cell& lhs, const cell& other);
 
@@ -131,21 +131,6 @@ cell::repr()
 	return s;
 }
 		
-/*
-void
-blang_assign(cell& lhs, const cell& other) 
-{
-	lhs._type = other._type;
-	switch(other._type) {
-		case CT_NUL: break;
-		case CT_STR: lhs._str = other._str; break;
-		case CT_DBL: lhs._dbl = other._dbl; break;
-		case CT_VEC: lhs._cvec = other._cvec; break;
-		default: throw 666;
-	}
-}
-*/
-
 
 cell::cell(const cell& other)
 {
@@ -207,17 +192,31 @@ get_string(const cell& c)
 	return c._str;
 }
 
-/*
-typedef std::variant<std::string, double> pre_cell;
-typedef std::vector<pre_cell> cell_list;
-typedef std::variant<pre_cell, cell_list> cell;
-*/
 
 std::map<std::string, cell> vars;
 
 void set_var(string id, cell val)
 {
-	vars.emplace(id, val);
+	auto it = vars.find(id);
+#if 0
+	if(it != vars.end()) vars.erase(it);
+	vars[id] =  val;
+#else
+	if(it == vars.end()) 
+		vars[id] =  val;
+	else
+		it->second = val;
+#endif
+}
+
+
+cell get_var(const string& s)
+{
+	auto it = vars.find(s);
+	if(it == vars.end()) 
+		unhandled("Unbound variable: " + s);
+
+	return it->second;
 }
 
 std::stringstream ss;
@@ -271,18 +270,17 @@ blang_apply(const std::string& id, const cell& c)
 		cell c1 = car(c);
 		assert(c1._type == CT_STR);
 		string id = c1._str;
-		cell args = cdr(c);
+		cell args = eval(car(cdr(c)));
+		//cout << "apply/define " << args._dbl << endl;
 		set_var(id, args);
 	} else if(id == "+") {
-		//cell c1 = car(c);
-		//assert(c1._type == CT_STR);
-		//cell args = cdr(c);
-		cout << "blang_apply() found '+'\n";
+		//cout << "blang_apply() found '+'\n";
 		double d =0;
 		for(const auto& a:c._cvec) {
-			assert(a._type == CT_DBL);
-			cout << "adding " << a._dbl << endl;
-			d += a._dbl;
+			cell c1 = eval(a);
+			assert(c1._type == CT_DBL);
+			//cout << "adding " << c1._dbl << endl;
+			d += c1._dbl;
 		}
 		res.set_dbl(d);
 	}
@@ -294,7 +292,7 @@ blang_apply(const std::string& id, const cell& c)
 
 cellvec parse_list()
 {
-	cout << "parse_list()...\n";
+	//cout << "parse_list()...\n";
 
 	cellvec cvec;
 	//cells._type = CT_VEC;
@@ -307,9 +305,7 @@ cellvec parse_list()
 		else {
 			ss.unget();
 			cell a_cell = cell_read();
-			cout << a_cell.repr() << endl;
-			//cell dummy;
-			//cvec.push_back(dummy);
+			//cout << a_cell.repr() << endl;
 			cvec.push_back(a_cell);
 		}
 	}
@@ -346,20 +342,10 @@ parse_atom()
 	return res;
 }
 
-std::string
+cell
 eval_string(const std::string& s)
 {
-	cout << "symbol is<" << s << ">\n";
-	auto it = vars.find(s);
-	if(it == vars.end()) {
-		cout << ("Ouch: couldn't find value for variable `" + s + "'\n");
-	} else {
-		cout << "eval_string() ident=" << s << ", value =" << it->second.repr() << "\n";
-		//cout << "TODO eval string\n";
-	}
-
-	return s; // TODO
-
+	return get_var(s);
 }
 
 cell
@@ -374,7 +360,7 @@ eval_cellvec(const cell& c)
 	return res;
 }
 
-void
+cell
 eval(const cell& c)
 {
 	cell result;
@@ -383,10 +369,12 @@ eval(const cell& c)
 		case CT_NUL:
 			break;
 		case CT_STR: 
-			cout << "TODO eval():CT_STR " << eval_string(c._str) << endl;
+			//cout << "TODO eval():CT_STR " << eval_string(c._str) << endl;
+			result = eval_string(c._str);
 			break;
 		case CT_DBL: 
-			cout << "TOD eval()CT_DBL " << c._dbl << endl;
+			result = c;
+			//cout << "TOD eval()CT_DBL " << c._dbl << endl;
 			break;
 		case CT_VEC:
 			{				  
@@ -398,8 +386,7 @@ eval(const cell& c)
 			unhandled("eval()");
 	}
 
-	cout << result.print_cell() << "\n";
-	//cout << "eval TODO\n";
+	return result;
 
 }
 
@@ -444,15 +431,37 @@ int main()
 }
 
 
+void
+run_test(string input)
+{
+	cout << "=========================\n";
+	cout << "Run test on: " << input << "\n";
+	ss.clear();
+	ss << input;
+	//std::stringstream ssnew;
+	//ssnew.str(input);
+	//ss = ssnew;
+
+	while(!ss.eof()){
+		cell c = cell_read();
+		cell e = eval(c);
+		if(e._type != CT_NUL)
+			cout << "Result: " << e.print_cell() << "\n";
+	}
+
+}
+
 void run_tests()
 {
 	//ss << "(define (foo  bar) 12) foo   ";
-	ss << "(+ 5 6 7) (define  foo 2.2) foo   ";
+	//ss << "(+ 5 6 7) (define  foo 2.2) foo ";
+	run_test("(+ 5 )");
+	run_test("(+ 5 6 7 )");
+	run_test("(define foo 12) foo");
+	run_test("(define foo (+ 12 2)) foo");
+	run_test("(define foo (+ 12 2)) (+ foo 3)");
+	run_test("(+ 1 2 (+ 3 4 (+ 5 6)))");
+	run_test("(define foo 10) (define bar (+ foo 1)) (+ foo bar)");
 	
-
-	while(!ss.eof()){
-		cout << "=========================\n";
-		cell c = cell_read();
-		eval(c);
-	}
+	//cout << "type of foo is " << get_var("foo")._type << "\n";
 }
