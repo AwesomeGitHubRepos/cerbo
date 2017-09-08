@@ -1,11 +1,8 @@
 #include <cassert>
-#include <functional>
 #include <iostream>
 #include <map>
 #include <sstream>
 #include <string>
-#include <typeinfo>
-#include <typeindex>
 #include <vector>
 
 using std::cerr;
@@ -13,61 +10,27 @@ using std::cout;
 using std::endl;
 using std::string;
 using std::to_string;
-using std::type_index;
 using std::vector;
 
-///////////////////////////////////////////////////////////////////////////
-// cells types
 
+const string gmr = R"(
+(foo (bar baz))
+)";
 
-typedef void* vptr;
-typedef std::function<void(void)> vfptr;
-typedef std::function<void*(void)> ctor_ptr;
-typedef std::function<void(void*)> dtor_ptr;
+//const string gmr = "";
 
-const int genid()
-{
-	static int id = 1;
-	return id++;
-}
+enum cell_e { CT_NUL, CT_STR, CT_DBL, CT_VEC };
 
-static_assert(sizeof(double)<=sizeof(vptr), 
-		"require a vptr to hold a double");
+struct cell_t {
+	cell_e type = CT_NUL;
+	void *ptr = nullptr;
+} cell_t;
 
-class bcell {
-	public:
-		int type = 0;
-		vptr ptr = nullptr;
-
-};
-
-
-static std::map<int, ctor_ptr> bcell_ctors;
-static std::map<int, dtor_ptr> bcell_dtors;
-const int str_id = genid();
-void
-init_bcell_types()
-{
-	//add_ctor(typeid(string), []() { return new(string); });
-	//int str_id = genid();
-	bcell_ctors[str_id] = []() {return new(string); } ;
-	bcell_dtors[str_id] = [](void* ptr) { delete (string*)ptr; } ;
-}
-
-
-
-
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////
+//class cell;
 
 void run_tests();
 typedef struct Nothing {} Nothing; // not anything
 
-enum cell_e { CT_NUL, CT_STR, CT_QST, CT_DBL, CT_VEC };
 // http://students.washington.edu/levistod/wordpress/2016/09/14/variants-in-c/
 class cell;
 typedef std::vector<cell> cellvec;
@@ -117,10 +80,6 @@ class cell {
 			_type = CT_STR;
 			new(&_str) auto(s); 
 		}
-		void set_qstr(const string& s) { 
-			_type = CT_QST;
-			new(&_str) auto(s); 
-		}
 
 		void set_vec(const cellvec& vec) {
 			_type = CT_VEC;
@@ -141,8 +100,6 @@ cell::print_cell() const
 			return to_string(_dbl);
 		case CT_STR:
 			return _str;
-		case CT_QST:
-			return "\"" + _str + "\"";
 		case CT_VEC:
 			return "<vec>";
 		default:
@@ -159,7 +116,6 @@ cell::repr()
 			s+= "NUL";
 			break;
 		case CT_STR: 
-		case CT_QST:
 			s += _str;
 			break;
 		case CT_DBL:
@@ -185,7 +141,6 @@ cell::cell(const cell& other)
 	switch(other._type) {
 		case CT_NUL: break;
 		case CT_STR: 
-		case CT_QST:
 			     //cout << "other string is " << other._str << endl;
 			     new (&_str)  auto(other._str);
 			     break;
@@ -209,7 +164,6 @@ cell::~cell()
 		case CT_DBL:
 			break;
 		case CT_STR:
-		case CT_QST:
 			_str.~basic_string();
 			break;
 		case CT_VEC:
@@ -234,7 +188,7 @@ to_cell(const cellvec& cvec)
 string
 get_string(const cell& c)
 {
-	assert(c._type == CT_STR || c._type == CT_QST);
+	assert(c._type == CT_STR);
 	return c._str;
 }
 
@@ -308,68 +262,30 @@ cdr(const cell& c)
 	return res;
 }
 
-
 cell
-define(const cell& c)
+blang_apply(const std::string& id, const cell& c)
 {
+	cell res;
+	if(id== "define") {
 		cell c1 = car(c);
 		assert(c1._type == CT_STR);
 		string id = c1._str;
 		cell args = eval(car(cdr(c)));
 		//cout << "apply/define " << args._dbl << endl;
 		set_var(id, args);
-		return cell();
-}
-
-cell
-blang_plus(const cell&c)
-{
-	double d =0;
-	for(const auto& a:c._cvec) {
-		cell c1 = eval(a);
-		assert(c1._type == CT_DBL);
-		//cout << "adding " << c1._dbl << endl;
-		d += c1._dbl;
+	} else if(id == "+") {
+		//cout << "blang_apply() found '+'\n";
+		double d =0;
+		for(const auto& a:c._cvec) {
+			cell c1 = eval(a);
+			assert(c1._type == CT_DBL);
+			//cout << "adding " << c1._dbl << endl;
+			d += c1._dbl;
+		}
+		res.set_dbl(d);
 	}
 
-	cell res;
-	res.set_dbl(d);
 	return res;
-}
-
-
-
-typedef std::function<cell(const cell&)> func_ptr;
-
-
-std::map<string, func_ptr> funcs = {{"define", define},
-	{"+", blang_plus}
-};
-
-
-void
-add_func(string func_name, func_ptr fn)
-{
-	funcs[func_name] = fn;
-}
-
-void init_funcs()
-{
-//	add_func("define", define);
-//	add_func("+", blang_plus);
-}
-
-cell
-blang_apply(const std::string& id, const cell& c)
-{
-	//cell res;
-	auto it = funcs.find(id);
-	if(it == funcs.end())
-		unhandled("In procedure appluL Unbound variable: " + id);
-
-	func_ptr f = it->second;
-	return f(c);
-
 }
 
 
@@ -399,23 +315,6 @@ cellvec parse_list()
 	//cout << "... parse_list(): index= " << res.value.index() << "\n";
 	return cvec;
 }
-
-cell
-parse_qstring()
-{
-	string s;
-	while(char c = getch()) {
-		if(ss.eof())
-			unhandled("In procedure parse_string: unmatched '\"'");
-		if(c == '"') break;
-		s += c;
-	}
-
-	cell res;
-	res.set_qstr(s);
-	return res;
-}
-
 
 cell
 parse_atom()
@@ -473,9 +372,6 @@ eval(const cell& c)
 			//cout << "TODO eval():CT_STR " << eval_string(c._str) << endl;
 			result = eval_string(c._str);
 			break;
-		case CT_QST:
-			result = c;
-			break;
 		case CT_DBL: 
 			result = c;
 			//cout << "TOD eval()CT_DBL " << c._dbl << endl;
@@ -497,22 +393,28 @@ eval(const cell& c)
 cell
 cell_read()
 {
+	/*
+	while(char c = getch()  ) {
+		if(ss.eof()) break;
+		cout << c;
+	}
+	*/
+
+	cell res; // = "TODO";
 	eat_white();
 	char c = getch();
-	if(ss.eof()) return cell();
-
-	cell res;
-	switch(c) {
-		case '(': 
-			res.set_vec(parse_list());
-			break;
-		case '"':
-			res = parse_qstring();
-			break;
-		default:
-			ss.unget();
-			res = parse_atom();
-	}
+       	if(ss.eof()) {
+		// nothing
+	} else if(c=='(') {
+		//res._type = CT_VEC;
+		res.set_vec(parse_list());
+	} else {
+		ss.unget();
+		res = parse_atom();
+		//res._type = CT_STR;
+		//res.set_str(s);
+		//res.value.copy<std::string>(parse_symbol());
+		}
 
 
 	//cout << "cell_read(): " << res.repr() << "\n";
@@ -524,7 +426,6 @@ cell_read()
 int main()
 {
 
-	init_funcs();
 	run_tests();
 	//reader();
 }
@@ -561,7 +462,6 @@ void run_tests()
 	run_test("(define foo (+ 12 2)) (+ foo 3)");
 	run_test("(+ 1 2 (+ 3 4 (+ 5 6)))");
 	run_test("(define foo 10) (define bar (+ foo 1)) (+ foo bar)");
-	run_test("(define bar \"hello world\")  bar");
 	
 	//cout << "type of foo is " << get_var("foo")._type << "\n";
 }
