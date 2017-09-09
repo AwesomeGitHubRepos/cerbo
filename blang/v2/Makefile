@@ -1,6 +1,8 @@
 AM_CXXFLAGS =
 AM_CXXFLAGS += -Wfatal-errors
-AM_CXXFLAGS += -no-pie -fsanitize=address
+
+AM_CXXFLAGS += -fsanitize=address
+#AM_CXXFLAGS += -no-pie 
 
 .PHONY: all clean
 
