@@ -12,6 +12,7 @@ using std::cerr;
 using std::cout;
 using std::endl;
 using std::string;
+using namespace std::string_literals;
 using std::to_string;
 using std::type_index;
 using std::vector;
@@ -67,7 +68,7 @@ init_bcell_types()
 void run_tests();
 typedef struct Nothing {} Nothing; // not anything
 
-enum cell_e { CT_NUL, CT_STR, CT_QST, CT_DBL, CT_VEC };
+enum cell_e { CT_NUL, CT_BOOL, CT_STR, CT_QST, CT_DBL, CT_VEC };
 // http://students.washington.edu/levistod/wordpress/2016/09/14/variants-in-c/
 class cell;
 typedef std::vector<cell> cellvec;
@@ -87,12 +88,14 @@ void unhandled(const string& s, cell_e type)
 
 class cell {
 	public:
+		cell(bool b);
 		cell(): _dbl(0) {;};
 		cell(const cell& other);  
 		~cell();
 		//cell(string s): value{s} {}
 		//std::variant<Nothing, std::string, cellvec, double> value;
 		union {
+			bool   _bool;
 			double _dbl;
 			string _str;
 			cellvec _cvec;
@@ -131,12 +134,18 @@ class cell {
 };
 
 		
+cell::cell(bool b)
+{
+	_type = CT_BOOL;
+	_bool = b;
+}
+
 string
 cell::print_cell() const
 {
 	switch(_type) {
-		case CT_NUL:
-			return "";
+		case CT_NUL: return "";
+		case CT_BOOL: return "#"s + (_bool? "t" : "f"); 
 		case CT_DBL:
 			return to_string(_dbl);
 		case CT_STR:
@@ -184,6 +193,7 @@ cell::cell(const cell& other)
 	_type = other._type;
 	switch(other._type) {
 		case CT_NUL: break;
+		case CT_BOOL: _bool = other._bool; break;
 		case CT_STR: 
 		case CT_QST:
 			     //cout << "other string is " << other._str << endl;
@@ -205,7 +215,7 @@ cell::~cell()
 	switch(_type)
 	{
 		case CT_NUL:
-			break;
+		case CT_BOOL:
 		case CT_DBL:
 			break;
 		case CT_STR:
@@ -312,13 +322,34 @@ cdr(const cell& c)
 cell
 define(const cell& c)
 {
-		cell c1 = car(c);
-		assert(c1._type == CT_STR);
-		string id = c1._str;
-		cell args = eval(car(cdr(c)));
-		//cout << "apply/define " << args._dbl << endl;
-		set_var(id, args);
-		return cell();
+	cell c1 = car(c);
+	assert(c1._type == CT_STR);
+	string id = c1._str;
+	cell args = eval(car(cdr(c)));
+	//cout << "apply/define " << args._dbl << endl;
+	set_var(id, args);
+	return cell();
+}
+
+cell 
+cadr(const cell& c) { return car(cdr(c)); }
+
+cell
+caaddr(const cell& c) { return car(car(cdr(cdr(c)))); }
+
+cell
+caddr(const cell& c) { return car(cdr(cdr(c))); }
+
+cell
+blang_if(const cell& c)
+{
+	assert(c._type == CT_VEC);
+	cell test = car(c);
+	bool yes = test._type == CT_BOOL && test._bool;
+	if(yes)
+		return eval(cadr(c));
+	else
+		return eval(caddr(c));
 }
 
 cell
@@ -342,7 +373,9 @@ blang_plus(const cell&c)
 typedef std::function<cell(const cell&)> func_ptr;
 
 
-std::map<string, func_ptr> funcs = {{"define", define},
+std::map<string, func_ptr> funcs = {
+	{"define", define},
+	{"if", blang_if},
 	{"+", blang_plus}
 };
 
@@ -365,7 +398,7 @@ blang_apply(const std::string& id, const cell& c)
 	//cell res;
 	auto it = funcs.find(id);
 	if(it == funcs.end())
-		unhandled("In procedure appluL Unbound variable: " + id);
+		unhandled("In procedure applu: Unbound variable: " + id);
 
 	func_ptr f = it->second;
 	return f(c);
@@ -470,16 +503,19 @@ eval(const cell& c)
 		case CT_NUL:
 			break;
 		case CT_STR: 
-			//cout << "TODO eval():CT_STR " << eval_string(c._str) << endl;
 			result = eval_string(c._str);
 			break;
+		case CT_BOOL:
+		case CT_DBL:
 		case CT_QST:
+			return c;
+			/*
 			result = c;
 			break;
 		case CT_DBL: 
 			result = c;
-			//cout << "TOD eval()CT_DBL " << c._dbl << endl;
 			break;
+			*/
 		case CT_VEC:
 			{				  
 				string id = car_string(c);
@@ -495,6 +531,18 @@ eval(const cell& c)
 }
 
 cell
+blang_bool()
+{
+
+	switch(char c=getch()) {
+		case 't': return cell(true);
+		case 'f': return cell(false);
+		default:
+			  unhandled("In procedure bool: Expecting either `#t' or `#f'");
+	}
+}
+
+cell
 cell_read()
 {
 	eat_white();
@@ -503,6 +551,8 @@ cell_read()
 
 	cell res;
 	switch(c) {
+		case '#':
+			return blang_bool();
 		case '(': 
 			res.set_vec(parse_list());
 			break;
@@ -562,6 +612,8 @@ void run_tests()
 	run_test("(+ 1 2 (+ 3 4 (+ 5 6)))");
 	run_test("(define foo 10) (define bar (+ foo 1)) (+ foo bar)");
 	run_test("(define bar \"hello world\")  bar");
+	run_test(" #t #f");
+	run_test("(if #t 10 11) (if #f 10 (+ 1 12))");
 	
 	//cout << "type of foo is " << get_var("foo")._type << "\n";
 }
