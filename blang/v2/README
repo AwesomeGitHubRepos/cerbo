@@ -1,5 +1,0 @@
-blang2 - a second attempt at writing an interpreter using a different
-approach. This time, it is based on sexprs.
-
-arc/blang2-1.cc - first crack at an interpreter. It works, but it could
-do with improvement.
