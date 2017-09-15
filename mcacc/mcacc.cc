@@ -69,9 +69,12 @@ int rmdir(const string& dirname)
 
 void clean()
 {
+	/*
 	rmdir(sndir(1));
 	rmdir(sndir(2));
 	rmdir(sndir(3));
+	*/
+	for(int i=1; i<=3; ++i) rmdir(sndir(i));
 }
 
 
@@ -109,10 +112,10 @@ main(int argc, char *argv[])
 	oven ove;
 	ove.m_vm = vm;
 	ove.load_inputs();
-	if(vm.at("snap") == "on") ove.fetch();
 
 	do_wiegley = true; // override defaults and just do it anyway
-	ove.process(do_wiegley);
+	bool do_fetch = vm.at("snap") == "on";
+	ove.process(do_wiegley, do_fetch);
 
 	//supo::ssystem("mcacc-reports.sh", true);
 	if(vm.count("show") > 0) show(vm.at("show"));

@@ -33,7 +33,7 @@ void insert_nacc(inputs_t& inputs, const strings& fields)
 }
 
 
-//void insert_comm(comm_ts& cs, const strings& fields)
+/*
 void insert_comm(inputs_t& inputs, const strings& fields)
 {
 	comm_t c;
@@ -46,6 +46,7 @@ void insert_comm(inputs_t& inputs, const strings& fields)
 	comm_ts& cs = inputs.comms;
 	cs[c.ticker] = c;
 }
+*/
 
 etran_c mketran(const strings& fields)
 {
@@ -172,7 +173,7 @@ inputs_t read_inputs()
 		bool operator==(const cmd_t &rhs) const { return name == rhs.name;};
 	};
 	const std::set<cmd_t> cmds = {
-		{"comm-1",  5, insert_comm},
+		//{"comm-1",  5, insert_comm},
 		{"etran-2", 7, insert_etran_2},
 		{"leak-2",  6, insert_leak_2},
 		{"nacc",    5, insert_nacc},
@@ -197,19 +198,6 @@ inputs_t read_inputs()
 		search->f(inputs, fields); // do whatever is required for that field
 
 	}
-
-
-	/*
-	for(auto& row: mat) {
-		if(row.size() == 0) continue;
-		//cout << row[0] << endl;
-		auto search = cmds.find(row[0]);
-		if(search == cmds.end()) continue;
-		row.erase(begin(row)); // the fields
-		assert(row.size() == search->num_fields);
-		search->f(inputs, row); // do whatever is required for that field
-	}
-	*/
 
 	ifs.close();
 	return inputs;

@@ -8,7 +8,7 @@ class oven
 	public:
 		void load_inputs();
 		void fetch();
-		void process(bool do_wiegley);
+		void process(bool do_wiegley, bool do_fetch);
 		period curr_period() const;
 		vm_t m_vm;
 	private:

@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "comm.h"
+//#include "comm.h"
 #include "etran.h"
 #include "nacc.h"
 #include "ntran.h"
@@ -13,7 +13,7 @@
 #include "yahoo.h"
 
 typedef struct inputs_t {
-	comm_ts comms;
+	//comm_ts comms;
 	etran_cs etrans;
 	nacc_ts naccs;
 	ntran_ts ntrans;

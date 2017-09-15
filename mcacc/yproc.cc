@@ -22,8 +22,10 @@ typedef struct downloads_t {
 } downloads_t;
 
 
-void download(const comm_ts& the_comms, downloads_t& ds)
+downloads_t
+yproc_download()
 {
+	downloads_t ds;
 	std::time_t t = std::time(nullptr);
 	char dstamp[80], tstamp[80];
 	strftime(dstamp, 80, "%Y-%m-%d", std::localtime(&t));
@@ -31,14 +33,21 @@ void download(const comm_ts& the_comms, downloads_t& ds)
 	strftime(tstamp, 80, "%H:%M:%S", std::localtime(&t));
 	ds.tstamp = tstamp;
 	
-	strings tickers;
+	strings tickers = supo::readlines(s2("qtys-1.txt"));
+	//cout << s2("qtys-1.txt");
+	//for(auto t:tickers) cout << t;
+	//print(tickers);
+	/*
 	for(auto& cm:the_comms) {
 		auto &c = cm.second;
 		if(c.down == "W") tickers.push_back(c.ticker);
 	}
+	*/
+
 
 	strings retrs = fetch_tickers(tickers, ds.usd);
 	for(auto& line: retrs) {
+		//cout << "yrpoc_download: " << line << endl;
 		strings fields = split(line, ',');
 		yahoo_t y;
 		y.dstamp = dstamp;
@@ -55,6 +64,8 @@ void download(const comm_ts& the_comms, downloads_t& ds)
 		y.chgpc = y.chg.dbl() / (y.yprice.dbl() - y.chg.dbl()) * 100;
 		ds.ys.insert(y);
 	}
+
+	return ds;
 }
  
 /* Create a yahoo cache file */
@@ -82,7 +93,7 @@ void write_fields(ofstream& ofs, const strings& values)
 
 
 
-void mksnap(const inputs_t& inps, const downloads_t& ds)
+void mksnap(const etran_cs& etrans, const downloads_t& ds)
 {
 	string fname = s3("snap.rep");
 	ofstream sout;
@@ -98,7 +109,7 @@ void mksnap(const inputs_t& inps, const downloads_t& ds)
 	for(auto& y:ds.ys) {
 		if(y.ticker[0] == '^') continue;
 		quantity qty;
-		for(auto& e:inps.etrans) 
+		for(auto& e:etrans) 
 			if(y.ticker == e.ticker) 
 				qty += e.qty;
 
@@ -136,11 +147,10 @@ void mksnap(const inputs_t& inps, const downloads_t& ds)
 	sout.close();
 }
 
-yahoo_ts process_yahoos(const inputs_t& inps)
+yahoo_ts process_yahoos(const etran_cs& etrans)
 {
-	downloads_t ds;
-	download(inps.comms, ds);
+	downloads_t ds = yproc_download();
 	mkyahoos(ds);
-	mksnap(inps, ds);
+	mksnap(etrans, ds);
 	return ds.ys;
 }
