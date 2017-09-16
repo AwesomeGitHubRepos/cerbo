@@ -29,11 +29,9 @@ string mkledger(const etran_cs& es, const ntran_ts& ns)
 	vector<spair> trans;
 
 	for(auto& e: es) {
-		//string t1 = (format("%1%\t*\tetran\n") % e.dstamp).str() ;
 		string t1 = e.dstamp + "\t*\tetran\n";
 		assert(e.typ != unknown);
 		string at = (e.typ == leak) ? "@" : "@@";
-		//string lcost = format_num(labs(e.cost), 2);
 		string t2 = "\tEquity:" + e.folio 
 			+ "\t\"" + e.ticker + "\""
 			+ "\t" + e.qty.str()
@@ -128,21 +126,8 @@ account	PaL:Expenses:Taxes
 	}
 
 	return dat;
-	//string fname = rootdir() + "/ledger.dat";
-	//spit(fname, dat);
 }
 
-
-/*
-void spit_strings(const string& filename, const multiset<string>& lines)
-{
-	ofstream out;
-	out.open(filename, ofstream::trunc);
-	for(auto& line: lines) out << line << endl;
-	out.close();
-
-}
-*/
 
 // create the prices
 string mkprices(const yahoo_ts&  ys)
@@ -161,9 +146,6 @@ string mkprices(const yahoo_ts&  ys)
 	for(const auto& p:prices) result += p + "\n";
 
 	return result;
-	//cout << result;
-	//string fname = rootdir() + "/prices.dat";
-	//spit_strings(fname, prices);
 }
 
 void wiegley(const etran_cs& etrans, const ntran_ts& ntrans, const yahoo_ts& yahoos)
