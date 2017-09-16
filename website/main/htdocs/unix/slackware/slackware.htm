@@ -11,26 +11,22 @@
 <h1>Slackware Linux</h1>
 
   
-
+<pre>
 # SLACKWARE 14.2
 
 # USER
 useradd -m -u 3003 mcarter
 passwd mcarter
 
-# VBOX
-## Network
-Set MAC
-Bridged adapter
+# LOCALE
+vim /etc/profile.d/lang.sh
+export LANG=en_GB.UTF-8
+export LC_COLLATE=C
 
-## Screen
-Install vbox guest additions
-/etc/fstab uncomment /dev/cdrom
-mount /dev/cdrom
-cd /mnt/cdrom
-./VBoxLinuxAdditions.run
+# MAN
+`makewhatis' - makes manpages
 
-#SWAP
+# SWAP
 fallocate -l 3G /swapfile
 chmod 600 /swapfile
 mkswap /swapfile
@@ -61,10 +57,12 @@ But perhaps a better way is to use slackbuilds.
 Contains binary builds for many extras, inc keepassx, sshfs, qt5:
 http://www.slackware.com/~alien/slackbuilds
 
-# LOCALE
-vim /etc/profile.d/lang.sh
-export LANG=en_GB.UTF-8
-export LC_COLLATE=C
+</pre>
+
+<hr><h2>See also</h2>
+
+<li><a href="vbox.htm">vbox</a></li>
+
 
 <hr><pre>
 Author:  Mark Carter
