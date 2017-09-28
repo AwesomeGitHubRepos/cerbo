@@ -154,7 +154,7 @@ void folio_c::print_to_epic_file(ofstream& ofs) const
 {
 	ofs << m_name << endl;
 
-	string hdr = "TICKER         QTY        COST       VALUE   RET%  "s +
+	string hdr = "TICKER          QTY        COST       VALUE   RET%  "s +
 		"     UCOST      UVALUE"s;
 	ofs << hdr << endl;
 
