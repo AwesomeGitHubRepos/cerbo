@@ -1,0 +1,16 @@
+Building on MSYS2
+
+pacman -S tar lzip make ncurses-devel
+
+Download gmp (needs gmp.h, which MSYS2 doesn't seem to supply)
+lzip -d ... to unzip it
+Although maybe `pacman -S gmp-devel' will work
+
+Download and install libdb. Needs db.h. Maybe get the sourdes from cygwin,
+as the installation instructions may be unclear otherwise.
+
+Compile error on cobc.c as at 05-Oct-2017 attempting to link
+to undefined references
+
+Created: 06-Oct-2017
+
