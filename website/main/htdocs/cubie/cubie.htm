@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html><head>
+  <LINK REL=StyleSheet HREF="../style.css" TYPE="text/css">
+  <title>cubietruck</title></head>
+<body>
+
+<a href="../index.html">Home</a>
+
+<h1>cubietruck</h1>
+
+<hr><h2>General problems</h2>
+
+Here are the obstacles you will face:
+<ul>
+	<li>kernel 4.X does not support NAND - but the ones with 3.X in them don't seem to work well</li>
+	<li>The cubietruck cannot boot from SATA, it has to piggieback off of uSD or NAND</li>
+</ul>
+
+Here are distros that I tried which seemed problematical, and which you are likely to want to avoid:
+<ul>
+	<li>Armbian_5.25_Cubietruck_Debian_jessie_default_3.4.113</li>
+	<li>Armbian_5.25_Cubietruck_Ubuntu_xenial_default_3.4.113</li>
+	<li>lubuntu-server.nand.img</li>
+	<li>NetBSD 7.1 - you can't get the bootloader unless you have a working version of NetBSD, which means installing an i386 version to a virtual machine. It seemed to have a problem with the CD drive, however. So I could not install it. A very convoluted process which ultimately failed</li>
+</ul>
+
+<hr><h2>Installing Armbian Debian Jessie for Cubietruck</h2>
+
+<ol>
+	<li>You can view potential (viable (?)) distros at the armbian cubietruck <a href="https://dl.armbian.com/cubietruck/">download</a> page. I chose Armbian_5.04_Cubietruck_Debian_jessie_4.4.3. I am now longer sure what the actual file is, but I have stored it on my Samsung as Armbian_5.04_Cubietruck_Debian_jessie_4.4.3.raw. Be careful how you unpack an archive, at it may well be a tarbomb. An extracted image may have the extension raw, or img. </li>
+<li>Use the vivo to install the raw file to the uSD. Insert the uSD card into the vivo and type e.g.:
+<pre>
+dd if=Armbian_5.04_Cubietruck_Debian_jessie_4.4.3.raw  of=/dev/sdc bs=1M conv=sync 
+</pre></li>
+
+<li>
+	Insert the uSD card into the cubietruck, and boot it. Everything should be OK. The password for <code>root</code> is <code>1234</code>, but you will have to reset it and set up a user account. Just follow the instructions that appear on screen.
+</li>
+
+<li>
+Reboot the machine and ensure everything looks fine before proceeding further.
+</li>
+
+<li>
+	Login as root, and <code>cd /boot</code>. Edit the first line in <code>boot.cmd</code> so that /dev/mmcblk0p1 reads <code>/dev/sda1</code> and insert ' rw ' (without the quotes) after <code>rootwait</code>.
+</li>
+
+<li>
+<pre>
+mkimage -C none -A arm -T script -d boot.cmd boot.scr
+</pre>
+Note that this will transfer the booting over to /dev/sda1, which is the SATA drive.
+</li>
+
+<li>
+Plug the sata drive into the vivo, and repeat the dd command in step 2. Exactly the same image is written to the hard drive as to the uSD.
+</li>
+
+<li>
+Plug the sata drive into the cubietruck. Reboot. 
+</li>
+
+</ol>
+
+
+<p>
+You should now be ready to rock and roll. You will probably need to repeat the spiel about the root user password and initial user account. When you boot, you will need the uSD installed, because remember, the cubietruck cannot boot from sata by itself.
+</p>
+
+<hr><h2>Also on this site</h2>
+
+<li><a href="barf.htm">barf</a> -  stuff archived off on 11-Oct-2017. It's probably no longer relevant, but you may find some use for it</li>
+
+
+<hr><h2>Links to other sites</h2>
+
+None.
+
+<hr><pre>
+Author:  Mark Carter
+Created: 16-Mar-2014
+Updated: 11-Oct-2017
+</pre>
+</body>
+</html>
