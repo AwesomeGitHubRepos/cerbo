@@ -68,8 +68,21 @@ You should now be ready to rock and roll. You will probably need to repeat the s
 </p>
 
 <p>
-You will probably find that /dev/sda1 is only a couple of gig big. So you may want to repartition it to take up the remainder of the disk.
+You will probably find that /dev/sda1 is only a couple of gig big. So you may want to repartition it to take up the remainder of the disk:
 </p>
+<pre>
+sudo fdisk /dev/sdc
+d
+n
+p
+Accept the defaults
+Do you want to remove the signature? N
+
+resize2fs /dev/sdc1
+
+e2fsck /dev/sdc1
+</pre>
+
 
 <hr><h2>Also on this site</h2>
 
@@ -77,6 +90,8 @@ You will probably find that /dev/sda1 is only a couple of gig big. So you may wa
 
 
 <hr><h2>Links to other sites</h2>
+
+<li><a href="https://github.com/blippy/cubiestuff">cubiestuff</a> - gihub repo (mine)</li>
 
 <li><a href="https://archlinuxarm.org/forum/viewtopic.php?f=57&t=12119">uEnv.txt vs boot.cmd</a> - question posed by me, unanswered as at 11-Oct-2017</li>
 
@@ -88,7 +103,7 @@ You will probably find that /dev/sda1 is only a couple of gig big. So you may wa
 <hr><pre>
 Author:  Mark Carter
 Created: 16-Mar-2014
-Updated: 11-Oct-2017
+Updated: 16-Oct-2017
 </pre>
 </body>
 </html>
