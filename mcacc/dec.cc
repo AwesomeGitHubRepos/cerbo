@@ -1,6 +1,25 @@
 #include "dec.h"
 #include "types.h"
 
+currency mul(const price& p, const quantity& q)
+{
+	return currency(p() * q());
+}
+price mul(const currency& c, const quantity& q)
+{
+	return price(c() * q());
+}
+
+price div(const currency& c, const quantity& q)
+{
+	double q1 = q.get();
+	return price(double(c())/q1);
+}
+
+price sub(const price& p1, const price& p2)
+{
+			return price(p1()-p2());
+}
 std::string currency::str() const
 {
 	return std::to_string(double(value)/100.0);  // TODO ptolly needs fixingdd

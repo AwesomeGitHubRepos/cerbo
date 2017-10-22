@@ -91,7 +91,7 @@ void print_index(const string& index, const stend& s, ostream& pout)
 {
 	const price& sp = s.start_price;
 	const price&  ep = s.end_price;
-	const price chg = ep-sp;
+	const price chg = sub(ep,sp);
 	string rstr = ret_str(ep, sp);
 	pout << pad_ticker(index)
 		<< as_currency(sp)

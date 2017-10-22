@@ -62,7 +62,7 @@ void insert_etran_2(inputs_t& inputs, const strings& fields)
 	y.dstamp = e.dstamp;
 	y.tstamp = "12:00:00";
 	y.ticker = e.ticker;
-	const price p = e.cost / e.qty;
+	const price p = div(e.cost, e.qty);
 	y.yprice = p;
 	y.chg = price();
 	y.chgpc = 0;

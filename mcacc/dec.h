@@ -75,8 +75,9 @@ class currency {
 };
 
 
-//currency operator*(const price& p, const quantity& q);
-//currency operator*(const currency& c, const price& p);
+currency operator*(const price& p, const quantity& q);
+currency operator*(const currency& c, const price& p);
+price operator/(const currency& c, const quantity& p);
 
 class price {
 	public:
@@ -98,16 +99,7 @@ class price {
 			return os;
 		}
 		
-		friend price operator/(const currency& c, const quantity& q)
-		{
-			double q1 = q.get();
-			return price(double(c())/q1);
-		}
-
-		friend price operator-(const price& p1, const price& p2)
-		{
-			return price(p1()-p2());
-		}
+		friend price operator/(const currency& c, const quantity& q);
 
 };
 
@@ -139,6 +131,10 @@ class quantity {
 
 std::string as_currency(const price& p);
 
+price div(const currency& c, const quantity& q);
+price mul(const currency& c, const quantity& q);
+currency mul(const price& p, const quantity& q);
+price sub(const price& p1, const price& p2);
 std::string ret_curr(const currency& num, const currency& denom); 
 #if 0
 std::decimal::decimal128 dbl_to_dec(double d, int dp);

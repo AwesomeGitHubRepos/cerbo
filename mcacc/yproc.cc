@@ -113,12 +113,12 @@ void mksnap(const etran_cs& etrans, const downloads_t& ds)
 			if(y.ticker == e.ticker) 
 				qty += e.qty;
 
-		const currency profit = y.chg * qty;
+		const currency profit = mul(y.chg, qty);
 		total_profit += profit;
 
 		string chgpc_str =ret_str(y.chgpc);
 		string price_str = y.yprice.str();
-		currency value = y.yprice*qty;
+		currency value = mul(y.yprice, qty);
 		total_value += value;
 		string value_str = value.str();
 		strings fields = strings {pad_right(y.ticker, 6), 

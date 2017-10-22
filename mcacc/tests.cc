@@ -61,9 +61,9 @@ void check_decimals()
 	check(c1.stra() == "34.56", "and back to string again");
 
 	quantity q1(10,0);
-	price p1 = c1/q1;
+	price p1 = div(c1, q1);
 	check_near(p1(), 345.6, "p 345.6 = c 34.56 / q 10.0");
-	currency c2 = p1 * q1;
+	currency c2 = mul(p1, q1);
 	check(c2.stra() == "34.56", "and back to string again");
 
 	price p2("145.6");
@@ -73,7 +73,7 @@ void check_decimals()
 	price p3 = p2;
 	check(p3.stra() == p2.stra(), "simple price assignment");
 
-	currency d3 = price("200.4749") * quantity("8889.15787");
+	currency d3 = mul(price("200.4749"),  quantity("8889.15787"));
 	check_near(d3(), 17820.53, "200.4749 * 8889.15787");
 
 

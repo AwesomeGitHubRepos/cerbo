@@ -25,7 +25,7 @@ detran_c augment(const etran_c& e, const stend_ts& stends, const period& per)
 	const stend& s = stends.at(e.ticker);
 
 	//aug.ucost.reprice(e.cost, e.qty); 
-	aug.ucost = e.cost/e.qty;
+	aug.ucost = div(e.cost, e.qty);
 	aug.start_dstamp = s.start_dstamp;
 	aug.start_price = s.start_price;
 	aug.end_dstamp = s.end_dstamp;
@@ -36,10 +36,10 @@ detran_c augment(const etran_c& e, const stend_ts& stends, const period& per)
 	aug.vbefore = 0;
 	aug.flow = 0;
 	aug.prior_year_profit = 0;
-	aug.vto = s.end_price * qty;
+	aug.vto = mul(s.end_price, qty);
 	switch(per.when(aug.dstamp)) {
 		case perBefore:
-			aug.vbefore = s.start_price * qty;
+			aug.vbefore = mul(s.start_price, qty);
 			aug.prior_year_profit = aug.vbefore 
 				- aug.cost;
 			break;
@@ -124,14 +124,14 @@ detran_c& detran_c::operator+=(const detran_c& rhs){
 	if(this->buy){
 		this->cost += rhs.cost;
 	} else {
-		this->cost += (this->cost/this->qty) * rhs.qty;
+		this->cost += mul(div(this->cost,this->qty),  rhs.qty);
 	}
 	this->ticker = rhs.ticker;
 	this->qty += rhs.qty;
-	this->ucost = this->cost/this->qty;
+	this->ucost = div(this->cost, this->qty);
 	this->end_price = rhs.end_price;
 	this->profit += rhs.profit;
-	this->vto = this->end_price * this->qty;
+	this->vto = mul(this->end_price,  this->qty);
 	this->vbefore += rhs.vbefore;
 	this->prior_year_profit += rhs.prior_year_profit;
 	return *this;
