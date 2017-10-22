@@ -83,12 +83,8 @@ class price {
 		price(std::string s) { value = std::stod(s); }
 		std::string str() const;
 		double operator() () const { return value; }
-		void from_str(const std::string& s) { 
-			value = std::stod( s);
-		} 
-		std::string stra() {
-			return "stra " + std::to_string(value);
-		}
+		void from_str(const std::string& s); 
+		std::string stra();
 		friend std::ostream& operator<<(std::ostream& os, const price& obj)
 		{
 			os << obj.str();
@@ -117,7 +113,7 @@ class quantity {
 			value = sgn * std::stod(s);
 			//dec = str_to_dec(sgn, s, DP); 
 		} ;
-		quantity(int whole, int frac) { value = whole * frac / 1000;}
+		quantity(int whole, int frac);
 		friend std::ostream& operator<<(std::ostream& os, const quantity& obj)
 		{
 			os << obj.str();

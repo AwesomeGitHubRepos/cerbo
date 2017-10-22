@@ -55,12 +55,17 @@ void check_decimals()
 	check(currency(10, 12) + currency(13, 14) == currency(23, 26), "decimal simple addition");
 	check_near(currency(10, 12)(), 10.12, "currency 10.12");
 
+	check_near(price(206.65).value, 206.65, "price 1: 206.65");
+	check_near(price(206.65)(), 206.65, "price 1: 206.65");
+
 	currency c1;
 	c1.from_str("34.56");
 	check_near(c1(), 34.56, "currency from str");
 	check(c1.stra() == "34.56", "and back to string again");
 
 	quantity q1(10,0);
+	check_near(q1(), 10.0, "qty 10.0");
+
 	price p1 = div(c1, q1);
 	check_near(p1(), 345.6, "p 345.6 = c 34.56 / q 10.0");
 	currency c2 = mul(p1, q1);

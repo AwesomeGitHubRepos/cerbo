@@ -1,6 +1,16 @@
 #include "dec.h"
 #include "types.h"
 
+std::string price::stra() {
+	return supo::format_num(value, 5);
+}
+quantity::quantity(int whole, int frac)
+{ 
+	value = whole + frac / 1000;
+}
+void price::from_str(const std::string& s) { 
+	value = std::stod(s);
+} 
 std::string currency::stra() const { 
 	//return "stra: " + std::to_string(value/100.99);
 	//double d = std::decimal::decimal_to_double(dec); 
@@ -26,7 +36,7 @@ price mul(const currency& c, const quantity& q)
 price div(const currency& c, const quantity& q)
 {
 	double q1 = q.get();
-	return price(double(c())/q1);
+	return price(double(c())/q1 * 100.0);
 }
 
 price sub(const price& p1, const price& p2)
