@@ -1,6 +1,19 @@
 #include "dec.h"
 #include "types.h"
 
+std::string currency::stra() const { 
+	//return "stra: " + std::to_string(value/100.99);
+	//double d = std::decimal::decimal_to_double(dec); 
+	return supo::format_num(double(value)/100.0, 2); 
+}
+currency::currency(int whole, int frac)
+{
+	value = whole * 100 + frac;
+}
+double currency::operator() () const 
+{ 
+	return double(value) / 100.0;
+}
 currency mul(const price& p, const quantity& q)
 {
 	return currency(p() * q());

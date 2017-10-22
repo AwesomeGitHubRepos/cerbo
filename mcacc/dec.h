@@ -16,8 +16,8 @@ class currency {
 		int value = 0;
 		currency() {}
 		currency(int i) { value = i;}
-		currency(int whole, int frac) { value = whole * 100 +frac;}
-		double operator() () const { return value; }
+		currency(int whole, int frac);
+		double operator() () const;
 		std::string str() const;
 		currency operator+=(const currency& rhs)
 		{
@@ -51,11 +51,7 @@ class currency {
 		void from_str(const std::string& s) { 
 			from_str(1, s);
 		} ;
-		std::string stra() const { 
-			return "stra: " + std::to_string(value/100.99);
-			//double d = std::decimal::decimal_to_double(dec); 
-			//return supo::format_num(d, DP); 
-		}
+		std::string stra() const;
 		bool zerop() const { return value == 0; }
 		void negate() { value = - value; }
 		bool operator==(const currency& rhs)
