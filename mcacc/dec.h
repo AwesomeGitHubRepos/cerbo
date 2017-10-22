@@ -19,6 +19,7 @@ class currency {
 		currency(int whole, int frac);
 		double operator() () const;
 		std::string str() const;
+		std::string wide() const;
 		currency operator+=(const currency& rhs)
 		{
 			this->value = this->value + rhs.value;

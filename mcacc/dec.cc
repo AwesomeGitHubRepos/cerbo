@@ -1,5 +1,11 @@
 #include "dec.h"
 #include "types.h"
+//#include "supo_general.hh"
+
+std::string currency::wide() const
+{
+	return supo::pad_left(str(), 10);
+}
 
 std::string price::stra() {
 	return supo::format_num(value, 5);
@@ -45,7 +51,7 @@ price sub(const price& p1, const price& p2)
 }
 std::string currency::str() const
 {
-	return std::to_string(double(value)/100.0);  // TODO ptolly needs fixingdd
+	return supo::format_num(double(value)/100.00, 2);
 }
 
 std::string price::str() const

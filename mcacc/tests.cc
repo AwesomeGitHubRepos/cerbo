@@ -55,6 +55,14 @@ void check_decimals()
 	check(currency(10, 12) + currency(13, 14) == currency(23, 26), "decimal simple addition");
 	check_near(currency(10, 12)(), 10.12, "currency 10.12");
 
+	string s286_54 = currency(286, 54).str();
+	check(s286_54 == "286.54", "currency 286.64 str");
+	s286_54 = currency(286, 54).wide();
+	check(s286_54 == "    286.54", "currency 286.64 wide");
+
+
+	//cout << "* " << s286_54 << "\n";
+
 	check_near(price(206.65).value, 206.65, "price 1: 206.65");
 	check_near(price(206.65)(), 206.65, "price 1: 206.65");
 

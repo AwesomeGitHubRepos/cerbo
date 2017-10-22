@@ -45,13 +45,10 @@ void etb_main(nacc_ts& the_naccs, const post_ts& posts)
 			aout << setw(6) << p.cr;
 			string desc = p.desc;
 			desc.resize(30, ' ');
-			//desc = pad_right(desc, 30);
 			aout << setw(30) << desc;
-			//write_centis(aout, p.amount);
-			aout << p.amount.str();
+			aout << p.amount.wide();
 			total += p.amount;
-			//total.write(aout);
-			aout << total.str();
+			aout << total.wide();
 			aout << endl;
 		}
 
@@ -67,7 +64,7 @@ void etb_main(nacc_ts& the_naccs, const post_ts& posts)
 		double scale = a_nacc.scale;
 		eout << pad_right(k, 6) << " "; 
 		//write_centis(eout, total);
-		eout << total.str() ;
+		eout << total.wide() ;
 		eout << " " << format_num(scale, 2, 0) << " " 
 			<< format_num(total(), 10, 0);
 		eout << endl;

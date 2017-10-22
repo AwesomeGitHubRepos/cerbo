@@ -34,16 +34,6 @@ yproc_download()
 	ds.tstamp = tstamp;
 	
 	strings tickers = supo::readlines(s2("qtys-1.txt"));
-	//cout << s2("qtys-1.txt");
-	//for(auto t:tickers) cout << t;
-	//print(tickers);
-	/*
-	for(auto& cm:the_comms) {
-		auto &c = cm.second;
-		if(c.down == "W") tickers.push_back(c.ticker);
-	}
-	*/
-
 
 	strings retrs = fetch_tickers(tickers, ds.usd);
 	for(auto& line: retrs) {
