@@ -36,7 +36,7 @@ string mkledger(const etran_cs& es, const ntran_ts& ns)
 			+ "\t\"" + e.ticker + "\""
 			+ "\t" + e.qty.str()
 			+ "\t" + at 
-			+ "\tGBP\t" + abs(e.cost).str(); 
+			+ "\tGBP\t" + std::to_string(abs(e.cost())); 
 		string t3 = "\n\t" + e.folio + "\n\n";
 		//string t3 = "\n\n";
 		string t = t1 + t2 + t3;
@@ -134,7 +134,7 @@ string mkprices(const yahoo_ts&  ys)
 {
 	multiset<string> prices;
 	for(const auto& y: ys) {
-		string price_str = format_num(y.yprice.dbl()/100, 7);
+		string price_str = format_num(y.yprice()/100, 7);
 		string ticker = "\"" + y.ticker + "\"";
 		strings fields = {"P", y.dstamp, y.tstamp, ticker, 
 			"GBP", price_str};

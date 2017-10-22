@@ -8,11 +8,15 @@
 
 #include <supo_general.hpp>
 
+class price;
+class quantity;
+
 class currency {
 	public:
 		int value = 0;
 		currency() {}
 		currency(int i) { value = i;}
+		currency(int whole, int frac) { value = whole * 100 +frac;}
 		double operator() () const { return value; }
 		std::string str() const;
 		currency operator+=(const currency& rhs)
@@ -41,23 +45,79 @@ class currency {
 		{
 			return currency(i);
 		}
+		void from_str(double sgn, const std::string& s) { 
+			value = sgn * std::stod(s) * 100.0;
+		} ;
+		void from_str(const std::string& s) { 
+			from_str(1, s);
+		} ;
+		std::string stra() const { 
+			return "stra: " + std::to_string(value/100.99);
+			//double d = std::decimal::decimal_to_double(dec); 
+			//return supo::format_num(d, DP); 
+		}
+		bool zerop() const { return value == 0; }
+		void negate() { value = - value; }
+		bool operator==(const currency& rhs)
+		{
+			return this->value == rhs.value;
+		}
+		bool operator!=(const currency& rhs)
+		{
+			return this->value != rhs.value;
+		}
+		friend std::ostream& operator<<(std::ostream& os, const currency& obj)
+		{
+			os << obj.str();
+			return os;
+		}
 
 };
 
+
+//currency operator*(const price& p, const quantity& q);
+//currency operator*(const currency& c, const price& p);
 
 class price {
 	public:
 		double value = 0;
 		price() {}
 		price(double p) { value = p;}
+		price(std::string s) { value = std::stod(s); }
 		std::string str() const;
 		double operator() () const { return value; }
+		void from_str(const std::string& s) { 
+			value = std::stod( s);
+		} 
+		std::string stra() {
+			return "stra " + std::to_string(value);
+		}
+		friend std::ostream& operator<<(std::ostream& os, const price& obj)
+		{
+			os << obj.str();
+			return os;
+		}
+		
+		friend price operator/(const currency& c, const quantity& q)
+		{
+			double q1 = q.get();
+			return price(double(c())/q1);
+		}
+
+		friend price operator-(const price& p1, const price& p2)
+		{
+			return price(p1()-p2());
+		}
+
 };
 
 class quantity {
 	public:
 		double value = 0;
+		quantity() {}
+		quantity(std::string s) { value = std::stod(s);}
 		double operator() () const { return value; }
+		double get() const { return value; }
 		std::string str() const;
 		bool zerop() const { return value == 0.0; }
 		quantity operator+=(const quantity& rhs)
@@ -65,37 +125,20 @@ class quantity {
 			this->value = this->value + rhs.value;
 			return *this;
 		}
+		void from_str(double sgn, const std::string& s) { 
+			value = sgn * std::stod(s);
+			//dec = str_to_dec(sgn, s, DP); 
+		} ;
+		quantity(int whole, int frac) { value = whole * frac / 1000;}
+		friend std::ostream& operator<<(std::ostream& os, const quantity& obj)
+		{
+			os << obj.str();
+			return os;
+		}
 };
-
-price operator/(const currency& c, const quantity& q)
-{
-	return price(double(c())/q());
-}
-
-price operator-(const price& p1, const price& p2)
-{
-	return price(p1()-p2());
-}
 
 std::string as_currency(const price& p);
 
-std::ostream& operator<<(std::ostream& os, const currency& obj)
-{
-	os << obj.str();
-	return os;
-};
-std::ostream& operator<<(std::ostream& os, const price& obj)
-{
-	os << obj.str();
-	return os;
-};
-std::ostream& operator<<(std::ostream& os, const quantity& obj)
-{
-	os << obj.str();
-	return os;
-};
-currency operator*(const price& p, const quantity& q);
-currency operator*(const currency& c, const price& p);
 std::string ret_curr(const currency& num, const currency& denom); 
 #if 0
 std::decimal::decimal128 dbl_to_dec(double d, int dp);

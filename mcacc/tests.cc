@@ -1,5 +1,5 @@
 #include <cmath>
-#include <decimal/decimal>
+//#include <decimal/decimal>
 #include <iostream>
 #include <string>
 #include <type_traits>
@@ -53,16 +53,16 @@ void check_decimals()
 	currency d2 = currency(12, 35);
 	check(d1!=d2, "decimal trivial inequality");
 	check(currency(10, 12) + currency(13, 14) == currency(23, 26), "decimal simple addition");
-	check_near(currency(10, 12).dbl(), 10.12, "currency 10.12");
+	check_near(currency(10, 12)(), 10.12, "currency 10.12");
 
 	currency c1;
 	c1.from_str("34.56");
-	check_near(c1.dbl(), 34.56, "currency from str");
+	check_near(c1(), 34.56, "currency from str");
 	check(c1.stra() == "34.56", "and back to string again");
 
 	quantity q1(10,0);
 	price p1 = c1/q1;
-	check_near(p1.dbl(), 345.6, "p 345.6 = c 34.56 / q 10.0");
+	check_near(p1(), 345.6, "p 345.6 = c 34.56 / q 10.0");
 	currency c2 = p1 * q1;
 	check(c2.stra() == "34.56", "and back to string again");
 
@@ -74,7 +74,7 @@ void check_decimals()
 	check(p3.stra() == p2.stra(), "simple price assignment");
 
 	currency d3 = price("200.4749") * quantity("8889.15787");
-	check_near(d3.dbl(), 17820.53, "200.4749 * 8889.15787");
+	check_near(d3(), 17820.53, "200.4749 * 8889.15787");
 
 
 

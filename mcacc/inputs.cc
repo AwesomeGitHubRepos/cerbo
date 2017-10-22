@@ -33,20 +33,6 @@ void insert_nacc(inputs_t& inputs, const strings& fields)
 }
 
 
-/*
-void insert_comm(inputs_t& inputs, const strings& fields)
-{
-	comm_t c;
-	constexpr int base = 0;
-	c.ticker = fields[base];
-	c.down =fields[base+1];
-	c.typ =fields[base+2];
-	c.unit = fields[base+3];
-	c.desc = fields[base+4];
-	comm_ts& cs = inputs.comms;
-	cs[c.ticker] = c;
-}
-*/
 
 etran_c mketran(const strings& fields)
 {
@@ -191,7 +177,8 @@ inputs_t read_inputs()
 		if(fields.size() ==0) continue;
 		auto search = cmds.find(fields[0]);
 		if(search == cmds.end()){
-			cerr << "ERR: Unrecognised command `" << fields[0] << "' in:" << line << "\n";
+			cerr << "ERR: Unrecognised command `" 
+				<< fields[0] << "' in:" << line << "\n";
 			continue;
 		}
 		fields.erase(begin(fields)); // the fields

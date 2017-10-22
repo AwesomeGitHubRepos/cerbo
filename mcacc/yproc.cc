@@ -61,7 +61,7 @@ yproc_download()
 					+ y.ticker + " price from string:" + fields[1]);
 		}
 		y.chg.from_str(fields[2]);
-		y.chgpc = y.chg.dbl() / (y.yprice.dbl() - y.chg.dbl()) * 100;
+		y.chgpc = y.chg() / (y.yprice() - y.chg()) * 100;
 		ds.ys.insert(y);
 	}
 
@@ -127,7 +127,7 @@ void mksnap(const etran_cs& etrans, const downloads_t& ds)
 		write_fields(sout, fields);
 	}
 	// write totals
-	string chgpc_str = retchg_str(total_profit.dbl(),total_value.dbl());
+	string chgpc_str = retchg_str(total_profit(),total_value());
 	fields = {pad_right("TOTAL", 6), 
 		total_profit.str(), 
 		chgpc_str, total_value.str()};

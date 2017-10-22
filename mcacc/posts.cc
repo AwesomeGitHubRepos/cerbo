@@ -95,7 +95,7 @@ post_ts posts_main(const inputs_t& inputs,
 	}
 	//puts("TODO opening_balances");
 	for(auto b: opening_balances){
-		if(b.second == 0) continue;
+		if(b.second.zerop()) continue;
 		post_t p;
 		p.dstamp = perd.start_date;
 		p.dr = b.first;

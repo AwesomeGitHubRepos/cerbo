@@ -24,6 +24,7 @@ std::string ret_curr(const currency& num, const currency& denom)
 {
 	return ret_str(num(), denom());
 }	
+/*
 currency operator*(const price& p, const quantity& q)
 {
 	double v = p() * q();
@@ -34,6 +35,7 @@ currency operator*(const currency& c, const price& p)
 	double v = c() * p();
 	return currency(v);
 }
+*/
 #if 0
 
 using namespace std::decimal;
