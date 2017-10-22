@@ -1,4 +1,4 @@
-#include <decimal/decimal>
+//#include <decimal/decimal>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -17,7 +17,7 @@
 #include "types.h"
 
 using namespace std;
-using namespace std::decimal;
+//using namespace std::decimal;
 using namespace supo;
 
         
@@ -188,7 +188,7 @@ void folio_c::print_to_portfolio_file(ofstream& ofs) const
 	if(m_name == "mine" || m_name == "total")
 		ofs << nchars('-', 61) << endl;
 	// TODO there is another function for this: use it
-	const string rstr = ret_str((pdp+vbefore).dbl(), vbefore.dbl());
+	const string rstr = ret_str(pdp+vbefore, vbefore);
 	ofs << pad_right(m_name, 6) << vbefore << flow
 	       	<< pdp << value << rstr << endl;
 		//"TODO folio_c::print_to_portfolio_file()\n";

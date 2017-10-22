@@ -1,6 +1,41 @@
 #include "dec.h"
 #include "types.h"
 
+std::string currency::str() const
+{
+	return std::to_string(double(value)/100.0);  // TODO ptolly needs fixingdd
+}
+
+std::string price::str() const
+{
+	return std::to_string(value);  // TODO ptolly needs fixingdd
+}
+std::string quantity::str() const
+{
+	return std::to_string(value);  // TODO ptolly needs fixingdd
+}
+std::string as_currency(const price& p) 
+{ 
+	//return currency(p.dbl()).str();
+	return std::to_string(p());
+}
+
+std::string ret_curr(const currency& num, const currency& denom)
+{
+	return ret_str(num(), denom());
+}	
+currency operator*(const price& p, const quantity& q)
+{
+	double v = p() * q();
+	return currency(v);
+}
+currency operator*(const currency& c, const price& p)
+{
+	double v = c() * p();
+	return currency(v);
+}
+#if 0
+
 using namespace std::decimal;
 
 std::decimal::decimal128 dbl_to_dec(double d, int dp) { 
@@ -22,9 +57,5 @@ price operator/(const currency& c, const quantity& q)
 currency operator*(const price& p, const quantity& q) { return currency(p.dbl()*q.dbl()/100); }
 
 
-std::string ret_curr(const currency& num, const currency& denom)
-{
-	return ret_str(num.dbl(), denom.dbl());
-}	
 
-std::string as_currency(const price& p) { return currency(p.dbl()).str(); };
+#endif

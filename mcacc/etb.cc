@@ -68,7 +68,8 @@ void etb_main(nacc_ts& the_naccs, const post_ts& posts)
 		eout << pad_right(k, 6) << " "; 
 		//write_centis(eout, total);
 		eout << total.str() ;
-		eout << " " << format_num(scale, 2, 0) << " " << format_num(total.dbl(), 10, 0);
+		eout << " " << format_num(scale, 2, 0) << " " 
+			<< format_num(total(), 10, 0);
 		eout << endl;
 		a_nacc.bal = total;
 

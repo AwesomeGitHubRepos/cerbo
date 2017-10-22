@@ -132,7 +132,7 @@ class section {
 
 string section::emit(const string& title, const currency& value)
 {
-	double bal = round2(value.dbl());
+	double bal = round2(value());
 	char sgn = bal<0 ? '-' : ' ';
 	bal = fabs(bal);
 	setlocale(LC_NUMERIC, "");

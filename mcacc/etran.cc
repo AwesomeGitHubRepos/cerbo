@@ -5,6 +5,7 @@
 #include <typeinfo>
 #include <unordered_map>
 
+//#include "dec.h"
 #include "inputs.h"
 #include <supo_general.hpp>
 #include "common.h"
@@ -13,6 +14,7 @@
 
 using namespace std;
 using namespace supo;
+
 
 
 detran_c augment(const etran_c& e, const stend_ts& stends, const period& per)

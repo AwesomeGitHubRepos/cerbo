@@ -40,9 +40,13 @@ std::string retchg_str(double num, double denom)
 
 std::string ret_str(const price& num, const price& denom)
 {
-	return ret_str(num.dbl(), denom.dbl());
+	return ret_str(num(), denom());
 }
 
+std::string ret_str(const currency& num, const currency& denom)
+{
+	return ret_str(num(), denom());
+}
 void print_strings(ostream &ost, const strings &strs)
 {
 	auto line = intercalate(" ", strs);

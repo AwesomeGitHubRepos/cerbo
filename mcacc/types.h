@@ -15,6 +15,7 @@ std::string pad_gbp(std::string s);
 std::string ret_str(double r);
 std::string ret_str(double num, double denom); 
 std::string ret_str(const price& num, const price& denom); 
+std::string ret_str(const currency& num, const currency& denom); 
 std::string ret_str(char c);
 std::string ret_str(std::string s);
 std::string retchg_str(double num, double denom);
