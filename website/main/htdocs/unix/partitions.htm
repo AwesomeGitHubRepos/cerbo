@@ -80,9 +80,9 @@ Listing the partitions by label (<a href="http://unix.stackexchange.com/question
 
 Other commands:
 
-<li><code>e2fsck /dev/sda1</code> - check a Linux ext2/ext3/ext4 file system
-
-<li><code>resize2fs /dev/sda1</code> - ext2/ext3/ext4 file system resizer
+<li><code>e2fsck /dev/sda1</code> - check a Linux ext2/ext3/ext4 file system</li>
+<li><code>parted resizepart NUMBER END</code> can be used to resize partition</li>
+<li><code>resize2fs /dev/sda1</code> - ext2/ext3/ext4 file system resizer. NB use <code>fdisk</code> or <code>parted</code> first if you want to expand the partition
 
 <hr><h2>Links to other sites</h2>
 
@@ -93,7 +93,7 @@ Move Raspberry Pi Root File System (rootfs) From SD Card To Usb / HDD - but it i
 <hr><pre>
 Author:  Mark Carter
 Created: 15-Jun-2013
-Updated: 11-Mar-2015
+Updated: 23-Oct-2017
 </pre>
 </body>
 </html>
