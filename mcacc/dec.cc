@@ -3,6 +3,28 @@
 #include "supo_general.hpp"
 //#include "supo_general.hh"
 
+quantity quantity::operator+=(const quantity& rhs)
+{
+	this->value = this->value + rhs.value;
+	if(fabs(this->value) < 1e-5) this->value = 0;
+	return *this;
+}
+quantity quantity::abs()
+{
+	quantity q;
+	if(value >= 0) 
+		q.value = value;
+	else
+		q.value = -value;
+	return q;
+}
+
+price& price::abs()
+{ 
+	if(value<0) value = - value;
+	return *this;
+}
+
 std::string quantity::wide() const
 {
 	return supo::format_num(value, 12, 6);

@@ -93,6 +93,7 @@ class price {
 		
 		friend price operator/(const currency& c, const quantity& q);
 		std::string wide() const;
+		price& abs();
 
 };
 
@@ -105,11 +106,7 @@ class quantity {
 		double get() const { return value; }
 		std::string str() const;
 		bool zerop() const { return value == 0.0; }
-		quantity operator+=(const quantity& rhs)
-		{
-			this->value = this->value + rhs.value;
-			return *this;
-		}
+		quantity operator+=(const quantity& rhs);
 		void from_str(double sgn, const std::string& s) { 
 			value = sgn * std::stod(s);
 			//dec = str_to_dec(sgn, s, DP); 
@@ -121,6 +118,7 @@ class quantity {
 			os << obj.str();
 			return os;
 		}
+		quantity abs();
 };
 
 std::string as_currency(const price& p);

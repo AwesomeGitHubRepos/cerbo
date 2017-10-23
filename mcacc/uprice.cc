@@ -20,7 +20,7 @@ mkuprices(const detran_cs& the_etrans)
 		//const etran_c &e1 = e.etran;
 		strings fields = strings {  
 			supo::pad_right(e.ticker, 7), 
-				e.dstamp, e.ucost.str(), e.buystr() 
+				e.dstamp, e.ucost.wide(), e.buystr() 
 		};
 		ofs << supo::intercalate(" ", fields) << endl;
 	}

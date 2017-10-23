@@ -30,9 +30,15 @@ string mkrow(const etran_c& e)
 	string d = e.dstamp.substr(8, 2);
 	string dstamp = d + "/" + m + "/" + y;
 
-	string q = std::to_string(fabs(e.qty()));
-	auto uprice = div(e.cost, e.qty);
-	string ustr = std::to_string(fabs(uprice()/100.0));
+	//string q = std::to_string(fabs(e.qty()));
+	//string q = e.qty.abs().wide();
+	quantity q1 = e.qty;
+	q1 = q1.abs();
+	string q = q1.wide();
+
+	auto uprice = div(e.cost, e.qty).abs();
+	//string ustr = std::to_string(fabs(uprice()/100.0));
+	string ustr = uprice.wide();
 	strings outs = {e.buystr(), dstamp, e.ticker, q, ustr, "0.00", "0.00"};
 	return intercalate("\t", outs);
 }

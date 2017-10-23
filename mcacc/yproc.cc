@@ -107,20 +107,20 @@ void mksnap(const etran_cs& etrans, const downloads_t& ds)
 		total_profit += profit;
 
 		string chgpc_str =ret_str(y.chgpc);
-		string price_str = y.yprice.str();
+		string price_str = y.yprice.wide();
 		currency value = mul(y.yprice, qty);
 		total_value += value;
-		string value_str = value.str();
+		string value_str = value.wide();
 		strings fields = strings {pad_right(y.ticker, 6), 
-			profit.str(), chgpc_str, value_str, 
-			qty.str(), price_str};
+			profit.wide(), chgpc_str, value_str, 
+			qty.wide(), price_str};
 		write_fields(sout, fields);
 	}
 	// write totals
 	string chgpc_str = retchg_str(total_profit(),total_value());
 	fields = {pad_right("TOTAL", 6), 
-		total_profit.str(), 
-		chgpc_str, total_value.str()};
+		total_profit.wide(), 
+		chgpc_str, total_value.wide()};
 	sout << intercalate(" ", fields) << endl << endl;
 
 	for(auto& y:ds.ys) {
