@@ -17,6 +17,7 @@ class currency {
 		currency() {}
 		currency(int i) { value = i;}
 		currency(int whole, int frac);
+		currency(std::string str);
 		double operator() () const;
 		std::string str() const;
 		std::string wide() const;
@@ -46,9 +47,7 @@ class currency {
 		{
 			return currency(i);
 		}
-		void from_str(double sgn, const std::string& s) { 
-			value = sgn * std::stod(s) * 100.0;
-		} ;
+		void from_str(double sgn, const std::string& s);
 		void from_str(const std::string& s) { 
 			from_str(1, s);
 		} ;

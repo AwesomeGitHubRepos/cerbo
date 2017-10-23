@@ -1,7 +1,17 @@
 #include "dec.h"
 #include "types.h"
+#include "supo_general.hpp"
 //#include "supo_general.hh"
 
+
+void currency::from_str(double sgn, const std::string& s) { 
+	value = supo::bround(sgn * std::stod(s) * 100.0);
+}
+
+currency::currency(std::string str) 
+{
+	from_str(str);
+}
 std::string currency::wide() const
 {
 	return supo::pad_left(str(), 10);

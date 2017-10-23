@@ -60,8 +60,8 @@ void check_decimals()
 	s286_54 = currency(286, 54).wide();
 	check(s286_54 == "    286.54", "currency 286.64 wide");
 
-
-	//cout << "* " << s286_54 << "\n";
+	check(currency("-141.73").str() == "-141.73", "currency -141.73");
+	check(currency("141.73").str() == "141.73", "currency +141.73");
 
 	check_near(price(206.65).value, 206.65, "price 1: 206.65");
 	check_near(price(206.65)(), 206.65, "price 1: 206.65");
