@@ -3,7 +3,10 @@
 #include "supo_general.hpp"
 //#include "supo_general.hh"
 
-
+std::string quantity::wide() const
+{
+	return supo::format_num(value, 12, 6);
+}
 void currency::from_str(double sgn, const std::string& s) { 
 	value = supo::bround(sgn * std::stod(s) * 100.0);
 }
@@ -14,10 +17,16 @@ currency::currency(std::string str)
 }
 std::string currency::wide() const
 {
-	return supo::pad_left(str(), 10);
+	return supo::pad_left(str(), 12);
 }
 
-std::string price::stra() {
+std::string price::wide() const
+{
+	return supo::format_num(value, 12, 6);
+}
+
+std::string price::stra() const
+{
 	return supo::format_num(value, 5);
 }
 quantity::quantity(int whole, int frac)
@@ -42,7 +51,7 @@ double currency::operator() () const
 }
 currency mul(const price& p, const quantity& q)
 {
-	return currency(p() * q());
+	return currency(supo::bround(p() * q()));
 }
 price mul(const currency& c, const quantity& q)
 {
@@ -74,8 +83,7 @@ std::string quantity::str() const
 }
 std::string as_currency(const price& p) 
 { 
-	//return currency(p.dbl()).str();
-	return std::to_string(p());
+	return currency(p()*100.0).wide();
 }
 
 std::string ret_curr(const currency& num, const currency& denom)

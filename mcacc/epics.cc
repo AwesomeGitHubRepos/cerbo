@@ -161,16 +161,17 @@ void folio_c::print_to_epic_file(ofstream& ofs) const
 	for(const auto& e:reduced_epics)
 	{
 		ofs << pad_ticker(e.ticker)
-			<< e.qty
-			<< e.cost
-			<< e.vto
+			<< e.qty.wide()
+			<< e.cost.wide()
+			<< e.vto.wide()
 			<< ret_curr(e.vto, e.cost)
-			<< e.ucost
-			<< e.end_price
+			<< e.ucost.wide()
+			<< e.end_price.wide()
 			<< endl;
 	}
 
-	ofs << pad_ticker("Grand:") << nchars(' ', 12) << cost << value 
+	ofs << pad_ticker("Grand:") << nchars(' ', 12) 
+		<< cost.wide() << value.wide()
 		<< ret_curr(value, cost) << endl << endl;
 
 	if(m_name != "total") return;
@@ -189,8 +190,9 @@ void folio_c::print_to_portfolio_file(ofstream& ofs) const
 		ofs << nchars('-', 61) << endl;
 	// TODO there is another function for this: use it
 	const string rstr = ret_str(pdp+vbefore, vbefore);
-	ofs << pad_right(m_name, 6) << vbefore << flow
-	       	<< pdp << value << rstr << endl;
+	ofs << pad_right(m_name, 6) 
+		<< vbefore.wide() << flow.wide()
+	       	<< pdp.wide() << value.wide() << rstr << endl;
 		//"TODO folio_c::print_to_portfolio_file()\n";
 	if(m_name == "total") ofs << nchars('=', 61) << endl;
 }

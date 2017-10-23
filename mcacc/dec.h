@@ -84,7 +84,7 @@ class price {
 		std::string str() const;
 		double operator() () const { return value; }
 		void from_str(const std::string& s); 
-		std::string stra();
+		std::string stra() const;
 		friend std::ostream& operator<<(std::ostream& os, const price& obj)
 		{
 			os << obj.str();
@@ -92,6 +92,7 @@ class price {
 		}
 		
 		friend price operator/(const currency& c, const quantity& q);
+		std::string wide() const;
 
 };
 
@@ -114,6 +115,7 @@ class quantity {
 			//dec = str_to_dec(sgn, s, DP); 
 		} ;
 		quantity(int whole, int frac);
+		std::string wide() const;
 		friend std::ostream& operator<<(std::ostream& os, const quantity& obj)
 		{
 			os << obj.str();

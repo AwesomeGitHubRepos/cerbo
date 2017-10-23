@@ -42,6 +42,11 @@ bool operator==(strings lhs, strings rhs)
 	return true;
 }
 
+template <class T>
+void pout(T value)
+{
+	cout << "pout " << value.str() << "\n";
+}
 
 void check_decimals()
 {
@@ -89,6 +94,8 @@ void check_decimals()
 	currency d3 = mul(price("200.4749"),  quantity("8889.15787"));
 	check_near(d3(), 17820.53, "200.4749 * 8889.15787");
 
+	currency d4 = mul(price("148.95148"), quantity("111.11"));
+	check(d4.str() == "165.50", "p*q 165.50");
 
 
 }
