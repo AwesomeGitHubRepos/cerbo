@@ -186,6 +186,13 @@ subroutine apply_rotations(rots)
         enddo
 end  subroutine
 
+subroutine test_rotations(rots)
+        integer:: rots(:)
+        call init()
+        call apply_rotations(rots)
+        call prmat(.true.)
+end subroutine
+
 end module rubik
 
 program cube
@@ -210,8 +217,9 @@ call init()
 
 !call test_basic_rot()
 
-call apply_rotations((/1 ,2, 3, 4, 5, 6 /))
-call prmat(.true.)
+
+call test_rotations((/1 ,2, 3, 4, 5, 6 /))
+call test_rotations((/5, 1, 1, 4, 2, 4, 2, 3, 6, 1/))
 
 end program
 
