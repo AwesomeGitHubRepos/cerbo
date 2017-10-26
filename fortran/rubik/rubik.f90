@@ -2,6 +2,7 @@
 module rubik
         implicit none
 integer*1 m(6, 3, 3) ! face, row, col
+!integer*1 m0(6, 3, 3)
 integer     f, r, c
 character :: colours(6) = (/ "W", "G", "R", "B", "O", "Y" /)
 
@@ -42,7 +43,7 @@ end subroutine
 
 subroutine rotf(f)
         ! rotate a face only
-        integer f
+        integer*1 :: f
         integer*1 m1(3, 3), tmp
         m1 = m(f, :, :)
         ! flip vertically
@@ -56,7 +57,7 @@ end subroutine
 
 subroutine rotn(f)
         ! rotate about face number f
-        integer f
+        integer*1 :: f
         call rotf(f)
         select case (f)
         case (1) 
@@ -146,7 +147,7 @@ end subroutine
 
 
 subroutine test_rotn(face)
-        integer :: face
+        integer*1 :: face
        logical sane
 
        if(.true.) then
@@ -169,16 +170,14 @@ endif
 end subroutine
 
 subroutine test_basic_rot()
-call test_rotn(1)
-call test_rotn(2)
-call test_rotn(3)
-call test_rotn(4)
-call test_rotn(5)
-call test_rotn(6)
+        integer*1 ::f
+        do f=1,6
+        call test_rotn(f)
+        enddo
 end subroutine
 
 subroutine apply_rotations(rots)
-        integer:: rots(:)
+        integer*1 :: rots(:)
         integer :: n, i
         n = size(rots)
         do i=1, n
@@ -187,10 +186,65 @@ subroutine apply_rotations(rots)
 end  subroutine
 
 subroutine test_rotations(rots)
-        integer:: rots(:)
+        integer:: rots(:), n
+        integer*1, allocatable :: rots1(:)
+        n = size(rots)
+        allocate(rots1(n))
+        rots1 = int(rots, 1)
         call init()
-        call apply_rotations(rots)
+        call apply_rotations(rots1)
         call prmat(.true.)
+        deallocate(rots1)
+end subroutine
+
+integer function score()
+        score = 0
+        do f=1,6
+        score = score + count(m(f, : , : ) .eq.f)
+        enddo
+        return
+end function
+
+subroutine algo1()
+        integer, parameter :: ntrials = 150
+        integer*1 :: m0(6, 3, 3), rots(ntrials, 100)
+        integer :: scores(0:100), i, imax, trial
+        m0 = m
+        do trial=1,ntrials
+        m = m0
+        call rand6(rots(trial, :))
+        scores(0) = score()
+        do i=1,100
+        call rotn(rots(trial, i))
+        scores(i) = score()
+        enddo
+
+        imax = maxloc(scores(0:100), 1)
+        print *, "max loc= ", imax, "score = ", scores(imax)
+        enddo
+        print *, 
+end subroutine        
+
+
+subroutine rand6(rots)
+        integer*1, intent(out) :: rots(:)
+        real, allocatable :: r(:)
+        integer :: n
+        n = size(rots)
+        allocate(r(n))
+        call random_number(r)
+        rots = nint(r*5+1) 
+        deallocate(r)
+end subroutine
+
+
+subroutine test_random()
+        integer*1 :: faces(10)
+        !real :: r(10)
+        !call random_number(r)
+        !faces = nint(r*5 +1)
+        call rand6(faces)
+        print *, faces
 end subroutine
 
 end module rubik
@@ -219,7 +273,13 @@ call init()
 
 
 call test_rotations((/1 ,2, 3, 4, 5, 6 /))
+print *, "score = ", score()
 call test_rotations((/5, 1, 1, 4, 2, 4, 2, 3, 6, 1/))
+print *, "score = ", score()
+call algo1()
+
+call test_random()
+call test_random()
 
 end program
 
