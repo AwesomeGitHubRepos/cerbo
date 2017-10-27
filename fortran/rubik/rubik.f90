@@ -15,6 +15,16 @@ subroutine init()
         !call prmat()
 end subroutine        
 
+subroutine ascolours(nums, cols)
+        integer*1, intent(in) :: nums(:)
+        character, intent(out) :: cols(:)
+        integer :: i, n
+        n = size(nums)
+        do i=1,n 
+        cols(i) = colours(nums(i))
+        enddo
+end subroutine
+
 subroutine prmat(coloured)
 ! print matrix
 logical, optional :: coloured
@@ -188,12 +198,18 @@ end  subroutine
 subroutine test_rotations(rots)
         integer:: rots(:), n
         integer*1, allocatable :: rots1(:)
+        character, allocatable :: cols(:)
+        
         n = size(rots)
         allocate(rots1(n))
+        allocate(cols(n))
         rots1 = int(rots, 1)
         call init()
+        call ascolours(rots1, cols)
+        print *, "rots: ", cols
         call apply_rotations(rots1)
         call prmat(.true.)
+        deallocate(cols)
         deallocate(rots1)
 end subroutine
 
@@ -205,23 +221,52 @@ integer function score()
         return
 end function
 
+subroutine test_maxloc()
+        integer :: arr(0:5)
+        arr = (/ 1, 0, 0, 1, 0, 0 /)
+        ! note an "off-by-one"
+        print * , "test_maxloc:", maxloc(arr, 1) == 1 
+end subroutine
+
 subroutine algo1()
-        integer, parameter :: ntrials = 150
-        integer*1 :: m0(6, 3, 3), rots(ntrials, 100)
-        integer :: scores(0:100), i, imax, trial
+        integer, parameter :: ntrials = 10E5, depth = 100
+        integer*1 :: m0(6, 3, 3), rots(ntrials, depth)
+        character :: cols(depth)
+        integer :: scores(ntrials, 0:depth), i, imax, trial
+        integer :: best_trial_score(ntrials), best_trial_score_loc(ntrials)
+        integer :: best_trial_loc, best_trial
         m0 = m
         do trial=1,ntrials
-        m = m0
-        call rand6(rots(trial, :))
-        scores(0) = score()
-        do i=1,100
-        call rotn(rots(trial, i))
-        scores(i) = score()
+                m = m0
+                call rand6(rots(trial, :))
+                scores(trial, 0) = score()
+                do i=1,depth
+                        call rotn(rots(trial, i))
+                        scores(trial, i) = score()
+                enddo
+
+                best_trial_score_loc(trial) = maxloc(scores(trial, 0:depth), 1)-1
+		best_trial_score(trial) = scores(trial, best_trial_score_loc(trial))
+                !print *, trial, best_trial_score_loc(trial), best_trial_score(trial)
         enddo
 
-        imax = maxloc(scores(0:100), 1)
-        print *, "max loc= ", imax, "score = ", scores(imax)
-        enddo
+	! best trial
+        m = m0
+	best_trial_loc = maxloc(best_trial_score(1:ntrials), 1)
+        if( best_trial_score_loc(best_trial_loc).ne.0) then
+        	print *, "best trial: ", best_trial_loc, best_trial_score_loc(best_trial_loc), best_trial_score(best_trial_loc)
+                ! recreate the rotations now that we have found the best
+                m = m0
+                call apply_rotations(rots(best_trial_loc, 1:best_trial_score_loc(best_trial_loc)))
+                print *, "seq ", rots(best_trial_loc, 1:best_trial_score_loc(best_trial_loc))
+                call ascolours(rots(best_trial_loc, 1:best_trial_score_loc(best_trial_loc)), cols)
+                print *, "seq ", cols( 1:best_trial_score_loc(best_trial_loc))
+                call prmat(.true.)
+                print *, "score", score()
+        endif
+
+
+
         print *, 
 end subroutine        
 
@@ -266,20 +311,29 @@ program cube
 
 !integer f ! face [1..6]
 !common /globs/ m
-
+integer ::i
 call init()
 
 !call test_basic_rot()
 
 
-call test_rotations((/1 ,2, 3, 4, 5, 6 /))
-print *, "score = ", score()
+!call test_rotations((/1 ,2, 3, 4, 5, 6 /))
+!print *, "score = ", score()
 call test_rotations((/5, 1, 1, 4, 2, 4, 2, 3, 6, 1/))
 print *, "score = ", score()
-call algo1()
 
-call test_random()
-call test_random()
+i = 0
+do while (score().ne.6*9)
+!do 
+i = i +1
+!i=1,10
+print *, "circuit", i
+call algo1()
+enddo
+
+!call test_random()
+!call test_random()
+!call test_maxloc()
 
 end program
 
