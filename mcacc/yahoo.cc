@@ -9,6 +9,7 @@
 #include "yahoo.h"
 
 using std::cout;
+using std::endl;
 
 /* This is a self-contained unit. You can use fetch_tickers as the functions to call
 */
@@ -54,6 +55,7 @@ std::vector<std::string> fetch_tickers(const std::vector<std::string>& tickers, 
 		//cout << "fetch_tickers: " << t << "\n";
 
 		std::string url = pre + t + "&f=sl1c1p2&e=.csv'";
+		//cout << "fetch url: " << url << endl;
 		fs.push_back(std::async(fetch_url, url));
 	}
 
