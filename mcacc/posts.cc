@@ -7,7 +7,7 @@
 
 #include "common.h"
 #include "inputs.h"
-#include <supo_general.hpp>
+#include <supo_general.h>
 #include "posts.h"
 
 using namespace std;

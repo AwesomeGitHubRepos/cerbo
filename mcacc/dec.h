@@ -6,7 +6,7 @@
 #include <ostream>
 #include <string>
 
-#include <supo_general.hpp>
+#include <supo_general.h>
 
 class price;
 class quantity;

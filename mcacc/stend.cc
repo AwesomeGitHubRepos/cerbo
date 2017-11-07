@@ -15,7 +15,7 @@ created 16-Feb-2016
 
 #include "common.h"
 #include "types.h"
-#include <supo_general.hpp>
+#include <supo_general.h>
 #include "stend.h"
 
 using namespace std;

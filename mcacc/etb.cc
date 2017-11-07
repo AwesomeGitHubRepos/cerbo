@@ -11,7 +11,7 @@
 #include "common.h"
 #include "types.h"
 #include "posts.h"
-#include <supo_general.hpp>
+#include <supo_general.h>
 
 using namespace std;
 using namespace supo;

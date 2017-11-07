@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "common.h"
-#include <supo_general.hpp>
+#include <supo_general.h>
 #include "yahoo.h"
 #include "reports.h"
 

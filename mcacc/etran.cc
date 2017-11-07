@@ -7,7 +7,7 @@
 
 //#include "dec.h"
 #include "inputs.h"
-#include <supo_general.hpp>
+#include <supo_general.h>
 #include "common.h"
 #include "types.h"
 #include "etran.h"

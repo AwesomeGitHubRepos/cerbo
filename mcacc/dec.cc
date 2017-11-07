@@ -1,6 +1,6 @@
 #include "dec.h"
 #include "types.h"
-#include "supo_general.hpp"
+#include "supo_general.h"
 //#include "supo_general.hh"
 
 quantity quantity::operator+=(const quantity& rhs)

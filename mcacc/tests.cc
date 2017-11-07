@@ -6,7 +6,7 @@
 
 #include "dec.h"
 #include "inputs.h"
-#include <supo_general.hpp>
+#include <supo_general.h>
 
 using std::cout;
 using std::endl;

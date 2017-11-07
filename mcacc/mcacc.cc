@@ -19,7 +19,7 @@
 #include "common.h"
 #include "oven.h"
 #include "tests.h"
-#include <supo_general.hpp>
+#include <supo_general.h>
 #include "show.h"
 
 
