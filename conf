@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # only useful to mcarter
 
-#autoreconf -iv
-#./configure --prefix=$HOME/.local CXXFLAGS='-std=gnu++14'
+if [ ! -f configure ]; then
+	autoreconf -iv
+fi
+
 ./configure --prefix=$HOME/.local
