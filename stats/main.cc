@@ -6,7 +6,7 @@
 #include <exception>
 #include <stdexcept> // std::invalid_argument for g++ 4.8.2
 
-#include <supo_parse.hpp>
+#include <supo_parse.h>
 
 using std::cout;
 using std::endl;
