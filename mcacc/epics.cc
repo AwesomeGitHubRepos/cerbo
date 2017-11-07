@@ -11,7 +11,7 @@
 
 #include "common.h"
 #include "dec.h"
-#include <supo_general.hpp>
+#include <supo_general.h>
 #include "stend.h"
 #include "epics.h"
 #include "types.h"

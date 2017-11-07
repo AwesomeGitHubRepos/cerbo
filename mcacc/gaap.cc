@@ -10,7 +10,7 @@
 #include <string.h>
 
 #include "common.h"
-#include <supo_general.hpp>
+#include <supo_general.h>
 #include "gaap.h"
 
 

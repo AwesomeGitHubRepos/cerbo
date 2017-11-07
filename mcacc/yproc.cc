@@ -4,7 +4,7 @@
 #include <set>
 #include <string>
 
-#include <supo_general.hpp>
+#include <supo_general.h>
 
 #include "common.h"
 #include "types.h"

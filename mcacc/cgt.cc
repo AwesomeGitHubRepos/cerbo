@@ -11,8 +11,8 @@
 
 #include "common.h"
 #include "dec.h"
-#include <supo_general.hpp>
-#include <supo_parse.hpp>
+#include <supo_general.h>
+#include <supo_parse.h>
 
 using namespace supo;
 

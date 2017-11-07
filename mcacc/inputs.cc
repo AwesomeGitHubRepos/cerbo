@@ -10,7 +10,7 @@
 #include <stdexcept>
 
 #include "common.h"
-#include <supo_parse.hpp>
+#include <supo_parse.h>
 #include "inputs.h"
 
 using namespace std;
