@@ -1,8 +1,0 @@
-Color scheme obtained from
-http://bytefluent.com/vivify/
-You can customise the colors online as you wish
-
-To install colorscheme:
-mkdir ~/.vim/colors
-cp corporation.vim  ~/.vim/colors
-
