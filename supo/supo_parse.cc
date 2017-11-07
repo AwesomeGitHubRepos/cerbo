@@ -6,9 +6,8 @@ created 19-Feb-2016
 #include <assert.h>
 #include <string.h>
 
-#include <supo_parse.hpp>
+#include <supo_parse.h>
 
-//using namespace std;
 
 namespace supo {
 

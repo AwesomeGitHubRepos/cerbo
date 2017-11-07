@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "supo_parse.h"
+#include "supo.h"
 using std::cin;
 using std::cout;
 using std::cerr;
@@ -25,31 +25,14 @@ Options:
 void
 process()
 {
-	string fs = "\t";
-	string rs = "\n";
-
 	string line;
 	while(getline(cin, line))
 	{
 		strings vals = supo::tokenize_line(line);
 		if(vals.size() == 0) continue;
-		cout << vals.size() << "\n";
-		for(const string& v:vals) {
-			cout << v << "\n";
-		}
-
-		cout << endl;
-		/*
-		for(int i=0; i< vals.size(); ++i) {
-			cout << vals[i];
-			if( i < vals.size()-1)
-				cout << fs;
-			else
-				cout << rs;
-		}*/
+		cout << supo::intercalate("\t", vals) << "\n";
 	}
 
-	cout << "0" << endl;
 }
 
 int 

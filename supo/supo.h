@@ -1,5 +1,9 @@
 #pragma once
 
+// an "all-inclusive" header file
+
+#include <supo_general.h>
+#include <supo_parse.h>
 #include <supo_stats.h>
 
 namespace supo {

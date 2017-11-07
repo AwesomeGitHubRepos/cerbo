@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <vector>
 
-#include <supo_general.hpp>
+#include <supo_general.h>
 
 namespace supo {
 
