@@ -27,18 +27,12 @@ string rootdir()
 	string root = expand_user("~/.mcacc");
 	static bool created = false;
 	if(!created) {
-		//fsys::create_directory(root);
 		mkdir(root);
 		string s = root + "/work";
-		//fsys::create_directory(s);
 		mkdir(s);
-		//fsys::create_directory(s + "/s1");
-		mkdir(s+"/s1");
-		//fsys::create_directory(s + "/s2");
+		//mkdir(s+"/s1");
 		mkdir(s+"/s2");
-		//fsys::create_directory(s + "/s3");
 		mkdir(s+"/s3");
-		//fsys::create_directory(root + "/yahoo");
 		mkdir(root+"/yahoo");
 		created = true;
 	}

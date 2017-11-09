@@ -169,10 +169,9 @@ inputs_t read_inputs()
 		{"yahoo-1", 9, insert_yahoo_1}
 	};
 
-	// TODO abstract and use wherever an input stream is used
-	ifstream ifs(s1("derive-2.txt"));
+	//ifstream ifs(s1("derive-2.txt"));
 	string line;
-	while(getline(ifs, line)){
+	while(getline(cin, line)){
 		strings fields = supo::tokenize_line(line);
 		if(fields.size() ==0) continue;
 		auto search = cmds.find(fields[0]);
@@ -186,7 +185,7 @@ inputs_t read_inputs()
 
 	}
 
-	ifs.close();
+	//ifs.close();
 	return inputs;
 }
 

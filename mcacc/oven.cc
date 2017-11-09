@@ -7,7 +7,6 @@
 #include "etb.h"
 #include "etran.h"
 #include "gaap.h"
-#include "pgposts.h"
 #include "posts.h"
 #include "stend.h"
 #include "reports.h"
@@ -54,7 +53,6 @@ void oven::process(bool do_wiegley, bool do_fetch)
 	etb_main(user_inputs.naccs, posts);
 	gaap_main(inps.naccs, perd);
 	cgt(inps.etrans, perd);
-	make_pgposts(inps.etrans, inps.ntrans);
 	mkuprices(augetrans);
 
 	if(do_wiegley) wiegley(inps.etrans, inps.ntrans, inps.yahoos);
