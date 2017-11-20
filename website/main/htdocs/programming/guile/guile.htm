@@ -1,0 +1,41 @@
+<html><head>
+<LINK REL=StyleSheet HREF="../../style.css" TYPE="text/css">
+<title>guile</title></head>
+<body>
+
+<a href="../../index.html">Home</a> 
+: <a href="../programming.htm" >programming</a>
+
+
+<h1>guile</h1>
+
+<hr><h2>Init file</h2>
+
+Typically in <code>~/.guile</code>:
+<pre>
+(use-modules (ice-9 readline))
+(activate-readline)
+</pre>
+
+<hr><h2>Parsing</h2>
+
+Using the lalr parser:
+<pre>
+(use-modules (system base lalr))
+</pre>
+
+Starting from version 2.2, guile has a PEG parser.
+
+
+<hr><h2>Also on this site</h2>
+
+None
+
+
+<hr><pre>
+Author:  Mark Carter
+Created: 20-Nov-2017
+Updated: 20-Nov-2017
+</pre>
+</body>
+</html>
