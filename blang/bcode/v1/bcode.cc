@@ -1,8 +1,11 @@
+#include <cassert>
 #include <fstream>
 #include <cstddef>
 #include <functional>
+#include <iomanip>
 #include <iostream>
 #include <map>
+#include <sstream>
 #include <stack>
 #include <string>
 #include <vector>
@@ -14,6 +17,16 @@ typedef function<void()> vptr;
 
 stack<int64_t> stk; // the stack
 
+template< typename T >
+std::string int_to_hex( T i )
+{
+	std::stringstream stream;
+	stream << "0x" 
+		<< setfill ('0') << setw(sizeof(T)*2) 
+		<< hex << i;
+	return stream.str();
+}
+
 void pushchar(bytes& bs, char c)
 {
 	bs.push_back(c);
@@ -23,9 +36,9 @@ template<class T>
 void push64(bytes& bs, T  v)
 {
 	int64_t v64 = v;
-	uint8_t b[4];
+	uint8_t b[8];
 	*b = v64;
-	for(int i = 0; i<4 ; ++i)
+	for(int i = 0; i<8 ; ++i)
 		bs.push_back(b[i]);
 }
 
@@ -66,6 +79,23 @@ vptr find_function(string name)
 
 int main()
 {
+
+	cout << "Test1: Should print a !\n";
+	push_stack(33); // ASCII !
+	emit(); // works
+	cout << "\nTest1 finished\n"; 
+
+	cout << "Test 2: s/b same result\n"; // works
+	{
+		push_stack(33);
+		auto fn = find_function("emit");
+		fn();
+		cout << "emit:" << &fn << "\n";
+	}
+	cout << "\nTest 2 finisned\n";
+
+	//exit(0);
+
 	string prog("p110 xemit p111 xemit p010 xemit 0");
 
 	// compile
@@ -77,17 +107,20 @@ int main()
 			case '0' : 
 				  pushchar(bcode, '0'); 
 				  break;
-			case 'p' : 
-				   pushchar(bcode, 'p');
-				   push64(bcode, prog[++i] * 100 + prog[++i]*10 +prog[ ++i]);
-				   break;				   
+			case 'p' :{
+       					  pushchar(bcode, 'p');
+					  auto val = (prog[++i] -'0') * 100 + (prog[++i]-'0')*10 +(prog[ ++i]- '0');
+					  cout << "compiling p:" << val << "\n";
+       					  push64(bcode, val);
+				  }
+				  break;				   
 			case 'x': {
        					  pushchar(bcode, 'x');
        					  string function_name = { prog[++i],  prog[++i], prog[++i], prog[++i]};
 					  cout << "function name:" << function_name << ".\n";
 					  auto function_ptr = find_function(function_name);
 					  int64_t ptr = reinterpret_cast<int64_t>(&function_ptr);
-					  //cout << &emit << " " << ptr << "\n";
+					  cout << "x function pointer: " << int_to_hex(ptr) << "\n";
 					  if(function_ptr)
 						  push64(bcode, ptr);
 					  else {
