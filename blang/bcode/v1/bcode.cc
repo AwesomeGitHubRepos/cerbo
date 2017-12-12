@@ -8,6 +8,7 @@
 #include <sstream>
 #include <stack>
 #include <string>
+#include <string.h>
 #include <vector>
 
 using namespace std;
@@ -38,6 +39,7 @@ void push64(bytes& bs, T  v)
 	int64_t v64 = v;
 	uint8_t b[8];
 	*b = v64;
+	cout << "push64 function pointer: " << int_to_hex(v64) << "\n";
 	for(int i = 0; i<8 ; ++i)
 		bs.push_back(b[i]);
 }
@@ -60,9 +62,21 @@ void emit()
 	putchar(c);
 }
 
+void hello()
+{
+	puts("hello world");
+}
 
 map<string, vptr>  functions = {
-	{ "emit", emit}
+	{"emit", emit},
+	{"hell", hello}
+};
+
+
+typedef struct { string  name; function<void()> fn; } func_desc;
+vector<func_desc> vecfns = {
+	{"emit", emit},
+	{"hell", hello}
 };
 
 
@@ -76,6 +90,22 @@ vptr find_function(string name)
 
 }
 
+int find_vecfn(string name)
+{
+	for(int i = 0 ; i<vecfns.size(); ++i)
+		if(vecfns[i].name == name)
+			return i;
+
+	cerr << "find_vecfn:unknown function:" << name << "\n";
+	exit(1);
+}
+
+void test3()
+{
+	cout <<"test3\n";
+	auto fn = vecfns[find_vecfn("hell")].fn;
+	fn();
+}
 
 int main()
 {
@@ -94,9 +124,12 @@ int main()
 	}
 	cout << "\nTest 2 finisned\n";
 
+	test3();
 	//exit(0);
 
-	string prog("p110 xemit p111 xemit p010 xemit 0");
+	string prog("p072 xemit p073 xemit p010 xemit xhell 0");
+	
+	//prog = "xhell 0";
 
 	// compile
 	bytes bcode;
@@ -117,6 +150,8 @@ int main()
 			case 'x': {
        					  pushchar(bcode, 'x');
        					  string function_name = { prog[++i],  prog[++i], prog[++i], prog[++i]};
+					  pushchar(bcode, find_vecfn(function_name)); 
+					  /*
 					  cout << "function name:" << function_name << ".\n";
 					  auto function_ptr = find_function(function_name);
 					  int64_t ptr = reinterpret_cast<int64_t>(&function_ptr);
@@ -126,7 +161,7 @@ int main()
 					  else {
 						  cerr << "Could not find function:" << function_name << ".\n";
 						  exit(1);
-					  }
+					  }*/
 					  break;
 				  }
 			default:
@@ -155,19 +190,24 @@ int main()
 			case 'p': {
 					  uint8_t b[8];
 					  for(int i = 0 ; i <8; ++i) b[i] = bcode[++pc];
-					  //= { *(++pc), *(++pc), *(++pc), *(++pc), ++pc, ++pc, ++pc, ++pc };
-	  				  //push_stack(++pc + ++pc<<8 + ++pc<<16 + ++pc<<24 + ++pc<<32 + ++pc<<40 + ++pc<<48 + ++pc<<56);
 					  int64_t v64 = *b;
 					  push_stack(v64);
 	  				  pc++;
 				  }
 				break;
 			case 'x': {
-	  				  void* addr = (void *) pop_stack();
+					  auto fn_idx = bcode[++pc];
+					  auto fn = vecfns[fn_idx].fn;
+					  fn();
+					  /*
+					  uint8_t b[8];
+					  int64_t addr = 0 ; // (int64_t) b;
+					  for(uint8_t i = 0 ; i <8; ++i) b[i] = bcode[++pc];
+					  memcpy(&addr, b, 8);
+					  cout << "x function pointer: " << int_to_hex(addr) << "\n";
 					  reinterpret_cast< void(*)() > (addr) ();
+					  */
 					  pc++;
-					  //using void (*void_f)(void);
-					  //((void_f)addr)();
 
 				  }
 				break;
