@@ -15,6 +15,7 @@ A toy BASIC interpreter written in C++. Its aims to be:
 
 ## Subprojects
 
+* [bcode](bcode/README.md) - a bytecode compiler experiment
 * v2 - an attempt at a rewrite of a parser based on s-expr
 * lisp - an interpreter for lisp copied from github
 
