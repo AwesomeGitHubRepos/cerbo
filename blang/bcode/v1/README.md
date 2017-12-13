@@ -27,7 +27,7 @@ The stack takes 64-bit words, and you push a number onto the stack using the `p`
 * `xhell` - which simply prints the phrase "hello world" to output
 * `xemit` - which pops a value from the top of the stack, and prints it.
 
-### Examples
+## Examples
 
 The program `hello.asm` prints "hello world":
 ```
@@ -52,3 +52,38 @@ xemit
 ```
 
 It is failry well documented. iUsing the instruction `p072`, we push the number 72 to the stack, which is the ascii value for "H". We then call `xemit`, which prints it to the console. We do likewise for "I", which has a decimal value 73, and for the carriage return, which has a value of 10. Finally, we call `0` to halt the interpreter.
+
+## Discussion of the code.
+
+The code is in file `bcode.cc`, and can be compiled using `make`. Programs can be run by passing them in stdin, e.g. `./bcode &lt; hi.asm`.
+
+First, we set up the virtual machine's stack, providing `pop` and `push`:
+```
+stack<int64_t> stk;
+
+int64_t pop_stack()
+{
+        int64_t v = stk.top();
+        stk.pop();
+        return v;
+}
+
+void push_stack(int64_t v)
+{
+        stk.push(v);
+}
+```
+
+Let's define the functions `emit` and `hell` that we described above:
+```
+void emit()
+{
+        int c = pop_stack();
+        putchar(c);
+}
+
+void hello()
+{
+        puts("hello world");
+}
+```
