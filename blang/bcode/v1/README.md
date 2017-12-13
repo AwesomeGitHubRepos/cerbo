@@ -55,9 +55,16 @@ It is failry well documented. iUsing the instruction `p072`, we push the number 
 
 ## Discussion of the code.
 
-The code is in file `bcode.cc`, and can be compiled using `make`. Programs can be run by passing them in stdin, e.g. `./bcode &lt; hi.asm`.
+The code is in file `bcode.cc`, and can be compiled using `make`. Programs can be run by passing them in stdin, e.g. `./bcode < hi.asm`.
 
-First, we set up the virtual machine's stack, providing `pop` and `push`:
+We define the machine instructions as a sequence of bytes:
+```
+typedef vector<uint8_t> bytes;
+```
+We will tag bytes onto the end of the instructions as we go.
+
+
+We set up the virtual machine's stack, providing `pop` and `push`:
 ```
 stack<int64_t> stk;
 
@@ -87,3 +94,161 @@ void hello()
         puts("hello world");
 }
 ```
+
+We need to make these functions visible to our intepreter:
+```
+typedef struct { 
+        string  name; 
+        function<void()> fn; 
+} func_desc;
+
+
+vector<func_desc> vecfns = {
+        {"emit", emit},
+        {"hell", hello}
+};
+```
+
+and we need to find a way of finding the function given its interpreter name:
+```
+int find_vecfn(string name)
+{
+        for(int i = 0 ; i<vecfns.size(); ++i)
+                if(vecfns[i].name == name)
+                        return i;
+
+        cerr << "find_vecfn:unknown function:" << name << "\n";
+        exit(1);
+}
+```
+We define a function for push a char onto the instruction set:
+```
+void pushchar(bytes& bs, char c)
+{
+        bs.push_back(c);
+}
+```
+and similarly, to push a 64-bit word:
+```
+template<class T>
+void push64(bytes& bs, T  v)
+{
+        int64_t v64 = v;
+        uint8_t b[8];
+        *b = v64;
+        cout << "push64 function pointer: " << int_to_hex(v64) << "\n";
+        for(int i = 0; i<8 ; ++i)
+                bs.push_back(b[i]);
+}
+```
+
+The bulk of the processing is done in `main()`. We read the input stream into a string called `prog`.
+
+We then process that string to compile into a sequence of bytecodes:
+```
+       bytes bcode;
+        for(int i = 0 ; i < prog.size(); ++i) {
+                char c = prog[i];
+                switch(c) {
+                        case ' ': // ignore white space
+                        case '\r':
+                        case '\t':
+                        case '\n':
+                                break; 
+                        case '#': // ignore comments
+                                while(prog[++i] != '\n');
+                                break;
+                        case '0' : 
+                                  pushchar(bcode, '0'); 
+                                  break;
+                        case 'p' :{
+                                          pushchar(bcode, 'p');
+                                          auto val = (prog[++i] -'0') * 100 + (prog[++i]-'0')*10 +(prog[ ++i]- '0');
+                                          //cout << "compiling p:" << val << "\n";
+                                          push64(bcode, val);
+                                  }
+                                  break;                                   
+                        case 'x': {
+                                          pushchar(bcode, 'x');
+                                          string function_name = { prog[++i],  prog[++i], prog[++i], prog[++i]};
+                                          pushchar(bcode, find_vecfn(function_name)); 
+                                          break;
+                                  }
+                        default:
+                                   cerr << "Compile error: Unknown code at position " << i << ":" << c << "\n";
+                                   exit(1);
+                }
+
+        }
+```
+Here, `i` is an index on the input program characters. You can see that white spaces and comments are just ignored. The simplest instruction is `0`, which just pushes the literal `0` onto the byte-code.
+
+The next instruction is `p`, which takes the next three numbers from the program, converts them into an integer, and pushes this value as byte-codes.
+
+The last instruction is `x`, It takes the next four characters as a function name, and finds the index number in our list of executable instructions. It them pushes this number to the byte-codes. Note that only one byte is pushed, so we are only allowed a maximum of 256 functions. This should be plenty sufficient for our purposes here. 
+
+That's it! A byte-code compiler in approximately 30 lines of code. 
+
+So, we have `bcode`, which is our sequence of instructions. We can put them out into a file `bin.out`. We can then execute the byte-code.
+
+First, we point our program counter, `pc`, which points to the current instruction in `bcode`, to 0:
+```
+	int pc = 0;
+```
+
+We set the interpreter running:
+```
+        bool running = true;
+```
+and we keep running until we encounter `0`, at which point we know to stop the interpreter. So the interpretation loop looks like this:
+```
+       while(running) {
+                uint8_t b = bcode[pc];
+                switch(b) {
+                        case '0':
+                                running = false;
+                                break;
+                        case 'p': {
+                                          uint8_t b[8];
+                                          for(int i = 0 ; i <8; ++i) b[i] = bcode[++pc];
+                                          int64_t v64 = *b;
+                                          push_stack(v64);
+                                          pc++;
+                                  }
+                                break;
+                        case 'x': {
+                                          auto fn_idx = bcode[++pc];
+                                          auto fn = vecfns[fn_idx].fn;
+                                          fn();
+                                          pc++;
+
+                                  }
+                                break;
+                        default:
+                                cerr << "Illegal instruction at PC " << pc << ":" << b << "\n";
+                                exit(1);
+                }
+        }
+```
+As you can see, `0` just sets `running = false` to halt execution.
+
+`p` takes the next 8 bytes (a 64-bit word) from `bcode`, and pushes it onto the stack. The program counter is updates accordingly.
+
+`x` is perhaps a bit more interesting. It looks up the next byte from the instruction set, which is interpreted as an index for the function. It then retrieves the function pointer from the index:
+```
+                                          auto fn = vecfns[fn_idx].fn;
+```
+and calls it:
+```
+                                          fn();
+```
+Don't forget that we must also advance the program counter:
+```
+                                          pc++;
+```
+
+As with the compiler, the interpreter only takes about 30 lines of code. 
+
+I have not yet enabled jumping, which is vital to a really useful intetpreter. I have also ommitted the embedding of strings, which is also very handy.
+
+Until next time, though.
