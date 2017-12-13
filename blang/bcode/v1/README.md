@@ -11,7 +11,7 @@ Let's define our instruction set for the assembly language.
 | ----------- | ------------------------- |
 | #           | Comment                   |
 | 0           | halt execution            |
-| p<nnn>      | push <nnn> onto stack     |
-| x<cccc>     | execute instruction <nnn> |
+| p`nnn'      | push <nnn> onto stack     |
+| x`cccc'     | execute instruction <nnn> |
 
 Comments
