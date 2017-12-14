@@ -44,7 +44,7 @@ Let's use the full extend of the instruction set to print "HI" to stdout. The pr
 # print HI to screen
 p072  # ascii H
 xemit # print the char to screen
-p073  # ascci I
+p073  # ascii I
 xemit
 p010  # \n
 xemit
