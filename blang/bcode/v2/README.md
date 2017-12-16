@@ -7,7 +7,7 @@ In this part, I will add two new instructions:
 | Instruction | Meaning                   |
 | ----------- | ------------------------- |
 | L'c'        | add address label         |
-| <'c'        | jump to label             |
+| <'c'        | jump to label if negative |
 
 As I write, I am increasingly coming to the realisation that this byte-compiler is an inferior implementation of Forth. It is dawning on me that Forth is, indeed, the perfect way to implement what I am trying to achieve. Nevertheless, I shall continue down the path I am going, as it seems to be good enough. The instructions embedded in the bin.out file do provide useful clues that I have coded the design correctly.
 
