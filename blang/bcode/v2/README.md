@@ -8,3 +8,4 @@ L label
 2 new functions : 
 resolve labels
 and label vars themselves
+opotential bug if labels re-used
