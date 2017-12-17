@@ -227,7 +227,7 @@ int main()
 					auto p1 = bcode.size(); //the address to jump to
 					auto p2 = p0 +1; // address where the string starts
 					bcode[p0] = p1; // fill in the jump address
-					auto len = p1-p2; // length of the string
+					auto len = p1-p2-1; // length of the string
 					//cout << "strings:strlen:" << len << "\n";
 					create_push(bcode, p2);
 					create_push(bcode, len);
