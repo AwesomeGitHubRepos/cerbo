@@ -93,7 +93,7 @@ std::string int_to_hex( T i )
 
 void decr()
 {
-	print_stack();
+	//print_stack();
 	stk.back() -= 1;
 }
 
@@ -121,12 +121,14 @@ void incr()
 
 void print_string()
 {
+	//cout << "print_string: stack before:\n"; print_stack();
 	auto len = pop_stack();
 	auto pos = pop_stack();
 	//cout << "print_string:len:" << len << "\n";
 	//cout << "print_string:pos:" << pos << "\n";
 	for(auto i=0; i< len; ++i)
 		cout << bcode[pos+i];
+	//cout << "print_string: stack after:\n"; print_stack();
 }
 
 void subt() // a b -- a-b
@@ -297,7 +299,7 @@ int main()
 					auto v = pop_stack();
 					++pc;
 					pc = v>0 ? bcode[pc] : pc+1;
-					cout << "Setting pc to" << pc << "\n";
+					//cout << "Setting pc to" << pc << "\n";
 				}
 				break;
 			case 'j': // unconditional jump

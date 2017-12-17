@@ -7,7 +7,6 @@ L1
 ' from bcode' xprin
 p010 xemit
 
-xdecr
->1
+xdecr xdupe >1 # possibly loop
 
 0
