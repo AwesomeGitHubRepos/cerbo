@@ -1,199 +1,191 @@
-new: create_push
-bcode becomes global
-new print_string()
+# Part 3 - strings
+
+In this part, we allow strings, which we delimit by a single quote ('). We do not implement escaping mecahnisms.
 
 
-# Part 2 - adding labels and branches
 
-## New instructions
-
-In this part, I will add two new instructions:
-
-| Instruction | Meaning                   |
-| ----------- | ------------------------- |
-| L'c'        | add address label         |
-| <'c'        | jump to label if negative |
-
-As I write, I am increasingly coming to the realisation that this byte-compiler is an inferior implementation of Forth. It is dawning on me that Forth is, indeed, the perfect way to implement what I am trying to achieve. Nevertheless, I shall continue down the path I am going, as it seems to be good enough. The instructions embedded in the bin.out file do provide useful clues that I have coded the design correctly.
-
-If I had gone down the road leading to Forth, I might have eskewed the whole idea of adding the two instructions above. Forth has some clever tricks where it pushes values to a return stack, and pops them off without the need for labels. I have decided to be less clever.
-
-`L'c'` creates a label. I have allowed the creation of 256 labels, corresponding to a char byte.
-
-`<'c'` causes a jump to the label if the value on the stack is negative.
-
-## Ancillary functions
-
-In order to make use of `L` and `<`, I need to use create some handing functions:
-
-* `dupe` - which duplicates the top of the tope of the stack
-* `incr` - increment the top of the stack by 1
-* `subt` - subtract the top two items from the stack
-
-The implementation of these functions is easy enough:
-
+The bytecodes are now made public near the top of the file:
 ```
-void dup()
-{
-        push_stack(stk.top());
+typedef vector<uint8_t> bytes;
+bytes bcode; 
+```
+This is necessary because in order to do something like print a string, we need to know its location in the byte-code.
 
+We also change the stack from from a C++ stack to a deque, which allows access to the stack starting from the front as well as the back. We do this so we can print a debug trace of the stack without having to pop elements off the stack:
+```
+void print_stack()
+{
+        cout << "Stack contents:";
+        for(auto it = stk.begin(); it != stk.end(); ++it)
+                cout << " " << *it;
+        cout << "\n";
 }
+```
+Functions that make use of the stack need a change in their internal calls. The need to call `push_back()` instead of `push()`, and `pop_back()` instead of `pop()`. 
 
-void incr()
+## New executable functions
+
+
+For convenience, we define the counterpart of `incr`:
+```
+void decr()
 {
-        stk.top() += 1;
-}
-
-void subt() // a b -- a-b
-{
-        int64_t tmp = pop_stack();
-        stk.top() -= tmp;
-
+        stk.back() -= 1;
 }
 ```
 
-We must remember to add them to our list of callable functions:
+To print a string:
+```
+void print_string()
+{
+        auto len = pop_stack();
+        auto pos = pop_stack();
+        for(auto i=0; i< len; ++i)
+                cout << bcode[pos+i];
+}
+```
+The function assumes that the byte-code position of the string, and its length, is on the stack when it is called. We will have to generate the corect byte code to make this happen.
+
+The two functions must be added to `vecfns` in the usual way:
 ```
 vector<func_desc> vecfns = {
-        {"dupe", dup},
-        {"emit", emit},
-        {"hell", hello},
-        {"incr", incr},
-        {"subt", subt}
+        {"decr", decr},
+	...
+        {"prin", print_string},
+	...
 };
 ```
 
-## Implementing labels and jumps
+## Changes to the byte-code compiler
 
-Define the labels as follows:
-```
-// The addresses of labels you create via the L command
-uint8_t labels[256];
-```
+Strings are denoted by enclosing characters in single quotes, like so: `'hello world'`. We introduce a new instruction, `j`, to perform an uncoditional jump. We also add a new instruction, `>`, which is a jump on stack positive. It is implemented in a very similar way to '<'. We do not need to do anything special at the compilation stage for `>`, and can fold it into the case for `<`.
 
-This is an array of mapping the label name to its address in the bytecode. This is where we jump to. Note the following:
-* we are assuming that the complete set of byte-codes can take a maximum of 256 bytes (because we define it as `uint8_t`). A more reasonable assumption would be to assume that the byte-codes will take up 16-bit addresses (so we should use `unit16_t`). This would allow for 64k of code, which should be more than enough for many applications. If you wanted to be more liberal, you might aim for 32-bit or 64-bit addresses.
-* you should not re-use labels. The program does not check for this, but it is almost certainly not what you want to do.
-* it is entirely likely that we will want to make a forward jump, i.e. jump to a label that is defined later in the code. So we cannot fill in jumps as we go; we should complete the parsing of the code and them "resolve" the labels at the end
-
-
-So we need a label reference structure:
+Handling strings at the compilation stage is the most complicated code we have introducted so far:
 ```
-// what addresses refer to those labels
-typedef struct { 
-        uint8_t label_name; 
-        uint8_t position;
-} lref_t;
-
-```
-which maps label names to their position in the byte code. As we parse the program, we add label references as necessary into the vector defined as follows:
-```
-vector<lref_t> label_refs;
-```
-
-During "resolution time", we fill in the references to the labels, i.e. the jump instructions, with the values we need. This is done via the function `resolve_lavels()`, defined as follows:
-```
-void resolve_labels(bytes &bcode)
-{
-        constexpr bool debug = false;
-
-        for(const auto& lref:label_refs) {
-                bcode[lref.position] = labels[lref.label_name];
-                if(debug) {
-                        cout << "resolve_labels:name:" << lref.label_name 
-                                << ",label position:" << int(labels[lref.label_name])
-                                << ",ref position:" << int(lref.position)
-                                << "\n";
-                }
-      }
-}
-```
-
-The compile-time operation switch statement for encountering a label is as follows:
-```
-case 'L':
-	labels[prog[++i]] = bcode.size();
-        break;
-```
-This is saying that the current byte-code position (`bcode.size()`) needs to be stored in the set of labels. The name of the label to be used is determined by `prog++i]`. Note that we do not need to create any byte-codes for a label at this point.
-
-The compile-time behaviour of the "jump negative" instruction is:
-```
-case '<':
-	pushchar(bcode, '<');
-	label_refs.push_back({prog[++i], (uint8_t) bcode.size()});
-	pushchar(bcode, '?'); // placeholder for an address to be resolved later
-	break;
-```
-We push `<` to bcode (i.e. the byte-code) so that it will perform the relevant test and jump as necessary, and store the label that we want to jump to in the `label_refs` variable, for later resolution. We also need to push another byte which will store the address. The code above does pushes a question-mark. If you wanted to implement a 16-bit machine, you would need to push two "?"s.
-
-`resolve_labels()` is called after we have finished processing the user program.
-
-In terms of running the byte-code, there is nothing to do as regards the labels. They have been resolved into the jump command. The runtime behaviour for the "jump-negative" instruction is as follows:
-```
-case '<': // jump if negative
+case '\'': // strings
 	{
-		auto v = pop_stack();
-		++pc;
-		if(v<0) 
-			pc = bcode[pc];
-		else
-			++pc;
+		pushchar(bcode, 'j'); // push an unconditional jump instruction
+		auto p0 = bcode.size(); // remember where the jump address has to be inserted
+		pushchar(bcode, '?'); // reserve space for the position of end of string
+		while(prog[++i] != '\'') bcode.push_back(prog[i]);
+		++i; // pace the program pointer beyond the '
+		bcode.push_back('\0'); // put in a null terminator for C functions
+		auto p1 = bcode.size(); //the address to jump to
+		auto p2 = p0 +1; // address where the string starts
+		bcode[p0] = p1; // fill in the jump address
+		auto len = p1-p2-1; // length of the string
+		//cout << "strings:strlen:" << len << "\n";
+		create_push(bcode, p2);
+		create_push(bcode, len);
 	}
 	break;
 ```
-We pop a value off the top of the stack, as we want to know if it is negative. We move the program counter one byte along, so that it points to the location where the label is. If what was on the stack was indeed negative, we reset the program counter to the label address. Otherwise, we advance the program counter beyond this address, ready to execute the next instruction.
+The code breaks down as follows:
+1. Send an uncoditional jump instruction, `j`, to the byte code. The purpose is that when the bcode is interpreted, it will perform a jump past the end of the string. We don't know where we have to jump to at this stage, so we omit a dummy address (`?`) to be resolved further down
+2. We work our way through the string in the program, adding the string contents to the byte code. We also push back a null terminator for the convenience of C functions wanting to use the string
+3. Now that we know where in the bcode we can jump to, we fill in this address at the space we reserved in step 1.
+4. We arrange to have the address and length of the string pushed onto the stack at interpretations time via `create_push()`. 
 
-## Some examples
-
-Let's test out some of the simple commands that we created first. This is the contents of `test1.asm`:
+Because we want to write the `p` (push) instruction in several places, we perform a small refactoring, and create the following function:
 ```
-# basic test of dupe, ince, subt
-#      stack
-p000   # 0
-xincr  # 1
-p010   # 1 10
-xsubt  # -9
-xdupe  # -9 -9
+template<class T>
+void  create_push(bytes& bcode, T val)
+{
+        pushchar(bcode, 'p');
+        push64(bcode, val);
+}
+```
+
+## Changes to the byte-code interpreter
+
+We need to handle the instruction `>`:
+```
+case '>': // jump if positive
+	{
+		auto v = pop_stack();
+		++pc;
+		pc = v>0 ? bcode[pc] : pc+1;
+	}
+	break;
+```
+It's just a small variation on `<`. Instead of testing for `v<0` to decide how to alter the program counter, we test for `v>0`.
+
+We need to be able to perform an unconditional jump:
+```
+case 'j': // unconditional jump
+	pc = bcode[++pc];
+	break;
+```
+
+## Testing
+
+As our program can now be quite tricky, at 335 lines long, it would be nice to automate our testing, and be sure we do not introduce any regressions into the code. 
+
+Assembly code is now stored in a directory called `asm`. We add a bash script, `run-tests`  to process the assembly:
+```
+#!/usr/bin/env bash
+
+mkdir -p out verified
+rm -f out/*.out
+
+for in in $( ls ../asm/v[123]*); do
+        #echo $in
+        out=`basename -s asm $in`out
+        ./bcode < $in >out/$out
+        diff out/$out verified/$out
+done
+```
+
+It processes assembly files in the asm directorym , and writes out the results to a directory called `out`. Im directory `verified`, we store the expected result for each program. The results in `out` are compared with the expected results in `verified` to ensure they match.
+
+
+## Example programs
+
+In the `asm` directory, we have created two programs to test out our new functionality. The simplest on is `v3-string.asm`:
+```
+# print a string
+
+p042 xemit # print an asterisk
+
+'hello world'
+xprin
+
+' from bcode'
+xprin
+
+p042 xemit # another asterisk
+
+p010 xemit # newline
+
 0
 ```
-We are just doing simple stack manipulation here: putting 0 on the stack, adding 1, putting 10 on the stack, performing a subtraction so that the value -9  (1-10 = -9) is on the stack, and then duplicating it.
-
-A more taxing example is if we try to print out `ABCDE` to stdout. Here is the code in `atoe.asm`:
+It will just print out the line:
 ```
-# print 
-p065 # A
-L0   # create label 0
-xdupe
-xemit
-xincr
-xdupe
-p070 # F
-xsubt
-<0 # if negative, jump to label 0
+*hello world from bcode*
+```
 
-# print newline
-p010
-xemit
+The compiler and interpreter is flexed more widely in the program `v3-string5.asm`:
+```
+# print a string 5 times
+
+p005
+L1
+
+'hello world' xprin
+' from bcode' xprin
+p010 xemit
+
+xdecr xdupe >1 # possibly loop
 
 0
 ```
+This prints out `hello world from bcode` five times. 
 
-Here's the sequence of events:
-1. `p065` : we start by putting 'A' on the stack. 
-2. `L0` : we add a label '0', which is the point we want to jump to. 
-3. `xdupe xemit` : print 'A' to the screen. 
-4. `xincr` : 'A' becomes 'B'
-5. `xdupe xdupe p070 xsubt` : find the difference between the top of the stack ('B') and the letter 'F'.
-6. `<0` : If it's negative, then jump to the position of `L0`
-7 `p010 xemit` : print a newline character
+## What's next?
 
-The expected output is
-`ABCDE`
+There are a few directions in which `bcode` could be extended:
+1. instead of restricting `x` functions to 4 characters, it could be extended to allow for an arbitrary length function
+2. addressing could be extended. Instead of restricting the bcode to be 256 bytes long, the length of the addressing word could be generalised. This would require careful testing (hurrah for automated testing!), as there are a number of places where the placement of addresses and the manipulation of the program counter are handled
+3. creation of an interpreted language. Something like BASIC, for example the language suggested by Bennett, would make an ideal testing ground. Stack frames and recursive functions need to be handled.
 
 
-## In summary
-
-Inevitably when adding functionality, it is easy to make mistakes. So testing is necessary. The code is only 270 lines long, which is manageable. And we are much of the way there to producing a useful byte-code compiler and interpreter. If you wanted to extend it to be a 16-bit or 32-bit "instruction set", then care would be required.
-
-What we need to do next is embed strings.
