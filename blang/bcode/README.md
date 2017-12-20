@@ -10,7 +10,7 @@ There are several factors that have led me to writing "bcode", my attempt at mak
 * my involvement with `neoleo`, a spreadsheet that I forked from `oleo`, which is GNU's spreadsheet program that has not been updated for many years. Part of the program parses user formulae, compiles and decompiles them into byte-codes as required. Lex and yacc are used. `Oleo` was originally written in C, and I was interested in converting it to C++. The workings of the compiler and parser were, and to some extent still are, a bit of a mystery to me. I figured that there must be a better way to do it.
 * my involvement with [`ultimc`](https://github.com/blippy/ultimc). `Ultimc` is a project that I created to work in conjunction with [Ultibo](https://ultibo.org/), a unikernel for the RPi (Raspberry Pi). I figured that it would be nice to have a scripting environment for the unikernel, and set about creating `Glute` ("gluing utility", although I like the name because it was vaguely rude). Although it currently "works", it can only deal with commands. You cannot perform branching, or define functions.
 * I was inspired by Jack Crenshaw PhD's series of articles, [Let's build a compiler](https://compilers.iecc.com/crenshaw/) to try my own take on the subject. Jack creates a compiler that spits out Motorola assembly. The assembly can then be compiled into an executable, assuming that you have access to the Motorola chipset
-* J.P. Bennett's book "Introduction to compiling techniques - a first course using ANSI C, LEX and YACC" was of interest to me. I bought the book in 1996. I never made my way through all of it, although I occasionally dipped in, latterly more than formerly. I am glad I bought the book, as it is a pleasant introduction to compiling techniques.
+* J.P. Bennett's book "Introduction to compiling techniques - a first course using ANSI C, LEX and YACC" was of interest to me. I bought the book in 1996. I never made my way through all of it, although I occasionally dipped in, latterly more than formerly. I am glad I bought the book, as it is a pleasant introduction to compiling techniques. His sources can be downloaded [here](http://www.jeremybennett.com/publications/download.html). I have also created a [github repo](https://github.com/blippy/bennett) for his code.
 
 Bennett's work adopts the typical approach to writing a compiler:
 1. define a lexer using lex. He discusses ad hoc lexing techniques, where you basically roll-your-own lexer
@@ -53,3 +53,5 @@ I am trying to write my assembler piecemeal, creating features as we go. I do ho
 [Part 2](v2/README.md) - labels and branches
 
 [Part 3](v3/README.md) - strings
+
+
