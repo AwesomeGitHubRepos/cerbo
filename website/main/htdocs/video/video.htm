@@ -28,7 +28,7 @@ Legend:
 
 Useful for converting flipcam files to PAL DV format, and boosting the gain:
 <pre>
-ffmpeg myvid.avi -af "volume=10dB" -target pal-dv myvid.dv
+ffmpeg -i myvid.avi -af "volume=10dB" -target pal-dv myvid.dv
 </pre>
 
 An AVI file of 1.2G, lasting 50m, produced a DV file of 11.0G in 5m36s.
@@ -73,7 +73,7 @@ As of Dec 2015, AAC is no longer experimental in <code>ffmpeg</code> .
 <hr><pre>
 Author:  Mark Carter
 Created: 14-Nov-2015
-Updated: 27-Jan-2018
+Updated: 01-Feb-2018
 </pre>
 </body>
 </html>
