@@ -14,8 +14,11 @@
    height="41.627064"
    id="svg3116"
    version="1.1"
-   inkscape:version="0.47 r22583"
-   sodipodi:docname="icon.svg">
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   sodipodi:docname="icon.svg"
+   inkscape:export-filename="/home/mcarter/repos/cerbo/website/main/logo/icon.svg.png"
+   inkscape:export-xdpi="690.64001"
+   inkscape:export-ydpi="690.64001">
   <defs
      id="defs3118">
     <inkscape:perspective
@@ -106,16 +109,16 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="5.5"
-     inkscape:cx="21.017252"
+     inkscape:cx="-11.437293"
      inkscape:cy="19.722623"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:document-units="px"
      inkscape:grid-bbox="true"
-     inkscape:window-width="1680"
-     inkscape:window-height="998"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:window-width="1920"
+     inkscape:window-height="1039"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata3121">
@@ -125,7 +128,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
