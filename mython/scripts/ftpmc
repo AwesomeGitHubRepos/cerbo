@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-# perform an ftp transfer
-python3 -m mython.ftpmc $*
