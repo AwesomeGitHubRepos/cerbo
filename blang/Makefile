@@ -17,4 +17,4 @@ clean :
 	rm -f blang
 
 blang : blang.cc
-	g++ -Wfatal-errors -std=gnu++14 -ggdb -O0 $(CHECKER) $< -o $@
+	g++ -Wfatal-errors -std=c++17 -ggdb -O0 $(CHECKER) $< -o $@
