@@ -26,7 +26,7 @@ using std::string;
 using std::string_view;
 using std::variant;
 using std::vector;
-using std::to_string;
+//using std::to_string;
 
 typedef vector<string> strings;
 typedef variant<double, string> value_t;
@@ -50,12 +50,6 @@ enum blang_t {
 	T_STR  // string
 };
 
-class BlangCode {
-	public:
-		//BlangCode() {;};
-		virtual ~BlangCode() {};
-		virtual void eval() = 0;
-};
 
 
 typedef struct token { blang_t type; string value; } token;
@@ -178,12 +172,50 @@ class Precedence {
 	public: vector<T> operands; vector<blang_func> fops;
 };
 
-class Term : public Precedence<Factor> {};
-//typedef Precedence<Factor> Term;
+//class Term : public Precedence<Factor> {};
+typedef Precedence<Factor> Term;
 typedef Precedence<Term> Relop;
 typedef Precedence<Relop> Expression;
 
 class Factor { public: variant<value_t, Expression> factor; };
+
+token take(tokens& tokes) { token toke = tokes.front(); tokes.pop_front(); return toke; }
+
+Factor make_factor(tokens& tokes)
+{
+	Factor f;
+	token toke = take(tokes);
+	switch(toke.type) {
+		case T_NUM:
+			f.factor = std::stod(toke.value);
+			break;
+		case T_STR:
+			f.factor = toke.value;
+			break;
+		default:
+			throw std::logic_error("make_factor() unhandled type:" + std::to_string(toke.type));
+	}
+	return f;
+}
+
+
+template <typename T, typename U>
+T parse_multiop(tokens& tokes, std::function<U(tokens&)> make, const strings& ops)
+{
+	T node;
+	node.operands.push_back(make(tokes));
+	return node;
+}
+Term make_term(tokens& tokes) { return parse_multiop<Term,Factor>(tokes, make_factor, {"*", "/"}); }
+Relop make_relop(tokens& tokes) { return parse_multiop<Relop,Term>(tokes, make_term, {"+", "-"}); }
+Expression make_expression(tokens& tokes) { return parse_multiop<Expression, Relop>(tokes, make_relop, {">", "<"}); }
+
+
+///////////////////////////////////////////////////////////////////////////
+// eval
+
+
+value_t eval(varmap_t& vars, Factor f) { return std::get<value_t>(f.factor); } // TODO may need to eval other althernatives
 
 template<class T>
 value_t eval_multiop(varmap_t& vars, T expr)
@@ -196,13 +228,21 @@ value_t eval_multiop(varmap_t& vars, T expr)
 	}
 	return result;
 }
-
-value_t eval(varmap_t& vars, Factor f) { return 666; }
 value_t eval(varmap_t& vars, Term t) { return eval_multiop(vars, t); }
 value_t eval(varmap_t& vars, Relop r) { return eval_multiop(vars, r); }
 value_t eval(varmap_t& vars, Expression e) { return eval_multiop(vars, e); }
 
 
+string to_string(value_t v)
+{
+	if(std::holds_alternative<double>(v)) {
+		return std::to_string(std::get<double>(v));
+	} else if(std::holds_alternative<string>(v)) {
+		return std::get<string>(v);
+	} else {
+		throw std::logic_error("to_string() unhandled value_t");
+	}
+}
 
 
 
@@ -224,7 +264,10 @@ value_t eval(varmap_t& vars, Expression e) { return eval_multiop(vars, e); }
 
 void scanner()
 {
-	Expression e;
+	Expression e{make_expression(g_tokens)};
+	varmap_t vars;
+	cout << to_string(eval(vars, e)) << "\n";
+
 }
 
 void print_tokeniser_report()
@@ -244,7 +287,7 @@ int main()
 	}
 
 	g_tokens = tokenise(str3);
-	if(false) print_tokeniser_report();
+	if constexpr(false) print_tokeniser_report();
 	scanner();
 	return 0;
 }
