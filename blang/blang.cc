@@ -34,20 +34,20 @@ typedef vector<value_t> values;
 typedef map<string, value_t> varmap_t;
 typedef std::function<value_t(values vs)> blang_func;
 
-enum blang_t { 
-	T_NUL, // represents NULL, or nothing
-	T_BAD, // non-matching whitespace. Should not happen, as all input should be made into a token
-	T_EOF, // end of input
-	T_REM, // comment
+enum blang_t : char { 
+	T_NUL = '0', // represents NULL, or nothing
+	T_BAD = '_', // non-matching whitespace. Should not happen, as all input should be made into a token
+	T_EOF = 'E', // end of input
+	T_REM = '\'', // comment
 
-	T_COM, // comma
-	T_LRB, // left round bracket
-	T_RRB, // right round bracket
-	T_REL, // relational operator
-	T_NUM, T_ID, T_ASS, 
-	T_MD,  // multiplication or divide
-	T_PM,  // plus or minus
-	T_STR  // string
+	T_COM =',', // comma
+	T_LRB = '(', // left round bracket
+	T_RRB = ')', // right round bracket
+	T_REL = '<', // relational operator
+	T_NUM = '9', T_ID = 'I', T_ASS = '=', 
+	T_MD = '*',  // multiplication or divide
+	T_PM = '+',  // plus or minus
+	T_STR  = '$' // string
 };
 
 
@@ -56,6 +56,7 @@ typedef struct token { blang_t type; string value; } token;
 typedef deque<struct token> tokens;
 
 
+string to_string(value_t v);
 
 ///////////////////////////////////////////////////////////////////////////
 // functions
@@ -81,11 +82,23 @@ value_t blang_mul(values vs) { auto [v1, v2] = two_nums(vs); return v1 * v2; }
 value_t blang_div(values vs) { auto [v1, v2] = two_nums(vs); return v1 / v2; }
 //value_t blang_add(values vs) { return num_op(std::plus<double,double>, vs); }
 
+value_t blang_print(values vs)
+{
+	for(int i= 0; i < vs.size(); i++) {
+		cout << to_string(vs[i]);
+		if(i+1<vs.size()) cout << " ";
+	}
+	cout << "\n";
+	return 0;
+}
+
 blang_funcs_t blang_funcs = {
 	{"+", blang_add},
 	{"/", blang_div},
 	{"*", blang_mul},
-	{"-", blang_sub}
+	{"-", blang_sub},
+
+	{"print", blang_print}
 };
 
 
@@ -198,6 +211,8 @@ void checkfor(const string& expecting)
 //  P --> v | "(" E ")" | "-" T
 
 class Factor;
+class FuncCall;
+//class Statement;
 //class Relop;
 //class Term;
 
@@ -209,16 +224,21 @@ class Precedence {
 	public: vector<T> operands; vector<blang_func> fops;
 };
 
-//class Term : public Precedence<Factor> {};
 typedef Precedence<Factor> Term;
 typedef Precedence<Term> Relop;
 typedef Precedence<Relop> Expression;
 
-class Factor { public: variant<value_t, Expression> factor; };
+class Variable { public: string name; };
+typedef variant<Expression> Statement ;// TODO more to follow
+class FuncCall { public: string name; vector<Expression> exprs; };
+class Factor { public: variant<value_t, Expression, FuncCall, Variable> factor; };
+class Program { public: vector<Statement> statements; };
 
 string curr(tokens& tokes) { return tokes.empty() ? "" : tokes.front().value; }
 token take(tokens& tokes) { token toke = tokes.front(); tokes.pop_front(); return toke; }
+string take_yytext(tokens& tokes) { token toke{take(tokes)}; return toke.value; }
 void advance(tokens& tokes) { tokes.pop_front(); }
+bool is_next(const tokens& tokes, string expected) { return tokes.size()<2 ? false : tokes[1].value == expected; }
 
 void require(tokens& tokes, string required) 
 { 
@@ -230,6 +250,42 @@ void require(tokens& tokes, string required)
 
 Expression make_expression(tokens& tokes);
 
+template<typename T>
+void make_funcargs(tokens& tokes,T make)
+{
+	require(tokes, "(");
+	if(curr(tokes) != ")") {
+		make(tokes);
+		while(curr(tokes) == ",") {
+			advance(tokes);
+			make(tokes);
+		}
+	}
+	require(tokes, ")");
+
+
+}
+
+FuncCall make_funccall(string name, tokens& tokes)
+{
+	cout << "make_funccall()\n";
+	FuncCall fn;
+	fn.name = name;
+	auto make = [&fn](tokens& tokes) { fn.exprs.push_back(make_expression(tokes)); };
+	make_funcargs(tokes, make);
+	return fn;
+}
+
+
+Variable make_variable(string name, tokens& tokes)
+{
+	cout << "make_variable()\n";
+	Variable var;
+	var.name = name;
+	return var;
+}
+
+
 Factor make_factor(tokens& tokes)
 {
 	Factor f;
@@ -237,8 +293,6 @@ Factor make_factor(tokens& tokes)
 	//cout << "make_factor():token" << toke.value  << "," << toke.type << "\n";
 	switch(toke.type) {
 		case T_LRB:
-			//advance(tokes);
-			//Expression e{make_expression(tokes)}; 
 			f.factor = make_expression(tokes);
 			require(tokes, ")");
 			break;
@@ -248,8 +302,16 @@ Factor make_factor(tokens& tokes)
 		case T_STR:
 			f.factor = toke.value;
 			break;
+		case T_ID:
+			cout << "make_factor():tokes[1].value:" << tokes[1].value << "\n";
+			if(curr(tokes) ==  "(")
+				f.factor = make_funccall(toke.value, tokes);
+			else
+				f.factor = make_variable(toke.value, tokes);
+			break;
 		default:
-			throw std::logic_error("make_factor() unhandled type:" + std::to_string(toke.type));
+			throw std::logic_error("make_factor() unhandled type:" 
+					+ string{toke.type} + ",value:" + toke.value);
 	}
 	return f;
 }
@@ -280,11 +342,41 @@ Relop make_relop(tokens& tokes) { return parse_multiop<Relop,Term>(tokes, make_t
 Expression make_expression(tokens& tokes) { return parse_multiop<Expression, Relop>(tokes, make_relop, {">", "<"}); }
 
 
+Statement make_statement(tokens& tokes)
+{
+	Statement stm;
+	// TODO lots more statements to do here
+	stm = make_expression(tokes);
+	return stm;
+
+}
+
+Program make_program(tokens& tokes)
+{
+	Program prog;
+	while(!tokes.empty()) 
+		prog.statements.push_back(make_statement(tokes));
+	return prog;
+}
+
 ///////////////////////////////////////////////////////////////////////////
 // eval
 
 
 value_t eval(varmap_t& vars, Expression e);
+
+value_t eval(varmap_t& vars, FuncCall fn)
+{
+	values vs;
+	for(const auto&e: fn.exprs)
+		vs.push_back(eval(vars, e));
+
+	auto it = blang_funcs.find(fn.name);
+	if(it == blang_funcs.end())
+		throw std::runtime_error("#UNK_FUNC:" + fn.name);
+	blang_func f = it->second;
+	return f(vs);
+}
 
 value_t eval(varmap_t& vars, Factor f)
 { 
@@ -292,6 +384,8 @@ value_t eval(varmap_t& vars, Factor f)
 		return std::get<value_t>(f.factor); 
 	else if(std::holds_alternative<Expression>(f.factor))
 		return eval(vars, std::get<Expression>(f.factor));
+	else if(std::holds_alternative<FuncCall>(f.factor))
+		return eval(vars, std::get<FuncCall>(f.factor));
 	else
 		throw std::runtime_error("eval<Factor>(): unhandled alternative");
 }
@@ -323,7 +417,16 @@ string to_string(value_t v)
 	}
 }
 
-
+value_t eval(varmap_t& vars, Program prog)
+{
+	for(auto& s: prog.statements) {
+		if(std::holds_alternative<Expression>(s))
+			eval(vars, std::get<Expression>(s));
+		else
+			std::logic_error("eval<Program>(): Unhandled statement type");
+	}
+	return 0;
+}
 
 
 // ARITHMETIC END
@@ -343,10 +446,13 @@ string to_string(value_t v)
 
 void scanner()
 {
-	Expression e{make_expression(g_tokens)};
 	varmap_t vars;
+	/*
+	Expression e{make_expression(g_tokens)};
 	cout << to_string(eval(vars, e)) << "\n";
-
+	*/
+	Program prog{make_program(g_tokens)};
+	eval(vars, prog);
 }
 
 void print_tokeniser_report()
