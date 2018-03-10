@@ -55,6 +55,43 @@ enum blang_t {
 typedef struct token { blang_t type; string value; } token;
 typedef deque<struct token> tokens;
 
+
+
+///////////////////////////////////////////////////////////////////////////
+// functions
+
+typedef std::function<value_t(values)> blang_func;
+typedef map<string, blang_func> blang_funcs_t;
+
+double num(value_t v) { return std::get<double>(v); }
+
+std::tuple<double, double> two_nums(values vs) 
+{ 
+	if(vs.size()!=2) throw std::runtime_error("#BAD_CALL: Expected 2 arguments");
+	double v1 = num(vs[0]), v2 = num(vs[1]);
+	return std::make_tuple(v1, v2);
+}
+
+//template<typename T>
+//value_t num_op(T op, values vs) { auto [v1, v2] = two_nums(vs) ; return op(v1, v2); }
+
+value_t blang_add(values vs) { auto [v1, v2] = two_nums(vs); return v1 + v2; }
+value_t blang_sub(values vs) { auto [v1, v2] = two_nums(vs); return v1 - v2; }
+value_t blang_mul(values vs) { auto [v1, v2] = two_nums(vs); return v1 * v2; }
+value_t blang_div(values vs) { auto [v1, v2] = two_nums(vs); return v1 / v2; }
+//value_t blang_add(values vs) { return num_op(std::plus<double,double>, vs); }
+
+blang_funcs_t blang_funcs = {
+	{"+", blang_add},
+	{"/", blang_div},
+	{"*", blang_mul},
+	{"-", blang_sub}
+};
+
+
+// functions
+///////////////////////////////////////////////////////////////////////////
+
 static tokens g_tokens;
 static token nextsymb;
 
@@ -179,13 +216,32 @@ typedef Precedence<Relop> Expression;
 
 class Factor { public: variant<value_t, Expression> factor; };
 
+string curr(tokens& tokes) { return tokes.empty() ? "" : tokes.front().value; }
 token take(tokens& tokes) { token toke = tokes.front(); tokes.pop_front(); return toke; }
+void advance(tokens& tokes) { tokes.pop_front(); }
+
+void require(tokens& tokes, string required) 
+{ 
+	auto toke = take(tokes);
+	string found = toke.value; 
+	if(found != required)
+		throw std::runtime_error("#PARSE_ERR: Required:" + required + ",found:" + found);
+}
+
+Expression make_expression(tokens& tokes);
 
 Factor make_factor(tokens& tokes)
 {
 	Factor f;
 	token toke = take(tokes);
+	//cout << "make_factor():token" << toke.value  << "," << toke.type << "\n";
 	switch(toke.type) {
+		case T_LRB:
+			//advance(tokes);
+			//Expression e{make_expression(tokes)}; 
+			f.factor = make_expression(tokes);
+			require(tokes, ")");
+			break;
 		case T_NUM:
 			f.factor = std::stod(toke.value);
 			break;
@@ -200,13 +256,26 @@ Factor make_factor(tokens& tokes)
 
 
 template <typename T, typename U>
-T parse_multiop(tokens& tokes, std::function<U(tokens&)> make, const strings& ops)
+T parse_multiop(tokens& tokes, std::function<U(tokens&)> make, strings ops)
+//T parse_multiop(tokens& tokes, std::function<U(tokens&)> make)
 {
+	//strings ops{{"+", "-"}};
 	T node;
 	node.operands.push_back(make(tokes));
+	while(1) {
+		string op = curr(tokes);
+		strings::iterator opit = std::find(ops.begin(), ops.end(), op);
+		if(opit == ops.end()) break;
+		tokes.pop_front();
+		auto fop = blang_funcs.find(op)->second;
+		node.fops.push_back(fop);
+
+		node.operands.push_back(make(tokes));
+	}
 	return node;
 }
 Term make_term(tokens& tokes) { return parse_multiop<Term,Factor>(tokes, make_factor, {"*", "/"}); }
+//Term make_term(tokens& tokes) { return parse_multiop<Term,Factor>(tokes, make_factor); }
 Relop make_relop(tokens& tokes) { return parse_multiop<Relop,Term>(tokes, make_term, {"+", "-"}); }
 Expression make_expression(tokens& tokes) { return parse_multiop<Expression, Relop>(tokes, make_relop, {">", "<"}); }
 
@@ -215,7 +284,17 @@ Expression make_expression(tokens& tokes) { return parse_multiop<Expression, Rel
 // eval
 
 
-value_t eval(varmap_t& vars, Factor f) { return std::get<value_t>(f.factor); } // TODO may need to eval other althernatives
+value_t eval(varmap_t& vars, Expression e);
+
+value_t eval(varmap_t& vars, Factor f)
+{ 
+	if(std::holds_alternative<value_t>(f.factor))
+		return std::get<value_t>(f.factor); 
+	else if(std::holds_alternative<Expression>(f.factor))
+		return eval(vars, std::get<Expression>(f.factor));
+	else
+		throw std::runtime_error("eval<Factor>(): unhandled alternative");
+}
 
 template<class T>
 value_t eval_multiop(varmap_t& vars, T expr)
