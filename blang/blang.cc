@@ -205,10 +205,14 @@ void checkfor(const string& expecting)
 //  P --> v | "(" E ")" | "-" T
 //
 // Here's mine:
-//  E --> R {( "<" | "<=" | ">" | ">=" | "==" | "!=" ) R}
-//  R --> T {( "+" | "-" ) T}
-//  T --> P {( "*" | "/" ) P}
-//  P --> v | "(" E ")" | "-" T
+// I extend BNF with the notion of a function, prefixed by &
+// {} zero or more repetitions
+// [] optional
+//  &M(o, X) --> X {o X} // e.g. &M(("+"|"-"), T) --> T { ("+"|"-") T }
+//  E --> &M(( "<" | "<=" | ">" | ">=" | "==" | "!=" ), R)
+//  R --> &M(( "+" | "-" ) T)
+//  T --> &M(( "*" | "/" ), F)
+//  F --> ("+"|"-") (v | "(" E ")")
 
 class Factor;
 class FuncCall;
@@ -227,7 +231,7 @@ typedef Precedence<Relop> Expression;
 class Variable { public: string name; };
 typedef variant<Expression, Let> Statement;
 class FuncCall { public: string name; vector<Expression> exprs; };
-class Factor { public: variant<value_t, Expression, FuncCall, Variable> factor; };
+class Factor { public: char sign = '+' ; variant<value_t, Expression, FuncCall, Variable> factor; };
 class Let { public: string varname; Expression expr; };
 class Program { public: vector<Statement> statements; };
 
@@ -287,6 +291,13 @@ Factor make_factor(tokens& tokes)
 {
 	Factor f;
 	token toke = take(tokes);
+
+	// optional sign
+	if((toke.value == "+") || (toke.value == "-")) {
+		f.sign = toke.value[0];
+		toke = take(tokes);
+	}
+
 	//cout << "make_factor():token" << toke.value  << "," << toke.type << "\n";
 	switch(toke.type) {
 		case T_LRB:
@@ -334,7 +345,6 @@ T parse_multiop(tokens& tokes, std::function<U(tokens&)> make, strings ops)
 	return node;
 }
 Term make_term(tokens& tokes) { return parse_multiop<Term,Factor>(tokes, make_factor, {"*", "/"}); }
-//Term make_term(tokens& tokes) { return parse_multiop<Term,Factor>(tokes, make_factor); }
 Relop make_relop(tokens& tokes) { return parse_multiop<Relop,Term>(tokes, make_term, {"+", "-"}); }
 Expression make_expression(tokens& tokes) { return parse_multiop<Expression, Relop>(tokes, make_relop, {">", "<"}); }
 
@@ -404,8 +414,38 @@ value_t eval(varmap_t& vars, Variable var)
 
 }
 
+value_t eval(varmap_t& vars, value_t v) { return v; }
+
+template<typename T>
+bool eval_factor(varmap_t& vars, Factor f, value_t& v)
+{
+	//bool hit = false;
+	//value_t v = 0;
+	if(std::holds_alternative<T>(f.factor)) {
+		//hit = true;
+		v = eval(vars, std::get<T>(f.factor));
+
+		if((f.sign == '-') && std::holds_alternative<double>(v)) 
+			v = - std::get<double>(v);
+		return true;
+	}
+	return false;
+}
+
+
 value_t eval(varmap_t& vars, Factor f)
 { 
+	//bool hit;
+       	value_t v;
+	bool hit = eval_factor<value_t>(vars, f, v) 
+		|| eval_factor<Expression>(vars, f, v)
+		|| eval_factor<FuncCall>(vars, f, v)
+		|| eval_factor<Variable>(vars, f, v);
+	if(!hit)
+		throw std::runtime_error("eval<Factor>(): unhandled alternative");
+	return v;
+
+	/*
 	if(std::holds_alternative<value_t>(f.factor))
 		return std::get<value_t>(f.factor); 
 	else if(std::holds_alternative<Expression>(f.factor))
@@ -416,6 +456,7 @@ value_t eval(varmap_t& vars, Factor f)
 		return eval(vars, std::get<Variable>(f.factor));
 	else
 		throw std::runtime_error("eval<Factor>(): unhandled alternative");
+		*/
 }
 
 template<class T>
