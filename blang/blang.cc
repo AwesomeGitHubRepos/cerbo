@@ -210,11 +210,12 @@ void checkfor(const string& expecting)
 // [] optional
 //  &M(o, X) --> X {o X} // e.g. &M(("+"|"-"), T) --> T { ("+"|"-") T }
 //  E --> &M(( "<" | "<=" | ">" | ">=" | "==" | "!=" ), R)
-//  R --> &M(( "+" | "-" ) T)
+//  R --> &M(( "+" | "-" ), T)
 //  T --> &M(( "*" | "/" ), F)
-//  F --> ("+"|"-") (v | "(" E ")")
+//  F --> ["+"|"-"] (v | "(" E ")")
 
 class Factor;
+class For;
 class FuncCall;
 class Let;
 
@@ -229,11 +230,13 @@ typedef Precedence<Term> Relop;
 typedef Precedence<Relop> Expression;
 
 class Variable { public: string name; };
-typedef variant<Expression, Let> Statement;
+typedef variant<Expression, Let,For> Statement;
+typedef vector<Statement> Statements;
 class FuncCall { public: string name; vector<Expression> exprs; };
 class Factor { public: char sign = '+' ; variant<value_t, Expression, FuncCall, Variable> factor; };
 class Let { public: string varname; Expression expr; };
-class Program { public: vector<Statement> statements; };
+class For { public: string varname; Expression from, to; Statements statements; };
+class Program { public: Statements statements; };
 
 string curr(tokens& tokes) { return tokes.empty() ? "" : tokes.front().value; }
 token take(tokens& tokes) { token toke = tokes.front(); tokes.pop_front(); return toke; }
@@ -250,6 +253,7 @@ void require(tokens& tokes, string required)
 }
 
 Expression make_expression(tokens& tokes);
+Statement make_statement(tokens& tokes);
 
 template<typename T>
 void make_funcargs(tokens& tokes,T make)
@@ -348,6 +352,7 @@ Term make_term(tokens& tokes) { return parse_multiop<Term,Factor>(tokes, make_fa
 Relop make_relop(tokens& tokes) { return parse_multiop<Relop,Term>(tokes, make_term, {"+", "-"}); }
 Expression make_expression(tokens& tokes) { return parse_multiop<Expression, Relop>(tokes, make_relop, {">", "<"}); }
 
+
 Let make_let(tokens& tokes)
 {
 	require(tokes, "let");
@@ -359,9 +364,28 @@ Let make_let(tokens& tokes)
 	return let;
 }
 
+For make_for(tokens& tokes)
+{
+	require(tokes, "for");
+	For a_for;
+	a_for.varname = take(tokes).value;
+	cout << "make_for()::varname:" << a_for.varname;
+	require(tokes, ":=");
+	cout << "make_for()::=from:" << curr(tokes);
+	a_for.from = make_expression(tokes);
+	require(tokes, "to");
+	a_for.to = make_expression(tokes);
+	while(curr(tokes) != "next")
+		a_for.statements.push_back(make_statement(tokes));
+	require(tokes, "next");
+	return a_for;
+}
+
+
 Statement make_statement(tokens& tokes)
 {
 	static const map<string, std::function<Statement(tokens&)>> commands = {
+		{"for", make_for},
 		{"let", make_let}
 	};
 
@@ -375,6 +399,7 @@ Statement make_statement(tokens& tokes)
 	return stm;
 
 }
+
 
 Program make_program(tokens& tokes)
 {
@@ -502,19 +527,35 @@ bool eval_holder(varmap_t& vars, Statement statement)
 	return false;
 }
 
-value_t eval(varmap_t& vars, Program prog)
+value_t eval(varmap_t& vars, Statements statements)
 {
-	for(auto& s: prog.statements) {
+	for(auto& s: statements) {
 
 		// use short-circuitng to evaluate the potential types of statements
 		bool executed = eval_holder<Expression>(vars, s) 
-			|| eval_holder<Let>(vars, s);
-		//if(std::holds_alternative<Expression>(s))
-		//	eval(vars, std::get<Expression>(s));
-		//else
+			|| eval_holder<Let>(vars, s)
+			|| eval_holder<For>(vars, s);
 		if(!executed)
 			std::logic_error("eval<Program>(): Unhandled statement type");
 	}
+	return 0;
+}
+
+value_t eval(varmap_t& vars, For a_for)
+{
+	double i = num(eval(vars, a_for.from));
+	double to = num(eval(vars, a_for.to));
+	while(i <= to) {
+		vars[a_for.varname] = i;
+		eval(vars, a_for.statements);
+		i++;
+	}
+	return 0;
+}
+
+value_t eval(varmap_t& vars, Program prog)
+{
+	eval(vars, prog.statements);
 	return 0;
 }
 
