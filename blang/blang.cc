@@ -231,7 +231,7 @@ class For;
 class FuncCall;
 class If;
 class Let;
-
+class While;
 
 template<typename T>
 class Precedence {
@@ -243,13 +243,14 @@ typedef Precedence<Term> Relop;
 typedef Precedence<Relop> Expression;
 
 class Variable { public: string name; };
-typedef variant<Expression,If,Let,For> Statement;
+typedef variant<Expression,If,Let,For,While> Statement;
 typedef vector<Statement> Statements;
 class FuncCall { public: string name; vector<Expression> exprs; };
 class Factor { public: char sign = '+' ; variant<value_t, Expression, FuncCall, Variable> factor; };
 class If { public: Expression condition; Statements consequent, alternative; };
 class Let { public: string varname; Expression expr; };
 class For { public: string varname; Expression from, to; Statements statements; };
+class While { public: Expression condition; Statements statements; };
 class Program { public: Statements statements; };
 
 string curr(tokens& tokes) { return tokes.empty() ? "" : tokes.front().value; }
@@ -287,7 +288,7 @@ void make_funcargs(tokens& tokes,T make)
 
 FuncCall make_funccall(string name, tokens& tokes)
 {
-	cout << "make_funccall()\n";
+	//cout << "make_funccall()\n";
 	FuncCall fn;
 	fn.name = name;
 	auto make = [&fn](tokens& tokes) { fn.exprs.push_back(make_expression(tokes)); };
@@ -298,7 +299,7 @@ FuncCall make_funccall(string name, tokens& tokes)
 
 Variable make_variable(string name, tokens& tokes)
 {
-	cout << "make_variable()\n";
+	//cout << "make_variable()\n";
 	Variable var;
 	var.name = name;
 	return var;
@@ -397,7 +398,7 @@ Let make_let(tokens& tokes)
 	require(tokes, "let");
 	Let let;
 	let.varname = take(tokes).value;
-	cout << "make_let():varname:" << let.varname << "\n";
+	//cout << "make_let():varname:" << let.varname << "\n";
 	require(tokes, ":=");
 	let.expr = make_expression(tokes);
 	return let;
@@ -420,13 +421,24 @@ For make_for(tokens& tokes)
 	return a_for;
 }
 
+While make_while(tokens& tokes)
+{
+	require(tokes, "while");
+	While a_while;
+	a_while.condition = make_expression(tokes);
+	while(curr(tokes) != "wend")
+		a_while.statements.push_back(make_statement(tokes));
+	require(tokes, "wend");
+	return a_while;
+}
 
 Statement make_statement(tokens& tokes)
 {
 	static const map<string, std::function<Statement(tokens&)>> commands = {
-		{"if",  make_if},
-		{"for", make_for},
-		{"let", make_let}
+		{"if",    make_if},
+		{"for",   make_for},
+		{"let",   make_let},
+		{"while", make_while}
 	};
 
 	Statement stm;
@@ -576,7 +588,8 @@ value_t eval(varmap_t& vars, Statements statements)
 		bool executed = eval_holder<Expression>(vars, s) 
 			|| eval_holder<If>(vars, s)
 			|| eval_holder<Let>(vars, s)
-			|| eval_holder<For>(vars, s);
+			|| eval_holder<For>(vars, s)
+			|| eval_holder<While>(vars, s);
 		if(!executed)
 			std::logic_error("eval<Program>(): Unhandled statement type");
 	}
@@ -601,6 +614,18 @@ value_t eval(varmap_t& vars, If an_if)
 		eval(vars, an_if.consequent);
 	else
 		eval(vars, an_if.alternative);
+	return 0;
+}
+
+value_t eval(varmap_t& vars, While a_while)
+{
+	//cout << "eval<While>() called\n";
+	while(1) {
+		value_t test = eval(vars, a_while.condition);
+		//cout << "eval<While>():test:" << num(test) << "\n";
+		if(num(test) == 0) break;
+		eval(vars, a_while.statements);
+	}
 	return 0;
 }
 
@@ -629,10 +654,6 @@ value_t eval(varmap_t& vars, Program prog)
 void scanner()
 {
 	varmap_t vars;
-	/*
-	Expression e{make_expression(g_tokens)};
-	cout << to_string(eval(vars, e)) << "\n";
-	*/
 	Program prog{make_program(g_tokens)};
 	eval(vars, prog);
 }
