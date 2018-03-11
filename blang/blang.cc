@@ -229,6 +229,7 @@ void checkfor(const string& expecting)
 class Factor;
 class For;
 class FuncCall;
+class If;
 class Let;
 
 
@@ -242,10 +243,11 @@ typedef Precedence<Term> Relop;
 typedef Precedence<Relop> Expression;
 
 class Variable { public: string name; };
-typedef variant<Expression, Let,For> Statement;
+typedef variant<Expression,If,Let,For> Statement;
 typedef vector<Statement> Statements;
 class FuncCall { public: string name; vector<Expression> exprs; };
 class Factor { public: char sign = '+' ; variant<value_t, Expression, FuncCall, Variable> factor; };
+class If { public: Expression condition; Statements consequent, alternative; };
 class Let { public: string varname; Expression expr; };
 class For { public: string varname; Expression from, to; Statements statements; };
 class Program { public: Statements statements; };
@@ -365,6 +367,31 @@ Expression make_expression(tokens& tokes) { return parse_multiop<Expression, Rel
 		{">", ">=", "<", "<=", "==", "!="}); }
 
 
+If make_if(tokens& tokes)
+{
+	If an_if;
+	require(tokes, "if");
+	an_if.condition = make_expression(tokes);
+	require(tokes, "then");
+
+	int num_elses = 0;
+	while(curr(tokes) != "fi") {
+		if(curr(tokes) == "else") { num_elses++; advance(tokes); }
+		switch(num_elses) {
+			case 0:
+				an_if.consequent.push_back(make_statement(tokes));
+				break;
+			case 1:
+				an_if.alternative.push_back(make_statement(tokes));
+				break;
+			default:
+				throw std::runtime_error("Unexpected else in alternative branch of 'if'");
+		}
+	}
+	require(tokes, "fi");
+	return an_if;
+}
+
 Let make_let(tokens& tokes)
 {
 	require(tokes, "let");
@@ -397,6 +424,7 @@ For make_for(tokens& tokes)
 Statement make_statement(tokens& tokes)
 {
 	static const map<string, std::function<Statement(tokens&)>> commands = {
+		{"if",  make_if},
 		{"for", make_for},
 		{"let", make_let}
 	};
@@ -529,6 +557,7 @@ value_t eval(varmap_t& vars, Let let)
 	return 0;
 }
 
+
 template<typename T>
 bool eval_holder(varmap_t& vars, Statement statement)
 {
@@ -545,6 +574,7 @@ value_t eval(varmap_t& vars, Statements statements)
 
 		// use short-circuitng to evaluate the potential types of statements
 		bool executed = eval_holder<Expression>(vars, s) 
+			|| eval_holder<If>(vars, s)
 			|| eval_holder<Let>(vars, s)
 			|| eval_holder<For>(vars, s);
 		if(!executed)
@@ -562,6 +592,15 @@ value_t eval(varmap_t& vars, For a_for)
 		eval(vars, a_for.statements);
 		i++;
 	}
+	return 0;
+}
+
+value_t eval(varmap_t& vars, If an_if)
+{
+	if(num(eval(vars, an_if.condition)))
+		eval(vars, an_if.consequent);
+	else
+		eval(vars, an_if.alternative);
 	return 0;
 }
 
