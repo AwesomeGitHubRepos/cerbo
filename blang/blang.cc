@@ -212,11 +212,7 @@ void checkfor(const string& expecting)
 
 class Factor;
 class FuncCall;
-//class Statement;
-//class Relop;
-//class Term;
-
-
+class Let;
 
 
 template<typename T>
@@ -229,9 +225,10 @@ typedef Precedence<Term> Relop;
 typedef Precedence<Relop> Expression;
 
 class Variable { public: string name; };
-typedef variant<Expression> Statement ;// TODO more to follow
+typedef variant<Expression, Let> Statement;
 class FuncCall { public: string name; vector<Expression> exprs; };
 class Factor { public: variant<value_t, Expression, FuncCall, Variable> factor; };
+class Let { public: string varname; Expression expr; };
 class Program { public: vector<Statement> statements; };
 
 string curr(tokens& tokes) { return tokes.empty() ? "" : tokes.front().value; }
@@ -341,12 +338,30 @@ Term make_term(tokens& tokes) { return parse_multiop<Term,Factor>(tokes, make_fa
 Relop make_relop(tokens& tokes) { return parse_multiop<Relop,Term>(tokes, make_term, {"+", "-"}); }
 Expression make_expression(tokens& tokes) { return parse_multiop<Expression, Relop>(tokes, make_relop, {">", "<"}); }
 
+Let make_let(tokens& tokes)
+{
+	require(tokes, "let");
+	Let let;
+	let.varname = take(tokes).value;
+	cout << "make_let():varname:" << let.varname << "\n";
+	require(tokes, ":=");
+	let.expr = make_expression(tokes);
+	return let;
+}
 
 Statement make_statement(tokens& tokes)
 {
+	static const map<string, std::function<Statement(tokens&)>> commands = {
+		{"let", make_let}
+	};
+
 	Statement stm;
-	// TODO lots more statements to do here
-	stm = make_expression(tokes);
+	auto it = commands.find(curr(tokes));
+	if(it != commands.end()) {
+		auto make = it->second;
+		stm = make(tokes);
+	} else
+		stm = make_expression(tokes);
 	return stm;
 
 }
@@ -378,6 +393,16 @@ value_t eval(varmap_t& vars, FuncCall fn)
 	return f(vs);
 }
 
+value_t eval(varmap_t vars, Variable var)
+{
+	auto it = vars.find(var.name);
+	if(it != vars.end())
+		return it->second;
+	else
+		return 0;
+
+}
+
 value_t eval(varmap_t& vars, Factor f)
 { 
 	if(std::holds_alternative<value_t>(f.factor))
@@ -386,6 +411,8 @@ value_t eval(varmap_t& vars, Factor f)
 		return eval(vars, std::get<Expression>(f.factor));
 	else if(std::holds_alternative<FuncCall>(f.factor))
 		return eval(vars, std::get<FuncCall>(f.factor));
+	else if(std::holds_alternative<Variable>(f.factor))
+		return eval(vars, std::get<Variable>(f.factor));
 	else
 		throw std::runtime_error("eval<Factor>(): unhandled alternative");
 }
@@ -417,12 +444,33 @@ string to_string(value_t v)
 	}
 }
 
+value_t eval(varmap_t& vars, Let let)
+{
+	vars[let.varname] = eval(vars, let.expr);
+	return 0;
+}
+
+template<typename T>
+bool eval_holder(varmap_t& vars, Statement statement)
+{
+	if(std::holds_alternative<T>(statement)) {
+		eval(vars, std::get<T>(statement));
+		return true;
+	}
+	return false;
+}
+
 value_t eval(varmap_t& vars, Program prog)
 {
 	for(auto& s: prog.statements) {
-		if(std::holds_alternative<Expression>(s))
-			eval(vars, std::get<Expression>(s));
-		else
+
+		// use short-circuitng to evaluate the potential types of statements
+		bool executed = eval_holder<Expression>(vars, s) 
+			|| eval_holder<Let>(vars, s);
+		//if(std::holds_alternative<Expression>(s))
+		//	eval(vars, std::get<Expression>(s));
+		//else
+		if(!executed)
 			std::logic_error("eval<Program>(): Unhandled statement type");
 	}
 	return 0;
