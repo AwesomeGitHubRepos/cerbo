@@ -300,7 +300,7 @@ Factor make_factor(tokens& tokes)
 			f.factor = toke.value;
 			break;
 		case T_ID:
-			cout << "make_factor():tokes[1].value:" << tokes[1].value << "\n";
+			//cout << "make_factor():T_ID:toke.value:" << toke.value << "\n";
 			if(curr(tokes) ==  "(")
 				f.factor = make_funccall(toke.value, tokes);
 			else
@@ -393,12 +393,13 @@ value_t eval(varmap_t& vars, FuncCall fn)
 	return f(vs);
 }
 
-value_t eval(varmap_t vars, Variable var)
+value_t eval(varmap_t& vars, Variable var)
 {
-	auto it = vars.find(var.name);
-	if(it != vars.end())
+	auto it = vars.find(var.name);	
+	if(it != vars.end()) {
+		//cout << "eval<Variable>():Found:" + var.name +",value:" + to_string(it->second) << "\n";
 		return it->second;
-	else
+	} else
 		return 0;
 
 }
