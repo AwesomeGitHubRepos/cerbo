@@ -77,6 +77,12 @@ std::tuple<double, double> two_nums(values vs)
 //value_t num_op(T op, values vs) { auto [v1, v2] = two_nums(vs) ; return op(v1, v2); }
 
 value_t blang_add(values vs) { auto [v1, v2] = two_nums(vs); return v1 + v2; }
+value_t blang_eq(values vs) { auto [v1, v2] = two_nums(vs); return v1 == v2; }
+value_t blang_ge(values vs) { auto [v1, v2] = two_nums(vs); return v1 >= v2; }
+value_t blang_gt(values vs) { auto [v1, v2] = two_nums(vs); return v1 > v2; }
+value_t blang_le(values vs) { auto [v1, v2] = two_nums(vs); return v1 <= v2; }
+value_t blang_lt(values vs) { auto [v1, v2] = two_nums(vs); return v1 < v2; }
+value_t blang_ne(values vs) { auto [v1, v2] = two_nums(vs); return v1 != v2; }
 value_t blang_sub(values vs) { auto [v1, v2] = two_nums(vs); return v1 - v2; }
 value_t blang_mul(values vs) { auto [v1, v2] = two_nums(vs); return v1 * v2; }
 value_t blang_div(values vs) { auto [v1, v2] = two_nums(vs); return v1 / v2; }
@@ -93,6 +99,12 @@ value_t blang_print(values vs)
 }
 
 blang_funcs_t blang_funcs = {
+	{"<", blang_lt},
+	{"<=", blang_le},
+	{">", blang_gt},
+	{">=", blang_ge},
+	{"==", blang_eq},
+	{"!=", blang_ne},
 	{"+", blang_add},
 	{"/", blang_div},
 	{"*", blang_mul},
@@ -136,7 +148,7 @@ tokens tokenise(const string& str)
 		{"\\+|\\-"      		, T_PM},
 		{"\\*|/"        		, T_MD},
 		{"'.*\\n"       		, T_REM},
-		{"<=|<|>=|>|==|!="		, T_REL},
+		{"<=?|>=?|==|!="		, T_REL},
 		{"\"(?:[^\"\\\\]|\\\\.)*\""	, T_STR},
 		{"\\S+"	        		, T_BAD}
 	};
@@ -331,7 +343,6 @@ Factor make_factor(tokens& tokes)
 
 template <typename T, typename U>
 T parse_multiop(tokens& tokes, std::function<U(tokens&)> make, strings ops)
-//T parse_multiop(tokens& tokes, std::function<U(tokens&)> make)
 {
 	//strings ops{{"+", "-"}};
 	T node;
@@ -350,7 +361,8 @@ T parse_multiop(tokens& tokes, std::function<U(tokens&)> make, strings ops)
 }
 Term make_term(tokens& tokes) { return parse_multiop<Term,Factor>(tokes, make_factor, {"*", "/"}); }
 Relop make_relop(tokens& tokes) { return parse_multiop<Relop,Term>(tokes, make_term, {"+", "-"}); }
-Expression make_expression(tokens& tokes) { return parse_multiop<Expression, Relop>(tokes, make_relop, {">", "<"}); }
+Expression make_expression(tokens& tokes) { return parse_multiop<Expression, Relop>(tokes, make_relop, 
+		{">", ">=", "<", "<=", "==", "!="}); }
 
 
 Let make_let(tokens& tokes)
