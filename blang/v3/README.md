@@ -109,7 +109,7 @@ That would shrink the code base, and make things a little more readable, assumin
 
 ## References
 
-* [HelenOS][http://www.helenos.org/)
+* [HelenOS](http://www.helenos.org/)
 * [Irie Pascal grammar](http://www.irietools.com/iriepascal/progref534.html)
 * [LLVM: Implementing a Language](https://www.gitbook.com/book/landersbenjamin/llvm-implementing-a-language/details)
 * [Mathematicsl Expression Parser Using Recursive Descent Parsing](https://www.codeproject.com/Articles/318667/Mathematical-Expression-Parser-Using-Recursive-Des)
