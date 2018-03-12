@@ -489,11 +489,9 @@ value_t wrap_def(Def def, values vs)
 	for(int i=0; i<vs.size(); ++i)
 		vars[def.args[i]] = vs[i];
 
-	value_t v = 0;
-	eval(vars, def.statements);
-	//for(const auto& stmt: def.statements)
-	//	v = eval(vars, stmt);
-	return v;
+	//value_t v = 0;
+	return eval(vars, def.statements);
+	//return v;
 }
 
 Def make_def(tokens& tokes)
@@ -599,7 +597,6 @@ bool eval_factor(varmap_t& vars, Factor f, value_t& v)
 
 value_t eval(varmap_t& vars, Factor f)
 { 
-	//bool hit;
        	value_t v;
 	bool hit = eval_factor<value_t>(vars, f, v) 
 		|| eval_factor<Expression>(vars, f, v)
@@ -608,19 +605,6 @@ value_t eval(varmap_t& vars, Factor f)
 	if(!hit)
 		throw std::runtime_error("eval<Factor>(): unhandled alternative");
 	return v;
-
-	/*
-	if(std::holds_alternative<value_t>(f.factor))
-		return std::get<value_t>(f.factor); 
-	else if(std::holds_alternative<Expression>(f.factor))
-		return eval(vars, std::get<Expression>(f.factor));
-	else if(std::holds_alternative<FuncCall>(f.factor))
-		return eval(vars, std::get<FuncCall>(f.factor));
-	else if(std::holds_alternative<Variable>(f.factor))
-		return eval(vars, std::get<Variable>(f.factor));
-	else
-		throw std::runtime_error("eval<Factor>(): unhandled alternative");
-		*/
 }
 
 template<class T>
@@ -663,10 +647,11 @@ value_t eval(varmap_t& vars, Def def)
 	return 0;
 }
 template<typename T>
-bool eval_holder(varmap_t& vars, Statement statement)
+bool eval_holder(varmap_t& vars, Statement statement, value_t& v)
 {
 	if(std::holds_alternative<T>(statement)) {
-		eval(vars, std::get<T>(statement));
+		v = eval(vars, std::get<T>(statement));
+		//cout << "eval_holder():" << to_string(v) << "\n";
 		return true;
 	}
 	return false;
@@ -674,19 +659,19 @@ bool eval_holder(varmap_t& vars, Statement statement)
 
 value_t eval(varmap_t& vars, Statements statements)
 {
+	value_t ret;
 	for(auto& s: statements) {
-
 		// use short-circuitng to evaluate the potential types of statements
-		bool executed = eval_holder<Expression>(vars, s) 
-			|| eval_holder<Def>(vars, s)
-			|| eval_holder<If>(vars, s)
-			|| eval_holder<Let>(vars, s)
-			|| eval_holder<For>(vars, s)
-			|| eval_holder<While>(vars, s);
+		bool executed = eval_holder<Expression>(vars, s, ret) 
+			|| eval_holder<Def>(vars, s, ret)
+			|| eval_holder<If>(vars, s, ret)
+			|| eval_holder<Let>(vars, s, ret)
+			|| eval_holder<For>(vars, s, ret)
+			|| eval_holder<While>(vars, s, ret);
 		if(!executed)
 			std::logic_error("eval<Program>(): Unhandled statement type");
 	}
-	return 0;
+	return ret;
 }
 
 value_t eval(varmap_t& vars, For a_for)
