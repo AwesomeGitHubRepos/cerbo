@@ -71,7 +71,9 @@ enum blang_t : char {
 	T_LRB = '(', // left round bracket
 	T_RRB = ')', // right round bracket
 	T_REL = '<', // relational operator
-	T_NUM = '9', T_ID = 'I', T_ASS = '=', 
+	T_NUM = '9', 
+	T_ID = 'I', 
+	T_ASS = '=', 
 	T_MD = '*',  // multiplication or divide
 	T_PM = '+',  // plus or minus
 	T_STR  = '$' // string
@@ -253,6 +255,7 @@ void checkfor(const string& expecting)
 //  T --> &M(( "*" | "/" ), F)
 //  F --> ["+"|"-"] (v | "(" E ")")
 
+class Def;
 class Factor;
 class For;
 class FuncCall;
@@ -270,7 +273,7 @@ typedef Precedence<Term> Relop;
 typedef Precedence<Relop> Expression;
 
 class Variable { public: string name; };
-typedef variant<Expression,If,Let,For,While> Statement;
+typedef variant<Expression,Def,If,Let,For,While> Statement;
 typedef vector<Statement> Statements;
 class FuncCall { public: string name; vector<Expression> exprs; };
 class Factor { public: char sign = '+' ; variant<value_t, Expression, FuncCall, Variable> factor; };
@@ -278,6 +281,7 @@ class If { public: Expression condition; Statements consequent, alternative; };
 class Let { public: string varname; Expression expr; };
 class For { public: string varname; Expression from, to; Statements statements; };
 class While { public: Expression condition; Statements statements; };
+class Def { public: string name; strings args; Statements statements; } ;
 class Program { public: Statements statements; };
 
 string curr(tokens& tokes) { return tokes.empty() ? "" : tokes.front().value; }
@@ -296,6 +300,10 @@ void require(tokens& tokes, string required)
 
 Expression make_expression(tokens& tokes);
 Statement make_statement(tokens& tokes);
+value_t eval(varmap_t& vars, Expression e);
+value_t eval(varmap_t& vars, Statement statement);
+value_t eval(varmap_t& vars, Statements statements);
+value_t eval(varmap_t& vars, value_t v);
 
 template<typename T>
 void make_funcargs(tokens& tokes,T make)
@@ -431,6 +439,14 @@ Let make_let(tokens& tokes)
 	return let;
 }
 
+Statements collect_statements(tokens& tokes, const string& terminator)
+{
+	Statements stmts;
+	while(curr(tokes) != terminator)
+		stmts.push_back(make_statement(tokes));
+	return stmts;
+}
+
 For make_for(tokens& tokes)
 {
 	require(tokes, "for");
@@ -442,8 +458,7 @@ For make_for(tokens& tokes)
 	a_for.from = make_expression(tokes);
 	require(tokes, "to");
 	a_for.to = make_expression(tokes);
-	while(curr(tokes) != "next")
-		a_for.statements.push_back(make_statement(tokes));
+	a_for.statements = collect_statements(tokes, "next");
 	require(tokes, "next");
 	return a_for;
 }
@@ -453,15 +468,58 @@ While make_while(tokens& tokes)
 	require(tokes, "while");
 	While a_while;
 	a_while.condition = make_expression(tokes);
-	while(curr(tokes) != "wend")
-		a_while.statements.push_back(make_statement(tokes));
+	a_while.statements = collect_statements(tokes, "wend");
+	//while(curr(tokes) != "wend")
+	//	a_while.statements.push_back(make_statement(tokes));
 	require(tokes, "wend");
 	return a_while;
+}
+
+// turn a user-define function into a blang_func
+value_t wrap_def(Def def, values vs)
+{
+	// bind argument identifiers to values
+	if(vs.size() != def.args.size()) {
+		auto str = [](int i) { return std::to_string(i);};
+		throw std::runtime_error("#FUNC_ARGS:" + def.name 
+				+ "():Expected " + str(def.args.size())
+				+ " args, got " + str(vs.size()));
+	}
+	varmap_t vars;
+	for(int i=0; i<vs.size(); ++i)
+		vars[def.args[i]] = vs[i];
+
+	value_t v = 0;
+	eval(vars, def.statements);
+	//for(const auto& stmt: def.statements)
+	//	v = eval(vars, stmt);
+	return v;
+}
+
+Def make_def(tokens& tokes)
+{
+	require(tokes, "def");
+	Def def;
+	def.name = take(tokes).value;
+	auto make = [&def](tokens& tokes) { 
+		auto toke = take(tokes);
+		if(toke.type != T_ID)
+			throw std::runtime_error("#PARSE: def of " + def.name 
+					+ "has non-var arg " + toke.value);
+		def.args.push_back(toke.value); 
+	};
+	make_funcargs(tokes, make);
+	def.statements = collect_statements(tokes, "fed");
+
+	using namespace std::placeholders;
+	blang_funcs[def.name] = std::bind(wrap_def, def, _1);
+	return def;
 }
 
 Statement make_statement(tokens& tokes)
 {
 	static const map<string, std::function<Statement(tokens&)>> commands = {
+		{"def",   make_def},
 		{"if",    make_if},
 		{"for",   make_for},
 		{"let",   make_let},
@@ -473,7 +531,10 @@ Statement make_statement(tokens& tokes)
 	if(it != commands.end()) {
 		auto make = it->second;
 		stm = make(tokes);
-	} else
+	}
+	//} else if(curr(tokes) == "def")
+	//	make_def(tokes);
+	else
 		stm = make_expression(tokes);
 	return stm;
 
@@ -492,7 +553,6 @@ Program make_program(tokens& tokes)
 // eval
 
 
-value_t eval(varmap_t& vars, Expression e);
 
 value_t eval(varmap_t& vars, FuncCall fn)
 {
@@ -596,7 +656,12 @@ value_t eval(varmap_t& vars, Let let)
 	return 0;
 }
 
-
+value_t eval(varmap_t& vars, Def def)
+{
+	// The function was actually created by make_def()
+	// and put in blang_funcs, so there is nothing to do here
+	return 0;
+}
 template<typename T>
 bool eval_holder(varmap_t& vars, Statement statement)
 {
@@ -613,6 +678,7 @@ value_t eval(varmap_t& vars, Statements statements)
 
 		// use short-circuitng to evaluate the potential types of statements
 		bool executed = eval_holder<Expression>(vars, s) 
+			|| eval_holder<Def>(vars, s)
 			|| eval_holder<If>(vars, s)
 			|| eval_holder<Let>(vars, s)
 			|| eval_holder<For>(vars, s)
@@ -655,6 +721,7 @@ value_t eval(varmap_t& vars, While a_while)
 	}
 	return 0;
 }
+
 
 value_t eval(varmap_t& vars, Program prog)
 {
