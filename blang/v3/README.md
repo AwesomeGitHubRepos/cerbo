@@ -113,7 +113,7 @@ That would shrink the code base, and make things a little more readable, assumin
 * [Irie Pascal grammar](http://www.irietools.com/iriepascal/progref534.html)
 * [LLVM: Implementing a Language](https://www.gitbook.com/book/landersbenjamin/llvm-implementing-a-language/details)
 * [Mathematicsl Expression Parser Using Recursive Descent Parsing](https://www.codeproject.com/Articles/318667/Mathematical-Expression-Parser-Using-Recursive-Des)
-* [(Parsing Expressions by Recursive Descent](https://www.engr.mun.ca/~theo/Misc/exp_parsing.htm#classic)
+* [Parsing Expressions by Recursive Descent](https://www.engr.mun.ca/~theo/Misc/exp_parsing.htm#classic)
 * [Prolog.c: a simple Prolog interpreter written in 200 LOC of C++](https://news.ycombinator.com/item?id=12193694)
 * [Simple precedence grammar](https://en.wikipedia.org/wiki/Simple_precedence_grammar)
 * [Why Create a New Unix Shell?](http://www.oilshell.org/blog/2018/01/28.html)
