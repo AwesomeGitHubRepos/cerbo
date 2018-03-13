@@ -6,7 +6,7 @@ blang is a toy BASIC interpreter written in C++17. Architectural notes are in th
 
 ## Synopsis
 
-**`blang [-f file]`***
+**`blang [-f file]`**
 
 `blang` reads a BASIC program from `stdin`, and executes it. Use the `-f` option to read the program from a file instead.
 
