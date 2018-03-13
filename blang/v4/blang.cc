@@ -26,6 +26,7 @@
  */
 
 #include <cassert>
+#include <cstdio>
 //#include <deque>
 #include <exception>
 #include <fstream>
@@ -96,6 +97,7 @@ typedef std::function<value_t(values)> blang_func;
 typedef map<string, blang_func> blang_funcs_t;
 
 double num(value_t v) { return std::get<double>(v); }
+string str(value_t v) { return std::get<string>(v); }
 
 std::tuple<double, double> two_nums(values vs) 
 { 
@@ -107,7 +109,26 @@ std::tuple<double, double> two_nums(values vs)
 //template<typename T>
 //value_t num_op(T op, values vs) { auto [v1, v2] = two_nums(vs) ; return op(v1, v2); }
 
-value_t blang_add(values vs) { auto [v1, v2] = two_nums(vs); return v1 + v2; }
+void need(values vs, int n, string func_name)
+{
+	if(vs.size() != n)
+		throw std::runtime_error("#FUNC_ARGS:" + func_name 
+				+ ": requires " + std::to_string(n)  
+				+ " args, got " + std::to_string(vs.size()));
+}
+
+bool is_str(value_t v) { return std::holds_alternative<string>(v); }
+bool is_num(value_t v) { return std::holds_alternative<double>(v); }
+
+value_t blang_add(values vs)
+{ 
+	need(vs, 2, "+");
+	value_t v1 = vs[0], v2 = vs[1];
+	if(is_str(v1) && is_str(v2))
+		return str(v1) + str(v2);
+	else
+		return num(v1) + num(v2);
+}
 value_t blang_eq(values vs) { auto [v1, v2] = two_nums(vs); return v1 == v2; }
 value_t blang_ge(values vs) { auto [v1, v2] = two_nums(vs); return v1 >= v2; }
 value_t blang_gt(values vs) { auto [v1, v2] = two_nums(vs); return v1 > v2; }
@@ -118,6 +139,106 @@ value_t blang_sub(values vs) { auto [v1, v2] = two_nums(vs); return v1 - v2; }
 value_t blang_mul(values vs) { auto [v1, v2] = two_nums(vs); return v1 * v2; }
 value_t blang_div(values vs) { auto [v1, v2] = two_nums(vs); return v1 / v2; }
 //value_t blang_add(values vs) { return num_op(std::plus<double,double>, vs); }
+
+
+// http://www.cplusplus.com/articles/2wA0RXSz/
+const vector<string> explode(const string& s, const char& c)
+{
+	string buff{""};
+	vector<string> v;
+
+	for(auto n:s)
+	{
+		if(n != c) buff+=n; else
+			if(n == c && buff != "") { v.push_back(buff); buff = ""; }
+	}
+	if(buff != "") v.push_back(buff);
+
+	return v;
+}
+
+
+value_t blang_cut(values vs)
+{
+	need(vs, 2, "cut");
+	string astr = str(vs[0]);
+	strings fields{explode(astr, '\t')};
+	int fieldnum = num(vs[1]);
+	if(fields.size() < fieldnum) 
+		return "";
+	else
+		return fields[fieldnum-1];
+
+	/*
+	size_t p0;
+	int nfound = 0;
+	for(p0 = 0 ; p0< len; ++p0) {
+		if(str[p0] == "\t") nfound++;
+
+	       	&& nfound == targ_field
+
+	cout << "blang_cut():1\n";
+	static std::regex rgx("\t");
+	cout << "blang_cut():2\n";
+	auto iter = std::sregex_token_iterator(str(vs[0]).begin(), str(vs[0]).end(), rgx, -1);
+	cout << "blang_cut():3\n";
+	auto end = std::sregex_token_iterator();
+	cout << "blang_cut():4\n";
+
+	int i = 0;
+	for(; iter != end; ++iter) {
+	cout << "blang_cut():5\n";
+
+		if(++i == num(vs[1])) {
+			cout << "blang_cut():found at " << i << "\n";
+			string s = *iter;
+		       	return s;
+		}
+	}
+
+	cout << "blang_cut():6\n";
+	return "";
+	*/
+}
+
+value_t blang_fmtnum(values vs)
+{
+	need(vs, 2, "FmtNum");
+	//cout << "blang_fmtnum:1\n";
+	double d = num(vs[0]);
+	//cout << "blang_fmtnum:2:" << d << "\n";
+	string fmt1{str(vs[1])};
+	char fmt2[fmt1.size()+1];
+	for(int i=0 ; i<fmt1.size(); ++i) fmt2[i] = fmt1[i];
+	fmt2[fmt1.size()] = 0;
+	//cout <<"fmt1:" << d << ":" << fmt2 << ".\n";
+
+
+	//cout << "blang_fmtnum:3\n";
+	int sz = std::snprintf(nullptr, 0, fmt2, d);
+	//cout << "blang_fmtnum:4:" << sz << "\n";
+	std::vector<char> buf(sz+1);
+	//cout << "blang_fmtnum:5\n";
+	std::snprintf(&buf[0], buf.size(), fmt2, d);
+	//cout << "blang_fmtnum:6\n";
+	string res(buf.begin(), buf.end());
+	//cout << "blang_fmtnum:7:" << res << "\n";
+	return res;
+
+	/*
+	int width = num(vs[1]);
+	int prec = num(vs[2]);
+	//int hdr = str(vs[3]);
+
+	std::ostringstream s;
+	s.precision(prec);
+	s.width(width);
+	s << d;
+	string s1{s.str()};
+	return s1;
+	*/
+
+}
 
 value_t blang_print(values vs)
 {
@@ -136,11 +257,27 @@ value_t blang_lines(values vs)
 
 }
 
+value_t blang_lmatch(values vs)
+{
+	if(vs.size() !=2) return 0;
+	string s1 = str(vs[0]);
+	string s2 = str(vs[1]);
+	if(s1.size() > s2.size()) return 0;
+	for(int i =0 ; i<s1.size(); ++i)
+		if( s1[i] != s2[i]) return 0;
+	return 1;
+}
+
 value_t blang_readln(values vs)
 {
 	string line;
 	getline(cin, line);
 	return line;
+}
+
+value_t blang_tab(values vs)
+{
+	return "\t";
 }
 
 blang_funcs_t blang_funcs = {
@@ -155,9 +292,13 @@ blang_funcs_t blang_funcs = {
 	{"*", blang_mul},
 	{"-", blang_sub},
 
+	{"cut", blang_cut},
+	{"FmtNum", blang_fmtnum},
 	{"lines", blang_lines},
+	{"lmatch", blang_lmatch},
 	{"print", blang_print},
-	{"readln", blang_readln}
+	{"readln", blang_readln},
+	{"TAB",	blang_tab}
 };
 
 
@@ -187,7 +328,7 @@ tokens tokenise(const string& str)
 	std::vector<std::pair<string, blang_t>> v
 	{
 		{"[0-9]+" 			, T_NUM},
-		{"[a-z]+"			, T_ID},
+		{"[a-zA-Z]+"			, T_ID},
 		{":="				, T_ASS},
 		{"\\("				, T_LRB},
 		{"\\)"				, T_RRB},
