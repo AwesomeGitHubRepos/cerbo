@@ -603,6 +603,7 @@ Statements collect_statements(tokens& tokes, const string& terminator)
 	Statements stmts;
 	while(curr(tokes) != terminator)
 		stmts.push_back(make_statement(tokes));
+	require(tokes, terminator);
 	return stmts;
 }
 
@@ -618,7 +619,7 @@ For make_for(tokens& tokes)
 	require(tokes, "to");
 	a_for.to = make_expression(tokes);
 	a_for.statements = collect_statements(tokes, "next");
-	require(tokes, "next");
+	//require(tokes, "next");
 	return a_for;
 }
 
@@ -628,9 +629,6 @@ While make_while(tokens& tokes)
 	While a_while;
 	a_while.condition = make_expression(tokes);
 	a_while.statements = collect_statements(tokes, "wend");
-	//while(curr(tokes) != "wend")
-	//	a_while.statements.push_back(make_statement(tokes));
-	require(tokes, "wend");
 	return a_while;
 }
 
