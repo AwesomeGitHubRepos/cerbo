@@ -1,9 +1,9 @@
-EXE = calc
+EXE = bnf
 
 .PHONY : clean
 	
-$(EXE) : calc.cc bnf.cc
+$(EXE) : bnf.cc
 	g++ --std=c++17 $^ -o $@
 
 clean :
-	rm $(EXE)
+	rm -f $(EXE)
