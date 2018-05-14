@@ -14,7 +14,8 @@ int main()
 	//yylex();
 	//FlexLexer* lexer = new yyFlexLexer;
 	yyFlexLexer lexer; // = new yyFlexLexer;
-	cout << lexer.yylex() << "\n";
-	cout << lexer.yylex() << "\n";
+
+	while(lexer.yylex())
+		cout << "Token:`" << lexer.YYText() << "'\n";
 	return 0;
 }
