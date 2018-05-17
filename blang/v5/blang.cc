@@ -22,6 +22,26 @@ int make_num(int pos)
 	return parsevec.size() -1;
 }
 
+std::string string_at(int pos)
+{
+	return std::any_cast<std::string>(parsevec[pos]);
+}
+
+int make_funcall(int funid, int argid)
+{
+	fn_t fn = [=] () {
+		// TODO some of this could be defined outside of here, maybe; and speed it up
+		std::string fn_name = string_at(funid); // e.g. name returned might be pi, or sqrt
+		cout << "make_funcall:fn_name:" << fn_name << endl;
+		fn1_t f = funcmap[fn_name];
+		values vs; // TODO needs to be created from argid
+		return f(vs);
+	};
+	parsevec.push_back(fn);
+	return parsevec.size() -1;
+}
+
+
 int make_concat(int str1, int str2)
 {
 	//using fn_t = std::function<std::string()>;
@@ -47,6 +67,11 @@ int yylex()
 	return lexer.yylex();
 }
 
+
+value_t do_pi(values vs)
+{
+	return 3.14159265359;
+}
 
 int main()
 {

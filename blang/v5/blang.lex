@@ -23,7 +23,10 @@ int line_number = 0;
 
 [\t\r ]* // discard whitespace
 \n	line_number++;
-\+	return(PLUS);
+\+	return '+';
+,	return ',';
+\(	return '(';
+\)	return ')';
 [0-9]+		{ 
 	yylval = parsevec.size();
 	parsevec.push_back(std::stod(yytext)); 

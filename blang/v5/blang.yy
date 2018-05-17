@@ -19,7 +19,7 @@ void yyerror(const char* s);
 
 
 
-%token IDENT NUM PLUS STRING
+%token IDENT NUM STRING
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -27,10 +27,27 @@ void yyerror(const char* s);
 
 prog:
 	concat
+	| funcall
 	| NUM { $$ = make_num($1); };
 	;
 
-concat: IDENT PLUS IDENT{ $$ = make_concat($1, $3); };
+
+concat: IDENT '+' IDENT{ $$ = make_concat($1, $3); };
+
+funcall:
+	IDENT args { cout << "making funcall\n"; $$ = make_funcall($1, $2) ; } 
+	;
+
+args: 
+	'(' ')'  
+	| '(' arglist ')'
+    	;
+     
+arglist:
+      	NUM
+	|  arglist ',' NUM
+	;
+
 
 ///////////////////////////////////////////////////////////////////////
 %%
