@@ -1,2 +1,13 @@
 blang5
 lex.yy.cc
+blang.tab.cc
+blang.tab.hh
+location.hh
+position.hh
+stack.hh
+Scanner.ih
+Scannerbase.h
+lex.cc
+Parser.ih
+Parserbase.h
+parse.cc
