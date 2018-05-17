@@ -24,9 +24,14 @@ int line_number = 0;
 [\t\r ]* // discard whitespace
 \n	line_number++;
 \+	return(PLUS);
+[0-9]+		{ 
+	yylval = parsevec.size();
+	parsevec.push_back(std::stod(yytext)); 
+	return NUM;
+}
 [a-zA-Z]+ { 
 	//yylval.STRING = "foos"s; 
-	yylval = strvec.size();
-	strvec.push_back(yytext); return(IDENT); }
+	yylval = parsevec.size();
+	parsevec.push_back(std::string(yytext)); return(IDENT); }
 
 %%

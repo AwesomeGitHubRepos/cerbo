@@ -17,49 +17,20 @@ extern FILE* yyin;
 void yyerror(const char* s);
 %}
 
-//%skeleton "lalr1.cc"
 
 
-/*
-%union {
-	double uval;
-	//std::shared_ptr<std::string> ustring;
-	std::string* ustring;
-}
-*/
-
-
-//%language "c++";
-//%define api.value.type variant;
-//%define api.value.type union;
-//%token<dval> T_DBL;
-//%token<std::string> IDENT;
-//%type<std::string> foo
-
-//%token<std::string> IDENT "identifier";
-//%token<std::string> STRING "string";
-//%token<int> STRING
-
-%token IDENT PLUS STRING
+%token IDENT NUM PLUS STRING
 
 
 ///////////////////////////////////////////////////////////////////////
 %%
 
-foo: 
-   IDENT PLUS IDENT{ 
-   
-cout << "Computer says: IDENT:" 
-<< strvec.back()
-<< "\n" ; 
+prog:
+	concat
+	| NUM { $$ = make_num($1); };
+	;
 
-	std::string catted =  strvec[$1] + strvec[$3];
-	cout << "concat: " << catted << "\n";
-	//$$ = std::string("string:666");
-	//$$ = std::string("string:666");
-
-}
-;
+concat: IDENT PLUS IDENT{ $$ = make_concat($1, $3); };
 
 ///////////////////////////////////////////////////////////////////////
 %%

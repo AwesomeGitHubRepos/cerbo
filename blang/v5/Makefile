@@ -25,4 +25,4 @@ blang.tab.cc : blang.yy lex.yy.cc
 
 #blang5 : blang.cc lex.cc parse.cc
 blang5 : blang.cc lex.yy.cc blang.tab.cc
-	g++ -Wno-register --std=c++17 $(ASAN) $^ -o $@
+	g++ -O0 -ggdb -Wno-register --std=c++17 $(ASAN) $^ -o $@
