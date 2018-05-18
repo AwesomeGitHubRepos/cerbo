@@ -26,8 +26,10 @@ void yyerror(const char* s);
 
 prog: proga { top_prog_node = $1; }
 
+
 proga:
-	NUM { $$ = $1 ; }
+     	IDENT '(' ')' { $$ = make_funcall($1, 666); }
+	| NUM { $$ = $1 ; }
 	;
 
 

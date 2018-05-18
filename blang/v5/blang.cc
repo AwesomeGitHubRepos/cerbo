@@ -26,19 +26,34 @@ int yylex()
 	return lexer.yylex();
 }
 
+pnode_t make_funcall(pnode_t& identifier, int TODO)
+{
+	/*
+	pnode_t fn = [=]() {
+		func_t func = funcmap[enstr(identifier)];
+		pnode_t p = func;
+		return p;
+	};
+	*/
+	return funcmap[enstr(identifier)];
+}
+
 pnode_t eval(pnode_t& pnode)
 {
-	pnode_t result;
+	//pnode_t result;
 	if(std::holds_alternative<prim_t>(pnode)) {
 		prim_t prim = std::get<prim_t>(pnode);
 		if(std::holds_alternative<double>(prim))
 			return std::get<double>(prim);
 		else
 			return std::get<std::string>(prim);
+	} else if(std::holds_alternative<func_t>(pnode)) {
+		auto fn = std::get<func_t>(pnode);
+		return fn();
 	}
 
 	assert(false);
-	return result;
+	//return result;
 }
 
 int main()

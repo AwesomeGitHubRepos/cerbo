@@ -1,28 +1,30 @@
 ASAN = -fsanitize=address
 
+CXXFLAGS = -O0 -ggdb --std=c++17
+OBJS = blang.o funcs.o blang.tab.o lex.yy.o
+
 all: blang5
 
 clean:
-	rm -f blang5 lex.yy.cc 	blang.tab.cc 	blang.tab.hh 	location.hh \
-	position.hh 	stack.hh \
-	Scanner.ih Scannerbase.h lex.cc parse.cc \
-	lex.yy.c lex.yy.h
+	rm -f blang5 lex.yy.cc 	blang.tab.cc 	blang.tab.hh \
+	lex.yy.c lex.yy.h \
+	*.o
 
+%.o : %.cc
+	g++ $(CXXFLAGS)  -c $<
 
-
-
-lex.yy.cc : blang.lex
-	flex -+  $^
-
-#lex.cc : lexer
-#	flexc++ lexer
-
-blang.tab.cc : blang.yy lex.yy.cc
+blang.tab.o : blang.yy
 	bison -d blang.yy
+	g++ $(CXXFLAGS) -c blang.tab.cc
 
-#parse.cc: grammar
-#	bisonc++ grammar
+lex.yy.o : blang.lex
+	flex -+  blang.lex
+	g++ $(CXXFLAGS) -Wno-register -c lex.yy.cc
 
-#blang5 : blang.cc lex.cc parse.cc
-blang5 : blang.cc lex.yy.cc blang.tab.cc
-	g++ -O0 -ggdb -Wno-register --std=c++17 $(ASAN) $^ -o $@
+
+
+
+
+
+blang5 : $(OBJS)
+	g++  $(ASAN) $^ -o $@
