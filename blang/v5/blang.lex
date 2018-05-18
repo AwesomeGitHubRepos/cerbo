@@ -27,7 +27,8 @@ int line_number = 0;
 ,	return ',';
 \(	return '(';
 \)	return ')';
-[0-9]+		{  yylval = std::stod(yytext); 	return NUM;}
-[a-zA-Z]+ 	{ yylval = std::string(yytext); return IDENT ; }
+\"[^"]*\"	{ yylval = std::string(yytext); return STRING; }
+[0-9]+		{ yylval = std::stod(yytext); 	return NUM;}
+[a-zA-Z]+ 	{ yylval = std::string(yytext); return IDENT; }
 
 %%

@@ -5,21 +5,33 @@
 
 using std::cout;
 
-std::string enstr(const pnode_t& pnode)
+std::string enstr(const prim_t& prim)
 {
-
-	if(std::holds_alternative<func_t>(pnode)) 
-		return "func()";
-
-	assert(std::holds_alternative<prim_t>(pnode));
-
-	prim_t prim = std::get<prim_t>(pnode);
 	if(std::holds_alternative<double>(prim))
 		return std::to_string(std::get<double>(prim));
 
 	return std::get<std::string>(prim);
 }
 
-int do_hello() { cout << "hello world\n" ; }
+std::string enstr(const pnode_t& pnode)
+{
 
-std::map<std::string, func_t> funcmap = { {"hello", do_hello}};
+	if(std::holds_alternative<funcall_c>(pnode)) 
+		return "func()";
+
+	assert(std::holds_alternative<prim_t>(pnode));
+	return enstr(std::get<prim_t>(pnode));
+}
+
+int do_print(prims_t ps)
+{
+	assert(ps.size()>0);
+	cout << enstr(ps[0]) << "\n";
+}
+
+int do_hello(prims_t ps) { cout << "hello world\n" ; return 0; }
+
+std::map<std::string, func_t> funcmap = { 
+	{"hello", do_hello},
+	{"print", do_print}
+};

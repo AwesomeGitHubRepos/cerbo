@@ -35,10 +35,13 @@ pnode_t make_funcall(pnode_t& identifier, int TODO)
 		return p;
 	};
 	*/
-	return funcmap[enstr(identifier)];
+	funcall_c fc;
+	fc.function_name = enstr(identifier);
+	//return funcmap[enstr(identifier)];
+	return fc;
 }
 
-pnode_t eval(pnode_t& pnode)
+prim_t eval(pnode_t& pnode)
 {
 	//pnode_t result;
 	if(std::holds_alternative<prim_t>(pnode)) {
@@ -47,9 +50,14 @@ pnode_t eval(pnode_t& pnode)
 			return std::get<double>(prim);
 		else
 			return std::get<std::string>(prim);
-	} else if(std::holds_alternative<func_t>(pnode)) {
-		auto fn = std::get<func_t>(pnode);
-		return fn();
+	} else if(std::holds_alternative<funcall_c>(pnode)) {
+		funcall_c& fc = std::get<funcall_c>(pnode);
+		func_t& fn = funcmap[fc.function_name];
+		prims_t vals;
+		std::transform(fc.pnodes.begin(), fc.pnodes.end(),
+				std::back_inserter(vals),				
+				eval); 
+		return fn(vals);
 	}
 
 	assert(false);

@@ -13,14 +13,14 @@ clean:
 	lex.yy.c lex.yy.h \
 	*.o
 
-%.o : %.cc
+%.o : %.cc blang.h
 	g++ $(CXXFLAGS)  -c $<
 
-blang.tab.o : blang.yy
+blang.tab.o : blang.yy blang.h
 	bison -d blang.yy
 	g++ $(CXXFLAGS) -c blang.tab.cc
 
-lex.yy.o : blang.lex
+lex.yy.o : blang.lex blang.h
 	flex -+  blang.lex
 	g++ $(CXXFLAGS) -Wno-register -c lex.yy.cc
 

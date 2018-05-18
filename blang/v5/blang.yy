@@ -28,10 +28,17 @@ prog: proga { top_prog_node = $1; }
 
 
 proga:
-     	IDENT '(' ')' { $$ = make_funcall($1, 666); }
-	| NUM { $$ = $1 ; }
+     	funcall
+	| prim { $$ = $1 ; }
 	;
 
+funcall:
+     	IDENT '(' ')' { $$ = make_funcall($1, 666.0); }
+
+prim:
+    	NUM {$$ = $1; }
+	| STRING { $$ = $1;}
+	;
 
 ///////////////////////////////////////////////////////////////////////
 %%
