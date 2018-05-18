@@ -27,14 +27,7 @@ int line_number = 0;
 ,	return ',';
 \(	return '(';
 \)	return ')';
-[0-9]+		{ 
-	yylval = parsevec.size();
-	parsevec.push_back(std::stod(yytext)); 
-	return NUM;
-}
-[a-zA-Z]+ { 
-	//yylval.STRING = "foos"s; 
-	yylval = parsevec.size();
-	parsevec.push_back(std::string(yytext)); return(IDENT); }
+[0-9]+		{  yylval = std::stod(yytext); 	return NUM;}
+[a-zA-Z]+ 	{ yylval = std::string(yytext); return IDENT ; }
 
 %%

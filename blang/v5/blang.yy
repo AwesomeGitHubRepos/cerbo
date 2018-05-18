@@ -10,7 +10,6 @@
 using std::cout;
 using std::endl;
 
-//extern int yylex();
 extern int yyparse();
 extern FILE* yyin;
 
@@ -25,27 +24,10 @@ void yyerror(const char* s);
 ///////////////////////////////////////////////////////////////////////
 %%
 
-prog:
-	concat
-	| funcall
-	| NUM { $$ = make_num($1); };
-	;
+prog: proga { top_prog_node = $1; }
 
-
-concat: IDENT '+' IDENT{ $$ = make_concat($1, $3); };
-
-funcall:
-	IDENT args { cout << "making funcall\n"; $$ = make_funcall($1, $2) ; } 
-	;
-
-args: 
-	'(' ')'  
-	| '(' arglist ')'
-    	;
-     
-arglist:
-      	NUM
-	|  arglist ',' NUM
+proga:
+	NUM { $$ = $1 ; }
 	;
 
 
