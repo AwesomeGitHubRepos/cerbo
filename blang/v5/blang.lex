@@ -24,6 +24,7 @@ int line_number = 0;
 [\t\r ]* // discard whitespace
 \n	line_number++;
 \+	return '+';
+-	return '-';
 ,	return ',';
 \(	return '(';
 \)	return ')';

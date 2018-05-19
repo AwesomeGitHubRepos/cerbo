@@ -20,6 +20,7 @@ void yyerror(const char* s);
 
 %token IDENT PRIM
 
+%left '-' '+'
 
 ///////////////////////////////////////////////////////////////////////
 %%
@@ -28,17 +29,26 @@ prog: proga { top_prog_node = $1; }
 
 
 proga:
-     	funcall
-	| PRIM { $$ = $1 ; }
-	;
+ expr
+;
 
 funcall:
-     	IDENT '(' arglist ')' { $$ = make_funcall($1, $3); }
+//  IDENT '('  ')' { pnodes_c pn; $$ = make_funcall($1, pn); }
+IDENT '(' arglist ')' { $$ = make_funcall($1, $3); }
+;
+
+expr:
+  PRIM 
+| funcall
+| expr '+' expr { $$ = make_funcall("+", $1, $3); }
+| expr '-' expr { $$ = make_funcall("-", $1, $3); }
+;
 
 arglist:
-       %empty { $$ = pnodes_c();}
-	| PRIM { pnodes_c p ; p.pnodes.push_back($1); $$ = p; }
-	| arglist ',' PRIM { pnodes_c p = std::get<pnodes_c>($1); p.pnodes.push_back($3); $$ = p ; } 
+  %empty { $$ = pnodes_c(); }       
+| expr { pnodes_c p ; p.append($1); $$ = p; }
+| arglist ',' expr { pnodes_c p = std::get<pnodes_c>($1); p.append($3); $$ = p ; } 
+;
 
 ///////////////////////////////////////////////////////////////////////
 %%

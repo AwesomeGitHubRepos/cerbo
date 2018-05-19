@@ -26,6 +26,20 @@ int yylex()
 	return lexer.yylex();
 }
 
+void pnodes_c::append(const pnode_t& pnode)
+{
+	pnodes.push_back(pnode);
+}
+
+pnode_t make_funcall(const std::string& function_name, const pnode_t& pnode1, const pnode_t& pnode2)
+{
+	funcall_c fc;
+	fc.function_name = function_name;
+	fc.pnodes.append(pnode1);
+	fc.pnodes.append(pnode2);
+	return fc;
+}
+
 pnode_t make_funcall(pnode_t& identifier, pnode_t& pnodes)
 {
 	funcall_c fc;

@@ -9,3 +9,6 @@ function run {
 run 23
 run "hello()"
 run 'print(23, " hello", " world" )'
+run 'print(23 + 24)'
+run 'print(6-4)'
+run 'print(pi() +1)'
