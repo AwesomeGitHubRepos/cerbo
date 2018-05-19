@@ -47,7 +47,7 @@ expr:
 | expr '-' expr { $$ = make_funcall("-", $1, $3); }
 | expr '*' expr { $$ = make_funcall("*", $1, $3); }
 | expr '/' expr { $$ = make_funcall("/", $1, $3); }
-//| '-' expr %prec NEG { $$ = - $2; TODO}
+| '-' expr %prec NEG { $$ = make_funcall("-", 0, $2); }
 | expr '^' expr	{ $$ = make_funcall("^", $1, $3); }
 | '(' expr ')'	{ $$ = $2;}
 ;

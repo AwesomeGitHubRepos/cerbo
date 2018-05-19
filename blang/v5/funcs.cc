@@ -30,20 +30,6 @@ double endouble(const prim_t prim)
 	return std::get<double>(prim);
 }
 
-/*
-double do_add(prims_t ps)
-{
-	double p1 = endouble(ps[0]);
-	double p2 = endouble(ps[1]);
-	return p1+p2;
-}
-double do_sub(prims_t ps)
-{
-	double p1 = endouble(ps[0]);
-	double p2 = endouble(ps[1]);
-	return p1-p2;
-}
-*/
 
 double mathop(std::function<double(double,double)> fop, const prims_t& ps)
 {
@@ -57,6 +43,7 @@ double do_sub(prims_t ps) { return mathop(std::minus<double>(), ps); }
 double do_mul(prims_t ps) { return mathop(std::multiplies<double>(), ps); }
 double do_div(prims_t ps) { return mathop(std::divides<double>(), ps); }
 double do_pow(prims_t ps) { return mathop(pow, ps); }
+//double do_neg(prims_t ps) { return - endouble(ps[0]); }
 
 double do_pi(prims_t ps) { return 3.14159265359; }
 
@@ -73,6 +60,7 @@ int do_hello(prims_t ps) { cout << "hello world\n" ; return 0; }
 std::map<std::string, func_t> funcmap = { 
 	{"+",		do_add},
 	{"-",		do_sub},
+	//{"negate",	do_neg},
 	{"*",		do_mul},
 	{"/",		do_div},
 	{"^",		do_pow},
