@@ -18,7 +18,7 @@ void yyerror(const char* s);
 
 
 
-%token IDENT NUM STRING
+%token IDENT PRIM
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -29,16 +29,12 @@ prog: proga { top_prog_node = $1; }
 
 proga:
      	funcall
-	| prim { $$ = $1 ; }
+	| PRIM { $$ = $1 ; }
 	;
 
 funcall:
      	IDENT '(' ')' { $$ = make_funcall($1, 666.0); }
 
-prim:
-    	NUM {$$ = $1; }
-	| STRING { $$ = $1;}
-	;
 
 ///////////////////////////////////////////////////////////////////////
 %%

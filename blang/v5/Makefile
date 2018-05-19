@@ -6,7 +6,7 @@ OBJS = blang.o funcs.o blang.tab.o lex.yy.o
 all: blang5
 
 wc:
-	wc -l blang.cc blang.lex blang.yy funcs.cc
+	wc -l blang.h blang.cc blang.lex blang.yy funcs.cc
 
 clean:
 	rm -f blang5 lex.yy.cc 	blang.tab.cc 	blang.tab.hh \

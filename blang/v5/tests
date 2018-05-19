@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+function run {
+	echo "Running $1"
+	./blang5 <<<"$1"
+	echo
+}
+
+run 23
+run "hello()"
