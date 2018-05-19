@@ -32,11 +32,12 @@ prog: proga { top_prog_node = $1; }
 
 
 proga:
- expr
+  %empty { $$ = pnodes_c(); }       
+| expr { pnodes_c p ; p.append($1); $$ = p; }
+| proga expr { $$ = append_expr($1, $2); }
 ;
 
 funcall:
-//  IDENT '('  ')' { pnodes_c pn; $$ = make_funcall($1, pn); }
 IDENT '(' arglist ')' { $$ = make_funcall($1, $3); }
 ;
 

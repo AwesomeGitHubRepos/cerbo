@@ -72,7 +72,13 @@ prim_t eval(pnode_t& pnode)
 				std::back_inserter(vals),				
 				eval); 
 		return fn(vals);
+	} else if(std::holds_alternative<pnodes_c>(pnode)) { 
+		prim_t result;
+		for(auto& pn: std::get<pnodes_c>(pnode).pnodes)
+			result = eval(pn);
+		return result;
 	}
+
 
 	assert(false);
 	//return result;
