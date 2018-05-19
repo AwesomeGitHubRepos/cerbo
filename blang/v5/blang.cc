@@ -26,18 +26,11 @@ int yylex()
 	return lexer.yylex();
 }
 
-pnode_t make_funcall(pnode_t& identifier, int TODO)
+pnode_t make_funcall(pnode_t& identifier, pnode_t& pnodes)
 {
-	/*
-	pnode_t fn = [=]() {
-		func_t func = funcmap[enstr(identifier)];
-		pnode_t p = func;
-		return p;
-	};
-	*/
 	funcall_c fc;
 	fc.function_name = enstr(identifier);
-	//return funcmap[enstr(identifier)];
+	fc.pnodes = std::get<pnodes_c>(pnodes);
 	return fc;
 }
 
@@ -54,7 +47,7 @@ prim_t eval(pnode_t& pnode)
 		funcall_c& fc = std::get<funcall_c>(pnode);
 		func_t& fn = funcmap[fc.function_name];
 		prims_t vals;
-		std::transform(fc.pnodes.begin(), fc.pnodes.end(),
+		std::transform(fc.pnodes.pnodes.begin(), fc.pnodes.pnodes.end(),
 				std::back_inserter(vals),				
 				eval); 
 		return fn(vals);

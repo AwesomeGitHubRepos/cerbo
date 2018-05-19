@@ -8,3 +8,4 @@ function run {
 
 run 23
 run "hello()"
+run "print(23)"

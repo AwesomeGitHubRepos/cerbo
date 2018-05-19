@@ -33,8 +33,11 @@ proga:
 	;
 
 funcall:
-     	IDENT '(' ')' { $$ = make_funcall($1, 666.0); }
+     	IDENT '(' arglist ')' { $$ = make_funcall($1, $3); }
 
+arglist:
+       %empty { $$ = pnodes_c();}
+	| PRIM { pnodes_c p ; p.pnodes.push_back($1); $$ = p; }
 
 ///////////////////////////////////////////////////////////////////////
 %%
