@@ -56,7 +56,7 @@ expr:
 arglist:
   %empty { $$ = pnodes_c(); }       
 | expr { pnodes_c p ; p.append($1); $$ = p; }
-| arglist ',' expr { pnodes_c p = std::get<pnodes_c>($1); p.append($3); $$ = p ; } 
+| arglist ',' expr { $$ = append_expr($1, $3); }
 ;
 
 ///////////////////////////////////////////////////////////////////////

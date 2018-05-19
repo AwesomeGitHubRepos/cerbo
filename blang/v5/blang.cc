@@ -31,6 +31,13 @@ void pnodes_c::append(const pnode_t& pnode)
 	pnodes.push_back(pnode);
 }
 
+pnodes_c append_expr(pnode_t& vec, const pnode_t& expr)
+{
+	pnodes_c p = std::get<pnodes_c>(vec); 
+	p.append(expr); 
+	return  p;
+}
+
 pnode_t make_funcall(const std::string& function_name, const pnode_t& pnode1, const pnode_t& pnode2)
 {
 	funcall_c fc;

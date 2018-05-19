@@ -34,6 +34,8 @@ extern std::map<std::string, func_t> funcmap;
 
 pnode_t make_funcall(const std::string& function_name, const pnode_t& pnode1, const pnode_t& pnode2);
 pnode_t make_funcall(pnode_t& identifier, pnode_t& pnodes);
+//pnodes_c append_expr(const pnodes_c& vec, const pnode_t& expr);
+pnodes_c append_expr(pnode_t& vec, const pnode_t& expr);
 std::string enstr(const pnode_t& pnode);
 std::string enstr(const prim_t& prim);
 
