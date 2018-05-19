@@ -21,6 +21,9 @@ void yyerror(const char* s);
 %token IDENT PRIM
 
 %left '-' '+'
+%left '*' '/'
+%precedence NEG
+%right '^'
 
 ///////////////////////////////////////////////////////////////////////
 %%
@@ -42,7 +45,13 @@ expr:
 | funcall
 | expr '+' expr { $$ = make_funcall("+", $1, $3); }
 | expr '-' expr { $$ = make_funcall("-", $1, $3); }
+| expr '*' expr { $$ = make_funcall("*", $1, $3); }
+| expr '/' expr { $$ = make_funcall("/", $1, $3); }
+//| '-' expr %prec NEG { $$ = - $2; TODO}
+| expr '^' expr	{ $$ = make_funcall("^", $1, $3); }
+| '(' expr ')'	{ $$ = $2;}
 ;
+
 
 arglist:
   %empty { $$ = pnodes_c(); }       

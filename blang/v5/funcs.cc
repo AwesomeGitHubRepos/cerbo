@@ -1,5 +1,7 @@
 #include <cassert>
+#include <functional>
 #include <iostream>
+#include <tgmath.h> // for pow
 
 #include "blang.h"
 
@@ -28,6 +30,7 @@ double endouble(const prim_t prim)
 	return std::get<double>(prim);
 }
 
+/*
 double do_add(prims_t ps)
 {
 	double p1 = endouble(ps[0]);
@@ -40,6 +43,20 @@ double do_sub(prims_t ps)
 	double p2 = endouble(ps[1]);
 	return p1-p2;
 }
+*/
+
+double mathop(std::function<double(double,double)> fop, const prims_t& ps)
+{
+	double arg1 = endouble(ps[0]);
+	double arg2 = endouble(ps[1]);
+	return fop(arg1, arg2);
+}
+
+double do_add(prims_t ps) { return mathop(std::plus<double>(), ps); }
+double do_sub(prims_t ps) { return mathop(std::minus<double>(), ps); }
+double do_mul(prims_t ps) { return mathop(std::multiplies<double>(), ps); }
+double do_div(prims_t ps) { return mathop(std::divides<double>(), ps); }
+double do_pow(prims_t ps) { return mathop(pow, ps); }
 
 double do_pi(prims_t ps) { return 3.14159265359; }
 
@@ -56,6 +73,9 @@ int do_hello(prims_t ps) { cout << "hello world\n" ; return 0; }
 std::map<std::string, func_t> funcmap = { 
 	{"+",		do_add},
 	{"-",		do_sub},
+	{"*",		do_mul},
+	{"/",		do_div},
+	{"^",		do_pow},
 	{"hello", do_hello},
 	{"pi",		do_pi},
 	{"print", do_print}

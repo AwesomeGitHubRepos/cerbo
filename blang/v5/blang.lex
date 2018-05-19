@@ -26,6 +26,9 @@ int line_number = 0;
 \+	return '+';
 -	return '-';
 ,	return ',';
+\*	return '*';
+\/	return '/';
+\^	return '^';
 \(	return '(';
 \)	return ')';
 \"[^"]*\"	{ yylval = std::string(yytext); return PRIM; }

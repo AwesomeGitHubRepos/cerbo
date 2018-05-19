@@ -4,6 +4,7 @@ function run {
 	echo "Running $1"
 	./blang5 <<<"$1"
 	echo
+	echo
 }
 
 run 23
@@ -12,3 +13,5 @@ run 'print(23, " hello", " world" )'
 run 'print(23 + 24)'
 run 'print(6-4)'
 run 'print(pi() +1)'
+run 'print(1+2*3)'
+run 'print((1+2)*3)'
