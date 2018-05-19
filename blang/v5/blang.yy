@@ -38,6 +38,7 @@ funcall:
 arglist:
        %empty { $$ = pnodes_c();}
 	| PRIM { pnodes_c p ; p.pnodes.push_back($1); $$ = p; }
+	| arglist ',' PRIM { pnodes_c p = std::get<pnodes_c>($1); p.pnodes.push_back($3); $$ = p ; } 
 
 ///////////////////////////////////////////////////////////////////////
 %%

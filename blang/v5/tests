@@ -8,4 +8,4 @@ function run {
 
 run 23
 run "hello()"
-run "print(23)"
+run 'print(23, " hello", " world" )'

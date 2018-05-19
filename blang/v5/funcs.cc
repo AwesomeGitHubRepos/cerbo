@@ -25,8 +25,10 @@ std::string enstr(const pnode_t& pnode)
 
 int do_print(prims_t ps)
 {
-	assert(ps.size()>0);
-	cout << enstr(ps[0]) << "\n";
+	for(const auto& p: ps)
+		cout << enstr(p);
+	//assert(ps.size()>0);
+	//cout << enstr(ps[0]) << "\n";
 }
 
 int do_hello(prims_t ps) { cout << "hello world\n" ; return 0; }
