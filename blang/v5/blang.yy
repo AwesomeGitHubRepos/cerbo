@@ -22,8 +22,8 @@ void yyerror(const char* s);
 
 %left '-' '+'
 %left '*' '/'
-%precedence NEG
-%right '^'
+%left '^'
+%left NEG
 
 ///////////////////////////////////////////////////////////////////////
 %%
@@ -48,8 +48,8 @@ expr:
 | expr '-' expr { $$ = make_funcall("-", $1, $3); }
 | expr '*' expr { $$ = make_funcall("*", $1, $3); }
 | expr '/' expr { $$ = make_funcall("/", $1, $3); }
-| '-' expr %prec NEG { $$ = make_funcall("-", 0, $2); }
 | expr '^' expr	{ $$ = make_funcall("^", $1, $3); }
+| '-' expr %prec NEG { $$ = make_funcall("-", 0, $2); }
 | '(' expr ')'	{ $$ = $2;}
 ;
 

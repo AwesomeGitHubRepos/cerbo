@@ -1,5 +1,6 @@
 blang5
 lex.yy.cc
+blang.output
 blang.tab.cc
 blang.tab.hh
 *.o

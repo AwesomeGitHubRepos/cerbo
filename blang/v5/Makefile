@@ -17,7 +17,7 @@ clean:
 	g++ $(CXXFLAGS)  -c $<
 
 blang.tab.o : blang.yy blang.h
-	bison -d blang.yy
+	bison -v -d blang.yy
 	g++ $(CXXFLAGS) -c blang.tab.cc
 
 lex.yy.o : blang.lex blang.h
