@@ -9,7 +9,7 @@ wc:
 	wc -l blang.h blang.cc blang.lex blang.yy funcs.cc
 
 clean:
-	rm -f blang5 lex.yy.cc 	blang.tab.cc 	blang.tab.hh \
+	rm -f blang5 lex.yy.cc 	blang.tab.cc blang.output blang.tab.hh \
 	lex.yy.c lex.yy.h \
 	*.o
 

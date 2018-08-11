@@ -37,28 +37,42 @@ proga:
 | proga expr { $$ = append_expr($1, $2); }
 ;
 
+/*
 funcall:
 IDENT '(' arglist ')' { $$ = make_funcall($1, $3); }
 ;
+*/
 
 expr:
-  PRIM 
-| funcall
-| expr '+' expr { $$ = make_funcall("+", $1, $3); }
+  expr '+' expr { $$ = make_funcall("+", $1, $3); }
 | expr '-' expr { $$ = make_funcall("-", $1, $3); }
 | expr '*' expr { $$ = make_funcall("*", $1, $3); }
 | expr '/' expr { $$ = make_funcall("/", $1, $3); }
 | expr '^' expr	{ $$ = make_funcall("^", $1, $3); }
 | '-' expr %prec NEG { $$ = make_funcall("-", 0, $2); }
 | '(' expr ')'	{ $$ = $2;}
+| PRIM
+| IDENT '(' argument_list ')' { $$ = make_funcall($1, $3); }
 ;
 
+argument_list:
+  %empty { $$ = pnodes_c(); }
+| expression_list
+;
 
+expression_list:
+  expr { pnodes_c p ; p.append($1); $$ = p; }
+| expression_list ',' expr { $$ = append_expr($1, $3); }
+;
+
+/*
 arglist:
   %empty { $$ = pnodes_c(); }       
 | expr { pnodes_c p ; p.append($1); $$ = p; }
 | arglist ',' expr { $$ = append_expr($1, $3); }
 ;
+*/
+
 
 ///////////////////////////////////////////////////////////////////////
 %%
