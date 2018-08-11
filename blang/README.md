@@ -18,8 +18,15 @@ A toy BASIC interpreter written in C++. Its aims to be:
 * [bcode](bcode/README.md) - a bytecode compiler experiment
 * v2 - an attempt at a rewrite of a parser based on s-expr
 * [v3](v3/README.md) - a complete BASIC interpreter in 760 lines of code
-* [v4](v4/README.md) - going beyond version 3 to include a bunch of other stuff
+* [v4](v4/README.md) - going beyond version 3 to include a bunch of other stuff (**BEST**)
+* [v5](v5/README.md) - starting out again, this time using lex/yacc. Requires C++17
 * lisp - an interpreter for lisp copied from github
+
+
+## Implementations
+
+Some implementations of BASIC are: basic256, brandy, bwbasic, sdlbasic, yabasic.
+
 
 ## References
 
