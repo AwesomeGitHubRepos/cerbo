@@ -1,7 +1,13 @@
 ;;(load "vasmc.scm")
 ;;(require 'posix)
+
+;; must be installed:
 (require-extension byte-blob) ; sudo chicken-install byte-blob
+(use bindings)
+
+(require 'srfi-1)
 (require 'srfi-4)
+(require 'srfi-13)
 
 (define oport '())
 
@@ -26,6 +32,7 @@
   (write-bytes bytes))
     
 
+#|
 (define (type-2 instruction-code rx offset ry)
   (write-byte instruction-code)
   (write-rxy rx ry)
@@ -57,10 +64,36 @@
 (define (bal rx ry)
   (write-byte 14)
   (write-rxy rx ry))
+|#
+
+(define opcode-table
+  ;; OPCODE ID Rn? OFF?
+  '(("HALT"  0 #f  #f)
+    ("NOP"   1 #f  #f)
+    ("TRAP"  2 #f  #f)
+    ("ADD"   3 #t  #f)
+    ("SUB"   4 #t  #f)
+    ("MUL"   5 #t  #f)
+    ("DIV"   6 #t  #f)
+    ("STI"   7 #t  #t)
+    ("LDI"   8 #t  #t)
+    ("LDA"   9 #t  #t)
+    ("LDR"  10 #t  #f)
+    ("BZE"  11 #f  #t)
+    ("BNZ"  12 #f  #t)
+    ("BRA"  13 #f  #t)
+    ("BAL"  14 #t  #f)))
+
+(define (write-op opcode rx ry offset)
+  (define rec (find (lambda (x) (string= (car x) opcode)) opcode-table))
+  (bind (opnum rn? off?) (cdr rec)
+	(write-byte opnum)
+	(when rn? (write-rxy rx ry))
+	(when off? (write-offset offset))))
 
 (begin
   (set! oport (open-output-file "output.dat"))
-  (bal 4 5)
+  (write-op "BAL" 4 5 0)
   (close-output-port oport)
   #t)
 
