@@ -1,4 +1,6 @@
-all : bytes vasmc
+TARGS = bytes vasmc
+
+all : $(TARGS)
 
 
 bytes : bytes.cc
@@ -8,4 +10,4 @@ vasmc : vasmc.scm
 	csc vasmc.scm
 
 clean :
-	rm -f bytes vasmc
+	rm -f $(TARGS)
