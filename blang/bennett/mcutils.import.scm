@@ -1,13 +1,15 @@
 (module
- mcutils (export define-syntax-rule displayln hello-utils until)
- (import scheme)
+ mcutils
+ (export define-syntax-rule displayln
+	 file->lines hello-utils until)
+ (import extras scheme)
  
 (define-syntax define-syntax-rule
   (syntax-rules ()
-    [(define-syntax-rule (id arg ...) body)
+    [(define-syntax-rule (id arg ...) body ...)
      (define-syntax id
        (syntax-rules ()
-	 [(id arg ...) body]))]))
+	 [(id arg ...) (begin body ...)]))]))
 
 (define-syntax-rule (until break body ...)
   (let* ((continue #t)
@@ -16,11 +18,21 @@
       body ...
       (when continue (loop)))))
 
- (define (displayln text)
+(define (displayln text)
    (display text)
    (newline))
- 
- (define (hello-utils)
+
+(define (file->lines filename)	
+  (define (loop lines)
+    (define line (read-line))
+    (if (eof-object? line)
+	(reverse lines)
+	(loop (cons line lines))))
+  (define (loop-0) (loop '()))
+  (with-input-from-file filename loop-0))
+
+
+(define (hello-utils)
    (displayln "hello utils says hello"))
 
  ) ; end of module
