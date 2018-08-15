@@ -3,3 +3,5 @@ vasmc
 output.dat
 test.vam
 vas-parser
+*.o
+*.so

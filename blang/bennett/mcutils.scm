@@ -2,8 +2,14 @@
  mcutils
  (export define-syntax-rule displayln
 	 file->lines hello-utils until)
- (import extras scheme)
- 
+ (import chicken extras scheme data-structures)
+
+;;(declare (unit mcutils))
+
+ (require-extension data-structures)
+ (require-extension extras)
+;;(import scheme)
+
 (define-syntax define-syntax-rule
   (syntax-rules ()
     [(define-syntax-rule (id arg ...) body ...)
@@ -22,6 +28,7 @@
    (display text)
    (newline))
 
+
 (define (file->lines filename)	
   (define (loop lines)
     (define line (read-line))
@@ -35,7 +42,7 @@
 (define (hello-utils)
    (displayln "hello utils says hello"))
 
- ) ; end of module
+) ; end of module
 
 
 	
