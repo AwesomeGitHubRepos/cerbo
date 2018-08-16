@@ -12,7 +12,7 @@ CLEANFILES = $(BUILT_SOURCES)
 
 #mcacc_LDADD = -lpthread $(LIBSUPO)
 
-mcacc_SOURCES =  \ 
+mcacc_SOURCES =  \
 	mcacc.cc \
 	parser.yy scanner.ll 
 
