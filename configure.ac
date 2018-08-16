@@ -15,7 +15,8 @@ AM_CONDITIONAL([HAVE_READLINE], [test x$ac_cv_header_readline_readline_h == xyes
 #CXXFLAGS="$CXXFLAGS -I${srcdir}/supo"
 AC_PROG_CXX
 AC_PROG_RANLIB
-#AC_PROG_LIBTOOL
+AC_PROG_LEX
+AC_PROG_YACC
 
 AC_PROG_FC
 AM_CONDITIONAL([HAVE_FORTRAN], [test x$FC == xgfortran])

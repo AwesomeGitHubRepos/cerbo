@@ -21,6 +21,7 @@
 #include "tests.h"
 #include <supo_general.h>
 #include "show.h"
+#include "scanner.h"
 
 
 using namespace std;
@@ -91,6 +92,14 @@ void preprocess(const char* command)
 int 
 main(int argc, char *argv[])
 {
+	freopen("test.txt", "r", stdin);
+	while(yylex()) {
+		puts("token");
+		puts(yytext);
+	}
+	cout << "TODO\n";
+	return 0;
+
 	feenableexcept(FE_OVERFLOW);
 	const vm_t vm = parse_args(argc, argv);
 
