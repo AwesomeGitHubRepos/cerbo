@@ -12,6 +12,8 @@
 #include <stdexcept>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <ostream>
+#include <sstream>
 
 
 #include "args.h"
@@ -23,45 +25,15 @@ typedef std::vector<std::string> strings;
 
 using namespace std;
 
-// http://www.linuxquestions.org/questions/programming-9/deleting-a-directory-using-c-in-linux-248696/
-// remove directory recursively
-// include dirent.h sys/types.h
-int rmdir(const char *dirname)
+
+std::string dout(double d)
 {
-    DIR *dir;
-    struct dirent *entry;
-    char path[PATH_MAX];
-
-    if (path == NULL) {
-        fprintf(stderr, "Out of memory error\n");
-        return 0;
-    }
-    dir = opendir(dirname);
-    if (dir == NULL) {
-        perror("Error opendir()");
-        return 0;
-    }
-
-    while ((entry = readdir(dir)) != NULL) {
-        if (strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")) {
-            snprintf(path, (size_t) PATH_MAX, "%s/%s", dirname, entry->d_name);
-            if (entry->d_type == DT_DIR) {
-                rmdir(path);
-            }
-
-	    remove(path);
-        }
-
-    }
-    closedir(dir);
-    remove(dirname);
-
-    return 1;
-}
-
-int rmdir(const string& dirname)
-{
-	return rmdir(dirname.c_str());
+        std::ostringstream s;
+        s.precision(2);
+        s.width(10);
+        s << std::fixed;
+        s <<  d;
+        return s.str();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -125,7 +97,7 @@ bool gaap()
 	inc_bal(meta, bals_at(acc));
 	string acc1 = acc == "=" ? meta : acc;
 	double amount = bals_at(acc1);
-	cout << "gaap-1\t" << acc1 << "\t" << amount << "\t" << cmp << "\t" << desc << "\n";
+	cout << "gaap-1\t" << acc1 << "\t" << dout(amount) << "\t" << dout(stod(cmp)) << "\t" << desc << "\n";
 	if(acc == "=") cout << "gaap-1\n";
 	return true;
 }
@@ -178,59 +150,18 @@ void scan(const char* path)
 }
 
 //////////
-/*
-void print_balances()
-{
-	//for(auto it = bals.;begin(); it != bals.end(); ++it) {
-	for(auto b : bals) {
-		cout << b.first << " " << b.second << "\n";
-	}
-
-}
-*/
 // section mcarter 16-Aug-2018
 //////////////////////////////////////////////////////////////////////////////////////
 
 int 
 main(int argc, char *argv[])
 {
+	feenableexcept(FE_OVERFLOW);
 	scan("accts2018v1.txt");
 	scan("ltbh.txt");
 	scan("gaap.txt");
 	//print_balances();
 	//scan("test.txt");
-	cout << "TODO\n";
+	//cout << "TODO\n";
 	return 0;
-
-	feenableexcept(FE_OVERFLOW);
-	const vm_t vm = parse_args(argc, argv);
-
-	if(vm.count("pre")>0) {
-		string pre = vm.at("pre");
-		//preprocess(pre.c_str());
-	}
-
-	string wiegley_str = vm.at("wiegley");
-	bool do_wiegley = wiegley_str == "on";
-	if(! do_wiegley && wiegley_str != "off") {
-		cerr << "ERR: Option wiegley error. Must be on|off, but given`"
-			<< wiegley_str 
-			<< "'. Continuing anyway." << endl;
-	}
-
-	/*
-	oven ove;
-	ove.m_vm = vm;
-	ove.load_inputs();
-	
-
-	do_wiegley = true; // override defaults and just do it anyway
-	bool do_fetch = vm.at("snap") == "on";
-	ove.process(do_wiegley, do_fetch);
-
-	//supo::ssystem("mcacc-reports.sh", true);
-	if(vm.count("show") > 0) show(vm.at("show"));
-	*/
-
-	return EXIT_SUCCESS;
 }
