@@ -1,3 +1,5 @@
+parser.cc
+parser.hh
 scanner.cc
 configure.lineno
 dsv

@@ -3,7 +3,9 @@ AM_CXXFLAGS += -Wfatal-errors
 bin_PROGRAMS = mcacc 
 man1_MANS = mcacc.1
 
-BUILT_SOURCES = scanner.cc
+YFLAGS = -d
+
+BUILT_SOURCES = scanner.cc parser.cc parser.hh
 CLEANFILES = $(BUILT_SOURCES)
 
 mcacc_LDADD = -lpthread $(LIBSUPO)
@@ -21,6 +23,9 @@ mcacc_SOURCES = args.cc \
 		uprice.cc \
 		wiegley.cc \
 		yahoo.cc yproc.cc \
-		scanner.ll
+		parser.yy scanner.ll 
 
-scanner.cc : scanner.ll
+# scanner.cc : scanner.ll parser.hh
+
+
+# parser.hh : parser.cc

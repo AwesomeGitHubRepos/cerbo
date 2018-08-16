@@ -1,5 +1,6 @@
 %{
 #include "scanner.h"
+#include "parser.hh"
 %}
 
 %option noyywrap
@@ -14,11 +15,10 @@ text	[^ \t\n\"]+
 
 %%
 {comment}	{}
-{newline}	{ return NEWLINE; }
+{newline}	{ return L_NEWLINE; }
 {whitespace}	{}
-{qstring}	{ return TEXT; }
-{text}		{ return TEXT; }
-.		{puts(":("); return 42; }
+{qstring}	{ yylval = yytext; return L_TEXT; }
+{text}		{ yylval = yytext; return L_TEXT; }
 
 %%
 

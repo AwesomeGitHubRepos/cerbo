@@ -21,7 +21,8 @@
 #include "tests.h"
 #include <supo_general.h>
 #include "show.h"
-#include "scanner.h"
+//#include "scanner.h"
+#include "parser.hh"
 
 
 using namespace std;
@@ -92,10 +93,13 @@ void preprocess(const char* command)
 void scan(const char* path)
 {
 	freopen(path, "r", stdin);
+	yyparse();
+	/*
 	while(yylex()) {
 		puts("token");
 		puts(yytext);
 	}
+	*/
 }
 
 int 
