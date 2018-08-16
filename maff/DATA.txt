@@ -1,4 +1,0 @@
-An overview of what's in data.xlsm:
-
-random1 : some random numbers
-quantile1 : some quantiles based on sheet random1, column 1
