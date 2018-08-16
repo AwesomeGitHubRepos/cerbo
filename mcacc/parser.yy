@@ -15,13 +15,12 @@ records :
 | records record
 ;	
 
-record : 
-| fields L_NEWLINE  { trace("record newline"); }
+record : fields L_NEWLINE  { dispatch_command(); }
 ;
 
 
-fields : L_TEXT {  trace("fields:L_TEXT:" + $1 + "."); }
-| fields L_TEXT { trace("1"); }
+fields : L_TEXT { start_command($1); }
+| fields L_TEXT { add_argument($2);  }
 ;
 
 %%
@@ -36,5 +35,5 @@ void yyerror(std::string s)
 
 void trace(const std::string& s)
 {
-	std::cout << "parser:trace:" << s << std::endl;
+//	std::cout << "parser:trace:" << s << std::endl;
 }

@@ -89,24 +89,70 @@ void preprocess(const char* command)
 	supo::ssystem(command, true);
 }
 
+//////////////////////////////////////////////////////////////////////////////////////
+// section mcarter 16-Aug-2018
+
+static string command_name;
+strings command_args;
+
+bool etran()
+{
+	if(command_name != "etran-2") return false;
+	cout << "I'm an etran\n";
+	return true;
+}
+
+bool ntran()
+{
+	if(command_name != "ntran") return false;
+	cout << "I'm an ntran\n";
+	return true;
+}
+void start_command(std::string s)
+{
+	//cout << "start_command:" << s << "\n";
+	command_name = s;
+	command_args.clear();
+}
+
+void add_argument(std::string s)
+{
+	//cout << "add_arg:" << s << "\n";
+	command_args.push_back(s);
+}
+
+void dispatch_command()
+{
+	//cout << "dispatch\n";
+	//auto is = [command_name](string s) { return s == command_name; };
+	//auto is = [](string s) { return s == command_name; };
+	etran() || ntran();
+	//if(is("etran-2"))
+	//	cout << "found etran\n";
+}
 
 void scan(const char* path)
 {
-	freopen(path, "r", stdin);
+	string full{"/home/mcarter/repos/redact/docs/accts2018/"};
+	full += path;
+	freopen(full.c_str(), "r", stdin);
 	yyparse();
 	/*
-	while(yylex()) {
-		puts("token");
-		puts(yytext);
-	}
-	*/
+	   while(yylex()) {
+	   puts("token");
+	   puts(yytext);
+	   }
+	   */
 }
+
+// section mcarter 16-Aug-2018
+//////////////////////////////////////////////////////////////////////////////////////
 
 int 
 main(int argc, char *argv[])
 {
-	scan("test.txt");
-	scan("test.txt");
+	scan("accts2018v1.txt");
+	//scan("test.txt");
 	cout << "TODO\n";
 	return 0;
 

@@ -14,3 +14,6 @@ void yyerror(std::string s);
 
 // enum token { NEWLINE = 1, TEXT };
 
+void start_command(std::string s);
+void add_argument(std::string s);
+void dispatch_command();
