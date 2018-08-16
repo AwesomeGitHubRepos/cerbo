@@ -89,14 +89,20 @@ void preprocess(const char* command)
 }
 
 
-int 
-main(int argc, char *argv[])
+void scan(const char* path)
 {
-	freopen("test.txt", "r", stdin);
+	freopen(path, "r", stdin);
 	while(yylex()) {
 		puts("token");
 		puts(yytext);
 	}
+}
+
+int 
+main(int argc, char *argv[])
+{
+	scan("test.txt");
+	scan("test.txt");
 	cout << "TODO\n";
 	return 0;
 
