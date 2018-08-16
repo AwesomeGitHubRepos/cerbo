@@ -17,7 +17,7 @@
 
 #include "args.h"
 #include "common.h"
-#include "oven.h"
+//#include "oven.h"
 #include "tests.h"
 #include <supo_general.h>
 #include "show.h"
@@ -174,9 +174,11 @@ main(int argc, char *argv[])
 			<< "'. Continuing anyway." << endl;
 	}
 
+	/*
 	oven ove;
 	ove.m_vm = vm;
 	ove.load_inputs();
+	
 
 	do_wiegley = true; // override defaults and just do it anyway
 	bool do_fetch = vm.at("snap") == "on";
@@ -184,5 +186,7 @@ main(int argc, char *argv[])
 
 	//supo::ssystem("mcacc-reports.sh", true);
 	if(vm.count("show") > 0) show(vm.at("show"));
+	*/
+
 	return EXIT_SUCCESS;
 }

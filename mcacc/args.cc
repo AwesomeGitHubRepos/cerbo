@@ -5,7 +5,7 @@
 
 #include "args.h"
 #include "common.h"
-#include "inputs.h"
+//#include "inputs.h"
 #include "tests.h"
 
 using std::cerr;
@@ -67,7 +67,7 @@ vm_t parse_args(int argc, char *argv[])
 			{"show",    required_argument, 0, 0},
                         {"snap",    no_argument,       0, 's'},
 			{"start",   required_argument, 0, 0},
-			{"tests",   no_argument,       0, 't'},
+			//{"tests",   no_argument,       0, 't'},
                         {"version", no_argument,       0, 'v'},
                         {0 ,0,0,0}
                 };
@@ -82,7 +82,7 @@ vm_t parse_args(int argc, char *argv[])
 			case 'r': cout << rootdir() << endl;
 				  exitok();
 			case 's': vm["snap"] = "on"; break;
-			case 't': run_all_tests(); exitok();
+			//case 't': run_all_tests(); exitok();
 			case 'v': 
 				  std::cout << "mcacc (" << PACKAGE_NAME;
 				  cout  << ") " << VERSION << "\n";

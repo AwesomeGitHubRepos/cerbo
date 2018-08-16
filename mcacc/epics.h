@@ -5,9 +5,10 @@
 #include <string>
 #include <vector>
 
-#include "etran.h"
-#include "stend.h"
+//#include "etran.h"
+//#include "stend.h"
 
+/*
 class folio_c {
 	public:
 		folio_c(const std::string& name): m_name(name) {};
@@ -30,3 +31,4 @@ typedef std::vector<folio_c> folio_cs;
 
 
 folio_cs epics_main(const detran_cs& es, const stend_ts& stends);
+*/

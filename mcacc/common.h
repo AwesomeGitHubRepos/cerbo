@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "inputs.h"
-
 std::string rootdir();
 std::string workdir();
 std::string sndir(int n);

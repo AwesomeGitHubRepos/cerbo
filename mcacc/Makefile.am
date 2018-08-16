@@ -10,19 +10,9 @@ CLEANFILES = $(BUILT_SOURCES)
 
 mcacc_LDADD = -lpthread $(LIBSUPO)
 mcacc_SOURCES = args.cc \
-		cgt.cc common.cc \
-		dec.cc \
-		epics.cc etb.cc etran.cc \
-		gaap.cc \
-		inputs.cc \
+		common.cc \
 		mcacc.cc \
-		oven.cc \
-		posts.cc \
-		show.cc stend.cc \
-		tests.cc types.cc \
-		uprice.cc \
-		wiegley.cc \
-		yahoo.cc yproc.cc \
+		show.cc \
 		parser.yy scanner.ll 
 
 # scanner.cc : scanner.ll parser.hh

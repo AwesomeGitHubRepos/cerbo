@@ -6,7 +6,7 @@
 
 #include "types.h"
 #include "dec.h"
-#include "epics.h"
+//#include "epics.h"
 
 typedef struct post_t {
 	std::string dstamp;
@@ -18,6 +18,8 @@ typedef struct post_t {
 
 typedef std::vector<post_t> post_ts;
 
+/*
 post_ts posts_main(const inputs_t& inputs, 
 		const folio_cs& folios, const period& perd);
 bool operator<(const post_t& a, const post_t& b);
+*/
