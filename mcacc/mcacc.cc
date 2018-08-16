@@ -13,20 +13,15 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <supo.h>
 
 #include "args.h"
 #include "common.h"
-//#include "oven.h"
-#include "tests.h"
-#include <supo_general.h>
-#include "show.h"
-//#include "scanner.h"
 #include "parser.hh"
 
 
+typedef std::vector<std::string> strings;
+
 using namespace std;
-using namespace supo;
 
 // http://www.linuxquestions.org/questions/programming-9/deleting-a-directory-using-c-in-linux-248696/
 // remove directory recursively
@@ -69,16 +64,6 @@ int rmdir(const string& dirname)
 	return rmdir(dirname.c_str());
 }
 
-void clean()
-{
-	/*
-	rmdir(sndir(1));
-	rmdir(sndir(2));
-	rmdir(sndir(3));
-	*/
-	for(int i=1; i<=3; ++i) rmdir(sndir(i));
-}
-
 //////////////////////////////////////////////////////////////////////////////////////
 // section mcarter 16-Aug-2018
 
@@ -86,17 +71,28 @@ static string start_date{"0"};
 
 std::map<string, double> bals;
 
+void inc_bal(string acc, double by)
+{
+	bals.insert( std::pair<string, double>(acc, 0)); 
+	bals[acc] += by;
+}
+
+double bals_at(string acc)
+{
+	bals.insert( std::pair<string, double>(acc, 0)); 
+	return bals[acc];
+}
+
 void ntran_1(string dstamp, string dr, string cr, string amount, string desc, double sgn)
 {
-	double amnt = sgn * stod(amount);
-	auto inc = [](string acc, double by) { 
-		bals.insert( std::pair<string, double>(acc, by)); 
-		bals[acc] += by;
-	};
 
 	if(dstamp < start_date) return;
-	inc(dr, amnt);
-	inc(cr, -amnt);
+	double amnt = sgn * stod(amount);
+
+	//if(dr == "amz") cout << amnt << "\n";
+
+	inc_bal(dr, amnt);
+	inc_bal(cr, -amnt);
 	
 }
 
@@ -120,6 +116,19 @@ bool etran()
 	return true;
 }
 
+bool gaap()
+{
+	if(command_name != "gaap") return false;
+	strings& a = command_args;
+	string meta{a.at(0)}, acc{a.at(1)}, cmp{a.at(2)}, desc{a.at(3)};
+	//cout << "acc = " << acc << "\n";
+	inc_bal(meta, bals_at(acc));
+	string acc1 = acc == "=" ? meta : acc;
+	double amount = bals_at(acc1);
+	cout << "gaap-1\t" << acc1 << "\t" << amount << "\t" << cmp << "\t" << desc << "\n";
+	if(acc == "=") cout << "gaap-1\n";
+	return true;
+}
 bool ntran()
 {
 	if(command_name != "ntran") return false;
@@ -155,7 +164,7 @@ void dispatch_command()
 	//cout << "dispatch\n";
 	//auto is = [command_name](string s) { return s == command_name; };
 	//auto is = [](string s) { return s == command_name; };
-	etran() || ntran() || start() ;
+	etran() || ntran() || gaap() || start() ;
 	//if(is("etran-2"))
 	//	cout << "found etran\n";
 }
@@ -169,7 +178,7 @@ void scan(const char* path)
 }
 
 //////////
-
+/*
 void print_balances()
 {
 	//for(auto it = bals.;begin(); it != bals.end(); ++it) {
@@ -178,7 +187,7 @@ void print_balances()
 	}
 
 }
-
+*/
 // section mcarter 16-Aug-2018
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -188,15 +197,13 @@ main(int argc, char *argv[])
 	scan("accts2018v1.txt");
 	scan("ltbh.txt");
 	scan("gaap.txt");
-	print_balances();
+	//print_balances();
 	//scan("test.txt");
 	cout << "TODO\n";
 	return 0;
 
 	feenableexcept(FE_OVERFLOW);
 	const vm_t vm = parse_args(argc, argv);
-
-	if(vm.count("clean")) clean();
 
 	if(vm.count("pre")>0) {
 		string pre = vm.at("pre");
