@@ -23,7 +23,7 @@ void yyerror(const char* s);
 %left '-' '+'
 %left '*' '/'
 %left '^'
-%left NEG
+%right UMINUS
 
 ///////////////////////////////////////////////////////////////////////
 %%
@@ -49,9 +49,9 @@ expr:
 | expr '*' expr { $$ = make_funcall("*", $1, $3); }
 | expr '/' expr { $$ = make_funcall("/", $1, $3); }
 | expr '^' expr	{ $$ = make_funcall("^", $1, $3); }
-| '-' expr %prec NEG { $$ = make_funcall("-", 0, $2); }
+| '-' expr %prec UMINUS { $$ = make_funcall("-", 0, $2); }
 | '(' expr ')'	{ $$ = $2;}
-| PRIM
+| "PRIM"
 | IDENT '(' argument_list ')' { $$ = make_funcall($1, $3); }
 ;
 
