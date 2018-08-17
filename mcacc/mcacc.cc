@@ -4,20 +4,21 @@
 #include <dirent.h>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <stdio.h>
 #include <stdlib.h>
-#include <set>
+//#include <set>
 #include <string>
 #include <vector>
 #include <stdexcept>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <ostream>
+//#include <sys/stat.h>
+//#include <unistd.h>
+//#include <ostream>
 #include <sstream>
 
 
-#include "args.h"
-#include "common.h"
+//#include "args.h"
+//#include "common.h"
 #include "parser.hh"
 
 
@@ -36,8 +37,18 @@ std::string dout(double d)
         return s.str();
 }
 
+void tout(const strings& strs)
+{
+	int len = strs.size();
+	for(int i=0; i<len; ++i) {
+		cout << strs[i];
+		if(i+1<len) cout << "\t";
+	}
+	cout << "\n";
+
+}
+
 //////////////////////////////////////////////////////////////////////////////////////
-// section mcarter 16-Aug-2018
 
 static string start_date{"0"};
 
@@ -64,7 +75,9 @@ void ntran_1(string dstamp, string dr, string cr, string amount, string desc, do
 	//if(dr == "amz") cout << amnt << "\n";
 
 	inc_bal(dr, amnt);
+	tout({"post-1", dstamp, dr, dout(amnt), cr, desc});
 	inc_bal(cr, -amnt);
+	tout({"post-1", dstamp, cr, dout(-amnt), dr, desc});
 	
 }
 
