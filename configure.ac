@@ -26,5 +26,5 @@ AC_CONFIG_FILES([Makefile \
 		 green/Makefile menu/Makefile text2pdf/Makefile \
 		 shlex/Makefile \
 		 mcacc/Makefile \
-		 splut/Makefile stats/Makefile])
+		 stats/Makefile])
 AC_OUTPUT
