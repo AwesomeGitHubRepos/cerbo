@@ -19,6 +19,8 @@ void yyerror(const char* s);
 
 
 %token IDENT TEXT INTEGER
+%token JUST
+%token PLUS
 
 %left '-' '+'
 %left '*' '/'
@@ -38,18 +40,18 @@ subitems:
 ;
 
 subitem:
-  "just" expr { pnodes_c p ; p.append($1); $$ = p; }
+  JUST expr { trace("just"); pnodes_c p ; p.append($1); $$ = p; }
 ;
 
 expr:
-  expr '+' expr { $$ = make_funcall("+", $1, $3); }
+  expr PLUS expr { $$ = make_funcall("+", $1, $3); }
 | expr '-' expr { $$ = make_funcall("-", $1, $3); }
 | expr '*' expr { $$ = make_funcall("*", $1, $3); }
 | expr '/' expr { $$ = make_funcall("/", $1, $3); }
 | expr '^' expr	{ $$ = make_funcall("^", $1, $3); }
 | '-' expr %prec UMINUS { $$ = make_funcall("-", 0, $2); } 
 | '(' expr ')'	{ $$ = $2;}
-| INTEGER
+| INTEGER { trace("INTEGER"); }
 ;
 
 

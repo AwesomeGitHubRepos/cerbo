@@ -39,6 +39,7 @@ pnodes_c append_expr(pnode_t& vec, const pnode_t& expr);
 std::string enstr(const pnode_t& pnode);
 std::string enstr(const prim_t& prim);
 
+void trace(std::string text);
 
 extern int yylex();
 

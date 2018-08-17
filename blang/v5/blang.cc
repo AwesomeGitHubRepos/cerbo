@@ -12,6 +12,10 @@ using std::endl;
 #include "blang.h"
 
 
+void trace(std::string text)
+{
+	cout << "trace:" << text << ".\n" << endl;
+}
 
 
 void yyerror(const char* s) {
