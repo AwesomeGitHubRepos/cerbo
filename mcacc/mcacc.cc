@@ -7,7 +7,7 @@
 #include <map>
 #include <stdio.h>
 #include <stdlib.h>
-//#include <set>
+#include <set>
 #include <string>
 #include <vector>
 #include <stdexcept>
@@ -66,6 +66,7 @@ double bals_at(string acc)
 	return bals[acc];
 }
 
+
 void ntran_1(string dstamp, string dr, string cr, string amount, string desc, double sgn)
 {
 
@@ -88,17 +89,26 @@ strings command_args;
 
 bool etran()
 {
-	if(command_name != "etran-2") return false;
+	if(command_name != "etran-3") return false;
 	strings& a = command_args;
-	//string dstamp{a.at(0)}, acc{a.at(1;
 	string dstamp{a.at(0)}, acc{a.at(1)}, ticker{a.at(2)}, 
-	       qty{a.at(3)}, amount{a.at(4)}, way{a.at(5)}, desc{a.at(6)};
-	double sgn = way == "S"? 1 : -1;
+	       qty{a.at(3)}, amount{a.at(4)}, desc{a.at(5)};
+	double sgn = stod(qty) < 0? 1 : -1;
 	ntran_1(dstamp, acc, "flow", amount, desc, sgn);
-	//std::tie(dstamp, acc, ticker, qty, amount, way, desc) = command_args;
-	//ntran_1(a.at(0),  
-	//cout << "I'm an etran\n";
+	tout({"qty-1", acc+":"+ticker, qty});
 	return true;
+}
+
+bool fail()
+{
+	set<string> ignore = {"nb", "stocko-off"};
+	if(ignore.find(command_name) != ignore.end())
+		return true;
+	//if(find(ignore.begin(), ignore.end(), command_name) != ignore.end())
+	//	return true;
+	//if(ignore.find(command_name) != ignore.end()) return true;
+	cerr << "Unknown command:" << command_name << ".\n";
+	return false;
 }
 
 bool gaap()
@@ -149,7 +159,7 @@ void dispatch_command()
 	//cout << "dispatch\n";
 	//auto is = [command_name](string s) { return s == command_name; };
 	//auto is = [](string s) { return s == command_name; };
-	etran() || ntran() || gaap() || start() ;
+	etran() || ntran() || gaap() || start() || fail();
 	//if(is("etran-2"))
 	//	cout << "found etran\n";
 }
@@ -170,8 +180,8 @@ int
 main(int argc, char *argv[])
 {
 	feenableexcept(FE_OVERFLOW);
-	scan("accts2018v1.txt");
-	scan("ltbh.txt");
+	scan("accts2018v2.txt");
+	scan("ltbhv2.txt");
 	scan("gaap.txt");
 	//print_balances();
 	//scan("test.txt");
