@@ -23,16 +23,8 @@ int line_number = 0;
 
 [\t\r ]* // discard whitespace
 \n	line_number++;
-\+	return '+';
--	return '-';
-,	return ',';
-\*	return '*';
-\/	return '/';
-\^	return '^';
-\(	return '(';
-\)	return ')';
-\"[^"]*\"	{ yylval = std::string(yytext); return PRIM; }
-[0-9]+		{ yylval = std::stod(yytext); 	return PRIM;}
+\"[^"]*\"	{ yylval = std::string(yytext); return TEXT; }
+[0-9]+		{ yylval = std::stod(yytext); 	return INTEGER;}
 [a-zA-Z]+ 	{ yylval = std::string(yytext); return IDENT; }
 
 %%
