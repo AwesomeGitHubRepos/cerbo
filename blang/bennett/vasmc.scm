@@ -32,39 +32,6 @@
   (write-bytes bytes))
     
 
-#|
-(define (type-2 instruction-code rx offset ry)
-  (write-byte instruction-code)
-  (write-rxy rx ry)
-  (write-offset offset))
-
-
-(define (branch id offset)
-  (write-byte id)
-  (write-offset offset))
-  
-  
-
-(define (sti rx off ry)
-  (type-2 7 rx off ry))
-
-(define (ldi offset rx ry)
-  (type-2 8 rx offset ry))
-
-(define (ldr rx ry)
-  (write-byte 10)
-  (write-rxy rx ry))
-
-(define (bze off) (branch 11 off))
-
-(define (bnz off) (branch 12 off))
-
-(define (bra off) (branch 13 off))
-
-(define (bal rx ry)
-  (write-byte 14)
-  (write-rxy rx ry))
-|#
 
 (define opcode-table
   ;; OPCODE ID Rn? OFF?
