@@ -1,4 +1,4 @@
-M_CXXFLAGS = -std=c++17
+AM_CXXFLAGS = -std=c++17
 
 bin_PROGRAMS = vasser
 
