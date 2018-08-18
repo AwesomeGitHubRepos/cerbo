@@ -4,21 +4,23 @@
 
 (require-extension srfi-1)
 
-(require-extension bindings)
+
+;;(require-extension bindings)
 ;; needing installation:
 ;;(require-extension srfi-34)
 ;;(require-extension loop)
 ;;(require-extension miscmacros)
-;;(require-extension matchable)
+;;(require-extension f-operator)
+(use shift-reset)
 (require-extension holes)
 ;;(require-extension anaphora)
-
+(require-extension list-utils)
 (use regex-literals)
 (require-extension regex-literals)
 
 ;;(import mcutils)
 ;;(declare (uses mcutils))
-(include "mcutils.scm")
+;;(include "mcutils.scm")
 (use mcutils)
 ;;(include "mcutils.scm")
 
@@ -34,68 +36,67 @@
 
 ;;(parse-file "fact.vas")
 
-(define (white? c) (char-set-contains? char-set:whitespace c))
+(define-syntax-rule (listify! chars)
+  (when (string? chars) (set! chars (string->list chars))))
 
-(define (letter? c) (char-set-contains? char-set:letter c))
+(define (taking cset sym)
+  (define (pred c) (char-set-contains? cset c))
+  (lambda (chars)
+    (listify! chars)
+    (define matched (take-while pred chars))
+    (if (pair? matched)
+	(cons sym matched)
+	#f)))
 
-(define (white chars) (cons 'WHITE (take-while white? chars)))
-
-(define (word chars) (cons 'WORD (take-while letter? chars)))
+(define word   (taking char-set:letter 'WORD))
+(define white (taking char-set:whitespace 'WHITE))
+(define number (taking char-set:digit 'NUMBER))
 
 (define (comment chars)
-  (cons 'COMMENT
-	(if (eq? #\\ (carf chars)) chars '())))
+  (listify! chars)
+  (if (eq? (carf chars) #\\)
+      (cons #f chars)
+      #f))
+
+(define (other chars)
+  (listify! chars) 
+  (if (pair? chars)
+      (list 'OTHER (car chars))
+      #f))
+
+
+(define (match-first chars)
+  (ormap (lambda (proc) (proc chars)) (list word white number comment other)))
+
+(define (return x)
+  (shift k x))
+
+(define (lexify chars)
+  (listify! chars)
+  (define (loop accum chars)
+    (reset
+     (when (null? chars) (return accum))
+     (define m (match-first chars))
+     ;;(show-var m)
+     (unless m (return accum))
+     (define rest (drop chars (length (cdr m))))
+     ;;(show-var rest)
+     (if (car m)
+	 (loop (cons m accum) rest)
+	 (loop accum rest))))
+  (reverse (loop '() chars)))
+
+(lexify "HEL WORK,D 23\\ foo")
+
+
+
+   
+
 
 (define (cdrf lst) (if (null? lst) #f (cdr lst)))
 
-(define (other chars)
-  (list 'OTHER (car chars)))
 
-(define (match-first procs chars)
-  (define (loop-0 procs)
-    (define matched ((car procs) chars))
-    ;;(show-var matched)
-    ;;(show-var (length (cdr matched)))
-    (if (pair? (cdr matched))
-	matched	       
-	(loop-0 (cdr procs))))
-  (loop-0 procs))
+(show-var (lexer matchers "  LDI 1000(R1),R2"))
 
-
-
-;;(define foo 12)
-;;(show-var foo)
-
-(define (lexer matchers str)
-  (define (loop-0 matches chars)
-    ;;(show-var chars)
-    (define match (match-first matchers chars))
-    ;;(show-var match)
-    (define yytext (cdr match))
-    (assert (pair? yytext)) ; you can't just match nothing
-    (define remainder (drop chars (length yytext)))
-    ;;(show-var remainder)
-    ;;(display 0)
-    (set! yytext (list->string yytext))
-    ;;(display 1)
-    (set! match (list (car match) yytext))
-    ;;(show-var match)
-    (set! matches (cons match matches))
-    (if (pair? remainder)
-	(loop-0 matches remainder)
-	(reverse matches)))
-  (loop-0 '() (string->list str)))
-    
-
-
-(define matchers (list white word comment other))
-
-;;(length (word '(#\space)))
-(show-var (lexer matchers "foo   (Rval,\\hello world"))
-
-;;(match-first matchers (string->list "foo  bar"))
-
-;;(pair? (take-while white? '(#\r)))
-
-;;(white? #\s)
-;;(pair? (cdr (white '(#\r))))
+(parse-line "  LDI 1000(R1),R2")
+   
