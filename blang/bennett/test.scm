@@ -1,0 +1,7 @@
+(LABEL START)
+(LDN A 80)
+(TRAP)
+(INC A)
+(CP 90)
+(BNZ START)
+(HALT)
