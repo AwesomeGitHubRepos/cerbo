@@ -1,17 +1,9 @@
-#include <any>
 #include <cassert>
-#include <deque>
-#include <functional>
-#include <iostream>
 #include <cmath>
+#include <iostream>
 #include <vector>
 
 #include <FlexLexer.h>
-
-//from deque imp
-//using std::cout;
-//using std::endl;
-
 
 #include "blang.h"
 #include "blang.tab.hh"
@@ -19,6 +11,8 @@
 using namespace std;
 
 
+yyFlexLexer lexer; 
+int top = 0; // root of the program
 vector<tac> tacs;
 
 int add_tac(int type, int arg1, int arg2, int arg3)
@@ -33,41 +27,18 @@ int add_tac(int type, int arg1, int arg2)
 	return add_tac(type, arg1, arg2, -1);
 }
 
-deque<deque<string>> frames;
-
-void create_frame()
-{
-	deque<string> frame;
-	frames.push_back(frame);
-}
-
-void emit_frame()
-{
-	for(auto& s: frames.front())
-		cout << s << "\n";
-	frames.pop_front();
-}
 
 void trace(std::string text)
 {
 	cout << "trace:" << text << ".\n" << endl;
 }
 
-void emit(std::string text)
-{
-	//static int opcode_num = 0;
-	//printf("%3d\t%s\n", opcode_num, text.c_str());
-	//cout << text << "\n";
-	//opcode_num++;
-	frames.back().push_back(text);
-}
 
 void yyerror(const char* s) {
 	cout << "Parse error:" <<  s << endl;
 	exit(1);
 }
 
-yyFlexLexer lexer; // = new yyFlexLexer;
 
 int yylex()
 {

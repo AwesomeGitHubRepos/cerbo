@@ -1,4 +1,4 @@
-ASAN = -fsanitize=address
+#ASAN = -fsanitize=address
 
 CXXFLAGS = -O0 -ggdb --std=c++17
 OBJS = blang.o blang.tab.o lex.yy.o
