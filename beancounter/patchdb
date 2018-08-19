@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-psql beancounter <<EOF
-\i hi52w.sql
-\i qat.sql
-\i mcacc.sql
-EOF

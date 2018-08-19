@@ -1,3 +1,0 @@
-sudo aptitude install hdf5-tools
-
-man -k hdf5
