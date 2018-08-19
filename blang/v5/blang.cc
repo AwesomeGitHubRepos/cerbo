@@ -3,6 +3,7 @@
 #include <deque>
 #include <functional>
 #include <iostream>
+#include <cmath>
 #include <vector>
 
 #include <FlexLexer.h>
@@ -94,73 +95,7 @@ pnode_t make_funcall(const std::string& function_name, const pnode_t& pnode1, co
 	return fc;
 }
 
-pnode_t make_funcall(pnode_t& identifier, pnode_t& pnodes)
-{
-	funcall_c fc;
-	fc.function_name = enstr(identifier);
-	fc.pnodes = std::get<pnodes_c>(pnodes);
-	return fc;
-}
 
-std::string str(pnode_t& pnode)
-{
-	//pnode_t result;
-	if(std::holds_alternative<prim_t>(pnode)) {
-		prim_t prim = std::get<prim_t>(pnode);
-		if(std::holds_alternative<double>(prim))
-			return std::to_string(std::get<double>(prim));
-		else
-			return std::get<std::string>(prim);
-	}
-
-	/* 
-	} else if(std::holds_alternative<funcall_c>(pnode)) {
-		funcall_c& fc = std::get<funcall_c>(pnode);
-		func_t& fn = funcmap[fc.function_name];
-		prims_t vals;
-		std::transform(fc.pnodes.pnodes.begin(), fc.pnodes.pnodes.end(),
-				std::back_inserter(vals),				
-				eval); 
-		return fn(vals);
-	} else if(std::holds_alternative<pnodes_c>(pnode)) { 
-		prim_t result;
-		for(auto& pn: std::get<pnodes_c>(pnode).pnodes)
-			result = eval(pn);
-		return result;
-	}
-*/
-
-	assert(false);
-	//return result;
-}
-prim_t eval(pnode_t& pnode)
-{
-	//pnode_t result;
-	if(std::holds_alternative<prim_t>(pnode)) {
-		prim_t prim = std::get<prim_t>(pnode);
-		if(std::holds_alternative<double>(prim))
-			return std::get<double>(prim);
-		else
-			return std::get<std::string>(prim);
-	} else if(std::holds_alternative<funcall_c>(pnode)) {
-		funcall_c& fc = std::get<funcall_c>(pnode);
-		func_t& fn = funcmap[fc.function_name];
-		prims_t vals;
-		std::transform(fc.pnodes.pnodes.begin(), fc.pnodes.pnodes.end(),
-				std::back_inserter(vals),				
-				eval); 
-		return fn(vals);
-	} else if(std::holds_alternative<pnodes_c>(pnode)) { 
-		prim_t result;
-		for(auto& pn: std::get<pnodes_c>(pnode).pnodes)
-			result = eval(pn);
-		return result;
-	}
-
-
-	assert(false);
-	//return result;
-}
 
 void disassemble()
 {
@@ -191,6 +126,8 @@ int eval(int pc)
 			return eval(t.arg1) * eval(t.arg2);
 		case PLUS:
 			return eval(t.arg1) + eval(t.arg2);
+		case POW:
+			return pow(eval(t.arg1), eval(t.arg2));
 		case INTEGER:
 			return t.arg1;
 		case IF:
