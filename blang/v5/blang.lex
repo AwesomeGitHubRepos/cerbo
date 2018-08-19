@@ -17,6 +17,9 @@ using std::cout;
 int line_number = 0;
 //extern yylval;
 
+// TODO reinstate these pattersn
+// \"[^"]*\"	{ yylval = store_string(yytext); return TEXT; }
+// [a-zA-Z]+ 	{ yylval = store_string(yytext); return IDENT; }
 %}
 
 ws	[ \t\r\n]
@@ -24,14 +27,19 @@ ws	[ \t\r\n]
 
 [\t\r ] // discard whitespace
 \n	line_number++;
-\"[^"]*\"	{ yylval = std::string(yytext); return TEXT; }
 "("		{ return LRB; }
 ")"		{ return RRB; }
+"-"		{ return SUB;}
 "+"		{ return PLUS;}
 "*"		{ return MUL;}
+"/"		{ return DIV; }
+"^"		{ return POW; }
 ";"		{ return SEMI;}
-[0-9]+		{ yylval = std::stod(yytext); 	return INTEGER;}
-just{ws}	{ return JUST;}
-[a-zA-Z]+ 	{ yylval = std::string(yytext); return IDENT; }
+[0-9]+		{ yylval = std::stoi(yytext); 	return INTEGER;}
+IF		{ return IF; }
+THEN		{ return THEN; }
+ELSE		{ return ELSE; }
+FI		{ return FI; }
+JUST		{ return JUST;}
 
 %%

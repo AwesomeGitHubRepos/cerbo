@@ -26,7 +26,8 @@ class pnodes_c {
 
 class funcall_c { public: std::string function_name;  pnodes_c pnodes; };
 
-#define YYSTYPE pnode_t
+//#define YYSTYPE pnode_t
+#define YYSTYPE int
 extern YYSTYPE yylval;
 inline pnode_t top_prog_node;
 
@@ -45,3 +46,10 @@ std::string str(pnode_t& pnode);
 
 extern int yylex();
 
+void create_frame();
+void emit_frame();
+
+inline int top = 0; // the top node
+
+typedef struct {int type; int arg1; int arg2; } tac;
+int add_tac(int type, int arg1, int arg2);

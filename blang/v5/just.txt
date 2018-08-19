@@ -1,1 +1,4 @@
-just 12+13
+IF 1 THEN
+	JUST 10 ;
+	JUST 20 ;
+FI
