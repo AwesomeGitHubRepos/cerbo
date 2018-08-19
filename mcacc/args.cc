@@ -5,7 +5,6 @@
 
 #include "args.h"
 #include "common.h"
-//#include "inputs.h"
 #include "tests.h"
 
 using std::cerr;
@@ -46,13 +45,6 @@ vm_t parse_args(int argc, char *argv[])
 	vm["snap"] = "off";
 	vm["wiegley"] = "off";
 
-	/*
-	vecvec_t ini_file = parse::vecvec(rootdir() + "/mcacc2.ini");
-	for(const auto& r: ini_file) {
-		if(r.size() !=2) continue;
-		vm[r[0]] = r[1];
-	}
-	*/
 
         int c;
         while(1) {

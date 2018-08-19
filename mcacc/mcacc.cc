@@ -17,8 +17,6 @@
 #include <sstream>
 
 
-//#include "args.h"
-//#include "common.h"
 #include "parser.hh"
 
 
@@ -37,15 +35,20 @@ std::string dout(double d)
         return s.str();
 }
 
-void tout(const strings& strs)
+string intercalate(const strings& strs, const string& sep)
 {
+	string result;
 	int len = strs.size();
 	for(int i=0; i<len; ++i) {
-		cout << strs[i];
-		if(i+1<len) cout << "\t";
+		result += strs[i];
+		if(i+1<len) result += sep;
 	}
-	cout << "\n";
+	return result;
+}
 
+void tout(const strings& strs)
+{
+	cout << intercalate(strs, "\t") << "\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -93,9 +96,21 @@ bool etran()
 	strings& a = command_args;
 	string dstamp{a.at(0)}, acc{a.at(1)}, ticker{a.at(2)}, 
 	       qty{a.at(3)}, amount{a.at(4)}, desc{a.at(5)};
-	double sgn = stod(qty) < 0? 1 : -1;
+	double dqty = stod(qty);
+	double sgn = dqty < 0? 1 : -1;
 	ntran_1(dstamp, acc, "flow", amount, desc, sgn);
 	tout({"qty-1", acc+":"+ticker, qty});
+
+	// stocko output
+	// TODO csv header
+	string dstamp1 = dstamp.substr(8,2) + "/" + dstamp.substr(5, 2) + "/" + dstamp.substr(0, 4);
+	string typa {"Buy"}, typb{"Desposit"};
+	if(dqty<0) { typa = "Sell"; bypb = "Withdrawal"; }
+	string empty{"\"\""};
+	auto sto = []() { cout << "stocko-1\t" << intercalate({dstamp1, "\"10:10:10\"", typ, q, u, p, empty, sconsid}); };
+	sto(ticker1, typa, aqty,   "1",   price, "\"GBX\"", "0");
+	sto(empty,   typb, empty,  empty, empty, empty, empty);
+
 	return true;
 }
 
