@@ -20,10 +20,16 @@ using namespace std;
 
 vector<tac> tacs;
 
+int add_tac(int type, int arg1, int arg2, int arg3)
+{
+	tacs.push_back(tac{type, arg1, arg2, arg3});
+	return tacs.size() -1;
+
+}
+
 int add_tac(int type, int arg1, int arg2)
 {
-	tacs.push_back(tac{type, arg1, arg2});
-	return tacs.size() -1;
+	return add_tac(type, arg1, arg2, -1);
 }
 
 deque<deque<string>> frames;
@@ -181,10 +187,22 @@ int eval(int pc)
 			//trace("Found just");
 			cout << "just " << eval(t.arg1) << "\n";
 			break;
+		case MUL:
+			return eval(t.arg1) * eval(t.arg2);
 		case PLUS:
 			return eval(t.arg1) + eval(t.arg2);
 		case INTEGER:
 			return t.arg1;
+		case IF:
+			if(eval(t.arg1)) eval(t.arg2);
+			break;			
+		case ELSE:
+			if(eval(t.arg1)) 
+				eval(t.arg2);
+			else
+				eval(t.arg3);
+			break;			
+
 		default:
 			trace("Unhandled type");
 	}

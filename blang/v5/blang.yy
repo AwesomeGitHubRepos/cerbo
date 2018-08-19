@@ -41,7 +41,7 @@ statements:
 ;
 
 statement:
-  if_statement   { $$ = add_tac(IF, $1, 0); }
+  if_statement   
 | JUST expr SEMI { $$ = add_tac(JUST, $2, 0); }
 ;
 
@@ -57,8 +57,8 @@ expr:
 ;
 
 if_statement:
-  IF expr THEN statements FI { $$ = add_tac(IF, $2, $3);  } 
-| IF expr THEN statements ELSE statements FI
+  IF expr THEN statements FI { $$ = add_tac(IF, $2, $4);  } 
+| IF expr THEN statements ELSE statements FI { $$ = add_tac(ELSE, $2, $4, $6); }
 ;  
 
 
