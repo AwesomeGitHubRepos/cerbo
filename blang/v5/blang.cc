@@ -14,9 +14,13 @@ using std::endl;
 
 void trace(std::string text)
 {
-	cout << "trace:" << text << ".\n" << endl;
+//	cout << "trace:" << text << ".\n" << endl;
 }
 
+void emit(std::string text)
+{
+	cout << text << "\n";
+}
 
 void yyerror(const char* s) {
 	cout << "Parse error:" <<  s << endl;
@@ -59,6 +63,37 @@ pnode_t make_funcall(pnode_t& identifier, pnode_t& pnodes)
 	return fc;
 }
 
+std::string str(pnode_t& pnode)
+{
+	//pnode_t result;
+	if(std::holds_alternative<prim_t>(pnode)) {
+		prim_t prim = std::get<prim_t>(pnode);
+		if(std::holds_alternative<double>(prim))
+			return std::to_string(std::get<double>(prim));
+		else
+			return std::get<std::string>(prim);
+	}
+
+	/* 
+	} else if(std::holds_alternative<funcall_c>(pnode)) {
+		funcall_c& fc = std::get<funcall_c>(pnode);
+		func_t& fn = funcmap[fc.function_name];
+		prims_t vals;
+		std::transform(fc.pnodes.pnodes.begin(), fc.pnodes.pnodes.end(),
+				std::back_inserter(vals),				
+				eval); 
+		return fn(vals);
+	} else if(std::holds_alternative<pnodes_c>(pnode)) { 
+		prim_t result;
+		for(auto& pn: std::get<pnodes_c>(pnode).pnodes)
+			result = eval(pn);
+		return result;
+	}
+*/
+
+	assert(false);
+	//return result;
+}
 prim_t eval(pnode_t& pnode)
 {
 	//pnode_t result;

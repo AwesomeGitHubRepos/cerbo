@@ -40,6 +40,8 @@ std::string enstr(const pnode_t& pnode);
 std::string enstr(const prim_t& prim);
 
 void trace(std::string text);
+void emit(std::string text);
+std::string str(pnode_t& pnode);
 
 extern int yylex();
 
