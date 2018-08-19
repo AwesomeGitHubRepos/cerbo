@@ -1,4 +1,0 @@
-#!/bin/sh
-export PYTHONPATH="~/src/whimsy/whimsy:$PYTHONPATH"
-xterm &
-while true; do sleep 1000000; done

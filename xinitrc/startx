@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-# what to do at the start of an X session
-xmessage "hello from ~/repos/nokilli/xinitrc/startx" &
-xbin &

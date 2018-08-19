@@ -1,7 +1,0 @@
-[Desktop Entry]
-Encoding=UTF-8
-Name=Ratpoison
-Comment=No mouse
-Exec=ratpoison
-Icon=xmonad.png
-Type=XSession

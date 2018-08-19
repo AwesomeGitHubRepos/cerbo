@@ -1,8 +1,0 @@
-#! /usr/bin/env bash
-
-function add { lnmc `pwd`/xinitrc.$1 /etc/X11/xinit/xinitrc.$1 ; }
-function desktop { lnmc `pwd`/$1 /usr/share/xsessions ; }
-
-add ratpoison
-add wmii
-desktop ratpoison.desktop
