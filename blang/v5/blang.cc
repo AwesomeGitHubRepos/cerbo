@@ -74,27 +74,6 @@ int yylex()
 	return lexer.yylex();
 }
 
-void pnodes_c::append(const pnode_t& pnode)
-{
-	pnodes.push_back(pnode);
-}
-
-pnodes_c append_expr(pnode_t& vec, const pnode_t& expr)
-{
-	pnodes_c p = std::get<pnodes_c>(vec); 
-	p.append(expr); 
-	return  p;
-}
-
-pnode_t make_funcall(const std::string& function_name, const pnode_t& pnode1, const pnode_t& pnode2)
-{
-	funcall_c fc;
-	fc.function_name = function_name;
-	fc.pnodes.append(pnode1);
-	fc.pnodes.append(pnode2);
-	return fc;
-}
-
 
 
 void disassemble()
@@ -122,10 +101,16 @@ int eval(int pc)
 			//trace("Found just");
 			cout << "just " << eval(t.arg1) << "\n";
 			break;
+		case UMINUS:
+			return - eval(t.arg1);
+		case DIV:
+			return eval(t.arg1) / eval(t.arg2);
 		case MUL:
 			return eval(t.arg1) * eval(t.arg2);
 		case PLUS:
 			return eval(t.arg1) + eval(t.arg2);
+		case SUB:
+			return eval(t.arg1) - eval(t.arg2);
 		case POW:
 			return pow(eval(t.arg1), eval(t.arg2));
 		case INTEGER:

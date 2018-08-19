@@ -20,7 +20,7 @@ void yyerror(const char* s);
 %token STATEMENT
 %token IDENT TEXT INTEGER
 %token JUST
-%token LRB RRB PLUS MUL
+%token LRB RRB PLUS MUL DIV POW 
 %token SEMI
 %token IF THEN ELSE FI
 
@@ -47,11 +47,11 @@ statement:
 
 expr:
   expr PLUS expr { $$ = add_tac(PLUS, $1, $3);  }
-| expr SUB expr {  }
+| expr SUB expr { $$ = add_tac(SUB, $1, $3);  }
 | expr MUL expr { $$ = add_tac(MUL, $1, $3); }
-| expr DIV expr {  }
-| expr POW expr	{  }
-| SUB expr %prec UMINUS {  } 
+| expr DIV expr { $$ = add_tac(DIV, $1, $3); }
+| expr POW expr	{ $$ = add_tac(POW, $1, $3); }
+| SUB expr %prec UMINUS { $$ = add_tac(UMINUS, $2, 0); } 
 | LRB expr RRB	{ $$ = $2;}
 | INTEGER { $$ = add_tac(INTEGER, $1, 0);  }
 ;
