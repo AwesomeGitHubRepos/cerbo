@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <cfenv>
+#include <cmath>
 #include <cstring>
 #include <dirent.h>
 #include <fstream>
@@ -106,7 +107,7 @@ bool etran()
 	string typa {"Buy"}, typb{"Deposit"};
 	double qamount = stod(amount);
 	if(dqty<0) { typa = "Sell"; typb = "Withdrawal"; qamount *= -1; }
-	string price = to_string(abs(qamount * 100.0 /dqty));
+	string price = to_string(fabs(qamount * 100.0 /dqty));
 	static char sconsid[30];
 	sprintf(sconsid, "%.2f", qamount);
 	//string empty{"\"\""};
