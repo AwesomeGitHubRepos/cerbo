@@ -102,15 +102,23 @@ bool etran()
 	tout({"qty-1", acc+":"+ticker, qty});
 
 	// stocko output
-	// TODO csv header
 	string dstamp1 = dstamp.substr(8,2) + "/" + dstamp.substr(5, 2) + "/" + dstamp.substr(0, 4);
 	string typa {"Buy"}, typb{"Desposit"};
-	if(dqty<0) { typa = "Sell"; typb = "Withdrawal"; }
-	string empty{"\"\""};
-	auto sto = [&](string typ, string q, string u, string p) { 
-		cout << "stocko-1\t" << intercalate({dstamp1, "\"10:10:10\"", typ, q, u, p, empty, sconsid}); };
-	sto(ticker1, typa, aqty,   "1",   price, "\"GBX\"", "0");
-	sto(empty,   typb, empty,  empty, empty, empty, empty);
+	double qamount = stod(amount);
+	if(dqty<0) { typa = "Sell"; typb = "Withdrawal"; qamount *= -1; }
+	string price = to_string(abs(qamount * 100.0 /dqty));
+	static char sconsid[30];
+	sprintf(sconsid, "%.2f", qamount);
+	//string empty{"\"\""};
+	auto sto = [&](string sym, string typ, string q, string u, string p, string rox, string r) { 
+		cout << "stocko-1\t"; 
+		strings fields = {sym, dstamp1, "10:10:10", typ, q, u, p, rox, r, "", sconsid};
+		cout << intercalate(fields, ",") << "\n"; 
+	};
+	string ticker1 = "LON:"s + ticker.substr(0, ticker.size()-2);
+	string aqty = to_string(int(abs(dqty)));
+	sto(ticker1, typa, aqty,   "1",   price, "GBX", "0");
+	sto("",   typb, "",  "", "", "", "");
 
 	return true;
 }
@@ -196,7 +204,7 @@ int
 main(int argc, char *argv[])
 {
 	feenableexcept(FE_OVERFLOW);
-	tout("stocko-1", "TICKER,DATE,TIME,TYPE,SHARES,FX,PRICE,CURRENCY,COMMISSION,TAX,TOTAL");
+	tout({"stocko-1", "TICKER,DATE,TIME,TYPE,SHARES,FX,PRICE,CURRENCY,COMMISSION,TAX,TOTAL"});
 	scan("accts2018v2.txt");
 	scan("ltbhv2.txt");
 	scan("gaap.txt");
