@@ -103,7 +103,7 @@ bool etran()
 
 	// stocko output
 	string dstamp1 = dstamp.substr(8,2) + "/" + dstamp.substr(5, 2) + "/" + dstamp.substr(0, 4);
-	string typa {"Buy"}, typb{"Desposit"};
+	string typa {"Buy"}, typb{"Deposit"};
 	double qamount = stod(amount);
 	if(dqty<0) { typa = "Sell"; typb = "Withdrawal"; qamount *= -1; }
 	string price = to_string(abs(qamount * 100.0 /dqty));
