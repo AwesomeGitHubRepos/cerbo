@@ -22,7 +22,6 @@ AC_SUBST([LIBSUPO], ['$(top_builddir)/supo/libsupo.a'])
 # Wrapping it up
 AC_CONFIG_FILES([Makefile \
 		 supo/Makefile \
-		 beancounter/scripts/Makefile \
 		 green/Makefile menu/Makefile text2pdf/Makefile \
 		 shlex/Makefile \
 		 mcacc/Makefile \

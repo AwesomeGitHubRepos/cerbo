@@ -105,9 +105,10 @@ bool etran()
 	// TODO csv header
 	string dstamp1 = dstamp.substr(8,2) + "/" + dstamp.substr(5, 2) + "/" + dstamp.substr(0, 4);
 	string typa {"Buy"}, typb{"Desposit"};
-	if(dqty<0) { typa = "Sell"; bypb = "Withdrawal"; }
+	if(dqty<0) { typa = "Sell"; typb = "Withdrawal"; }
 	string empty{"\"\""};
-	auto sto = []() { cout << "stocko-1\t" << intercalate({dstamp1, "\"10:10:10\"", typ, q, u, p, empty, sconsid}); };
+	auto sto = [&](string typ, string q, string u, string p) { 
+		cout << "stocko-1\t" << intercalate({dstamp1, "\"10:10:10\"", typ, q, u, p, empty, sconsid}); };
 	sto(ticker1, typa, aqty,   "1",   price, "\"GBX\"", "0");
 	sto(empty,   typb, empty,  empty, empty, empty, empty);
 
@@ -195,6 +196,7 @@ int
 main(int argc, char *argv[])
 {
 	feenableexcept(FE_OVERFLOW);
+	tout("stocko-1", "TICKER,DATE,TIME,TYPE,SHARES,FX,PRICE,CURRENCY,COMMISSION,TAX,TOTAL");
 	scan("accts2018v2.txt");
 	scan("ltbhv2.txt");
 	scan("gaap.txt");
