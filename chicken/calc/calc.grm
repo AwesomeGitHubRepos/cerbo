@@ -2,7 +2,7 @@
 (define expr-parser
  (lalr-parser
 
-  (output: calc-parser "calc.yy.scm")
+  (output: calc-parser "calc-yy.scm")
   (out-table: "calc.out")
   (expect: 5)
 
