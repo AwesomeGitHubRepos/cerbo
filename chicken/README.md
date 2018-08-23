@@ -10,4 +10,9 @@ For various things chicken scheme
 * [lexing](lexing/README.md) - just silex, without yacc
 
 Resources:
+* [silex example](http://marcomaggi.github.io/docs/vicare-libs.html/silex-example.html)
+* [silex + lalr combo](http://compgroups.net/comp.lang.scheme/a-quick-getting-started-example-with-silex-l/1183462)
 
+# Resources
+
+* [The Scheme Language](https://home.adelphi.edu/sbloch/class/archive/270/scheme.shtml)
