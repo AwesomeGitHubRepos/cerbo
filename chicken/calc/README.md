@@ -1,1 +1,1 @@
-An example of lexing using chicken scheme
+An example of lexing and yaccing using chicken scheme
