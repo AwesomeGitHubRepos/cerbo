@@ -1,6 +1,7 @@
 ;;(load "blangc.scm")
 (require-extension lalr-driver)
 (require-extension fmt)
+(require-extension chili)
 
 (cond-expand
  (compiling (declare (uses grammar-out)))
@@ -18,8 +19,26 @@
  (else (include "lex-out.scm")))
 
 
+;; TODO should be part of chili
+(define-syntax-rule (do-list var lst body ...)
+  (begin
+    (define (loop-1 lst1)
+      (when (pair? lst1)
+	    (define var (car lst1))
+	    body ...
+	    (loop-1 (cdr lst1))))
+    (loop-1 lst)))
+;; Example usage:
+;;(do-list i '(10 11)
+;;	 (print i)
+;;	 (print i))
+
+
 (define (prlist x)
-  (fmt #t x nl))
+  (do-list i x (fmt #t i))  
+  (newline))
+;; (prlist 10 11)
+
 (define (just x)
   (prlist x))
 

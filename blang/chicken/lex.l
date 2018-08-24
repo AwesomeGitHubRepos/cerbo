@@ -12,6 +12,7 @@ text	\"({ascii_char}|{escaped_char})*\"
 "/"	(simple-token '/)
 "^"	(simple-token 'POW)
 ";"	(simple-token 'SEMI)
+","	(simple-token 'COMMA)
 JUST	(simple-token 'JUST)
 PRINT	(simple-token 'PRINT)
 [0-9]+	(my-make-token 'NUM (string->number yytext))

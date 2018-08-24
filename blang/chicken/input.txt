@@ -1,2 +1,4 @@
 PRINT "The meaning of life is..."
 PRINT 41+1
+PRINT "But I don't know", " about anything else" , " for that matter"
+PRINT 10-10, 11-10, 12-10

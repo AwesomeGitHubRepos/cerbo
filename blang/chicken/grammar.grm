@@ -7,7 +7,7 @@
   (expect: 5)
 
   ; Terminal symbols
-  (NUM  JUST SEMI TEXT PRINT
+  (NUM  JUST SEMI TEXT PRINT COMMA
    (left: + -)
    (left: * /)
    (nonassoc: uminus))
@@ -28,7 +28,12 @@
   )
 
   (print_statement
-	(PRINT print_item) : `(prlist ,$2))
+	(PRINT print_list) : `(prlist ,$2))
+
+  (print_list
+	(print_item)	: `(list ,$1)
+	(print_list COMMA print_item) : `(list ,@$1 ,$3)
+  )
 
   (print_item
 	(e)	: $1
@@ -36,10 +41,10 @@
   )
 
 	
-  (e (e + e)              : (begin (print "an addition") (print $1) (print $3) (list '+ $1 $3))
-     (e - e)              : (list '- $1 $3)
-     (e * e)              : (begin (print "a mult") (print $1) (print $3) (list '* $1 $3))
-     (e / e)              : (list '/ $1 $3)
-     (- e (prec: uminus)) : (list '- $2)
-     (NUM)		  : (begin (print "a num") (print $1) $1)
+  (e (e + e)              : `(+ ,$1 ,$3)
+     (e - e)              : `(- ,$1 ,$3)
+     (e * e)              : `(* ,$1 ,$3)
+     (e / e)              : `(/ ,$1 ,$3)
+     (- e (prec: uminus)) : `(- ,$2)
+     (NUM)		  : $1
 )))
