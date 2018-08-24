@@ -1,3 +1,4 @@
+#this is a comment
 PRINT "The meaning of life is..."
 PRINT 41+1
 PRINT "But I don't know", " about anything else" , " for that matter"

@@ -4,6 +4,7 @@ text	\"({ascii_char}|{escaped_char})*\"
 
 %%
 [ \t\r\n]	(yycontinue)
+"#"[^\n]+	(yycontinue)
 "("	(simple-token 'LRB)
 ")"	(simple-token 'RRB)
 "+"	(simple-token '+)
