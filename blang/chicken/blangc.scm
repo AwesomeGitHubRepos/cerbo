@@ -1,5 +1,6 @@
 ;;(load "blangc.scm")
 (require-extension lalr-driver)
+(require-extension fmt)
 
 (cond-expand
  (compiling (declare (uses grammar-out)))
@@ -16,10 +17,12 @@
  (compiling (declare (uses lex-out)))
  (else (include "lex-out.scm")))
 
+
+(define (prlist x)
+  (fmt #t x nl))
 (define (just x)
-  (display "just:")
-  (display x)
-  (newline))
+  (prlist x))
+
 
 (lexer-init 'port (open-input-file "input.txt"))
 ;;(lexer-init 'string "JUST 14+12+5;")

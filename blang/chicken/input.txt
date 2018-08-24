@@ -1,1 +1,2 @@
-JUST "hello world" ;
+PRINT "The meaning of life is..."
+PRINT 41+1
