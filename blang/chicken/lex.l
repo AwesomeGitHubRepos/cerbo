@@ -1,3 +1,4 @@
+
 %%
 [ \t\r\n]	(yycontinue)
 "("	(simple-token 'LRB)

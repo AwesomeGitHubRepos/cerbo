@@ -1,0 +1,20 @@
+(require-extension lalr)
+(define expr-parser
+ (lalr-parser
+
+  (output: blang-parser "grammar-out.scm")
+  (out-table: "grammar.out")
+  (expect: 5)
+
+  ; Terminal symbols
+  (NUM 
+   (left: + -)
+   (left: * /)
+   (nonassoc: uminus))
+  (e (e + e)              : (begin (print "an addition") (print $1) (print $3) (list '+ $1 $3))
+     (e - e)              : (list '- $1 $3)
+     (e * e)              : (begin (print "a mult") (print $1) (print $3) (list '* $1 $3))
+     (e / e)              : (list '/ $1 $3)
+     (- e (prec: uminus)) : (list '- $2)
+     (NUM)		  : (begin (print "a num") (print $1) $1)
+)))

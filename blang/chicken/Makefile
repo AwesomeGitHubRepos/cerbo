@@ -2,7 +2,7 @@
 
 #all : lex-out.scm calc-yy.scm
 	
-calc : calc.scm calc-yy.o lex-out.o
+blangc : blangc.scm grammar-out.o lex-out.o
 	csc $^
 
 lex-out.scm : lex.l
@@ -11,12 +11,12 @@ lex-out.scm : lex.l
 lex-out.o : lex-out.scm
 	csc -unit lex-out -c $^
 
-calc-yy.scm : calc.grm
-	csi < calc.grm
+grammar-out.scm : grammar.grm
+	csi < $^
 
-calc-yy.o : calc-yy.scm
-	csc -unit calc-yy -c $^
+grammar-out.o : grammar-out.scm
+	csc -unit grammar-out -c $^
 
 
 clean :
-	rm -f lex-out.scm calc.yy.scm *.o *~ calc.out calc
+	rm -f lex-out.scm grammar-out.scm  grammar.out *.o *~  blangc
