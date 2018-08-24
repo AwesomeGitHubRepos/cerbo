@@ -16,8 +16,15 @@
  (compiling (declare (uses lex-out)))
  (else (include "lex-out.scm")))
 
-;;(lexer-init 'port (open-input-file "input.txt"))
-(lexer-init 'string "14+12+5")
+(define (just x)
+  (display "just:")
+  (display x)
+  (newline))
 
-(print (eval (blang-parser lexer print)))
+;;(lexer-init 'port (open-input-file "input.txt"))
+(lexer-init 'string "JUST 14+12+5;")
+(define syntax-tree (blang-parser lexer print))
+(print syntax-tree)
+(eval syntax-tree)
+
 
