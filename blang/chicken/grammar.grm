@@ -7,13 +7,14 @@
   (expect: 5)
 
   ; Terminal symbols
-  (NUM  JUST SEMI
+  (NUM  JUST SEMI TEXT
    (left: + -)
    (left: * /)
    (nonassoc: uminus))
 
   (statement
-     (JUST e SEMI)        : `(just ,$2))
+     (JUST e SEMI)        : `(just ,$2)
+	(JUST TEXT SEMI)  : `(just ,$2))
 
   (e (e + e)              : (begin (print "an addition") (print $1) (print $3) (list '+ $1 $3))
      (e - e)              : (list '- $1 $3)

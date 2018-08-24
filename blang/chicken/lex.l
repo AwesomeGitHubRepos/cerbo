@@ -1,3 +1,6 @@
+ascii_char	[^\"\n"]
+escaped_char	\\n|\\\"
+text	\"({ascii_char}|{escaped_char})*\"
 
 %%
 [ \t\r\n]	(yycontinue)
@@ -11,6 +14,7 @@
 ";"	(simple-token 'SEMI)
 JUST	(simple-token 'JUST)
 [0-9]+	(my-make-token 'NUM (string->number yytext))
+{text}	(my-make-token 'TEXT yytext)
 <<EOF>>	'*eoi*
 
 %%

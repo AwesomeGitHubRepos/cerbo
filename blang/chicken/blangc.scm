@@ -21,8 +21,8 @@
   (display x)
   (newline))
 
-;;(lexer-init 'port (open-input-file "input.txt"))
-(lexer-init 'string "JUST 14+12+5;")
+(lexer-init 'port (open-input-file "input.txt"))
+;;(lexer-init 'string "JUST 14+12+5;")
 (define syntax-tree (blang-parser lexer print))
 (print syntax-tree)
 (eval syntax-tree)
