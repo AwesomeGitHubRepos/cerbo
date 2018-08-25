@@ -1,7 +1,7 @@
 (module
  chili
- (export define-syntax-rule displayln
-	 file->lines hello-utils until)
+ (export define-syntax-rule defq displayln
+	 file->lines hello-utils shlex-line )
  (import chicken extras scheme data-structures)
 
 ;;(declare (unit mcutils))
@@ -38,6 +38,38 @@
   (define (loop-0) (loop '()))
   (with-input-from-file filename loop-0))
 
+(define-syntax-rule (defq var queuer)
+  (begin
+    (define var (make-queue))
+    (define (queuer lst) (queue-add! var lst))))
+
+
+(define (build-shlex-token sp members)
+  (define token (open-output-string))
+  (let loop ()
+    (define c (read-char sp))
+    (unless (eof-object? c)
+	    (unless (member c members)
+		    (display c token)
+		    (loop))))
+  (define res (get-output-string token))
+  (close-output-port token)
+  res)
+
+(define (shlex-line line)
+  (define sp (open-input-string line))
+  (defq fields f+)
+  (define (enq members) (f+ (build-shlex-token sp members)))
+  (let loop ()
+	 (define c (peek-char sp))
+	 (unless (eof-object? c)
+		 (case c
+		   [(#\space #\tab) (read-char sp) (loop)]
+		   [(#\#) #t]
+		   [(#\") (read-char sp) (enq '(#\")) (loop)] ; string
+		   [else (enq '(#\space #\tab #\#)) (loop)]))) ; word
+  (close-input-port sp)
+  (queue->list fields))
 
 (define (hello-utils)
    (displayln "hello utils says hello"))
