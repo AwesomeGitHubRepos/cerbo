@@ -28,25 +28,30 @@
 	    body ...
 	    (loop-1 (cdr lst1))))
     (loop-1 lst)))
-;; Example usage:
-;;(do-list i '(10 11)
-;;	 (print i)
-;;	 (print i))
-
+#|
+ Example usage:
+(do-list i '(10 11)
+	 (print i)
+	 (print i))
+|#
 
 (define (prlist x)
   (do-list i x (fmt #t i))  
   (newline))
-;; (prlist 10 11)
+;; (prlist '(10 11))
 
 (define (just x)
   (prlist x))
 
 
-(lexer-init 'port (open-input-file "input.txt"))
-;;(lexer-init 'string "JUST 14+12+5;")
-(define syntax-tree (blang-parser lexer print))
-(print syntax-tree)
-(eval syntax-tree)
+(define (go)
+  (lexer-init 'port (open-input-file "if.txt"))
+  ;;(lexer-init 'string "JUST 14+12+5;")
+  (define syntax-tree (blang-parser lexer print))
+  (displayln "Made it this far")
+  (pretty-print syntax-tree)
+  (eval syntax-tree)
+  #t)
+(go)
 
 

@@ -7,14 +7,12 @@
   (expect: 5)
 
   ; Terminal symbols
-  (NUM  JUST SEMI TEXT PRINT COMMA
+  (NUM  JUST SEMI TEXT PRINT COMMA IF THEN ELSE FI
    (left: + -)
    (left: * /)
    (nonassoc: uminus))
 
-  (program
-	(statements)	: $1
-  )
+  (program (statements)	: $1)
 
   (statements
 	(statement)	: $1
@@ -22,9 +20,14 @@
   )
 
   (statement
-	(print_statement) : $1
-   	(JUST e SEMI)        : `(just ,$2)
-	(JUST TEXT SEMI)  : `(just ,$2)
+	(if_statement)		: $1
+	(print_statement) 	: $1
+   	(JUST e SEMI)        	: `(just ,$2)
+	(JUST TEXT SEMI)  	: `(just ,$2))
+
+  (if_statement
+	(IF e THEN statements FI)	: `(if (not (eq? 0 ,$2)) (begin ,$4))
+	(IF e THEN statements ELSE statements FI) : `(if (not (eq? 0 ,$2)) (begin ,$4) (begin ,$6))
   )
 
   (print_statement
