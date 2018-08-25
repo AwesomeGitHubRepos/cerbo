@@ -21,22 +21,6 @@
  (else (include "lex-out.scm")))
 
 
-;; TODO should be part of chili
-(define-syntax-rule (do-list var lst body ...)
-  (begin
-    (define (loop-1 lst1)
-      (when (pair? lst1)
-	    (define var (car lst1))
-	    body ...
-	    (loop-1 (cdr lst1))))
-    (loop-1 lst)))
-#|
- Example usage:
-(do-list i '(10 11)
-	 (print i)
-	 (print i))
-|#
-
 (define variables (make-hash-table))
 (define (get-var varname)
   (hash-table-ref/default variables varname 0))
