@@ -1,6 +1,6 @@
 (module
  chili
- (export define-syntax-rule defq displayln
+ (export define-syntax-rule defq displayln do-list
 	 file->lines hello-utils shlex-line )
  (import chicken extras scheme data-structures)
 
@@ -73,6 +73,28 @@
 
 (define (hello-utils)
    (displayln "hello utils says hello"))
+
+
+(define-for-syntax (do-list-lambda proc lst)
+  (let loop ((lst1 lst))
+    (when (pair? lst1)
+	  (proc (car lst1))
+	  (loop (cdr lst1)))))
+
+(define-syntax-rule (do-list var lst body ...)
+  (do-list-lambda
+   (lambda (x)
+     (let ((var x))
+       body ...))
+   lst))
+#|
+ Example usage:
+(do-list i '(10 11)
+	 (print i)
+	 (print i))
+|#
+
+
 
 ) ; end of module
 
