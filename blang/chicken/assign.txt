@@ -1,0 +1,2 @@
+foo := 41
+PRINT "I assign the meaning of life to be: ", foo +1

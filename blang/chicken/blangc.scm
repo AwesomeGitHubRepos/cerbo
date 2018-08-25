@@ -1,6 +1,8 @@
 ;;(load "blangc.scm")
 (require-extension lalr-driver)
 (require-extension fmt)
+(require-extension srfi-69)
+
 (require-extension chili)
 
 (cond-expand
@@ -35,6 +37,12 @@
 	 (print i))
 |#
 
+(define variables (make-hash-table))
+(define (get-var varname)
+  (hash-table-ref/default variables varname 0))
+(define (set-var varname value)
+  (hash-table-set! variables varname value))
+  
 (define (prlist x)
   (do-list i x (fmt #t i))  
   (newline))
@@ -45,7 +53,7 @@
 
 
 (define (go)
-  (lexer-init 'port (open-input-file "if.txt"))
+  (lexer-init 'port (open-input-file "assign.txt"))
   ;;(lexer-init 'string "JUST 14+12+5;")
   (define syntax-tree (blang-parser lexer print))
   (displayln "Made it this far")
