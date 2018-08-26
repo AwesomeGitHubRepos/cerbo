@@ -12,9 +12,6 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
-//#include <sys/stat.h>
-//#include <unistd.h>
-//#include <ostream>
 #include <sstream>
 
 
@@ -76,9 +73,6 @@ void ntran_1(string dstamp, string dr, string cr, string amount, string desc, do
 
 	if(dstamp < start_date) return;
 	double amnt = sgn * stod(amount);
-
-	//if(dr == "amz") cout << amnt << "\n";
-
 	inc_bal(dr, amnt);
 	tout({"post-1", dstamp, dr, dout(amnt), cr, desc});
 	inc_bal(cr, -amnt);
@@ -110,7 +104,6 @@ bool etran()
 	string price = to_string(fabs(qamount * 100.0 /dqty));
 	static char sconsid[30];
 	sprintf(sconsid, "%.2f", qamount);
-	//string empty{"\"\""};
 	auto sto = [&](string sym, string typ, string q, string u, string p, string rox, string r) { 
 		cout << "stocko-1\t"; 
 		strings fields = {sym, dstamp1, "10:10:10", typ, q, u, p, rox, r, "", sconsid};
@@ -122,11 +115,9 @@ bool etran()
 	sto("",   typb, "",  "", "", "", "");
 
 	// cgt output
-	//cout << "cgt-1\t";
 	string way = dqty >0 ? "B" : "S";
 	string cprice = to_string(fabs(qamount/dqty));
 	tout({"cgt-1", way, dstamp1, ticker, aqty, cprice, "0.00", "0.00"});
-	//cout << intercalate(cgt_fields, 
 
 	return true;
 }
@@ -136,9 +127,6 @@ bool fail()
 	set<string> ignore = {"nb", "stocko-off"};
 	if(ignore.find(command_name) != ignore.end())
 		return true;
-	//if(find(ignore.begin(), ignore.end(), command_name) != ignore.end())
-	//	return true;
-	//if(ignore.find(command_name) != ignore.end()) return true;
 	cerr << "Unknown command:" << command_name << ".\n";
 	return false;
 }
@@ -148,7 +136,6 @@ bool gaap()
 	if(command_name != "gaap") return false;
 	strings& a = command_args;
 	string meta{a.at(0)}, acc{a.at(1)}, cmp{a.at(2)}, desc{a.at(3)};
-	//cout << "acc = " << acc << "\n";
 	inc_bal(meta, bals_at(acc));
 	string acc1 = acc == "=" ? meta : acc;
 	double amount = bals_at(acc1);
@@ -161,7 +148,6 @@ bool ntran()
 	if(command_name != "ntran") return false;
 	ntran_1(command_args.at(0), command_args.at(1), command_args.at(2), 
 			command_args.at(3), command_args.at(4), 1);
-	//cout << "I'm an ntran\n";
 	return true;
 }
 
@@ -175,25 +161,18 @@ bool start()
 
 void start_command(std::string s)
 {
-	//cout << "start_command:" << s << "\n";
 	command_name = s;
 	command_args.clear();
 }
 
 void add_argument(std::string s)
 {
-	//cout << "add_arg:" << s << "\n";
 	command_args.push_back(s);
 }
 
 void dispatch_command()
 {
-	//cout << "dispatch\n";
-	//auto is = [command_name](string s) { return s == command_name; };
-	//auto is = [](string s) { return s == command_name; };
 	etran() || ntran() || gaap() || start() || fail();
-	//if(is("etran-2"))
-	//	cout << "found etran\n";
 }
 
 void scan(const char* path)
@@ -216,8 +195,5 @@ main(int argc, char *argv[])
 	scan("accts2018v2.txt");
 	scan("ltbhv2.txt");
 	scan("gaap.txt");
-	//print_balances();
-	//scan("test.txt");
-	//cout << "TODO\n";
 	return 0;
 }
