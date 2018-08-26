@@ -75,18 +75,12 @@
    (displayln "hello utils says hello"))
 
 
-(define-for-syntax (do-list-lambda proc lst)
-  (let loop ((lst1 lst))
-    (when (pair? lst1)
-	  (proc (car lst1))
-	  (loop (cdr lst1)))))
-
 (define-syntax-rule (do-list var lst body ...)
-  (do-list-lambda
-   (lambda (x)
-     (let ((var x))
-       body ...))
-   lst))
+  (let loop ((sublst lst))
+    (when (pair? sublst)
+	  (let ((var (car sublst)))
+	    body ...
+	    (loop (cdr sublst))))))
 #|
  Example usage:
 (do-list i '(10 11)
