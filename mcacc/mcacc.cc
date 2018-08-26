@@ -121,6 +121,13 @@ bool etran()
 	sto(ticker1, typa, aqty,   "1",   price, "GBX", "0");
 	sto("",   typb, "",  "", "", "", "");
 
+	// cgt output
+	//cout << "cgt-1\t";
+	string way = dqty >0 ? "B" : "S";
+	string cprice = to_string(fabs(qamount/dqty));
+	tout({"cgt-1", way, dstamp1, ticker, aqty, cprice, "0.00", "0.00"});
+	//cout << intercalate(cgt_fields, 
+
 	return true;
 }
 
