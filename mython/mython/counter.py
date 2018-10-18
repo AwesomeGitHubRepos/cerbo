@@ -1,7 +1,7 @@
 import os
 import time
 
-import pyfiglet
+import pyfiglet # sudo apt install python3-pyfiglet
 
 #secs = 100
 
