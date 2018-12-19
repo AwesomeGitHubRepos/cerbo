@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-# write a CSV file in neatly spaced columns
-
-python3 -m mython.csvmc $*

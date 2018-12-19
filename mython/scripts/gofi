@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-#pycall3 `basename $0` $*
-python3 -m mython.gofi $*
