@@ -75,7 +75,7 @@ def stage02():
     conf_version = config_version()
     tarball = "neoleo-"+conf_version + ".tar.gz"
     md5 =hashlib.md5()
-    md5.update(open("../" + tarball, mode="rb").read())
+    md5.update(open(BDIR + "/" + tarball, mode="rb").read())
     md5 = md5.hexdigest()
 
     # create PKGBUILDs
@@ -84,7 +84,7 @@ def stage02():
     d['SOURCE'] = 'https://github.com/blippy/neoleo/releases/download/v$pkgver/$pkgname-$pkgver.tar.gz'
     ptxt = praw.safe_substitute(d)
     open("release/PKGBUILD", "w").write(ptxt)
-    d['SOURCE'] = "file://../../neoleo-7.0.0.tar.gz"
+    d['SOURCE'] = "file://" + BDIR +"/neoleo-8.0.0.tar.gz"
     ptxt = praw.safe_substitute(d)
     open("test/PKGBUILD", "w").write(ptxt)
     #print(ptxt)
