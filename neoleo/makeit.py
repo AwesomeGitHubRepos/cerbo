@@ -67,10 +67,11 @@ def stage01():
 def stage02():
     # replacement for mksetup
 
-    shutil.rmtree("release", ignore_errors=True)
-    os.makedirs("release")
-    shutil.rmtree("test", ignore_errors=True)
-    os.makedirs("test")
+    #shutil.rmtree("release", ignore_errors=True)
+    #os.makedirs("release")
+    #shutil.rmtree("test", ignore_errors=True)
+    #os.makedirs("test")
+    os.system("rm -rf test release ; mkdir test release")
 
     conf_version = config_version()
     tarball = "neoleo-"+conf_version + ".tar.gz"
