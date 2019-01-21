@@ -7,15 +7,17 @@ import shutil
 from string import Template
 from importlib import reload
 
+BDIR= "/home/mcarter/repos/neoleo"
+
 def config_version():
     # get the version according to configure.ac
-    txt = open("../configure.ac").read()
+    txt = open(BDIR + "/configure.ac").read()
     # AC_INIT([neoleo], [7.0.0])
     pat = re.compile("AC_INIT\\(\\[neoleo\\], \\[(.+)\\]\\)")
     return pat.search(txt).group(1)
 
 def doc_version():
-    lines = open("../docs/index.html").readlines()
+    lines = open(BDIR + "/docs/index.html").readlines()
     pat = re.compile("^Version: (\\S+)")
     result = "UNK"
     for line in lines:
@@ -27,7 +29,7 @@ def doc_version():
 
 
 def news_info():
-    fp = open("../NEWS")
+    fp = open(BDIR + "/NEWS")
     fp.readline()
     version_text = fp.readline()
     version = re.compile("^VERSION:\\s+(\\S+)").search(version_text).group(1)
@@ -41,7 +43,7 @@ def sys(cmd):
     return os.system(cmd)
 
 def stage01():
-    sys("cd .. && rm *.gz")
+    sys("cd " + BDIR + "&& rm *.gz")
 
     # cross-check versioning info
     config_ver = config_version()
@@ -55,7 +57,7 @@ def stage01():
         raise SystemExit("Versions in configure.ac and NEWS mismatch")
     print("Versioning info seems reasonable")
 
-    res = sys("cd .. && make dist && make distcheck")
+    res = sys("cd " + BDIR + " && make dist && make distcheck")
     rstr = "PASS" if res == 0 else "FAIL"
     print(rstr, ": stage01 checking basic compilation")
     print("Check that the following makes sense:")
