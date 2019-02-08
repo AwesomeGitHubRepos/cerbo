@@ -9,7 +9,7 @@
 (define-syntax ++
   (syntax-rules ()
     ((_ var)
-     (set! var (1+ var)))
+     (set! var (+ 1 var)))
     ((_ var by)
      (set! var (+ by var)))))
 
@@ -20,4 +20,4 @@
        (define var lo)
        (while (<= var hi)
 	      (begin . body)
-	      (set! var (1+ var)))))))
+	      (++ var))))))
