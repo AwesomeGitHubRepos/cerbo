@@ -11,3 +11,10 @@
        (set! x (+ x 1)))
 
 (++ x)
+
+
+(display (collect bob
+	 (bob 1)
+	 (for x 10 15
+	      (bob x))
+	 (bob 42)))

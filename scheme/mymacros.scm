@@ -16,8 +16,16 @@
 (define-syntax for
   (syntax-rules ()
     ((_ var lo hi . body)
-     (begin
-       (define var lo)
+     (let ((var lo))
        (while (<= var hi)
 	      (begin . body)
 	      (++ var))))))
+
+
+(define-syntax collect
+  (syntax-rules ()
+    ((_ collector . body)
+     (let* ((acc '())
+	    (collector (lambda (el) (set! acc (cons el acc)))))
+       (begin . body)
+       (reverse acc)))))
