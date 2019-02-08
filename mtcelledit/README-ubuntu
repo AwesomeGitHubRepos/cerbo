@@ -1,7 +1,0 @@
-Dependencies:
-qtbase5-dev-tools
-qtbase5-dev
-libcairo2-dev
-libpango1.0-dev
-libgif-dev
-
