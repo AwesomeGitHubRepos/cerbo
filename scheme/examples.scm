@@ -1,5 +1,7 @@
-(load "mymacros.scm")
+;(load "mymacros.scm")
 
+;; works with chicken, chez, guile
+(include "mymacros.scm")
 
 (for i 1 3
      (display i)
