@@ -1,16 +1,14 @@
 (load "mymacros.scm")
 
 
-(for x 1 3
-     (display x)
+(for i 1 3
+     (display i)
      (newline))
 
-(define x 1)
-(while (< x 3)
+(define i1 1)
+(while (< i1 3)
        (display ",")
-       (set! x (+ x 1)))
-
-(++ x)
+       (++ i1))
 
 
 (display (collect bob
