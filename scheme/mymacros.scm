@@ -1,3 +1,5 @@
+;;;; for use with guile
+
 (use-modules (ice-9 rdelim))
 
 ;; simplify the definition of syntaxes
@@ -9,15 +11,14 @@
 ;	 [(id arg ...) body]))]))
 
 
-;(def-syntax (while test) . body
-
-(define-syntax while
-  (syntax-rules ()
-    ((_ condition . body)
-     (let loop ()
-       (cond (condition
-	      (begin . body)
-	      (loop)))))))
+;; guile has a better implementation that uses break and continue
+;(define-syntax while
+;  (syntax-rules ()
+;    ((_ condition . body)
+;     (let loop ()
+;       (cond (condition
+;	      (begin . body)
+;	      (loop)))))))
 
 (define-syntax ++
   (syntax-rules ()
