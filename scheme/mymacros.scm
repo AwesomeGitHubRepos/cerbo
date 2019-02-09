@@ -1,3 +1,14 @@
+;; simplify the definition of syntaxes
+;(def-syntax define-syntax-rule
+;  (syntax-rules ()
+;    [(define-syntax-rule (id arg ...) body)
+;     (define-syntax id
+;       (syntax-rules ()
+;	 [(id arg ...) body]))]))
+
+
+;(def-syntax (while test) . body
+
 (define-syntax while
   (syntax-rules ()
     ((_ condition . body)
