@@ -18,3 +18,7 @@
 	 (for x 10 15
 	      (bob x))
 	 (bob 42)))
+
+
+
+(write (mc-read-lines "scratch.scm"))

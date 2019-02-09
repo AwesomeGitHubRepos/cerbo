@@ -1,3 +1,5 @@
+(use-modules (ice-9 rdelim))
+
 ;; simplify the definition of syntaxes
 ;(def-syntax define-syntax-rule
 ;  (syntax-rules ()
@@ -40,3 +42,14 @@
 	    (collector (lambda (el) (set! acc (cons el acc)))))
        (begin . body)
        (reverse acc)))))
+
+
+
+(define (mc-read-lines filename)
+  (define (loop lines)
+    (define line (read-line))
+    (if (eof-object? line)
+	(reverse lines)
+	(loop (cons line lines))))
+  (define (loop-0) (loop '()))
+  (with-input-from-file filename loop-0))
