@@ -3,7 +3,7 @@ A brain dump
 ## contents
 
 * blang - toy BASIC interpreter written in C++
-* efence - see C
+* dsp - Digital Signal Processing
 
 ## green
 `green` - turn every third line green
