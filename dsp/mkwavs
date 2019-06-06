@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+for f in *raw 
+do
+	RAW="`basename -s .raw $f`.wav"
+	CMD="sox -t raw -r 8000 -b8 -c 1 -e unsigned-integer $f $RAW"
+	echo $CMD
+	$CMD
+done

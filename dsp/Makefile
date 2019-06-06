@@ -1,5 +1,5 @@
 #OBJS = hz440.o white.o
-BINS = brown choco hz440 white
+BINS = brown choco hz440 pink white
 LIBS = -lm
 
 all : $(BINS)
@@ -9,6 +9,9 @@ all : $(BINS)
 
 brown : brown.c
 	gcc $^ -o $@ -lm
+
+pink : pink.cc
+	g++ $^ -o $@
 
 clean :
 	rm -f *raw *.wav $(BINS)
