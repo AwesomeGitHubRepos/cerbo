@@ -67,3 +67,6 @@ dist:	clean
 	find dist -type f -exec chmod 644 {} \;
 	( cd dist ; tar cfvz ../atlast-$(VERSION).tar.gz atlast-$(VERSION) )
 	rm -rf dist
+
+install :
+	cp atlast ~/.local/bin
