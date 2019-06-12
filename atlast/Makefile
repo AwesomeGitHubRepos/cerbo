@@ -69,4 +69,4 @@ dist:	clean
 	rm -rf dist
 
 install :
-	cp atlast ~/.local/bin
+	cp atlast jwf ~/.local/bin

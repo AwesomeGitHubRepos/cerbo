@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+
+function print_help {
+cat <<EOF
+jwf - John Walker's Forth (atlast)
+etc
+EOF
+}
+ 
+
+case $1 in
+    h) print_help ; echo . ; exit ;;
+esac
+
+rlwrap atlast
