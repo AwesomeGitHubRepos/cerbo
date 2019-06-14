@@ -1446,6 +1446,13 @@ prim P_question()		      /* Print value at address */
     Pop;
 }
 
+prim P_emit()
+{
+	Sl(1);
+	printf("%c", (char) S0);
+	Pop;
+}
+
 prim P_cr()			      /* Carriage return */
 {
     V printf("\n");
@@ -2933,6 +2940,7 @@ static struct primfcn primt[] = {
     {"0.", P_dot},
     {"0?", P_question},
     {"0CR", P_cr},
+    {"0EMIT", P_emit},
     {"0.S", P_dots},
     {"1.\"", P_dotquote},
     {"1.(", P_dotparen},
