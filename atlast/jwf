@@ -13,4 +13,11 @@ case $1 in
     h) print_help ; echo . ; exit ;;
 esac
 
-rlwrap atlast
+CORE_F=$HOME/repos/cerbo/atlast/core.4th
+if [[ -f "$CORE_F" ]]; then
+	CORE="-I$CORE_F"
+fi
+
+#echo $CORE
+
+rlwrap atlast $CORE $@
