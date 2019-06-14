@@ -70,3 +70,4 @@ dist:	clean
 
 install :
 	cp atlast jwf ~/.local/bin
+	cp atlast.1 ~/.local/man/man1
