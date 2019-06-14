@@ -21,8 +21,9 @@ size_t W;	// Working register.  Multi-purpose
 size_t X;	// Working register
 
 
-char _PAD[136]; // The input buffer
-char* PAD = _PAD;
+char _TIB[136]; // The input buffer
+char* TIB = _TIB;
+int bytes_read = 0; // number of bytes read into TIB
 
 
 
@@ -35,8 +36,8 @@ void BL()
 
 void FIND()
 {
-	_PAD[_PAD[0]+1] = 0;
-	printf("TODO: finding:%s", PAD+1);
+	_TIB[_TIB[0]+1] = 0;
+	printf("TODO: finding:%s", TIB+1);
 }
 
 /* read the next work from stdin and store it on the stack as address.
@@ -44,25 +45,28 @@ void FIND()
  * The first char stores the number of characters, excluding the
  * delimiter.
  *
- * TODO check for PAD overflow
  * */
 void WORD()
 {
-	char delim = POP();
+	puts("TODO WORD");
+	//char delim = POP();
 	//printf("delim=%d, %d\n", delim, (char) pstack[0]);
-	char n = 0;
+	//char n = 0;
+	//int c;
+	//PUSH(PAD);
+}
+
+
+void QUERY()
+{
+	bytes_read =0;
 	int c;
 	for(;;) {
 		c = getc(stdin);
-		PAD[++n] = (char) c;
-		if(c == EOF || c == '\n') break;
-		if((char) c == delim) {
-			//puts("bingo");
-		       	break;
-		}
+		if(c == EOF || c == '\n' || bytes_read >= sizeof(TIB)) break;
+		TIB[bytes_read++] = (char) c;
 	}
-	PAD[0] = n-1;
-	PUSH(PAD);
+	//TIB[bytes_read] = 0;
 }
 
 void add_primitives()
@@ -97,8 +101,8 @@ QUIT: /* reset the return stack pointer, loop stack pointer and
 	 It is the "top level" of Forth
 	 */
 
-ACCEPT: // read a line from keyboard
-	//fgets(TIB, sizeof(TIB), stdin);
+QUERY: // read a line from keyboard
+	QUERY();
 
 INTERPRET:
 	BL();
