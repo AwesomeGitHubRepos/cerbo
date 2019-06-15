@@ -4,12 +4,14 @@
 #include <unistd.h>
 //#include <ctype.h>
 //#include <cstddef>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
 typedef size_t cell_t;
-static_assert(sizeof(cell_t) == sizeof(char*));
+//static_assert(sizeof(cell_t) == sizeof(char*));
+typedef unsigned char byte;
 
 size_t IP;	// Interpreter Pointer. 
 
@@ -20,7 +22,7 @@ cell_t *PSP = pstack; // Parameter Stack, aka data stack, aka SP
 
 size_t RSP[10]; // Return Stack Pointer, aka RP
 uint8_t heap[10000];
-uint8_t* UP = heap;	// User Pointer. Holds the base address of the task's user area
+uint8_t* hptr = heap;	// User Pointer. Holds the base address of the task's user area
 size_t W;	// Working register.  Multi-purpose
 size_t X;	// Working register
 
@@ -30,6 +32,32 @@ char* TIB = _TIB;
 int bytes_read = 0; // number of bytes read into TIB
 
 
+typedef struct { // dictionary entry
+	void* next;
+	byte  len; // it is OR'd with flags
+	char  name[]; // the name will actually be longer
+} dent_s;
+
+dent_s *dict = NULL, *latest = NULL; // pointers to first and last dictionary entry
+
+char strupr(char c) { if('a' <= c && c <= 'z') return c-'a'+'A'; else return c; }
+
+void createz(char* zname) // zname being a null-terminated string
+{
+	if(dict==NULL) dict = (dent_s*) hptr;
+
+	if(latest) {
+		latest->next = hptr;
+	}
+
+	latest = (dent_s*) hptr;
+	cell_t nil = 0;
+	memcpy(hptr, &nil, sizeof(void*));
+	hptr += sizeof(void*);
+	//printf("createz:%ld\n", strlen(zname));
+	*hptr++ = strlen(zname);
+	for(int i = 0 ; i< strlen(zname); ++i) *hptr++ = strupr(zname[i]);
+}
 
 /* leave the ASCII value for space (DEC 32) on the stack
  */
@@ -68,27 +96,43 @@ void p_word()
 
 void p_nextword () { p_bl(); p_word(); p_find(); }
 
+void p_words() {
+	dent_s* dw = dict;
+	while(dw) {
+		for(int i = 0; i < dw->len; ++i) putchar(dw->name[i]);
+		puts("");
+		dw = dw->next;
+	}
+	// TODO
+}
 
+void p_dots()
+{
+	puts("TODO p_dots");
+}
+
+typedef struct {char* zname; void (*fn)(); } prim_s;
+prim_s prims[] =  {
+	{"WORDS", p_words},
+	{".S", p_dots},
+	0
+};
 void add_primitives()
 {
-	//UP[0] = 0;
-	//UP++;
-	*UP++ = 0;
-	char name[] = "hello";
-	int len = strlen(name);
-	*UP++ = len;
-	for(int i = 0; i<len; ++i) {
-		char c = name[i];
-		if('a' <= c && c <= 'z') c += 'A' - 'a';
-		*UP++ = c;
+	prim_s* p = prims;
+	while(p->zname) {
+		//p->len = strlen(p->zname);
+		printf("strlen=%ld\n", strlen(p->zname));
+		createz(p->zname);
+		p++;
 	}
-
-
 }
 
 int main()
 {
 	int8_t STATE = 0; // 0 means interpretting
+	add_primitives();
+	p_words(); // TODO remove
 	for(;;) {
 		p_word();
 
