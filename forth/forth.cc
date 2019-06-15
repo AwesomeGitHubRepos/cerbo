@@ -1,3 +1,7 @@
+#include <stdio.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
 //#include <ctype.h>
 //#include <cstddef>
 #include <stdint.h>
@@ -47,7 +51,7 @@ void p_word()
 {
 	puts("TODO WORD");
 	char delim = POP();
-	while(
+	//while(
 	//printf("delim=%d, %d\n", delim, (char) pstack[0]);
 	//char n = 0;
 	//int c;
@@ -58,7 +62,7 @@ void p_word()
 void p_query()
 {
 	//TIB[0] = ' '; // need to reserve a space so that `word' words
-	in = 0; 
+	//in = 0; 
 	bytes_read = 0;
 	int c;
 	for(;;) {
@@ -92,6 +96,37 @@ int main()
 {
 	int8_t STATE = 0; // 0 means interpretting
 	//std::byte STATE = 0; // 0 means interpretting
+
+	
+	fd_set rfds;
+	struct timeval tv;
+	tv.tv_sec = 10;
+	tv.tv_usec = 100;
+	for(;;) {
+		FD_ZERO(&rfds);
+		//FD_SET(STDIN_FILENO, &rfds);
+		FD_SET(0, &rfds);
+		//int ret = select(STDIN_FILENO, &rfds, NULL, NULL, &tv);
+		int ret = select(1, &rfds, NULL, NULL, &tv);
+		if(ret == 0) { // timeout
+			puts("timeout");
+		} else if(ret == -1)
+			perror("select()");
+		else {
+			char c; // = getchar();
+			fgets(&c, 1, stdin);
+			printf("You pressed%c\n", c);
+		}
+	/*	
+
+		int res = FD_ISSET(STDIN_FILENO, &rfds);
+		if(res != 0) {
+			int c = getchar();
+			printf("You typed:%c\n", c);
+		}
+		*/
+	}
+
 
 COLD: // initialises user variables from startup table and does ABORT
 	add_primitives();
