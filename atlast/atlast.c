@@ -274,8 +274,7 @@ static void ucase(c)
 
 /*  TOKEN  --  Scan a token and return its type.  */
 
-static int token(cp)
-  char **cp;
+static int token (char** cp)
 {
     char *sp = *cp;
 
