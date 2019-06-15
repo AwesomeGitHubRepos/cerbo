@@ -29,12 +29,9 @@ int bytes_read = 0; // number of bytes read into TIB
 
 /* leave the ASCII value for space (DEC 32) on the stack
  */
-void BL()
-{
-	PUSH(32);
-}
+void p_bl() { PUSH(32); }
 
-void FIND()
+void p_find()
 {
 	_TIB[_TIB[0]+1] = 0;
 	printf("TODO: finding:%s", TIB+1);
@@ -46,10 +43,11 @@ void FIND()
  * delimiter.
  *
  * */
-void WORD()
+void p_word()
 {
 	puts("TODO WORD");
-	//char delim = POP();
+	char delim = POP();
+	while(
 	//printf("delim=%d, %d\n", delim, (char) pstack[0]);
 	//char n = 0;
 	//int c;
@@ -57,9 +55,11 @@ void WORD()
 }
 
 
-void QUERY()
+void p_query()
 {
-	bytes_read =0;
+	//TIB[0] = ' '; // need to reserve a space so that `word' words
+	in = 0; 
+	bytes_read = 0;
 	int c;
 	for(;;) {
 		c = getc(stdin);
@@ -68,6 +68,8 @@ void QUERY()
 	}
 	//TIB[bytes_read] = 0;
 }
+
+void p_nextword () { p_bl(); p_word(); p_find(); }
 
 void add_primitives()
 {
@@ -102,12 +104,10 @@ QUIT: /* reset the return stack pointer, loop stack pointer and
 	 */
 
 QUERY: // read a line from keyboard
-	QUERY();
+	p_query();
 
 INTERPRET:
-	BL();
-	WORD();
-	FIND();
+	p_nextword();
 	if(STATE == 0) puts(" ok");
 	goto QUIT;
 
