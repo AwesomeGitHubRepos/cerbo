@@ -47,33 +47,27 @@ void p_find()
  * delimiter.
  *
  * */
+char wordpad[32];
 void p_word()
 {
-	puts("TODO WORD");
-	char delim = POP();
-	//while(
-	//printf("delim=%d, %d\n", delim, (char) pstack[0]);
-	//char n = 0;
-	//int c;
-	//PUSH(PAD);
-}
+// TODO check word len overflow
+	int count = 0, c;
 
-
-void p_query()
-{
-	//TIB[0] = ' '; // need to reserve a space so that `word' words
-	//in = 0; 
-	bytes_read = 0;
-	int c;
+	bool skip_spaces = true;
 	for(;;) {
-		c = getc(stdin);
-		if(c == EOF || c == '\n' || bytes_read >= sizeof(TIB)) break;
-		TIB[bytes_read++] = (char) c;
+		int c = getchar();
+		if((c == ' ') && skip_spaces) continue;
+		skip_spaces = false;
+		wordpad[++count] = c;
+		if(c == '\n' || c == ' ' || c == EOF || c == 0) {count--; break; }
 	}
-	//TIB[bytes_read] = 0;
+	wordpad[0] = count;
 }
+
+
 
 void p_nextword () { p_bl(); p_word(); p_find(); }
+
 
 void add_primitives()
 {
@@ -95,56 +89,14 @@ void add_primitives()
 int main()
 {
 	int8_t STATE = 0; // 0 means interpretting
-	//std::byte STATE = 0; // 0 means interpretting
-
-	
-	fd_set rfds;
-	struct timeval tv;
-	tv.tv_sec = 10;
-	tv.tv_usec = 100;
 	for(;;) {
-		FD_ZERO(&rfds);
-		//FD_SET(STDIN_FILENO, &rfds);
-		FD_SET(0, &rfds);
-		//int ret = select(STDIN_FILENO, &rfds, NULL, NULL, &tv);
-		int ret = select(1, &rfds, NULL, NULL, &tv);
-		if(ret == 0) { // timeout
-			puts("timeout");
-		} else if(ret == -1)
-			perror("select()");
-		else {
-			char c; // = getchar();
-			fgets(&c, 1, stdin);
-			printf("You pressed%c\n", c);
-		}
-	/*	
+		p_word();
 
-		int res = FD_ISSET(STDIN_FILENO, &rfds);
-		if(res != 0) {
-			int c = getchar();
-			printf("You typed:%c\n", c);
-		}
-		*/
+		printf("word is:<");
+		for(int i = 1; i <= wordpad[0]; ++i) printf("%c", wordpad[i]); // debug purposes
+		printf(">\n");
+
+		if(wordpad[wordpad[0]+1] == '\n') puts("  ok");
 	}
-
-
-COLD: // initialises user variables from startup table and does ABORT
-	add_primitives();
-
-ABORT: // resets parameter stack point and do QUIT
-
-QUIT: /* reset the return stack pointer, loop stack pointer and
-	 interpret state, and begin to interpret Forth commands.
-	 It is the "top level" of Forth
-	 */
-
-QUERY: // read a line from keyboard
-	p_query();
-
-INTERPRET:
-	p_nextword();
-	if(STATE == 0) puts(" ok");
-	goto QUIT;
-
 	return 0;
 }
