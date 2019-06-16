@@ -42,6 +42,7 @@ uint8_t* hptr = heap;	// User Pointer. Holds the base address of the task's user
 size_t W;	// Working register.  Multi-purpose
 size_t X;	// Working register
 
+bool compiling = false; // start of by interpretting
 
 char _TIB[136]; // The input buffer
 char* TIB = _TIB;
@@ -57,6 +58,10 @@ typedef struct { // dictionary entry
 
 //dent_s *dict = NULL;
 dent_s *latest = NULL; // latest word being defined
+dent_s *dwptr  = NULL; // this allows docol() to know the word that called it
+
+const byte F_IMM = 1;
+
 
 char* strupr(char* str) 
 { 
@@ -112,6 +117,10 @@ str2int_errno str2int(int *out, char *s, int base) {
         return STR2INT_INCONVERTIBLE;
     *out = l;
     return STR2INT_SUCCESS;
+}
+
+void undefined(char* token){
+	printf("undefined word:<%s>\n", token);
 }
 
 void heapify(void* fn)
@@ -238,32 +247,90 @@ void p_dot()
 
 }
 
-void docol()
+void p_tick()
 {
-	puts("docol TODO NOW tricky!");
-	
+	char* token = word();
+	dent_s* dw = find(token);
+	if(dw == NULL)
+		undefined(token);
+	else 
+		push((cell_t)dw);
+}
+
+void execute(dent_s* dw)
+{
+	codeptr fn = *(codeptr*) code(dw);
+	fn();
+}
+void p_execute()
+{
+	execute((dent_s*)pop());
 }
 
 void p_exit()
 {
 }
+void docol()
+{
+	puts("docol TODO NOW tricky!");
+	//void* ip = code(dwptr) + sizeof(void*); // remembering to skip over docol() itself
+	void* ip =0;
+	for(;;) {
+		execute(0);
+		//dent_s* dw = (dent_s) 
+		//codeptr fn = *(codeptr*) ip;
+		//if(fn == p_exit) break;
+		//dwptr = fn; TODO definitely need to fix this
+		//fn();
+		ip += sizeof(void*);
+	}
 
+	
+}
+
+
+void p_hi()
+{
+	puts("hello world");
+}
 void p_colon()
 {
 	word();
 	printf("colon:<%s>\n", token);
 	createz(0, token, docol);
-	heapify(p_plus); // TODO NOW we'll need to generalise
-	heapify(p_exit);
+	//heapify(find("HI")); // TODO NOW we'll need to generalise
+	//heapify(p_words);
+	//heapify(p_hi);
+	//heapify(p_exit);
+	compiling = true;
 }
 
+void p_semi()
+{
+	heapify(p_exit);
+	compiling = false;
+}
+
+void p_dotname() /// print a word's name given its dictionary address
+{
+	dent_s* dw = (dent_s*) pop();
+	for(int i = 0; i< dw->len; ++i)
+		printf("%c", dw->name[i]);
+	printf(" ");
+
+}
 typedef struct {byte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
-	{0, ":", p_colon},
-	{0, ".", p_dot},
-	{0, "WORDS", p_words},
-	{0, ".S", p_dots},
-	{0, "+", p_plus},
+	{0,	".NAME", p_dotname},
+	{0,	"HI", p_hi},
+	{0,	"'", p_tick},
+	{0,	"EXECUTE", p_execute},
+	{0, 	":", p_colon},
+	{F_IMM,	";", p_semi},
+	{0, 	".", p_dot},
+	{0, 	"WORDS", p_words},	
+	{0, 	".S", p_dots},
+	{0, 	"+", p_plus},
 	0
 };
 void add_primitives()
@@ -312,22 +379,23 @@ void process_word()
 			printf("v=%d\n", v);
 			push(v);
 		} else { 
-			printf("undefined word:<%s>\n", token);
+			undefined(token);
 		}
 	} else {
-		//printf("main finds word at dw %p\n", dw);
-
-		//void* h = *code(dw);
-		codeptr fn ;
-		memcpy(&fn, code(dw), sizeof(void*));
-		//printf("main: -p_words = %p , codeptr found = %p at heap location %p\n", p_words, fn, code(dw));
-		fn();
+		dwptr = dw; // store it in case docol() needs it
+		//codeptr fn = *(codeptr*) code(dw);		
+		if(compiling && !(dwptr->flags & F_IMM)) 
+			heapify(dw);
+		else
+			execute(dw);
+			//fn(); // interpretting, so just call it
 	}
 }
 
 int main()
 {
-	int8_t STATE = 0; // 0 means interpretting
+	//int8_t STATE = 0; // 0 means interpretting
+	compiling = false;
 	add_primitives();
 	//echo_dict();
 	//p_words(); // TODO remove
