@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -58,10 +59,13 @@ typedef struct { // dictionary entry
 
 //dent_s *dict = NULL;
 dent_s *latest = NULL; // latest word being defined
-dent_s *dwptr  = NULL; // this allows docol() to know the word that called it
+//dent_s *dwptr  = NULL; // this allows docol() to know the word that called it
 
 const byte F_IMM = 1;
+const byte F_SYN = 2; // a synthesised word, i.e. one that's a colon-definition
 
+
+void execute(dent_s* dw);
 
 char* strupr(char* str) 
 { 
@@ -126,16 +130,15 @@ void undefined(char* token){
 void heapify(void* fn)
 {
 	printf("heapify fn %p at hptr %p\n", fn, hptr);
-	struct foo { codeptr fn ;} foo1;
-	foo1.fn = fn;
-	memcpy(hptr, &foo1, sizeof(void*));
-	//((codeptr) hptr)(); // test code
-	//printf("heapified %p\n", (void*) *hptr);
+	//struct foo { codeptr fn ;} foo1;
+	//foo1.fn = fn;
+	//memcpy(hptr, &foo1, sizeof(void*));
+
+	*(codeptr*)hptr = fn;
 	hptr += sizeof(void*);
-	//hptr += 8; // fudge for now TODO remove
 }
 
-void createz(byte flags, char* zname, codeptr fn) // zname being a null-terminated string
+void create_header(byte flags, char* zname)
 {
 	memcpy(hptr, &latest, sizeof(void*));
 	latest = (dent_s*) hptr;
@@ -145,6 +148,10 @@ void createz(byte flags, char* zname, codeptr fn) // zname being a null-terminat
 	*hptr++ = strlen(zname);
 	for(int i = 0 ; i< strlen(zname); ++i) *hptr++ = toupper(zname[i]);
 	//printf("createz heapifying fn %p at %p\n", fn, hptr);
+}
+void createz(byte flags, char* zname, codeptr fn) // zname being a null-terminated string
+{
+	create_header(flags, zname);
 	heapify(fn);
 }
 
@@ -257,10 +264,41 @@ void p_tick()
 		push((cell_t)dw);
 }
 
+void docol(dent_s* dw) // dw points to the dicitonary header of the synthesised word
+{
+	assert(dw->flags & F_SYN);
+
+	puts("docol TODO NOW tricky!");
+	//dw = code(dw);
+	execute(dw);
+	//dw = dw+ sizeof(dent_s*);
+	
+	/*
+	while(dw->
+	//void* ip = code(dwptr) + sizeof(void*); // remembering to skip over docol() itself
+	void* ip =0;
+	for(;;) {
+		//execute(0);
+		//dent_s* dw = (dent_s) 
+		//codeptr fn = *(codeptr*) ip;
+		//if(fn == p_exit) break;
+		//dwptr = fn; TODO definitely need to fix this
+		//fn();
+		ip += sizeof(void*);
+	}
+	*/
+
+	
+}
+
 void execute(dent_s* dw)
 {
-	codeptr fn = *(codeptr*) code(dw);
-	fn();
+	if(dw->flags & F_SYN)
+		docol(dw);
+	else {
+		codeptr fn = *(codeptr*) code(dw);
+		fn();
+	}
 }
 void p_execute()
 {
@@ -269,23 +307,7 @@ void p_execute()
 
 void p_exit()
 {
-}
-void docol()
-{
-	puts("docol TODO NOW tricky!");
-	//void* ip = code(dwptr) + sizeof(void*); // remembering to skip over docol() itself
-	void* ip =0;
-	for(;;) {
-		execute(0);
-		//dent_s* dw = (dent_s) 
-		//codeptr fn = *(codeptr*) ip;
-		//if(fn == p_exit) break;
-		//dwptr = fn; TODO definitely need to fix this
-		//fn();
-		ip += sizeof(void*);
-	}
-
-	
+	puts("p_exit called");
 }
 
 
@@ -297,7 +319,8 @@ void p_colon()
 {
 	word();
 	printf("colon:<%s>\n", token);
-	createz(0, token, docol);
+	create_header(F_SYN, token);
+	//createz(F_SYN, token, docol);
 	//heapify(find("HI")); // TODO NOW we'll need to generalise
 	//heapify(p_words);
 	//heapify(p_hi);
@@ -376,15 +399,15 @@ void process_word()
 		//wordpad[wordpad[0]+1] = 0;
 		str2int_errno res = str2int(&v, token, 10);
 		if(res == STR2INT_SUCCESS) {
-			printf("v=%d\n", v);
+			//printf("v=%d\n", v);
 			push(v);
 		} else { 
 			undefined(token);
 		}
 	} else {
-		dwptr = dw; // store it in case docol() needs it
+		//dwptr = dw; // store it in case docol() needs it
 		//codeptr fn = *(codeptr*) code(dw);		
-		if(compiling && !(dwptr->flags & F_IMM)) 
+		if(compiling && !(dw->flags & F_IMM)) 
 			heapify(dw);
 		else
 			execute(dw);
