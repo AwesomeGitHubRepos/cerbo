@@ -214,8 +214,29 @@ void p_dot()
 	printf("%ld ", pop());
 
 }
+
+void docol()
+{
+	puts("docol TODO NOW tricky!");
+	
+}
+
+void p_exit()
+{
+}
+
+void p_colon()
+{
+	p_word();
+	printf("colon:<%s>\n", wordpad+1);
+	createz(0, wordpad+1, docol);
+	heapify(p_plus); // TODO NOW we'll need to generalise
+	heapify(p_exit);
+}
+
 typedef struct {byte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0, ":", p_colon},
 	{0, ".", p_dot},
 	{0, "WORDS", p_words},
 	{0, ".S", p_dots},
