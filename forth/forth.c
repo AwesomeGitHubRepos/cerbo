@@ -66,6 +66,7 @@ const byte F_SYN = 2; // a synthesised word, i.e. one that's a colon-definition
 
 
 void execute(dent_s* dw);
+dent_s* find(char* name);
 
 char* strupr(char* str) 
 { 
@@ -153,6 +154,14 @@ void createz(byte flags, char* zname, codeptr fn) // zname being a null-terminat
 {
 	create_header(flags, zname);
 	heapify(fn);
+}
+
+void heapify_word(char* name)
+{
+	dent_s* dw = find(name);
+	heapify(dw);
+	//*(dent_s*) hptr = dw;
+	//hptr += sizeof(void*);
 }
 
 /* leave the ASCII value for space (DEC 32) on the stack
@@ -264,12 +273,28 @@ void p_tick()
 		push((cell_t)dw);
 }
 
+void dotname(dent_s* dw) /// print a word's name given its dictionary address
+{
+	//dent_s* dw = (dent_s*) pop();
+	for(int i = 0; i< dw->len; ++i)
+		printf("%c", dw->name[i]);
+	printf(" ");
+}
+
+
+void p_dotname() /// print a word's name given its dictionary address
+{
+	dotname((dent_s*) pop());
+}
+
 void docol(dent_s* dw) // dw points to the dicitonary header of the synthesised word
 {
 	assert(dw->flags & F_SYN);
 
 	puts("docol TODO NOW tricky!");
-	//dw = code(dw);
+	dotname(dw);
+	dw = code(dw);
+	dotname(dw);
 	execute(dw);
 	//dw = dw+ sizeof(dent_s*);
 	
@@ -330,18 +355,10 @@ void p_colon()
 
 void p_semi()
 {
-	heapify(p_exit);
+	heapify_word("EXIT");
 	compiling = false;
 }
 
-void p_dotname() /// print a word's name given its dictionary address
-{
-	dent_s* dw = (dent_s*) pop();
-	for(int i = 0; i< dw->len; ++i)
-		printf("%c", dw->name[i]);
-	printf(" ");
-
-}
 typedef struct {byte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
 	{0,	".NAME", p_dotname},
