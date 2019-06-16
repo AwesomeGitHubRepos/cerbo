@@ -58,7 +58,17 @@ typedef struct { // dictionary entry
 //dent_s *dict = NULL;
 dent_s *latest = NULL; // latest word being defined
 
-char strupr(char c) { if('a' <= c && c <= 'z') return c-'a'+'A'; else return c; }
+char* strupr(char* str) 
+{ 
+	int c = -1, i =0;
+	if(!str) return NULL;
+	//char* ptr = str;
+	while(c = toupper(str[i])) {
+		str[i] = c;
+		i++;
+		if(c==0) return str;
+	}
+}
 
 typedef enum {
     STR2INT_SUCCESS,
@@ -124,7 +134,7 @@ void createz(byte flags, char* zname, codeptr fn) // zname being a null-terminat
 
 	*hptr++ = flags;
 	*hptr++ = strlen(zname);
-	for(int i = 0 ; i< strlen(zname); ++i) *hptr++ = strupr(zname[i]);
+	for(int i = 0 ; i< strlen(zname); ++i) *hptr++ = toupper(zname[i]);
 	//printf("createz heapifying fn %p at %p\n", fn, hptr);
 	heapify(fn);
 }
@@ -136,8 +146,9 @@ void p_bl() { push(32); }
 dent_s* find(char* name)
 {
 	dent_s* dw = latest;
+	int len = strlen(name);
 	while(dw) {
-		if(dw->len == name[0] && strncmp(dw->name, name+1, dw->len) == 0)
+		if(dw->len == len && strncmp(dw->name, name, len) == 0)
 			return dw;
 		dw = dw->prev;
 	}
@@ -162,6 +173,17 @@ void* code (dent_s* dw)
  * delimiter.
  *
  * */
+char tib[132];
+char* token;
+char* rest;
+char* word()
+{
+        token = strtok_r(rest, " \n", &rest); 
+	strupr(token);
+        return token;
+}
+
+/*
 char wordpad[32];
 void p_word()
 {
@@ -185,6 +207,7 @@ void p_word()
 
 
 void p_nextword () { p_bl(); p_word(); p_find(); }
+*/
 
 void p_words() {
 	dent_s* dw = latest;
@@ -227,9 +250,9 @@ void p_exit()
 
 void p_colon()
 {
-	p_word();
-	printf("colon:<%s>\n", wordpad+1);
-	createz(0, wordpad+1, docol);
+	word();
+	printf("colon:<%s>\n", token);
+	createz(0, token, docol);
 	heapify(p_plus); // TODO NOW we'll need to generalise
 	heapify(p_exit);
 }
@@ -274,43 +297,45 @@ void echo_dict()
 		dw = dw->prev;
 	}
 }
+
+
+void process_word()
+{
+	//printf("<%s>\n", token);
+	//p_word();
+	dent_s* dw = find(token);
+	if(dw == 0) {
+		int v;
+		//wordpad[wordpad[0]+1] = 0;
+		str2int_errno res = str2int(&v, token, 10);
+		if(res == STR2INT_SUCCESS) {
+			printf("v=%d\n", v);
+			push(v);
+		} else { 
+			printf("undefined word:<%s>\n", token);
+		}
+	} else {
+		//printf("main finds word at dw %p\n", dw);
+
+		//void* h = *code(dw);
+		codeptr fn ;
+		memcpy(&fn, code(dw), sizeof(void*));
+		//printf("main: -p_words = %p , codeptr found = %p at heap location %p\n", p_words, fn, code(dw));
+		fn();
+	}
+}
+
 int main()
 {
 	int8_t STATE = 0; // 0 means interpretting
 	add_primitives();
 	//echo_dict();
 	//p_words(); // TODO remove
-	for(;;) {
-		p_word();
-		dent_s* dw = find(wordpad);
-		if(dw == 0) {
-			int v;
-			wordpad[wordpad[0]+1] = 0;
-			str2int_errno res = str2int(&v, wordpad+1, 10);
-			//char *wp = wordpad;
-			//char **endptr = &wp;
-			//endptr++;
-			//cell_t v = strtol(wordpad, endptr, 10);
-			if(res == STR2INT_SUCCESS) {
-			       printf("v=%d\n", v);
-			       push(v);
-			} else { 
-				printf("undefined word:<");
-				for(int i = 1; i <= wordpad[0]; ++i) printf("%c", wordpad[i]);
-				printf(">\n");
-			}
-		} else {
-			//printf("main finds word at dw %p\n", dw);
+	        while(fgets(tib, sizeof(tib), stdin)) {
+                rest = tib;
+                while(word()) process_word();
+                puts("  ok");
+        }
 
-			//void* h = *code(dw);
-			codeptr fn ;
-			memcpy(&fn, code(dw), sizeof(void*));
-			//printf("main: -p_words = %p , codeptr found = %p at heap location %p\n", p_words, fn, code(dw));
-			fn();
-		}
-
-
-		if(wordpad[wordpad[0]+1] == '\n') puts("  ok");
-	}
 	return 0;
 }
