@@ -81,6 +81,9 @@ void execute(codeptr fn);
 dent_s* find(char* name);
 void docol();
 void xdw(dent_s* dw);
+void eval_string(char* str);
+void process_tib();
+void process_word();
 
 char* strupr(char* str) 
 { 
@@ -488,56 +491,67 @@ void add_primitives()
 	}
 }
 
+char* derived[] = {
+	": 1+ 1 + ;",
+	0
+};
+
+void add_derived()
+{
+	//char* line = derived[0; 
+	char** strs = derived;
+	while(*strs) {
+		eval_string(*strs++);
+	}
+
+}
 
 
+void eval_string(char* str)
+{
+	strncpy(tib, str, sizeof(tib));
+	process_tib();
+}
+
+void process_tib()
+{
+	rest = tib;
+	while(word()) process_word();
+}
 
 
 void process_word()
 {
-	//printf("<%s>\n", token);
-	//p_word();
 	dent_s* dw = find(token);
 	if(dw == 0) {
 		int v;
-		//wordpad[wordpad[0]+1] = 0;
 		str2int_errno res = str2int(&v, token, 10);
 		if(res == STR2INT_SUCCESS) {
-			if(compiling) { 
+			if(compiling)  
 				embed_literal(v);
-			} else {
+			 else 
 				push(v);
-			}
 		} else { 
 			undefined(token);
 		}
 	} else {
-		//dwptr = dw; // store it in case docol() needs it
-		//codeptr fn = *(codeptr*) code(dw);		
-		//IP = (cell_t*) code(dw);
-		//codeptr fn = (codeptr) *IP;
 		if(compiling && !(dw->flags & F_IMM)) 
 			heapify_dw(dw);
-		else {
+		else 
 			xdw(dw);
-			//execute();
-			//fn(); // interpretting, so just call it
-		}
 	}
 }
 
+
 int main()
 {
-	//int8_t STATE = 0; // 0 means interpretting
 	compiling = false;
 	add_primitives();
-	//echo_dict();
-	//xdw(find("WORDS"));
-	//p_words(); // TODO remove
-	        while(fgets(tib, sizeof(tib), stdin)) {
-                rest = tib;
-                while(word()) process_word();
-                puts("  ok");
-        }
+	add_derived();
+	while(fgets(tib, sizeof(tib), stdin)) {
+		process_tib();
+		puts("  ok");
+	}
 
 	return 0;
 }
