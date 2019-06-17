@@ -31,13 +31,24 @@ void push(cell_t v)
 cell_t pop()
 {
 	// TODO check for stack in range
-	puts("pop() called");
+	//puts("pop() called");
 	return dstack[--tos];
 }
 //#define PUSH(x) *PSP++ = (cell_t) x // push an item onto the parameter stack
 //#define POP()   *--PSP //pop an item off the parameter stack
 
-size_t RSP[10]; // Return Stack Pointer, aka RP
+cell_t  rstack[10]; // Return Stack Pointer, aka RP
+int rtop; // items on the stack
+void rpush(cell_t v)
+{
+	rstack[rtop++] = v;
+}
+cell_t rpop()
+{
+	return rstack[--rtop];
+}
+
+
 uint8_t heap[100000];
 uint8_t* hptr = heap;	// User Pointer. Holds the base address of the task's user area
 size_t W;	// Working register.  Multi-purpose
@@ -68,6 +79,7 @@ const byte F_SYN = 2; // a synthesised word, i.e. one that's a colon-definition
 void execute(codeptr fn);
 dent_s* find(char* name);
 void docol();
+void xdw(dent_s* dw);
 
 char* strupr(char* str) 
 { 
@@ -131,11 +143,25 @@ void undefined(char* token){
 
 void heapify(void* fn)
 {
-	printf("heapify fn %p at hptr %p\n", fn, hptr);
+	//printf("heapify fn %p at hptr %p\n", fn, hptr);
 	*(codeptr*)hptr = fn;
 	hptr += sizeof(void*);
 }
 
+
+void heapify_dw(dent_s* dw)
+{
+	*(cell_t*)hptr = (cell_t)dw;
+	hptr += sizeof(void*);
+}
+
+void heapify_word(char* name)
+{
+	dent_s* dw = find(name);
+	heapify_dw(dw);
+	//*(dent_s*) hptr = dw;
+	//hptr += sizeof(void*);
+}
 void create_header(byte flags, char* zname)
 {
 	memcpy(hptr, &latest, sizeof(void*));
@@ -153,13 +179,6 @@ void createz(byte flags, char* zname, codeptr fn) // zname being a null-terminat
 	heapify(fn);
 }
 
-void heapify_word(char* name)
-{
-	dent_s* dw = find(name);
-	heapify(dw);
-	//*(dent_s*) hptr = dw;
-	//hptr += sizeof(void*);
-}
 
 /* leave the ASCII value for space (DEC 32) on the stack
  */
@@ -189,7 +208,7 @@ void* code (dent_s* dw)
 	void* ptr = dw->name + dw->len;
 	codeptr fn = *(codeptr*) ptr;
 	if(fn == docol) {
-		puts("code found docol");
+		//puts("code found docol");
 		IP = ptr;
 	}
 	//return (codeptr)(dw->name + dw->len);
@@ -238,6 +257,25 @@ void p_word()
 void p_nextword () { p_bl(); p_word(); p_find(); }
 */
 
+void p_dot_dict() 
+{
+	dent_s* dw = latest;
+	while(dw) {
+		printf("echo_dict: location=%p, prev=%p, flags=%d len=%d\n", dw, dw->prev, dw->flags, dw->len);
+		printf("word=<");
+		for(int i = 0; i< dw->len; ++i) printf("%c", dw->name[i]);		
+		//size_t p =  (size_t) code(dw);
+		//for(int i = 0; i<8; ++i) { printf("%x",  (unsigned int)(p % 8));  p = p/8; }
+				
+		//codeptr p1 = **p;
+		//memcpy(&p, code(dw), sizeof(void*));
+		//p1();
+		codeptr p1 = *(codeptr*) code(dw);
+		printf(">, code() = %p, %p\n", code(dw), p1);
+		//puts("");
+		dw = dw->prev;
+	}
+}
 void p_words() {
 	dent_s* dw = latest;
 	while(dw) {
@@ -298,34 +336,68 @@ void p_dotname() /// print a word's name given its dictionary address
 void p_exit()
 {
 	puts("p_exit called");
+	IP = (cell_t*) rpop();
 }
 
-//void docol(dent_s* dw) // dw points to the dicitonary header of the synthesised word
-void docol()
+cell_t dref(void* addr)
 {
-	//assert(dw->flags & F_SYN);
+	return *(cell_t*)addr;
+}
+//void docol(dent_s* dw) // dw points to the dicitonary header of the synthesised word
+void docol (dent_s* dw)
+{
 
 	puts("docol TODO NOW tricky!");
+	assert(dw->flags & F_SYN);	
+	dent_s* dw_exit = find("EXIT");
+	printf("exit is %p\n", dw);
+
+	IP = code(dw);
+
+	//dw = *(cell_t*) code(dw);
+	for(;;) {
+		puts("docol looping");
+		dw = (dent_s*) dref(IP++);
+		xdw(dw);
+		if(dw == dw_exit) break;
+	}
+	return;
 loop:
+	xdw(dw);
+	return;
 	IP++;
 	execute((codeptr) *IP);
 	if((codeptr) *IP != p_exit) goto loop;
+	return;
 
+	// better solution would be
+	rpush((cell_t)IP);
+	while(rtop) {
+		++IP;
+		if((codeptr) *IP == docol)
+			rpush((cell_t)IP);
+		else
+			execute((codeptr) *IP);
+	}
 	
 }
 
 void execute(codeptr fn)
 {
 	fn();
-	/*
+}
+
+void xdw(dent_s* dw)
+{
 	if(dw->flags & F_SYN)
 		docol(dw);
 	else {
 		codeptr fn = *(codeptr*) code(dw);
 		fn();
 	}
-	*/
+
 }
+
 void p_execute()
 {
 	execute((codeptr) pop());
@@ -340,25 +412,20 @@ void p_hi()
 void p_colon()
 {
 	word();
-	printf("colon:<%s>\n", token);
-	createz(0, token, docol);
-	//createz(F_SYN, token, docol);
-	//heapify(find("HI")); // TODO NOW we'll need to generalise
-	//heapify(p_hi);
-	//heapify(p_words);
-	//heapify_word("HI");
-	//heapify(p_exit);
+	//createz(0, token, docol);
+	create_header(F_SYN, token);
 	compiling = true;
 }
 
 void p_semi()
 {
-	heapify(p_exit);
+	heapify_word("EXIT");
 	compiling = false;
 }
 
 typedef struct {byte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"EXIT", p_exit},
 	{0,	".NAME", p_dotname},
 	{0,	"HI", p_hi},
 	{0,	"'", p_tick},
@@ -369,6 +436,7 @@ prim_s prims[] =  {
 	{0, 	"WORDS", p_words},	
 	{0, 	".S", p_dots},
 	{0, 	"+", p_plus},
+	{0,	".DICT", p_dot_dict},
 	0
 };
 void add_primitives()
@@ -382,26 +450,8 @@ void add_primitives()
 	}
 }
 
-// a debugging routine
-void echo_dict() 
-{
-	dent_s* dw = latest;
-	while(dw) {
-		printf("echo_dict: location=%p, prev=%p, flags=%d len=%d\n", dw, dw->prev, dw->flags, dw->len);
-		printf("word=<");
-		for(int i = 0; i< dw->len; ++i) printf("%c", dw->name[i]);		
-		//size_t p =  (size_t) code(dw);
-		//for(int i = 0; i<8; ++i) { printf("%x",  (unsigned int)(p % 8));  p = p/8; }
-				
-		//codeptr p1 = **p;
-		//memcpy(&p, code(dw), sizeof(void*));
-		//p1();
-		codeptr p1 = *(codeptr*) code(dw);
-		printf(">, code() = %p, %p\n", code(dw), p1);
-		//puts("");
-		dw = dw->prev;
-	}
-}
+
+
 
 
 void process_word()
@@ -421,14 +471,15 @@ void process_word()
 		}
 	} else {
 		//dwptr = dw; // store it in case docol() needs it
-		codeptr fn = *(codeptr*) code(dw);		
+		//codeptr fn = *(codeptr*) code(dw);		
 		//IP = (cell_t*) code(dw);
 		//codeptr fn = (codeptr) *IP;
 		if(compiling && !(dw->flags & F_IMM)) 
-			heapify(fn);
+			heapify_dw(dw);
 		else {
+			xdw(dw);
 			//execute();
-			fn(); // interpretting, so just call it
+			//fn(); // interpretting, so just call it
 		}
 	}
 }
@@ -439,6 +490,7 @@ int main()
 	compiling = false;
 	add_primitives();
 	//echo_dict();
+	//xdw(find("WORDS"));
 	//p_words(); // TODO remove
 	        while(fgets(tib, sizeof(tib), stdin)) {
                 rest = tib;
