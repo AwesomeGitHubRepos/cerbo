@@ -447,8 +447,22 @@ void p_semi()
 	compiling = false;
 }
 
+void p_lit()
+{
+	cell_t v = dref((void*) rstack[rtop-1]);
+	rstack[rtop-1] += sizeof(cell_t);
+	push(v);
+}
+
+void embed_literal(cell_t v)
+{
+	heapify_word("LIT");
+	heapify((void*) v);
+
+}
 typedef struct {byte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"LIT", p_lit},
 	{0,	"EXIT", p_exit},
 	{0,	".NAME", p_dotname},
 	{0,	"HI", p_hi},
@@ -488,8 +502,11 @@ void process_word()
 		//wordpad[wordpad[0]+1] = 0;
 		str2int_errno res = str2int(&v, token, 10);
 		if(res == STR2INT_SUCCESS) {
-			//printf("v=%d\n", v);
-			push(v);
+			if(compiling) { 
+				embed_literal(v);
+			} else {
+				push(v);
+			}
 		} else { 
 			undefined(token);
 		}
