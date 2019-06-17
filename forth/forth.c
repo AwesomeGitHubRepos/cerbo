@@ -472,8 +472,9 @@ void p_qbranch()
 }
 void p_branch()
 {
-	cell_t offset = dref((void*) rstack[rtop-1]+ sizeof(cell_t))+2;
-	rstack[rtop-1] += offset * sizeof(cell_t);
+	//cell_t offset = dref((void*) rstack[rtop-1]+ sizeof(cell_t))+2;
+	//rstack[rtop-1] += offset * sizeof(cell_t);
+	rstack[rtop-1] = dref((void*) rstack[rtop-1]); //+ sizeof(cell_t));
 }
 
 void p_dup()
@@ -489,8 +490,15 @@ void p_immediate() { latest->flags |= F_IMM; }
 void p_lsb() { compiling = false; }
 void p_rsb() { compiling = true; }
 
+void p_comma() { heapify((void*)pop()); hptr += sizeof(cell_t); }
+void p_swap() { cell_t temp = dstack[tos-1]; dstack[tos-1] = dstack[tos-2]; dstack[tos-2] = temp; }
+
 typedef struct {byte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	//{0,	"!",	p_exc},
+	//{0,	"@",	p_at},
+	{0,	"SWAP", p_swap},
+	{0,	",", p_comma},
 	{F_IMM,	"[", p_lsb},
 	{0,	"]", p_rsb},
 	{0,	"IMMEDIATE", p_immediate},
