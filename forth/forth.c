@@ -18,7 +18,7 @@ typedef size_t cell_t;
 typedef uint8_t byte;
 typedef void (*codeptr)();
 
-size_t IP;	// Interpreter Pointer. 
+cell_t* IP;	// Interpreter Pointer. 
 
 cell_t dstack[10]; // data stack
 int tos = 0; // items on stack
@@ -38,7 +38,7 @@ cell_t pop()
 //#define POP()   *--PSP //pop an item off the parameter stack
 
 size_t RSP[10]; // Return Stack Pointer, aka RP
-uint8_t heap[10000];
+uint8_t heap[100000];
 uint8_t* hptr = heap;	// User Pointer. Holds the base address of the task's user area
 size_t W;	// Working register.  Multi-purpose
 size_t X;	// Working register
@@ -65,7 +65,7 @@ const byte F_IMM = 1;
 const byte F_SYN = 2; // a synthesised word, i.e. one that's a colon-definition
 
 
-void execute(dent_s* dw);
+void execute(codeptr fn);
 dent_s* find(char* name);
 
 char* strupr(char* str) 
@@ -269,8 +269,10 @@ void p_tick()
 	dent_s* dw = find(token);
 	if(dw == NULL)
 		undefined(token);
-	else 
-		push((cell_t)dw);
+	else {
+	       codeptr fn = *(codeptr*) code(dw);
+	       push((cell_t) fn);
+	}
 }
 
 void dotname(dent_s* dw) /// print a word's name given its dictionary address
@@ -287,53 +289,42 @@ void p_dotname() /// print a word's name given its dictionary address
 	dotname((dent_s*) pop());
 }
 
-void docol(dent_s* dw) // dw points to the dicitonary header of the synthesised word
+void p_exit()
 {
-	assert(dw->flags & F_SYN);
+	puts("p_exit called");
+}
+
+//void docol(dent_s* dw) // dw points to the dicitonary header of the synthesised word
+void docol()
+{
+	//assert(dw->flags & F_SYN);
 
 	puts("docol TODO NOW tricky!");
-	dotname(dw);
-	dw = code(dw);
-	dotname(dw);
-	execute(dw);
-	//dw = dw+ sizeof(dent_s*);
-	
-	/*
-	while(dw->
-	//void* ip = code(dwptr) + sizeof(void*); // remembering to skip over docol() itself
-	void* ip =0;
-	for(;;) {
-		//execute(0);
-		//dent_s* dw = (dent_s) 
-		//codeptr fn = *(codeptr*) ip;
-		//if(fn == p_exit) break;
-		//dwptr = fn; TODO definitely need to fix this
-		//fn();
-		ip += sizeof(void*);
-	}
-	*/
+loop:
+	IP++;
+	execute((codeptr) *IP);
+	if((codeptr) *IP != p_exit) goto loop;
 
 	
 }
 
-void execute(dent_s* dw)
+void execute(codeptr fn)
 {
+	fn();
+	/*
 	if(dw->flags & F_SYN)
 		docol(dw);
 	else {
 		codeptr fn = *(codeptr*) code(dw);
 		fn();
 	}
+	*/
 }
 void p_execute()
 {
-	execute((dent_s*)pop());
+	execute((codeptr) pop());
 }
 
-void p_exit()
-{
-	puts("p_exit called");
-}
 
 
 void p_hi()
@@ -344,18 +335,19 @@ void p_colon()
 {
 	word();
 	printf("colon:<%s>\n", token);
-	create_header(F_SYN, token);
+	createz(0, token, docol);
 	//createz(F_SYN, token, docol);
 	//heapify(find("HI")); // TODO NOW we'll need to generalise
-	//heapify(p_words);
 	//heapify(p_hi);
+	//heapify(p_words);
+	//heapify_word("HI");
 	//heapify(p_exit);
 	compiling = true;
 }
 
 void p_semi()
 {
-	heapify_word("EXIT");
+	heapify(p_exit);
 	compiling = false;
 }
 
@@ -424,11 +416,14 @@ void process_word()
 	} else {
 		//dwptr = dw; // store it in case docol() needs it
 		//codeptr fn = *(codeptr*) code(dw);		
+		IP = (cell_t*) code(dw);
+		codeptr fn = (codeptr) *IP;
 		if(compiling && !(dw->flags & F_IMM)) 
-			heapify(dw);
-		else
-			execute(dw);
-			//fn(); // interpretting, so just call it
+			heapify(fn);
+		else {
+			//execute();
+			fn(); // interpretting, so just call it
+		}
 	}
 }
 
