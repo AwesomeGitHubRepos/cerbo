@@ -67,6 +67,7 @@ const byte F_SYN = 2; // a synthesised word, i.e. one that's a colon-definition
 
 void execute(codeptr fn);
 dent_s* find(char* name);
+void docol();
 
 char* strupr(char* str) 
 { 
@@ -131,10 +132,6 @@ void undefined(char* token){
 void heapify(void* fn)
 {
 	printf("heapify fn %p at hptr %p\n", fn, hptr);
-	//struct foo { codeptr fn ;} foo1;
-	//foo1.fn = fn;
-	//memcpy(hptr, &foo1, sizeof(void*));
-
 	*(codeptr*)hptr = fn;
 	hptr += sizeof(void*);
 }
@@ -189,7 +186,14 @@ void p_find ()
 // return the position on the heap where the code begins
 void* code (dent_s* dw)
 {
-	return (codeptr)(dw->name + dw->len);
+	void* ptr = dw->name + dw->len;
+	codeptr fn = *(codeptr*) ptr;
+	if(fn == docol) {
+		puts("code found docol");
+		IP = ptr;
+	}
+	//return (codeptr)(dw->name + dw->len);
+	return (codeptr) ptr;
 }
 
 /* read the next work from stdin and store it on the stack as address.
@@ -270,8 +274,10 @@ void p_tick()
 	if(dw == NULL)
 		undefined(token);
 	else {
-	       codeptr fn = *(codeptr*) code(dw);
-	       push((cell_t) fn);
+		//IP = (cell_t*) code(dw);
+		//codeptr fn = (codeptr) *IP;
+		codeptr fn = *(codeptr*) code(dw);
+		push((cell_t) fn);
 	}
 }
 
@@ -415,9 +421,9 @@ void process_word()
 		}
 	} else {
 		//dwptr = dw; // store it in case docol() needs it
-		//codeptr fn = *(codeptr*) code(dw);		
-		IP = (cell_t*) code(dw);
-		codeptr fn = (codeptr) *IP;
+		codeptr fn = *(codeptr*) code(dw);		
+		//IP = (cell_t*) code(dw);
+		//codeptr fn = (codeptr) *IP;
 		if(compiling && !(dw->flags & F_IMM)) 
 			heapify(fn);
 		else {
