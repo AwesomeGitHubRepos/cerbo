@@ -19,6 +19,7 @@ typedef uint8_t byte;
 typedef void (*codeptr)();
 
 cell_t* IP;	// Interpreter Pointer. 
+cell_t* wptr;
 
 cell_t dstack[10]; // data stack
 int tos = 0; // items on stack
@@ -319,7 +320,7 @@ void p_tick()
 	}
 }
 
-void dotname(dent_s* dw) /// print a word's name given its dictionary address
+void dotname (dent_s* dw) /// print a word's name given its dictionary address
 {
 	//dent_s* dw = (dent_s*) pop();
 	for(int i = 0; i< dw->len; ++i)
@@ -333,9 +334,9 @@ void p_dotname() /// print a word's name given its dictionary address
 	dotname((dent_s*) pop());
 }
 
-void p_exit()
+void p_exit ()
 {
-	puts("p_exit called");
+	//puts("p_exit called");
 	IP = (cell_t*) rpop();
 }
 
@@ -347,37 +348,54 @@ cell_t dref(void* addr)
 void docol (dent_s* dw)
 {
 
-	puts("docol TODO NOW tricky!");
+	//puts("docol TODO NOW tricky!");
+
+	// cache the dictionary location for EXIT
+	static dent_s* dw_exit = 0;
+	if(!dw_exit) dw_exit = find("EXIT");	
+
+	IP=wptr;
+	IP++; // skip of myself (docol)
+	//dotname((dent_s*) IP);
+again:
+	dw = (dent_s*) dref(IP++);
+	//dotname(dw);
+	if(dw == dw_exit) goto finis;
+	rpush((cell_t) IP);
+	xdw(dw);
+	IP = (cell_t*) rpop();
+	goto again;
+finis:
+	return;
+
+
+
+
 	assert(dw->flags & F_SYN);	
-	dent_s* dw_exit = find("EXIT");
-	printf("exit is %p\n", dw);
+	//printf("exit is %p\n", dw);
 
 	IP = code(dw);
+	rpush((cell_t)IP); // although I don't think it serves any purpose
 
 	//dw = *(cell_t*) code(dw);
 	for(;;) {
-		puts("docol looping");
+		//puts("docol looping");
 		dw = (dent_s*) dref(IP++);
-		xdw(dw);
-		if(dw == dw_exit) break;
-	}
-	return;
-loop:
-	xdw(dw);
-	return;
-	IP++;
-	execute((codeptr) *IP);
-	if((codeptr) *IP != p_exit) goto loop;
-	return;
-
-	// better solution would be
-	rpush((cell_t)IP);
-	while(rtop) {
-		++IP;
-		if((codeptr) *IP == docol)
-			rpush((cell_t)IP);
-		else
-			execute((codeptr) *IP);
+		if(dw->flags & F_SYN) {
+			//puts("docol found dictionary word");
+			//rpush(IP);
+			rpush((cell_t)IP); // EXIT will pop it for us
+			dw = (dent_s*) dref(code(dw));
+			xdw(dw);
+			//codeptr fn = (codeptr)dref(code(dw));
+			//fn();
+			//IP = (cell_t*) rpop();
+			//puts("docol finished with syn word");
+		} else {
+			xdw(dw);
+		}
+		//if(dw == dw_exit) break;
+		if(rtop==0) break;
 	}
 	
 }
@@ -387,14 +405,20 @@ void execute(codeptr fn)
 	fn();
 }
 
-void xdw(dent_s* dw)
+void xdw (dent_s* dw)
 {
-	if(dw->flags & F_SYN)
-		docol(dw);
-	else {
-		codeptr fn = *(codeptr*) code(dw);
-		fn();
-	}
+	wptr = code(dw);
+	//codeptr fn = *(codeptr*) IP;
+	codeptr fn = (codeptr) dref(wptr);
+	fn();
+	/*
+	   if(dw->flags & F_SYN)
+	   docol(dw);
+	   else {
+	   codeptr fn = *(codeptr*) code(dw);
+	   fn();
+	   }
+	   */
 
 }
 
@@ -412,8 +436,8 @@ void p_hi()
 void p_colon()
 {
 	word();
-	//createz(0, token, docol);
-	create_header(F_SYN, token);
+	createz(0, token, docol);
+	//create_header(F_SYN, token);
 	compiling = true;
 }
 
