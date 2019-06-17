@@ -463,8 +463,41 @@ void embed_literal(cell_t v)
 	heapify((void*) v);
 
 }
+
+void p_qbranch()
+{
+	cell_t offset = 2; 
+	if(pop()) offset += dref((void*) rstack[rtop-1]+ sizeof(cell_t));
+	rstack[rtop-1] += offset * sizeof(cell_t);
+}
+void p_branch()
+{
+	cell_t offset = dref((void*) rstack[rtop-1]+ sizeof(cell_t))+2;
+	rstack[rtop-1] += offset * sizeof(cell_t);
+}
+
+void p_dup()
+{
+	cell_t v = pop();
+	push(v); 
+	push(v);
+}
+void p_here() { push((cell_t)IP); }
+
+void p_immediate() { latest->flags |= F_IMM; }
+
+void p_lsb() { compiling = false; }
+void p_rsb() { compiling = true; }
+
 typedef struct {byte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{F_IMM,	"[", p_lsb},
+	{0,	"]", p_rsb},
+	{0,	"IMMEDIATE", p_immediate},
+	{0,	"HERE", p_here},
+	{0,	"DUP", p_dup},
+	{0,	"BRANCH", p_branch},
+	{0,	"?BRANCH", p_qbranch},
 	{0,	"LIT", p_lit},
 	{0,	"EXIT", p_exit},
 	{0,	".NAME", p_dotname},
