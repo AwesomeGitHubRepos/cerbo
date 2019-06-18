@@ -285,11 +285,7 @@ void p_minus() { cell_t v1 = pop(), v2 = pop(); push(v2-v1); }
 void p_mult() { push(pop() * pop()); }
 void p_div() { cell_t v1 = pop(), v2 = pop(); push(v2/v1); }
 
-void p_dot()
-{
-	printf("%ld ", pop());
-
-}
+void p_dot() { printf("%ld ", pop()); }
 
 void p_tick()
 {
@@ -298,8 +294,6 @@ void p_tick()
 	if(dw == NULL)
 		undefined(token);
 	else {
-		//codeptr fn = *(codeptr*) code(dw);
-		//push((cell_t) fn);
 		push((cell_t)dw);
 	}
 }
@@ -327,7 +321,8 @@ void p_exit ()
 
 
 //void docol(dent_s* dw) // dw points to the dicitonary header of the synthesised word
-void docol (dent_s* dw)
+//void docol (dent_s* dw)
+void docol ()
 {
 
 	//puts("docol TODO NOW tricky!");
@@ -336,50 +331,16 @@ void docol (dent_s* dw)
 	static dent_s* dw_exit = 0;
 	if(!dw_exit) dw_exit = find("EXIT");	
 
+	dent_s* dw;
 	IP=wptr;
 	IP++; // skip of myself (docol)
-	//dotname((dent_s*) IP);
-again:
-	dw = (dent_s*) dref(IP++);
-	//dotname(dw);
-	if(dw == dw_exit) goto finis;
-	rpush((cell_t) IP);
-	xdw(dw);
-	IP = (cell_t*) rpop();
-	goto again;
-finis:
-	return;
-
-
-
-
-	assert(dw->flags & F_SYN);	
-	//printf("exit is %p\n", dw);
-
-	IP = code(dw);
-	rpush((cell_t)IP); // although I don't think it serves any purpose
-
-	//dw = *(cell_t*) code(dw);
 	for(;;) {
-		//puts("docol looping");
 		dw = (dent_s*) dref(IP++);
-		if(dw->flags & F_SYN) {
-			//puts("docol found dictionary word");
-			//rpush(IP);
-			rpush((cell_t)IP); // EXIT will pop it for us
-			dw = (dent_s*) dref(code(dw));
-			xdw(dw);
-			//codeptr fn = (codeptr)dref(code(dw));
-			//fn();
-			//IP = (cell_t*) rpop();
-			//puts("docol finished with syn word");
-		} else {
-			xdw(dw);
-		}
-		//if(dw == dw_exit) break;
-		if(rtop==0) break;
+		if(dw == dw_exit) break;
+		rpush((cell_t) IP);
+		xdw(dw);
+		IP = (cell_t*) rpop();
 	}
-	
 }
 
 //void execute(codeptr fn) { fn(); }
