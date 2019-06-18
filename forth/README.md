@@ -2,8 +2,6 @@
 
 ## Bugs
 
-VARIABLE not yet working
-
 branch, ?branch doesn't seem to work quite right yet.
 
 ## Implementing a Forth

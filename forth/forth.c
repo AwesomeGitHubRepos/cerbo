@@ -317,7 +317,6 @@ void p_exit ()
 
 void docol ()
 {
-
 	//puts("docol TODO NOW tricky!");
 
 	// cache the dictionary location for EXIT
@@ -336,6 +335,17 @@ void docol ()
 	}
 }
 
+void p_colon()
+{
+	word();
+	createz(0, token, docol);
+	compiling = true;
+}
+
+
+void _create() { push((cell_t)++wptr); }
+void p_create() { word(); createz(0, token, _create); }
+
 void xdw (dent_s* dw)
 {
 	wptr = code(dw);
@@ -347,12 +357,6 @@ void p_execute() { xdw((dent_s*) pop()); }
 
 void p_hi() { puts("hello world"); }
 
-void p_colon()
-{
-	word();
-	createz(0, token, docol);
-	compiling = true;
-}
 
 void p_semi()
 {
@@ -406,9 +410,6 @@ void p_at () { push(dref((void*)pop())); }
 void p_exc() { cell_t pos = pop(); cell_t val = pop(); store(pos, val); }
 void p_allot() { hptr += pop(); }
 
-void _create() { push((cell_t)wptr); }
-void p_create() { word(); createz(0, token, _create); }
-
 void p_char() { word(); push(token[0]);}
 void p_emit() { printf("%c", (char)pop()); }
 
@@ -461,7 +462,7 @@ void add_primitives()
 }
 
 char* derived[] = {
-	": VARIABLE	create 42 , ;",
+	": VARIABLE	create 0 , ;",
 	": 1+ 1 + ;",
 	0
 };
