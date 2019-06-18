@@ -13,7 +13,10 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef size_t cell_t;
+#if(__x86_64 ==1)
+typedef int64_t cell_t;
+#endif
+
 //static_assert(sizeof(cell_t) == sizeof(char*));
 typedef uint8_t byte;
 typedef void (*codeptr)();
@@ -154,7 +157,6 @@ void store(cell_t pos, cell_t val) { *(cell_t*)pos = val; }
 
 void heapify(void* fn)
 {
-	//printf("heapify fn %p at hptr %p\n", fn, hptr);
 	*(codeptr*)hptr = fn;
 	hptr += sizeof(void*);
 }
@@ -278,12 +280,10 @@ void p_dots()
 	for(int i = 0; i< tos; ++i) printf("%ld ", dstack[i]);
 }
 
-void p_plus()
-{
-	//cell_t v1 = pop();
-	//cell_t v2 = pop();
-	push(pop() + pop());
-}
+void p_plus() { push(pop() + pop()); }
+void p_minus() { cell_t v1 = pop(), v2 = pop(); push(v2-v1); }
+void p_mult() { push(pop() * pop()); }
+void p_div() { cell_t v1 = pop(), v2 = pop(); push(v2/v1); }
 
 void p_dot()
 {
@@ -494,6 +494,9 @@ prim_s prims[] =  {
 	{0, 	"WORDS", p_words},	
 	{0, 	".S", p_dots},
 	{0, 	"+", p_plus},
+	{0, 	"-", p_minus},
+	{0, 	"*", p_mult},
+	{0, 	"/", p_div},
 	{0,	".DICT", p_dot_dict},
 	0
 };
