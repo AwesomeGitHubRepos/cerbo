@@ -379,15 +379,14 @@ void embed_literal(cell_t v)
 
 void p_qbranch()
 {
-	cell_t offset = 2; 
-	if(pop()) offset += dref((void*) rstack[rtop-1]+ sizeof(cell_t));
-	rstack[rtop-1] += offset * sizeof(cell_t);
+	if(pop()) 
+		rstack[rtop-1] = dref((void*) rstack[rtop-1]);
+	else
+		rstack[rtop-1] = rstack[rtop-1] + sizeof(cell_t);
 }
 void p_branch()
 {
-	//cell_t offset = dref((void*) rstack[rtop-1]+ sizeof(cell_t))+2;
-	//rstack[rtop-1] += offset * sizeof(cell_t);
-	rstack[rtop-1] = dref((void*) rstack[rtop-1]); //+ sizeof(cell_t));
+	rstack[rtop-1] = dref((void*) rstack[rtop-1]);
 }
 
 void p_dup()
