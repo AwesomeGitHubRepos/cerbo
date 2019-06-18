@@ -72,9 +72,7 @@ typedef struct { // dictionary entry
 	char  name[]; // the name will actually be longer
 } dent_s;
 
-//dent_s *dict = NULL;
 dent_s *latest = NULL; // latest word being defined
-//dent_s *dwptr  = NULL; // this allows docol() to know the word that called it
 
 const byte F_IMM = 1;
 const byte F_SYN = 2; // a synthesised word, i.e. one that's a colon-definition
@@ -222,10 +220,8 @@ void* code (dent_s* dw)
 	void* ptr = dw->name + dw->len;
 	codeptr fn = *(codeptr*) ptr;
 	if(fn == docol) {
-		//puts("code found docol");
 		IP = ptr;
 	}
-	//return (codeptr)(dw->name + dw->len);
 	return (codeptr) ptr;
 }
 
@@ -320,8 +316,6 @@ void p_exit ()
 
 
 
-//void docol(dent_s* dw) // dw points to the dicitonary header of the synthesised word
-//void docol (dent_s* dw)
 void docol ()
 {
 
