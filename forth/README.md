@@ -2,9 +2,9 @@
 
 ## Bugs
 
-Segfaults: `: h hi ; ' h execute`
+VARIABLE not yet working
 
-branhc, ?branch doesn't seem to work quite right yet.
+branch, ?branch doesn't seem to work quite right yet.
 
 ## Implementing a Forth
 

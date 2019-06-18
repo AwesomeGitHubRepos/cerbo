@@ -145,6 +145,13 @@ void undefined(char* token){
 	printf("undefined word:<%s>\n", token);
 }
 
+cell_t dref(void* addr)
+{
+	return *(cell_t*)addr;
+}
+
+void store(cell_t pos, cell_t val) { *(cell_t*)pos = val; }
+
 void heapify(void* fn)
 {
 	//printf("heapify fn %p at hptr %p\n", fn, hptr);
@@ -230,36 +237,11 @@ char* token;
 char* rest;
 char* word()
 {
-        token = strtok_r(rest, " \n", &rest); 
+        token = strtok_r(rest, " \t\n", &rest); 
 	strupr(token);
         return token;
 }
 
-/*
-char wordpad[32];
-void p_word()
-{
-// TODO check word len overflow
-	int count = 0, c;
-
-	bool skip_spaces = true;
-	for(;;) {
-		int c = getchar();
-		if((c == ' ') && skip_spaces) continue;
-		skip_spaces = false;
-		//if('a'<= c && c <= 'z') c = c + 'A' - 'a';
-		wordpad[++count] = toupper(c);
-		if(c == '\n' || c == ' ' || c == EOF || c == 0) {count--; break; }
-	}
-	wordpad[0] = count;
-	wordpad[count+2] = 0;
-
-}
-
-
-
-void p_nextword () { p_bl(); p_word(); p_find(); }
-*/
 
 void p_dot_dict() 
 {
@@ -316,10 +298,9 @@ void p_tick()
 	if(dw == NULL)
 		undefined(token);
 	else {
-		//IP = (cell_t*) code(dw);
-		//codeptr fn = (codeptr) *IP;
-		codeptr fn = *(codeptr*) code(dw);
-		push((cell_t) fn);
+		//codeptr fn = *(codeptr*) code(dw);
+		//push((cell_t) fn);
+		push((cell_t)dw);
 	}
 }
 
@@ -343,10 +324,8 @@ void p_exit ()
 	IP = (cell_t*) rpop();
 }
 
-cell_t dref(void* addr)
-{
-	return *(cell_t*)addr;
-}
+
+
 //void docol(dent_s* dw) // dw points to the dicitonary header of the synthesised word
 void docol (dent_s* dw)
 {
@@ -403,39 +382,20 @@ finis:
 	
 }
 
-void execute(codeptr fn)
-{
-	fn();
-}
+//void execute(codeptr fn) { fn(); }
+
 
 void xdw (dent_s* dw)
 {
 	wptr = code(dw);
-	//codeptr fn = *(codeptr*) IP;
 	codeptr fn = (codeptr) dref(wptr);
 	fn();
-	/*
-	   if(dw->flags & F_SYN)
-	   docol(dw);
-	   else {
-	   codeptr fn = *(codeptr*) code(dw);
-	   fn();
-	   }
-	   */
-
 }
 
-void p_execute()
-{
-	execute((codeptr) pop());
-}
+void p_execute() { xdw((dent_s*) pop()); }
 
+void p_hi() { puts("hello world"); }
 
-
-void p_hi()
-{
-	puts("hello world");
-}
 void p_colon()
 {
 	word();
@@ -483,20 +443,29 @@ void p_dup()
 	push(v); 
 	push(v);
 }
-void p_here() { push((cell_t)IP); }
+void p_here() { push((cell_t)hptr); }
 
 void p_immediate() { latest->flags |= F_IMM; }
 
 void p_lsb() { compiling = false; }
 void p_rsb() { compiling = true; }
 
-void p_comma() { heapify((void*)pop()); hptr += sizeof(cell_t); }
+//void p_comma() { heapify((void*)pop()); hptr += sizeof(cell_t); }
+void p_comma() { heapify((void*)pop()); }
 void p_swap() { cell_t temp = dstack[tos-1]; dstack[tos-1] = dstack[tos-2]; dstack[tos-2] = temp; }
+void p_at() { push(dref((void*)pop())); }
+void p_exc() { cell_t pos = pop(); cell_t val = pop(); store(pos, val); }
+void p_allot() { hptr += pop(); }
+
+void _create() { push((cell_t)wptr); }
+void p_create() { word(); createz(0, token, _create); }
 
 typedef struct {byte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
-	//{0,	"!",	p_exc},
-	//{0,	"@",	p_at},
+	{0,	"CREATE", p_create},
+	{0,	"ALLOT", p_allot},
+	{0,	"!",	p_exc},
+	{0,	"@",	p_at},
 	{0,	"SWAP", p_swap},
 	{0,	",", p_comma},
 	{F_IMM,	"[", p_lsb},
@@ -533,6 +502,7 @@ void add_primitives()
 }
 
 char* derived[] = {
+	": VARIABLE	create 42 , ;",
 	": 1+ 1 + ;",
 	0
 };
