@@ -460,8 +460,15 @@ void p_allot() { hptr += pop(); }
 void _create() { push((cell_t)wptr); }
 void p_create() { word(); createz(0, token, _create); }
 
+void p_char() { word(); push(token[0]);}
+void p_emit() { printf("%c", (char)pop()); }
+
+
+
 typedef struct {byte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"CHAR",	p_char},
+	{0,	"EMIT", p_emit},
 	{0,	"CREATE", p_create},
 	{0,	"ALLOT", p_allot},
 	{0,	"!",	p_exc},
