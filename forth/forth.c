@@ -147,16 +147,12 @@ void undefined(char* token){
 	printf("undefined word:<%s>\n", token);
 }
 
-cell_t dref(void* addr)
-{
-	return *(cell_t*)addr;
-}
+cell_t dref(void* addr) { return *(cell_t*)addr; }
 
 void store(cell_t pos, cell_t val) { *(cell_t*)pos = val; }
 
 void heapify (cell_t v)
 {
-	//*(cell_t*)hptr = v;
 	store((cell_t)hptr, v);
 	hptr += sizeof(cell_t);
 }
@@ -219,9 +215,11 @@ void* code (dent_s* dw)
 {
 	void* ptr = dw->name + dw->len;
 	codeptr fn = *(codeptr*) ptr;
+	/*
 	if(fn == docol) {
 		IP = ptr;
 	}
+	*/
 	return (codeptr) ptr;
 }
 
@@ -311,7 +309,8 @@ void p_dotname() /// print a word's name given its dictionary address
 void p_exit ()
 {
 	//puts("p_exit called");
-	IP = (cell_t*) rpop();
+	//IP = (cell_t*) rpop();
+	rpop();
 }
 
 
@@ -337,9 +336,6 @@ void docol ()
 	}
 }
 
-//void execute(codeptr fn) { fn(); }
-
-
 void xdw (dent_s* dw)
 {
 	wptr = code(dw);
@@ -355,7 +351,6 @@ void p_colon()
 {
 	word();
 	createz(0, token, docol);
-	//create_header(F_SYN, token);
 	compiling = true;
 }
 
