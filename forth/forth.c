@@ -155,12 +155,12 @@ cell_t dref(void* addr)
 
 void store(cell_t pos, cell_t val) { *(cell_t*)pos = val; }
 
-void heapify(void* fn)
+void heapify (cell_t v)
 {
-	*(codeptr*)hptr = fn;
-	hptr += sizeof(void*);
+	//*(cell_t*)hptr = v;
+	store((cell_t)hptr, v);
+	hptr += sizeof(cell_t);
 }
-
 
 void heapify_dw(dent_s* dw)
 {
@@ -189,7 +189,7 @@ void create_header(byte flags, char* zname)
 void createz(byte flags, char* zname, codeptr fn) // zname being a null-terminated string
 {
 	create_header(flags, zname);
-	heapify(fn);
+	heapify((cell_t)fn);
 }
 
 
@@ -271,7 +271,6 @@ void p_words() {
 		puts("");
 		dw = dw->prev;
 	}
-	// TODO
 }
 
 void p_dots()
@@ -420,8 +419,7 @@ void p_lit()
 void embed_literal(cell_t v)
 {
 	heapify_word("LIT");
-	heapify((void*) v);
-
+	heapify(v);
 }
 
 void p_qbranch()
@@ -451,7 +449,7 @@ void p_lsb() { compiling = false; }
 void p_rsb() { compiling = true; }
 
 //void p_comma() { heapify((void*)pop()); hptr += sizeof(cell_t); }
-void p_comma() { heapify((void*)pop()); }
+void p_comma() { heapify(pop()); }
 void p_swap() { cell_t temp = dstack[tos-1]; dstack[tos-1] = dstack[tos-2]; dstack[tos-2] = temp; }
 void p_at() { push(dref((void*)pop())); }
 void p_exc() { cell_t pos = pop(); cell_t val = pop(); store(pos, val); }
