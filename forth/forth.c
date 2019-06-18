@@ -107,33 +107,14 @@ typedef enum {
     STR2INT_INCONVERTIBLE
 } str2int_errno;
 
+/*
 // from https://stackoverflow.com/questions/7021725/how-to-convert-a-string-to-integer-in-c#7021750
-/* Convert string s to int out.
- *
- * @param[out] out The converted int. Cannot be NULL.
- *
- * @param[in] s Input string to be converted.
- *
- *     The format is the same as strtol,
- *     except that the following are inconvertible:
- *
- *     - empty string
- *     - leading whitespace
- *     - any trailing characters that are not part of the number
- *
- *     Cannot be NULL.
- *
- * @param[in] base Base to interpret string in. Same range as strtol (2 to 36).
- *
- * @return Indicates if the operation succeeded, or why it failed.
- */
 str2int_errno str2int(int *out, char *s, int base) {
     char *end;
     if (s[0] == '\0' || isspace(s[0]))
         return STR2INT_INCONVERTIBLE;
     errno = 0;
     long l = strtol(s, &end, base);
-    /* Both checks are needed because INT_MAX == LONG_MAX is possible. */
     if (l > INT_MAX || (errno == ERANGE && l == LONG_MAX))
         return STR2INT_OVERFLOW;
     if (l < INT_MIN || (errno == ERANGE && l == LONG_MIN))
@@ -142,6 +123,26 @@ str2int_errno str2int(int *out, char *s, int base) {
         return STR2INT_INCONVERTIBLE;
     *out = l;
     return STR2INT_SUCCESS;
+}
+*/
+
+
+bool int_str(char*s, cell_t *v)
+{
+	*v = 0;
+	cell_t sgn = 1;
+	if(*s=='-') { sgn = -1; s++; }
+	if(*s == '+') s++;
+	if(*s == 0) return false;
+	while(*s) {
+		if('0' <= *s && *s <= '9') 
+			*v = *v * 10 + *s - '0';
+		else
+			return false;
+		s++;
+	}
+	*v *= sgn;
+	return true;
 }
 
 void undefined(char* token){
@@ -441,7 +442,7 @@ void p_dup()
 	push(v); 
 	push(v);
 }
-void p_here() { push((cell_t)hptr); }
+void p_here () { push((cell_t)hptr); }
 
 void p_immediate() { latest->flags |= F_IMM; }
 
@@ -451,7 +452,7 @@ void p_rsb() { compiling = true; }
 //void p_comma() { heapify((void*)pop()); hptr += sizeof(cell_t); }
 void p_comma() { heapify(pop()); }
 void p_swap() { cell_t temp = dstack[tos-1]; dstack[tos-1] = dstack[tos-2]; dstack[tos-2] = temp; }
-void p_at() { push(dref((void*)pop())); }
+void p_at () { push(dref((void*)pop())); }
 void p_exc() { cell_t pos = pop(); cell_t val = pop(); store(pos, val); }
 void p_allot() { hptr += pop(); }
 
@@ -543,9 +544,10 @@ void process_word()
 {
 	dent_s* dw = find(token);
 	if(dw == 0) {
-		int v;
-		str2int_errno res = str2int(&v, token, 10);
-		if(res == STR2INT_SUCCESS) {
+		cell_t v;
+		//str2int_errno res = str2int(&v, token, 10);
+		//if(res == STR2INT_SUCCESS) {
+		if(int_str(token, &v)) {
 			if(compiling)  
 				embed_literal(v);
 			 else 
