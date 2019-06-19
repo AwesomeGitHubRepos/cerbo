@@ -24,6 +24,28 @@ typedef void (*codeptr)();
 cell_t* IP;	// Interpreter Pointer. 
 cell_t* wptr;
 
+
+typedef struct {
+	int tos;
+	cell_t contents[10];
+} stack_t;
+
+stack_t tstack = {.tos=0};
+
+void push_x(stack_t* stk, cell_t v)
+{
+	stk->contents[stk->tos++] = v;
+}
+
+cell_t pop_x(stack_t* stk)
+{
+	return stk->contents[--stk->tos];
+}
+
+
+void push_t(cell_t v) { push_x(&tstack, v); }
+cell_t pop_t() { pop_x(&tstack); }
+
 cell_t dstack[10]; // data stack
 int tos = 0; // items on stack
 //cell_t *PSP = pstack; // Parameter Stack, aka data stack, aka SP
@@ -59,6 +81,7 @@ size_t W;	// Working register.  Multi-purpose
 size_t X;	// Working register
 
 bool compiling = false; // start of by interpretting
+bool show_prompt = true; // allow for supression of prompts in scripts
 
 char _TIB[136]; // The input buffer
 char* TIB = _TIB;
@@ -192,7 +215,7 @@ void createz(byte flags, char* zname, codeptr fn) // zname being a null-terminat
  */
 void p_bl() { push(32); }
 
-dent_s* find(char* name)
+dent_s* find (char* name)
 {
 	dent_s* dw = latest;
 	int len = strlen(name);
@@ -232,14 +255,29 @@ void* code (dent_s* dw)
 char tib[132];
 char* token;
 char* rest;
-char* word()
+char* delim_word (char* delims, bool upper)
 {
-        token = strtok_r(rest, " \t\n", &rest); 
-	strupr(token);
+        token = strtok_r(rest, delims, &rest); 
+	if(upper) strupr(token);
         return token;
 }
 
+char* word () { delim_word(" \t\n", true); }
 
+
+
+void dotname (dent_s* dw, char* after)
+{
+	for(int i = 0; i< dw->len; ++i)
+		printf("%c", dw->name[i]);
+	printf("%s", after);
+}
+
+
+void p_dotname () /// print a word's name given its dictionary address
+{
+	dotname((dent_s*) pop(), " ");
+}
 void p_dot_dict() 
 {
 	dent_s* dw = latest;
@@ -281,7 +319,7 @@ void p_div() { cell_t v1 = pop(), v2 = pop(); push(v2/v1); }
 
 void p_dot() { printf("%ld ", pop()); }
 
-void p_tick()
+void p_tick ()
 {
 	char* token = word();
 	dent_s* dw = find(token);
@@ -292,18 +330,16 @@ void p_tick()
 	}
 }
 
-void dotname (dent_s* dw) /// print a word's name given its dictionary address
-{
-	//dent_s* dw = (dent_s*) pop();
-	for(int i = 0; i< dw->len; ++i)
-		printf("%c", dw->name[i]);
-	printf(" ");
-}
+void p_compile_comma() { heapify(pop()); }
 
 
-void p_dotname() /// print a word's name given its dictionary address
+void p_compile()
 {
-	dotname((dent_s*) pop());
+	// atlast: Ho(1); Hstore = (stackitem) *ip++; Hstore == *hptr++
+	cell_t cell = dref((void*)rstack[rtop-1]);
+	//dotname(cell, "\n");
+	heapify(cell);
+	rstack[rtop-1] += sizeof(cell_t);
 }
 
 void p_exit ()
@@ -377,6 +413,13 @@ void embed_literal(cell_t v)
 	heapify(v);
 }
 
+void p_0branch()
+{
+	if(!pop()) 
+		rstack[rtop-1] = dref((void*) rstack[rtop-1]);
+	else
+		rstack[rtop-1] = rstack[rtop-1] + sizeof(cell_t);
+}
 void p_qbranch()
 {
 	if(pop()) 
@@ -402,7 +445,6 @@ void p_immediate() { latest->flags |= F_IMM; }
 void p_lsb() { compiling = false; }
 void p_rsb() { compiling = true; }
 
-//void p_comma() { heapify((void*)pop()); hptr += sizeof(cell_t); }
 void p_comma() { heapify(pop()); }
 void p_swap() { cell_t temp = dstack[tos-1]; dstack[tos-1] = dstack[tos-2]; dstack[tos-2] = temp; }
 void p_at () { push(dref((void*)pop())); }
@@ -412,10 +454,68 @@ void p_allot() { hptr += pop(); }
 void p_char() { word(); push(token[0]);}
 void p_emit() { printf("%c", (char)pop()); }
 
+void p_drop () { pop(); }
+void p_hole () { heapify(0); }
+void p_prompt () { show_prompt = (bool) pop(); }
+void p_bslash () { strtok_r(rest, "\n", &rest); }
+void p_z_slash () { delim_word("\"", false); push((cell_t)token); }
+void p_type () { printf("%s", (char*) pop()); }
+void p_dot_dq () {  p_z_slash(); p_type(); }
+void p_0_eq() { if(pop()) push(1); else push(0); }
 
+/*
+void p_tor() { 
+	cell_t v = pop();
+	cell_t ip = rstack[rtop-1];
+	rstack[rtop -1] = v;
+	rpush(ip); 
+}
+
+void p_fromr() 
+{ 
+
+	push(rpop()); }
+*/
+
+//void p_if() { heapify_word("0BRANCH"); p_here(); heapify(0xBAD); }
+//void p_then() { store(pop(), hptr); }
+//void p_then() { store(hptr, pop()); }
+
+/*
+void p_else() 
+{ 
+	heapify_word("BRANCH"); 
+	cell_t where = hptr;
+	heapify(0xBAD);
+	heapify_word("BRANCH");
+	p_then();
+	push(where);
+}
+*/
+
+
+void p_tot() { push_t(pop()); }
+void p_fromt() { push(pop_t()); }
 
 typedef struct {byte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	//{0,	"IF", p_if},
+	//{0,	"THEN", p_then},
+	//{0,	"ELSE", p_else},
+	//{0,	">R", p_tor},
+	//{0,	"R>", p_fromr},
+	{0,	">T", p_tot},
+	{0,	"T>", p_fromt},
+	{0,	"0=", p_0_eq},
+	{0,	"COMPILE", p_compile},
+	{0,	"TYPE", p_type},
+	{0,	"Z\"", p_z_slash},
+	{0,	".\"", p_dot_dq},
+	{0,	"\\", p_bslash},
+	{0,	"PROMPT", p_prompt},
+	{0,	"HOLE", p_hole},
+	{0,	"COMPILE,", p_compile_comma},
+	{0,	"DROP", p_drop},
 	{0,	"CHAR",	p_char},
 	{0,	"EMIT", p_emit},
 	{0,	"CREATE", p_create},
@@ -430,12 +530,14 @@ prim_s prims[] =  {
 	{0,	"HERE", p_here},
 	{0,	"DUP", p_dup},
 	{0,	"BRANCH", p_branch},
+	{0,	"0BRANCH", p_0branch},
 	{0,	"?BRANCH", p_qbranch},
 	{0,	"LIT", p_lit},
 	{0,	"EXIT", p_exit},
 	{0,	".NAME", p_dotname},
 	{0,	"HI", p_hi},
 	{0,	"'", p_tick},
+	//{F_IMM,	"`", p_btick},
 	{0,	"EXECUTE", p_execute},
 	{0, 	":", p_colon},
 	{F_IMM,	";", p_semi},
@@ -463,6 +565,11 @@ void add_primitives()
 char* derived[] = {
 	": VARIABLE	create 0 , ;",
 	": 1+ 1 + ;",
+	//": not ?branch [ here 0 , ] 1 exit [ here swap ! ] 0 ;",
+	": CR 10 emit ;",
+	": IF compile 0branch here 0 , ; immediate",
+	": THEN here swap ! ; immediate",
+	": ELSE compile branch here >t 0 , here swap ! t> ; immediate",
 	0
 };
 
@@ -521,7 +628,7 @@ int main()
 	add_derived();
 	while(fgets(tib, sizeof(tib), stdin)) {
 		process_tib();
-		puts("  ok");
+		if(show_prompt) puts("  ok");
 	}
 
 	return 0;
