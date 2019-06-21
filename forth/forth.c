@@ -17,6 +17,9 @@
 typedef int64_t cell_t;
 #endif
 
+#define DEBUG(cmd) cmd
+#define DEBUGX(cmd)
+
 //static_assert(sizeof(cell_t) == sizeof(char*));
 typedef uint8_t byte;
 typedef void (*codeptr)();
@@ -172,7 +175,7 @@ void undefined(char* token){
 
 cell_t dref(void* addr) { return *(cell_t*)addr; }
 
-void store(cell_t pos, cell_t val) { *(cell_t*)pos = val; }
+void store (cell_t pos, cell_t val) { *(cell_t*)pos = val; }
 
 void heapify (cell_t v)
 {
@@ -497,6 +500,52 @@ void p_else()
 void p_tot() { push_t(pop()); }
 void p_fromt() { push(pop_t()); }
 
+void p_dodoes() // not an immediate word
+{
+	DEBUGX(puts("calling dodoes");)
+	cell_t does_loc  = pop(); // provided by 555. Previous cell should be an EXIT
+
+	cell_t loc888 = (cell_t) code(latest) + 4*sizeof(cell_t);
+	DEBUGX(printf("dodoes thinks 888 is located at %p\n", (void*) loc888);)
+	store(loc888, does_loc);
+
+	cell_t loc777 = loc888 - 2*sizeof(cell_t);
+	DEBUGX(printf("dodoes thinks 777 is located at %p\n", (void*) loc777);)
+	cell_t offset = loc888 + 2*sizeof(cell_t); // points to just after the ';' of the docol 
+	store(loc777, offset);	
+}
+
+
+void p_does() // is immeditate
+{
+	heapify_word("LIT");
+	cell_t loc = (cell_t) hptr; // loc holds the location of 555
+	heapify(555); // ready for backfill
+	heapify_word("(DOES>)"); // aka p_dodoes
+	heapify_word("EXIT");
+	store(loc, (cell_t)hptr); // now backfill it
+	// so now 555 has been replaced by the cell after the EXIT, which gets pushed onto the stack
+	// so that (DOES>) knows where it is on the heap
+
+}
+void p_builds() // not an immediate word
+{
+	word();
+	createz(0, token, docol);
+
+	heapify_word("LIT");
+	DEBUGX(printf("p_builds: location of 777: %p\n", hptr);)
+	heapify(777); // filled in properly by dodoes
+
+	heapify_word("BRANCH");
+	DEBUGX(printf("p_builds: location of 888: %p\n", hptr);)
+	heapify(888);
+
+	heapify_word(";");
+}
+
+
+
 typedef struct {byte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
 	//{0,	"IF", p_if},
@@ -504,6 +553,9 @@ prim_s prims[] =  {
 	//{0,	"ELSE", p_else},
 	//{0,	">R", p_tor},
 	//{0,	"R>", p_fromr},
+	{0,	"<BUILDS", p_builds},
+	{F_IMM,	"DOES>", p_does},
+	{0,	"(DOES>)", p_dodoes},
 	{0,	">T", p_tot},
 	{0,	"T>", p_fromt},
 	{0,	"0=", p_0_eq},
@@ -567,6 +619,7 @@ char* derived[] = {
 	": 1+ 1 + ;",
 	//": not ?branch [ here 0 , ] 1 exit [ here swap ! ] 0 ;",
 	": CR 10 emit ;",
+	": CONSTANT	<builds , does> @ ;",
 	": IF compile 0branch here 0 , ; immediate",
 	": THEN here swap ! ; immediate",
 	": ELSE compile branch here >t 0 , here swap ! t> ; immediate",
