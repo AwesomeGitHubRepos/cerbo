@@ -1,3 +1,13 @@
+/* 
+ * I release this file into the Public Domain, together with
+ * all the other files in this directory.
+ *
+ * Enjoy!
+ *
+ * Mark Carter, Jun 2019
+ * 
+ */
+
 #include <assert.h>
 #include <stdio.h>
 #include <sys/time.h>
