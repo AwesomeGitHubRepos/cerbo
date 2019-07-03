@@ -1,0 +1,109 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\pagestyle{fancy}
+
+\rhead{}
+\lfoot{noise}
+\cfoot{}
+\rfoot{\thepage}
+\renewcommand{\footrulewidth}{0.4pt}
+%opening
+\title{Generating pleasant noises using microcontrollers}
+%\author{Mark Carter \\ email \href{mailto:me@somewhere.com}}
+%\author{Mark Carter}
+\author{Mark Carter \\ alt.mcarter@gmail.com}
+%\author{Mark Carter --- alt.mcarter@gmail.com}
+
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+
+\begin{abstract}
+
+A common MCU (microcontrollers) project is the generation of noise for sleep or other purposes. Most projects found on the internet demonstrate how MCUs can be used to generate white noise. However, white noise sounds harsh, or ``tinny'', to humans. Brown noise is more pleasant, but it is difficult to find literature on how to generate it simply.
+
+This paper explains how an approximation to Brown noise can be produced using a cheap MCU, a resistor, and a capacitor. A model and simulation of the underlying electrical theory is presented.
+\end{abstract}
+
+\section{Introduction}
+Humans hear in the range 20-20kHz \cite{wikihearing}. 
+Noise-making machines are often used to promote sleep. They are not particularly cheap, costing around £30 as at July 2019. It is easy to produce white noise using hobbiest MCUs like an Arduino Uno. The following sketch for the Arduino IDE shows just how simple it is:
+\begin{verbatim}
+void setup() {
+  pinMode(12, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(12, random(2));
+}
+\end{verbatim} 
+The code can be adapted easily to work with a variety of MCUs. Halfacree \cite{halfacree} elaborates on this idea by creating a project called the Sleepduino, consisting of an MCU, a potentiometer, some LEDs and a speaker.  The source file is available on github \cite{sleepduino}. It uses its own algorithm to generate random numbers, although this would not appear to be necessary, as the Arduino IDE already provides a random number generator.
+
+The problem with white noise is that it is unpleasant to human ears. There is too much hissing to it \cite{gulf}, which is caused by the ear's perception of loudness at the higher frequencies. In order to produce a more pleasing sound, the energy output at the higher frequencies needs to be attenuated.
+
+\section{White noise}
+This section defines white noise and ...
+
+White noise is a random signal having equal intensity at different frequencies, giving it a constant power spectral density\cite{wiki_white}. A power spectrum that is close to ideal is shown below\cite{wiki_colour}:
+
+\begin{center}
+\includegraphics[height=3cm]{wns.png}
+\end{center}
+ 
+A signal that is generated ad-hoc may look far more irregular. Audacity\cite{audacity}
+
+
+Now is the winter of our discontent.
+\begin{equation*}
+  f(x) = x^2
+\end{equation*}
+
+\begin{thebibliography}{9}
+ 
+\bibitem{halfacree}
+Halfacree, Gareth.
+\textit{Introducing the Sleepduino}
+2012 
+\\\texttt{https://is.gd/5zEFYt}
+Extracted 2 July 2019
+
+
+
+\bibitem{sleepduino}
+Cox, Patrick.
+\textit{Basic version of the Sleepduino.}
+\\\texttt{https://github.com/patcox/Sleepduino}
+
+\bibitem{gulf}
+Gulf Coast Audiology.
+\textit{White, Pink or Brown: Which Noise Helps You Sleep Better?}
+\\\texttt{https://is.gd/41EOqr}
+
+\bibitem{wikihearing}
+Wikipedia.
+\textit{Hearing range}
+\\\texttt{https://en.wikipedia.org/wiki/Hearing\_range}
+
+\bibitem{wiki_white}
+Wikipedia.
+\textit{White noise}
+\\\texttt{https://en.wikipedia.org/wiki/White\_noise}
+
+\bibitem{wiki_colour}
+Wikipedia.
+\textit{Colors of noise}
+\\\texttt{https://en.wikipedia.org/wiki/Colors\_of\_noise}
+
+\bibitem{audacity}
+Audacity.
+\textit{Free, open source, cross-platform audio software}
+\\\texttt{https://www.audacityteam.org/}
+
+\end{thebibliography}
+
+
+\end{document}
