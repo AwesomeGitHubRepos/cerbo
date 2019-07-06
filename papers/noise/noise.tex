@@ -4,7 +4,11 @@
 \usepackage{hyperref}
 \usepackage{fancyhdr}
 \usepackage{graphicx}
+\usepackage{fancyvrb}
 \pagestyle{fancy}
+
+%generate mono-spaced
+\def\code#1{\texttt{#1}}
 
 \rhead{}
 \lfoot{noise}
@@ -45,17 +49,60 @@ The code can be adapted easily to work with a variety of MCUs. Halfacree \cite{h
 
 The problem with white noise is that it is unpleasant to human ears. There is too much hissing to it \cite{gulf}, which is caused by the ear's perception of loudness at the higher frequencies. In order to produce a more pleasing sound, the energy output at the higher frequencies needs to be attenuated.
 
+\section{Measurement of sound}
+
+For \emph{power} quantities, a decibel (dB) is defined as: https://en.wikipedia.org/wiki/Decibel
+\begin{equation}
+ L_P = 10 \log_{10}\left(\frac{P}{P_0}\right)
+\end{equation}
+where $P$ is the measured power, and $P_0$ is the reference power.
+
+For \emph{field} quantities, such as voltages and amplitudes, it is defined as:
+
+\begin{equation}
+ L_F = 10 \log_{10}\left(\frac{F^2}{F^2_0}\right) \equiv 20 \log_{10}\left(\frac{F}{F_0}\right)
+\end{equation}
+
+where $F$ is the measured field value, and $F_0$ is the reference field value.
+
+The dB is therefore a relative to some reference value, rather than absolute one. Note that if an amplitude or voltage halves, its dB changes by approximately -6 dB $( = 20 \log_{10}\frac{1}{2})$.
+
+Consider the representation of amplitudes in a sound file, where each sound sample is represented by an unsigned 8-bit byte. Each byte has a minimum value of 0, and a maximum value of 255 inclusive. Choosing $F_0$ to be the value 255, it follows that the dB value for an amplitude of 255 is 0dB. An amplitude of 128, it is approximately half of 255, therefore measures as $\approx$-6dB.
 \section{White noise}
 This section defines white noise and ...
 
-White noise is a random signal having equal intensity at different frequencies, giving it a constant power spectral density\cite{wiki_white}. A power spectrum that is close to ideal is shown below\cite{wiki_colour}:
+White noise is a random signal having equal intensity at different frequencies, giving it a constant power spectral density\cite{wiki_white}. Its spectrum looks like this:
 
 \begin{center}
-\includegraphics[height=3cm]{wns.png}
+\includegraphics[height=6cm]{white.png}
 \end{center}
- 
-A signal that is generated ad-hoc may look far more irregular. Audacity\cite{audacity}
 
+A typical 10s sample generated using the code (\code{white.c}):
+\begin{Verbatim}[tabsize=8]
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+	FILE* fp = fopen("noise.raw", "wb");
+	assert(fp);
+	for(int i = 0; i<80000; ++i) {
+		int v = rand() % 256;
+		fprintf(fp, "%c", v);
+	}
+	fclose(fp);
+	return 0;
+}
+\end{Verbatim}
+
+
+
+
+
+\appendix
+
+\section{Appendix: for which no-one has found a use}
 
 Now is the winter of our discontent.
 \begin{equation*}

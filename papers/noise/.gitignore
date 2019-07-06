@@ -1,0 +1,11 @@
+*.raw
+*.wav
+white
+noise.aux
+noise.bbl
+noise.blg
+noise.log
+noise.out
+noise.pdf
+noise.synctex.gz
+spectrum.txt
