@@ -1,3 +1,6 @@
+brown : brown.c
+	gcc $^ -o $@
+	
 white: white.c
 	gcc $^ -o $@
 
@@ -8,4 +11,7 @@ spectrum.png : spectrum.txt plotspec.py
 	python3 plotspec.py
 
 clean:	
-	rm -f spectrum.txt
+	rm -f spectrum.txt 	\
+		noise.aux noise.bbl noise.blg noise.log \
+		noise.out noise.pdf noise.synctex.gz
+
