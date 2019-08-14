@@ -10,11 +10,12 @@ noise.wav : noise.raw
 spectrum.png : spectrum.txt plotspec.py
 	python3 plotspec.py
 
-noise.pdf : noise.tex noise.aux noise.blg
-	pdflatex noise.tex
+#noise.pdf : noise.tex noise.aux noise.blg
+noise.pdf : noise.tex
+	pdflatex noise.tex && pdflatex noise.tex
 
 clean:	
 	rm -f spectrum.txt 	\
 		noise.aux noise.bbl noise.blg noise.log \
-		noise.out noise.pdf noise.synctex.gz
+		noise.out noise.pdf noise.synctex.gz noise.pdf
 
