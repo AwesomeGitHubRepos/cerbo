@@ -35,11 +35,12 @@ ws	[ \t\r\n]
 "/"		{ return DIV; }
 "^"		{ return POW; }
 ";"		{ return SEMI;}
-[0-9]+		{ yylval = std::stoi(yytext); 	return INTEGER;}
+[0-9]+		{ yylval = YYSTYPE{INTEGER-HALT, (byte_t) std::stoi(yytext)}; 	return INTEGER;}
 IF		{ return IF; }
 THEN		{ return THEN; }
 ELSE		{ return ELSE; }
 FI		{ return FI; }
 JUST		{ return JUST;}
+print		{ return PRINT;}
 
 %%

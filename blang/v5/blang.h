@@ -6,8 +6,11 @@
 #include <string>
 #include <vector>
 
-#define YYSTYPE int
+typedef unsigned char byte_t;
+
+#define YYSTYPE std::vector<byte_t>
 extern YYSTYPE yylval;
+inline YYSTYPE bcode;
 
 
 
@@ -18,6 +21,31 @@ extern int yylex();
 
 extern int top; // the top node
 
-typedef struct {int type; int arg1; int arg2; int arg3; } tac;
-int add_tac(int type, int arg1, int arg2);
-int add_tac(int type, int arg1, int arg2, int arg3);
+/*
+#ifndef YYTOKENTYPE
+# define YYTOKENTYPE
+  enum yytokentype
+  {
+    HALT = 1,
+    STATEMENT,
+    DENT,
+    TEXT,
+    INTEGER,
+    JUST,
+    LRB,
+    RRB,
+    PLUS,
+    MUL,
+    DIV,
+    POW,
+    SEMI,
+    IF,
+    THEN,
+    ELSE,
+    FI,
+    PRINT,
+    SUB,
+    UMINUS
+  };
+#endif
+*/
