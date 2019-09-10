@@ -35,7 +35,9 @@ ws	[ \t\r\n]
 "/"		{ return DIV; }
 "^"		{ return POW; }
 ";"		{ return SEMI;}
-[0-9]+		{ yylval = YYSTYPE{INTEGER-HALT};
+[0-9]+		{ 
+		yylval = YYSTYPE{INTEGER-HALT};
+		//yylval = YYSTYPE{};
 		int i = std::stoi(yytext);
 		//byte_t* arr = reinterpret_cast<byte_t*>(static_cast<const void*>(&i));
 		byte_t* arr = (byte_t*) &i;

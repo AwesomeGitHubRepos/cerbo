@@ -21,6 +21,14 @@ YYSTYPE join(YYSTYPE vec1, YYSTYPE vec2)
 	return vec1;
 }
 
+YYSTYPE join(byte_t b, YYSTYPE vec1, YYSTYPE vec2)
+{
+	YYSTYPE vec{b};
+	vec = join(vec, join(vec1, vec2));
+	//vec1.insert(vec1.end(), vec2.begin(), vec2.end());
+	return vec;
+}
+
 %}
 
 
@@ -46,9 +54,15 @@ YYSTYPE join(YYSTYPE vec1, YYSTYPE vec2)
 program: statements  { bcode = $1; top = 0;}
 ;
 
-statements:
-	  INTEGER { $$ = $1; }
-| statements INTEGER { $$ = join($1, $2); }
+statements	:	expression
+			{ $$ = $1; }
+		| 	statements expression
+			{ $$ = join($1, $2); }
+
+expression	:	expression PLUS expression
+	   		{ $$ = join((byte_t) (PLUS-HALT), $1, $3); }
+		|	INTEGER
+			{ $$ = $1; }
 
 ///////////////////////////////////////////////////////////////////////
 %%

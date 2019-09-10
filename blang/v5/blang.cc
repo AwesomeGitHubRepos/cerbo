@@ -64,6 +64,15 @@ void eval()
 			case INTEGER:
 				cout << "integer:" << (int) iget(ip) << "\n";
 				break;
+			case PLUS:
+				{
+					bget(ip); // INTEGER header
+					int a = iget(ip);
+					bget(ip); // INTEGER header
+					int b = iget(ip);					
+					cout << a << "+" << b << "=" << (a+b) << "\n";
+				}
+				break;
 			default:
 				cout << "unknown bcode:" << (int)opcode <<  "\n";				
 		}
