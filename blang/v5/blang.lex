@@ -35,7 +35,15 @@ ws	[ \t\r\n]
 "/"		{ return DIV; }
 "^"		{ return POW; }
 ";"		{ return SEMI;}
-[0-9]+		{ yylval = YYSTYPE{INTEGER-HALT, (byte_t) std::stoi(yytext)}; 	return INTEGER;}
+[0-9]+		{ yylval = YYSTYPE{INTEGER-HALT};
+		int i = std::stoi(yytext);
+		//byte_t* arr = reinterpret_cast<byte_t*>(static_cast<const void*>(&i));
+		byte_t* arr = (byte_t*) &i;
+		for(int j=0; j< sizeof(int); ++j) yylval.push_back(*(arr+j));
+
+
+		 //YYSTYPE{INTEGER-HALT, (byte_t) std::stoi(yytext)}; 	
+		return INTEGER;}
 IF		{ return IF; }
 THEN		{ return THEN; }
 ELSE		{ return ELSE; }

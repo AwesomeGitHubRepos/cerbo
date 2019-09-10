@@ -41,6 +41,15 @@ byte_t bget(int& ip)
 	return bcode[ip++];
 }
 
+int iget(int& ip)
+{
+	int i = 0;
+	for(int j = 0; j< sizeof(int); ++j) 
+		i += bget(ip) << (8*j);
+	//int i = (int) bcode[ip];
+	//ip += sizeof(int);
+	return i;
+}
 
 void eval()
 {
@@ -53,7 +62,7 @@ void eval()
 				goto finis;
 
 			case INTEGER:
-				cout << "integer:" << (int) bget(ip) << "\n";
+				cout << "integer:" << (int) iget(ip) << "\n";
 				break;
 			default:
 				cout << "unknown bcode:" << (int)opcode <<  "\n";				
