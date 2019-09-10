@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cmath>
+#include <functional>
 #include <iostream>
 #include <stack>
 #include <vector>
@@ -18,8 +19,10 @@ int top = 0; // root of the program
 //vector<tac> tacs;
 
 
+static int ip = 0;       	
 stack<int> stk;
 
+int eval1();
 
 void trace(std::string text)
 {
@@ -53,6 +56,7 @@ int iget(int& ip)
 	//ip += sizeof(int);
 	return i;
 }
+int iget() { return iget(ip); }
 
 
 int pop()
@@ -62,25 +66,28 @@ int pop()
 	return i;
 }
 
+void push(int i) { stk.push(i); }
+
+typedef std::function<void()> func_t;
+typedef struct { yytokentype opcode; func_t fn; } opcode_t;
+
+//void do_int() { push(666); }
+
+vector<opcode_t> opcodes{
+	//opcode_t{INTEGER, do_int },
+	opcode_t{INTEGER, [](){ push(iget());} },
+	opcode_t{PLUS, [](){ eval1(); eval1(); push(pop() + pop());} }
+};
+
+map<yytokentype,opcode_t> opmap;
+
 int eval1()
 {
-	static int ip = 0;       	
 	int opcode = bget(ip) + HALT;
 	if(opcode==HALT) return 0;
 
-	switch(opcode) {
-		case INTEGER:
-			stk.push(iget(ip));
-			//cout << "integer:" << (int) iget(ip) << "\n";
-			break;
-		case PLUS:
-			eval1();
-			eval1();
-			stk.push(pop() + pop());
-			break;
-		default:
-			cout << "unknown bcode:" << (int)opcode <<  "\n";				
-	}
+	opcode_t& op = opmap[(yytokentype) opcode];
+	op.fn();
 	return 1;
 }
 
@@ -98,6 +105,8 @@ void eval()
 
 int main()
 {
+	for(auto& op:opcodes) opmap[op.opcode] = op;
+
 	//extern int yyparse();
 
 	//create_frame();
