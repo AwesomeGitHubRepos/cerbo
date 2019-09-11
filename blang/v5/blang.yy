@@ -5,6 +5,7 @@
 #include <string>
 
 #include "blang.h"
+#include "blang.tab.hh"
 
 using std::cout;
 using std::endl;
@@ -27,6 +28,19 @@ YYSTYPE join(byte_t b, YYSTYPE vec1, YYSTYPE vec2)
 	vec = join(vec, join(vec1, vec2));
 	//vec1.insert(vec1.end(), vec2.begin(), vec2.end());
 	return vec;
+}
+
+YYSTYPE join_toke(yytokentype toke, YYSTYPE vec1)
+{
+	YYSTYPE vec{(byte_t) (toke-HALT)};
+	vec = join(vec, vec1);
+	return vec;
+}
+
+YYSTYPE join_toke(yytokentype toke, YYSTYPE vec1, YYSTYPE vec2)
+{
+	YYSTYPE vec = join_toke(toke, vec1);
+	return join(vec, vec2);
 }
 
 %}
@@ -54,15 +68,20 @@ YYSTYPE join(byte_t b, YYSTYPE vec1, YYSTYPE vec2)
 program: statements  { bcode = $1; top = 0;}
 ;
 
-statements	:	expression
+statements	:	statement
 			{ $$ = $1; }
-		| 	statements expression
+		| 	statements statement
 			{ $$ = join($1, $2); }
 
+statement	:	print_statement
+
+print_statement	:	PRINT expression
+			{$$ = join_toke(PRINT, $2); }
+
 expression	:	expression PLUS expression
-	   		{ $$ = join((byte_t) (PLUS-HALT), $1, $3); }
+	   		{ $$ = join_toke(PLUS, $1, $3); }
 		|	INTEGER
-			{ $$ = $1; }
+			{ $$ = join_toke(INTEGER, $1); }
 
 ///////////////////////////////////////////////////////////////////////
 %%

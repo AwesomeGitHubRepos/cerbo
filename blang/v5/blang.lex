@@ -36,10 +36,9 @@ ws	[ \t\r\n]
 "^"		{ return POW; }
 ";"		{ return SEMI;}
 [0-9]+		{ 
-		yylval = YYSTYPE{INTEGER-HALT};
-		//yylval = YYSTYPE{};
+		//yylval = YYSTYPE{INTEGER-HALT};
+		yylval.clear();
 		int i = std::stoi(yytext);
-		//byte_t* arr = reinterpret_cast<byte_t*>(static_cast<const void*>(&i));
 		byte_t* arr = (byte_t*) &i;
 		for(int j=0; j< sizeof(int); ++j) yylval.push_back(*(arr+j));
 
@@ -51,6 +50,6 @@ THEN		{ return THEN; }
 ELSE		{ return ELSE; }
 FI		{ return FI; }
 JUST		{ return JUST;}
-print		{ return PRINT;}
+PRINT		{ return PRINT;}
 
 %%
