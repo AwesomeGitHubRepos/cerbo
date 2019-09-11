@@ -80,6 +80,8 @@ print_statement	:	PRINT expression
 
 expression	:	expression PLUS expression
 	   		{ $$ = join_toke(PLUS, $1, $3); }
+		|	expression MUL expression
+	   		{ $$ = join_toke(MUL, $1, $3); }
 		|	INTEGER
 			{ $$ = join_toke(INTEGER, $1); }
 

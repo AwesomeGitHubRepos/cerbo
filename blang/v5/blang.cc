@@ -73,11 +73,33 @@ typedef struct { yytokentype opcode; func_t fn; } opcode_t;
 
 //void do_int() { push(666); }
 
+void do_arith(yytokentype type)
+{
+	eval1(); 
+	int a = pop();
+	eval1(); 
+	int b = pop();
+	int res;
+	switch(type) {
+		case PLUS:
+			res = a+b;
+			break;
+		case MUL:
+			res = a*b;
+			break;
+		default:
+			assert(false);
+	}
+	push(res);
+}
+
 vector<opcode_t> opcodes{
 	//opcode_t{INTEGER, do_int },
 	opcode_t{INTEGER, [](){ push(iget());} },
-	opcode_t{PLUS, [](){ eval1(); eval1(); push(pop() + pop());} },
-	opcode_t{PRINT, [](){ eval1(); cout << pop() << " ";} }
+	//opcode_t{PLUS, [](){ eval1(); eval1(); push(pop() + pop());}},
+	opcode_t{MUL, [](){ do_arith(MUL);}},
+	opcode_t{PLUS, [](){ do_arith(PLUS);}},
+	opcode_t{PRINT, [](){ eval1(); cout << pop() << " ";}}
 };
 
 map<yytokentype,opcode_t> opmap;
