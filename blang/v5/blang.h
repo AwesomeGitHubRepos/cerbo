@@ -13,6 +13,8 @@ extern YYSTYPE yylval;
 inline YYSTYPE bcode;
 
 
+typedef struct {std::string name; int value; } var_t;
+inline std::vector<var_t> vars;
 
 void trace(std::string text);
 void emit(std::string text);

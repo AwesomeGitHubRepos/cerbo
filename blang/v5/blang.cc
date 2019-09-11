@@ -24,6 +24,9 @@ stack<int> stk;
 
 int eval1();
 
+
+
+
 void trace(std::string text)
 {
 	cout << "trace:" << text << ".\n" << endl;
@@ -94,12 +97,11 @@ void do_arith(yytokentype type)
 }
 
 vector<opcode_t> opcodes{
-	//opcode_t{INTEGER, do_int },
 	opcode_t{INTEGER, [](){ push(iget());} },
-	//opcode_t{PLUS, [](){ eval1(); eval1(); push(pop() + pop());}},
 	opcode_t{MUL, [](){ do_arith(MUL);}},
 	opcode_t{PLUS, [](){ do_arith(PLUS);}},
-	opcode_t{PRINT, [](){ eval1(); cout << pop() << " ";}}
+	opcode_t{PRINT, [](){ eval1(); cout << pop() << " ";}},
+	opcode_t{VAR, [](){ push(vars[iget()].value); }}
 };
 
 map<yytokentype,opcode_t> opmap;

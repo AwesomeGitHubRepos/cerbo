@@ -56,6 +56,7 @@ YYSTYPE join_toke(yytokentype toke, YYSTYPE vec1, YYSTYPE vec2)
 %token SEMI
 %token IF THEN ELSE FI
 %token PRINT
+%token VAR
 
 %left  SUB PLUS
 %left  MUL DIV
@@ -84,6 +85,8 @@ expression	:	expression PLUS expression
 	   		{ $$ = join_toke(MUL, $1, $3); }
 		|	INTEGER
 			{ $$ = join_toke(INTEGER, $1); }
+		|	VAR
+			{ $$ = join_toke(VAR, $1); }
 
 ///////////////////////////////////////////////////////////////////////
 %%

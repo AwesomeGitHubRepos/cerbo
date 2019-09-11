@@ -1,2 +1,3 @@
 PRINT 30+10 + 2
 PRINT 2+ 3 *4
+PRINT foo + 2
