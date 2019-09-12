@@ -96,8 +96,18 @@ void do_arith(yytokentype type)
 	push(res);
 }
 
+void eval_let()
+{
+	int idx = iget();
+	eval1();
+	//int value   = pop();
+	vars[idx].value = pop();
+
+}
+
 vector<opcode_t> opcodes{
 	opcode_t{INTEGER, [](){ push(iget());} },
+	opcode_t{LET, eval_let },
 	opcode_t{MUL, [](){ do_arith(MUL);}},
 	opcode_t{PLUS, [](){ do_arith(PLUS);}},
 	opcode_t{PRINT, [](){ eval1(); cout << pop() << " ";}},

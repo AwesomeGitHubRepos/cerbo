@@ -45,6 +45,7 @@ ws	[ \t\r\n]
 
 [\t\r ] // discard whitespace
 \n	line_number++;
+"="		{ return EQ; }
 "("		{ return LRB; }
 ")"		{ return RRB; }
 "-"		{ return SUB;}

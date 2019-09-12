@@ -57,6 +57,8 @@ YYSTYPE join_toke(yytokentype toke, YYSTYPE vec1, YYSTYPE vec2)
 %token IF THEN ELSE FI
 %token PRINT
 %token VAR
+%token EQ
+%token LET
 
 %left  SUB PLUS
 %left  MUL DIV
@@ -69,15 +71,16 @@ YYSTYPE join_toke(yytokentype toke, YYSTYPE vec1, YYSTYPE vec2)
 program: statements  { bcode = $1; top = 0;}
 ;
 
-statements	:	statement
-			{ $$ = $1; }
-		| 	statements statement
-			{ $$ = join($1, $2); }
+statements	:	statement { $$ = $1; }
+		| 	statements statement { $$ = join($1, $2); }
+
 
 statement	:	print_statement
+	  	|	assignment
 
-print_statement	:	PRINT expression
-			{$$ = join_toke(PRINT, $2); }
+assignment	:	VAR EQ expression {$$ = join_toke(LET, $1, $3); }
+
+print_statement	:	PRINT expression {$$ = join_toke(PRINT, $2); }
 
 expression	:	expression PLUS expression
 	   		{ $$ = join_toke(PLUS, $1, $3); }
