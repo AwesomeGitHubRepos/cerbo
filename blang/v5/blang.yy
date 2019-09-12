@@ -64,6 +64,7 @@ YYSTYPE join_toke(yytokentype toke, YYSTYPE vec1, YYSTYPE vec2)
 %token VAR
 %token EQ
 %token LET
+%token JREL
 
 %left  SUB PLUS
 %left  MUL DIV
@@ -90,8 +91,16 @@ if_statement	:	IF expression THEN statements FI
 	     		{ 
 				$$ = join_toke(IF, $2);
 				$$ = join($$, to_bvec($4.size()), $4);
-				//$$.push_back($3.size()); // how much should we jump forward if the condition is not satisfied
-				//$$ = join($$, $3);
+			}
+		| 	IF expression THEN statements ELSE statements FI
+			{
+				$$ = join_toke(IF, $2);
+				YYSTYPE &if_clause = $4;
+				YYSTYPE else_clause{$6};
+				YYSTYPE jump = join_toke(JREL, to_bvec(else_clause.size()));
+				if_clause = join(if_clause, jump);
+				$$ = join($$, to_bvec(if_clause.size()));
+				$$ = join($$, if_clause, else_clause);
 			}
 
 print_statement	:	PRINT expression {$$ = join_toke(PRINT, $2); }

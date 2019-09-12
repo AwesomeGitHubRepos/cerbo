@@ -110,6 +110,13 @@ void eval_if()
 	int jump  = iget();
 	if(!cond) ip += jump;
 }
+
+void eval_jrel()
+{ 
+	int off = iget(); 
+	ip+= off;
+}
+
 void eval_let()
 {
 	int idx = iget();
@@ -121,7 +128,9 @@ void eval_let()
 
 vector<opcode_t> opcodes{
 	opcode_t{IF, eval_if},
-	opcode_t{INTEGER, [](){ push(iget());} },
+	opcode_t{INTEGER, [](){ push(iget());}},
+	opcode_t{JREL, [](){ int off = iget(); ip+= off;}},
+	opcode_t{JREL, eval_jrel},
 	opcode_t{LET, eval_let },
 	opcode_t{MUL, [](){ do_arith(MUL);}},
 	opcode_t{PLUS, [](){ do_arith(PLUS);}},
