@@ -79,7 +79,7 @@ int pop()
 void push(int i) { stk.push(i); }
 
 typedef std::function<void()> func_t;
-typedef struct { yytokentype opcode; func_t fn; } opcode_t;
+typedef struct { yytokentype opcode; string name; int size; func_t fn; } opcode_t;
 
 //void do_int() { push(666); }
 
@@ -108,8 +108,9 @@ void do_arith(yytokentype type)
 
 void eval_goto()
 {
-	int addr = iget();
-	ip = addr;
+	int idx = iget();
+
+	ip = labels[idx].value;
 }
 
 void eval_if()
@@ -135,18 +136,21 @@ void eval_let()
 
 }
 
+const auto int1 = sizeof(int);
+const auto int2 = 2*sizeof(int);
+
 vector<opcode_t> opcodes{
-	opcode_t{GOTO, eval_goto},
-	opcode_t{IF, eval_if},
-	opcode_t{INTEGER, [](){ push(iget());}},
-	opcode_t{JREL, eval_jrel},
-	opcode_t{LABEL, [](){ iget(); }},
-	opcode_t{LET, eval_let },
-	opcode_t{MUL, [](){ do_arith(MUL);}},
-	opcode_t{PLUS, [](){ do_arith(PLUS);}},
-	opcode_t{PRINT, [](){ eval1(); cout << pop() << " "; std::flush(cout);}},
-	opcode_t{SUB, [](){ do_arith(SUB);}},
-	opcode_t{VAR, [](){ push(vars[iget()].value); }}
+	opcode_t{GOTO,	"GOTO",	int1, 	eval_goto},
+	opcode_t{IF, 	"IF",	int1, 	eval_if},
+	opcode_t{INTEGER, "INT",int1, [](){ push(iget());}},
+	opcode_t{JREL, 	"JREL",	int1, 	eval_jrel},
+	opcode_t{LABEL, "LAB",	int1, 	[](){ iget(); }},
+	opcode_t{LET, 	"LET",	int1, 	eval_let },
+	opcode_t{MUL, 	"MUL",	0, 	[](){ do_arith(MUL);}},
+	opcode_t{PLUS, 	"PLUS",	0, 	[](){ do_arith(PLUS);}},
+	opcode_t{PRINT, "PRINT",0, 	[](){ eval1(); cout << pop() << " "; std::flush(cout);}},
+	opcode_t{SUB, 	"SUB",	0,	[](){ do_arith(SUB);}},
+	opcode_t{VAR, 	"VAR",	int1, [](){ push(vars[iget()].value); }}
 };
 
 map<yytokentype,opcode_t> opmap;
@@ -163,6 +167,7 @@ int eval1()
 
 void eval()
 {
+	ip = 0;
 	while(eval1());
 
 	cout << "Stack is: ";
@@ -171,6 +176,54 @@ void eval()
 
 	return;
 
+}
+
+void decompile()
+{
+	ip = 0;
+	while(1) {
+		auto opcode = bget(ip) + HALT;
+		if(opcode==HALT) goto finis;
+		opcode_t& op = opmap[(yytokentype) opcode];
+		cout << op.name << " ";
+		switch(op.opcode) {
+			case INTEGER: //fal;
+			case GOTO: // fallthrough
+			case LABEL:
+				cout << iget();
+				break;
+			default:
+				ip+= op.size;
+		}
+		cout << "\n";
+	}
+finis:
+
+	cout << "\nLABELS:\n";
+	for(int i=0; i< labels.size(); ++i) {
+		cout << i << " " << labels[i].name << " " <<labels[i].value << "\n";
+		std::flush(cout);
+	}
+}
+
+void resolve_labels()
+{
+	ip = 0;
+	while(1) {
+		auto opcode = bget(ip) + HALT;
+		if(opcode==HALT) goto finis;
+		opcode_t& op = opmap[(yytokentype) opcode];
+		if(op.opcode == LABEL) {
+			int label_idx = iget();
+			//ip -= sizeof(int);
+			labels[label_idx].value = ip;
+			//iput(add
+		} else {
+			ip += op.size;
+		}
+	}
+finis:
+	return;
 }
 
 int main()
@@ -185,6 +238,10 @@ int main()
 	assert(ret == 0);
 	bcode.push_back(0); // HALT
 	//cout << top << "\n";
+
+	resolve_labels();
+
+	decompile();
 
 	eval();
 

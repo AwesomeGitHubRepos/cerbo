@@ -1,6 +1,6 @@
 #ASAN = -fsanitize=address
 
-CXXFLAGS = -O0 -ggdb --std=c++17
+CXXFLAGS = -O0 -ggdb --std=c++2a
 OBJS = blang.o blang.tab.o lex.yy.o
 
 all: blang5

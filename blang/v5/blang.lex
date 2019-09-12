@@ -48,15 +48,14 @@ int var_idx(string varname)
 int get_label_id(string label)
 {
 	//static int id = 0;
-	static std::vector<string> labels;
 	// check for prexisitng label
 	for(int i = 0; i< labels.size(); ++i)
-		if(labels[i] == label)
+		if(labels[i].name == label)
 			return i; 
 
 	// not found, so add it
-	labels.push_back(label);
-	return labels.size();
+	labels.push_back(var_t{label,-1});
+	return labels.size()-1;
 }
 
 %}

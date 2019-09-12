@@ -15,6 +15,7 @@ inline YYSTYPE bcode;
 
 typedef struct {std::string name; int value; } var_t;
 inline std::vector<var_t> vars;
+inline std::vector<var_t> labels;
 
 void trace(std::string text);
 void emit(std::string text);
