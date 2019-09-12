@@ -4,12 +4,15 @@
 
 #include <iostream>
 #include <memory>
+//#include <map>
 #include <string>
+#include <vector>
 
 
 using std::cin;
 using std::cerr;
 using std::cout;
+//using std::map;
 using std::string;
 
 #include "blang.h"
@@ -42,6 +45,20 @@ int var_idx(string varname)
 	return res;
 }
 
+int get_label_id(string label)
+{
+	//static int id = 0;
+	static std::vector<string> labels;
+	// check for prexisitng label
+	for(int i = 0; i< labels.size(); ++i)
+		if(labels[i] == label)
+			return i; 
+
+	// not found, so add it
+	labels.push_back(label);
+	return labels.size();
+}
+
 %}
 
 ws	[ \t\r\n]
@@ -63,8 +80,10 @@ IF		{ return IF; }
 THEN		{ return THEN; }
 ELSE		{ return ELSE; }
 FI		{ return FI; }
+GOTO		{ return GOTO; }
 JUST		{ return JUST;}
 PRINT		{ return PRINT;}
 [a-z]([a-z]|[0-9])*	{ set_yylval(var_idx(yytext)); return VAR; }
+:[a-z]([a-z]|[0-9])*	{ set_yylval(get_label_id(yytext));  return LABEL; }
 
 %%

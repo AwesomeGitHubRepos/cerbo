@@ -1,3 +1,4 @@
+PRINT 10-1
 PRINT 30+10 + 2
 PRINT 2+ 3 *4
 foo = 20

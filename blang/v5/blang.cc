@@ -94,6 +94,9 @@ void do_arith(yytokentype type)
 		case PLUS:
 			res = a+b;
 			break;
+		case SUB:
+			res = a-b;
+			break;
 		case MUL:
 			res = a*b;
 			break;
@@ -103,9 +106,15 @@ void do_arith(yytokentype type)
 	push(res);
 }
 
+void eval_goto()
+{
+	int addr = iget();
+	ip = addr;
+}
+
 void eval_if()
 {
-	eval1();
+	//eval1();
 	int cond = pop();
 	int jump  = iget();
 	if(!cond) ip += jump;
@@ -127,14 +136,16 @@ void eval_let()
 }
 
 vector<opcode_t> opcodes{
+	opcode_t{GOTO, eval_goto},
 	opcode_t{IF, eval_if},
 	opcode_t{INTEGER, [](){ push(iget());}},
-	opcode_t{JREL, [](){ int off = iget(); ip+= off;}},
 	opcode_t{JREL, eval_jrel},
+	opcode_t{LABEL, [](){ iget(); }},
 	opcode_t{LET, eval_let },
 	opcode_t{MUL, [](){ do_arith(MUL);}},
 	opcode_t{PLUS, [](){ do_arith(PLUS);}},
-	opcode_t{PRINT, [](){ eval1(); cout << pop() << " ";}},
+	opcode_t{PRINT, [](){ eval1(); cout << pop() << " "; std::flush(cout);}},
+	opcode_t{SUB, [](){ do_arith(SUB);}},
 	opcode_t{VAR, [](){ push(vars[iget()].value); }}
 };
 
