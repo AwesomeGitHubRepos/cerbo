@@ -6,6 +6,7 @@ PRINT foo + 2 + bar
 foo = foo + bar
 PRINT foo + 1
 
-IF 0 THEN
+IF 10 THEN
 	PRINT 11
+	PRINT 12 + 13
 FI
