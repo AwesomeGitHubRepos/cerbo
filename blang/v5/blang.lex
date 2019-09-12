@@ -24,9 +24,13 @@ int line_number = 0;
 	
 void set_yylval(int i)
 {
+	yylval = to_bvec(i);
+/*
 	yylval.clear();
 	byte_t* arr = (byte_t*) &i;
 	for(int j=0; j< sizeof(int); ++j) yylval.push_back(*(arr+j));
+*/
+
 }
 
 int var_idx(string varname)

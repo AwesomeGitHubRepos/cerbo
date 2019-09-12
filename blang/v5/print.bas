@@ -5,3 +5,7 @@ bar = 30
 PRINT foo + 2 + bar
 foo = foo + bar
 PRINT foo + 1
+
+IF 0 THEN
+	PRINT 11
+FI

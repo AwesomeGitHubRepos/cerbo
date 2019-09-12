@@ -22,6 +22,11 @@ YYSTYPE join(YYSTYPE vec1, YYSTYPE vec2)
 	return vec1;
 }
 
+YYSTYPE join(YYSTYPE vec1, YYSTYPE vec2, YYSTYPE vec3)
+{
+	return join(vec1, join(vec2, vec3));
+}
+
 YYSTYPE join(byte_t b, YYSTYPE vec1, YYSTYPE vec2)
 {
 	YYSTYPE vec{b};
@@ -77,8 +82,17 @@ statements	:	statement { $$ = $1; }
 
 statement	:	print_statement
 	  	|	assignment
+		|	if_statement
 
 assignment	:	VAR EQ expression {$$ = join_toke(LET, $1, $3); }
+
+if_statement	:	IF expression THEN statements FI 
+	     		{ 
+				$$ = join_toke(IF, $2);
+				$$ = join($$, to_bvec($4.size()), $4);
+				//$$.push_back($3.size()); // how much should we jump forward if the condition is not satisfied
+				//$$ = join($$, $3);
+			}
 
 print_statement	:	PRINT expression {$$ = join_toke(PRINT, $2); }
 

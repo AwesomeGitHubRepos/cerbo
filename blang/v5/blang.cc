@@ -32,6 +32,13 @@ void trace(std::string text)
 	cout << "trace:" << text << ".\n" << endl;
 }
 
+YYSTYPE to_bvec(int i)
+{
+	YYSTYPE res;
+	byte_t* arr = (byte_t*) &i;
+	for(int j=0; j< sizeof(int); ++j) res.push_back(*(arr+j));
+	return res;
+}
 
 void yyerror(const char* s) {
 	cout << "Parse error:" <<  s << endl;
@@ -96,6 +103,13 @@ void do_arith(yytokentype type)
 	push(res);
 }
 
+void eval_if()
+{
+	eval1();
+	int cond = pop();
+	int jump  = iget();
+	if(!cond) ip += jump;
+}
 void eval_let()
 {
 	int idx = iget();
@@ -106,6 +120,7 @@ void eval_let()
 }
 
 vector<opcode_t> opcodes{
+	opcode_t{IF, eval_if},
 	opcode_t{INTEGER, [](){ push(iget());} },
 	opcode_t{LET, eval_let },
 	opcode_t{MUL, [](){ do_arith(MUL);}},

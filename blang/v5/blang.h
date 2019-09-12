@@ -21,6 +21,9 @@ void emit(std::string text);
 
 extern int yylex();
 
+//std::vector<byte_t> to_bvec(int i);
+YYSTYPE to_bvec(int i);
+
 extern int top; // the top node
 
 /*
