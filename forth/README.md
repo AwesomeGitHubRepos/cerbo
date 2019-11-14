@@ -1,5 +1,10 @@
 # bbf - barebones forth
 
+bbf is a barebones Forth written in C with the following design goals:
+
+* small and easy to understand and extend
+* suitable for MCUs (microcontrollers)
+
 ## Versions
 
 * v1 - **CURRENT** version
