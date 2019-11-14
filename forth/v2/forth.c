@@ -20,6 +20,37 @@ typedef intptr_t cell_t;
 typedef uint8_t ubyte;
 typedef void (*codeptr)();
 
+typedef struct {
+	int size;
+	cell_t contents[10];
+} stack_t;
+
+stack_t rstack = { .size = 0 }; // return stack
+stack_t sstack = { .size = 0 }; // standard data stack
+
+void push_x(stack_t* stk, cell_t v)
+{
+	//int* size = &stk->size;
+	if(stk->size>=10)
+		puts("Stack overflow");
+	else
+		stk->contents[stk->size++] = v;
+}
+
+cell_t pop_x(stack_t* stk)
+{
+	if(stk->size <=0) {
+		puts("Stack underflow");
+		return 0; // TODO maybe should throw
+	} else 
+		return stk->contents[--stk->size];
+}
+void push(cell_t v) { push_x(&sstack, v); }
+cell_t pop(cell_t v)  { return pop_x(&sstack); }
+
+void rpush(cell_t v) { push_x(&rstack, v); }
+cell_t rpop(cell_t v)  { return pop_x(&rstack); }
+
 ubyte heap[10000];
 ubyte* hptr = heap;
 
@@ -61,6 +92,23 @@ char* strupr(char* str)
 	return str;
 }
 
+bool int_str(char*s, cell_t *v)
+{
+	*v = 0;
+	cell_t sgn = 1;
+	if(*s=='-') { sgn = -1; s++; }
+	if(*s == '+') s++;
+	if(*s == 0) return false;
+	while(*s) {
+		if('0' <= *s && *s <= '9')
+			*v = *v * 10 + *s - '0';
+		else
+			return false;
+		s++;
+	}
+	*v *= sgn;
+	return true;
+}
 
 void undefined(char* token){
 	printf("undefined word:<%s>\n", token);
@@ -79,7 +127,6 @@ void heapify (cell_t v)
 void create_header(ubyte flags, char* zname)
 {
 	char* name = hptr;
-	//do { *hptr++ = toupper(*zname) } while( *zname++); // include trailing 0
 	for(int i = 0 ; i<= strlen(zname); ++i) *hptr++ = toupper(zname[i]); // include trailing 0
 	dent_s dw;
 	dw.prev = latest;
@@ -88,17 +135,6 @@ void create_header(ubyte flags, char* zname)
 	memcpy(hptr, &dw, sizeof(dw));
 	latest = (dent_s*) hptr;
 	hptr += sizeof(dw);
-
-	/*
-	   memcpy(hptr, &latest, sizeof(void*));
-	   latest = (dent_s*) hptr;
-	   hptr += sizeof(void*);
-
-	 *hptr++ = flags;
-	 *hptr++ = strlen(zname);
-	 for(int i = 0 ; i< strlen(zname); ++i) *hptr++ = toupper(zname[i]);
-	 */
-	//printf("createz heapifying fn %p at %p\n", fn, hptr);
 }
 
 void createz(ubyte flags, char* zname, codeptr fn) // zname being a null-terminated string
@@ -114,15 +150,28 @@ codeptr xt_find(char* name, ubyte* flags) // name can be lowercase, if you like
 	//strupr(name);
 	while(dw) {
 		if(strcasecmp(name, dw->name) == 0) break;
-			//goto found;
+		//goto found;
 		dw = dw->prev;
 	}
 	//return NULL;
-//found:
+	//found:
 	if(dw) xt = (codeptr) dref(++dw);
 	return xt;
 }
 
+void heapify_word(char* name)
+{
+	ubyte flags;
+	codeptr xt = xt_find(name, &flags);
+	heapify((cell_t) xt);
+}
+
+void embed_literal(cell_t v)
+{
+	heapify_word("LIT");
+	heapify(v);
+
+}
 
 
 char* token;
@@ -155,8 +204,27 @@ void p_words() {
 	}
 }
 
+void p_lit() 
+{
+	puts("TODO p_lit");
+	/*
+	   cell_t v = dref((void*) rstack[rtop-1]);
+	   rstack[rtop-1] += sizeof(cell_t);
+	   push(v);
+	   */
+}
+
+void p_dots()
+{
+	printf("Stack: (%d):", sstack.size);
+	for(int i = 0; i< sstack.size; ++i) printf("%ld ", sstack.contents[i]);
+}
+
+
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	".S", p_dots},
+	{0,	"LIT", p_lit},
 	{0,	"WORDS", p_words},
 	{0,	"HELLO", p_hello},
 	0
@@ -198,17 +266,15 @@ void process_token(char* token)
 	ubyte flags;
 	codeptr xt = xt_find(token, &flags);
 	if(xt == 0) {
-		/* TODO
-		   cell_t v;
-		   if(int_str(token, &v)) {
-		   if(compiling)
-		   embed_literal(v);
-		   else
-		   push(v);
-		   } else {
-		   undefined(token);
-		   }
-		   */
+		cell_t v;
+		if(int_str(token, &v)) {
+			if(compiling)
+				embed_literal(v);
+			else
+				push(v);
+		} else {
+			undefined(token);
+		}
 	} else {
 		//codeptr xt = (codeptr) dref(dw+sizeof(dw));
 		if(compiling && !(flags & F_IMM))
