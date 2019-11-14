@@ -107,20 +107,19 @@ void createz(ubyte flags, char* zname, codeptr fn) // zname being a null-termina
 	heapify((cell_t)fn);
 }
 
-codeptr xt_find(char* name, ubyte* flags)
+codeptr xt_find(char* name, ubyte* flags) // name can be lowercase, if you like
 {
 	dent_s* dw = latest;
+	codeptr xt = 0;
 	//strupr(name);
 	while(dw) {
-		if(strcasecmp(name, dw->name) == 0)
-			goto found;
+		if(strcasecmp(name, dw->name) == 0) break;
+			//goto found;
 		dw = dw->prev;
 	}
-	return NULL;
-found:
-	puts("found word");
-	//codeptr xt = (codeptr) dref((void*)dw+sizeof(dw)-(void*)heap);
-	codeptr xt = (codeptr) dref(++dw);
+	//return NULL;
+//found:
+	if(dw) xt = (codeptr) dref(++dw);
 	return xt;
 }
 
@@ -173,9 +172,24 @@ void add_primitives()
 	}
 }
 
+void eval_string(char* str)
+{
+	strncpy(tib, str, sizeof(tib));
+	process_tib();
+}
+
+char* derived[] = {
+	"hello hello",
+	0
+};
+
 void add_derived()
 {
-	// TODO
+	char** strs = derived;
+	while(*strs) {
+		eval_string(*strs++);
+	}
+
 }
 
 void process_token(char* token)
@@ -216,11 +230,11 @@ int main()
 	add_primitives();
 	add_derived();
 
-	puts("words are");
-	//char * word = "WORDS";
-	process_token("words");
-	//p_words();
-	puts("fin");
+	/*
+	   puts("words are");
+	   process_token("words");
+	   puts("fin");
+	   */
 
 	while(fgets(tib, sizeof(tib), stdin)) {
 		process_tib();
