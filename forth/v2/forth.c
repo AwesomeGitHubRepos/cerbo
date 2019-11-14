@@ -155,7 +155,9 @@ codeptr xt_find(char* name, ubyte* flags) // name can be lowercase, if you like
 	}
 	//return NULL;
 	//found:
-	if(dw) xt = (codeptr) dref(++dw);
+	if(!dw) return 0;
+	*flags = dw->flags;
+	xt = (codeptr) dref(++dw);
 	return xt;
 }
 
@@ -229,12 +231,14 @@ void p_semi()
 {
 	heapify_word("EXIT");
 	compiling = false;
+	puts("p_semi:exit");
 }
 
 void p_colon()
 {
 	word();
 	createz(0, token, docol);
+	printf("p_colon:created:%s.\n", token);
 	compiling = true;
 }
 
@@ -246,7 +250,7 @@ typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
 	{0,	"EXIT", p_exit},
 	{0,	":", p_colon},
-	{0,	";", p_semi},
+	{F_IMM,	";", p_semi},
 	{0,	".S", p_dots},
 	{0,	"LIT", p_lit},
 	{0,	"WORDS", p_words},
