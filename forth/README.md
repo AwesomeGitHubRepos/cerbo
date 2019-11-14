@@ -1,5 +1,10 @@
 # bbf - barebones forth
 
+## Versions
+
+* v1 - **CURRENT** version
+* v2 - experimental version under development
+
 ## Bugs
 
 ## Implementing a Forth
