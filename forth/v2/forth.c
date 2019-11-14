@@ -190,7 +190,7 @@ char* word () { delim_word(" \t\n", true); }
 void process_tib();
 
 
-void p_hello() {
+void p_hi() {
 	puts("hello world");
 }
 
@@ -226,7 +226,7 @@ prim_s prims[] =  {
 	{0,	".S", p_dots},
 	{0,	"LIT", p_lit},
 	{0,	"WORDS", p_words},
-	{0,	"HELLO", p_hello},
+	{0,	"HI", p_hi},
 	0
 };
 
@@ -247,7 +247,7 @@ void eval_string(char* str)
 }
 
 char* derived[] = {
-	"hello hello",
+	"hi hi",
 	0
 };
 
