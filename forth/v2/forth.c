@@ -43,6 +43,31 @@ typedef struct { // dictionary entry
 
 dent_s *latest = NULL; // latest word being defined
 
+const ubyte F_IMM = 1;
+
+/* not sure if this is strictly necessary
+ * because we use strcasecmp instead of strcmp
+ */
+char* strupr(char* str) 
+{ 
+	int c = -1, i =0;
+	if(!str) return NULL;
+	//char* ptr = str;
+	while(c = toupper(str[i])) {
+		str[i] = c;
+		i++;
+		if(c==0) return str;
+	}
+	return str;
+}
+
+
+void undefined(char* token){
+	printf("undefined word:<%s>\n", token);
+}
+
+cell_t dref(void* addr) { return *(cell_t*)addr; }
+
 void store (cell_t pos, cell_t val) { *(cell_t*)pos = val; }
 
 void heapify (cell_t v)
@@ -82,6 +107,35 @@ void createz(ubyte flags, char* zname, codeptr fn) // zname being a null-termina
 	heapify((cell_t)fn);
 }
 
+codeptr xt_find(char* name, ubyte* flags)
+{
+	dent_s* dw = latest;
+	//strupr(name);
+	while(dw) {
+		if(strcasecmp(name, dw->name) == 0)
+			goto found;
+		dw = dw->prev;
+	}
+	return NULL;
+found:
+	puts("found word");
+	//codeptr xt = (codeptr) dref((void*)dw+sizeof(dw)-(void*)heap);
+	codeptr xt = (codeptr) dref(++dw);
+	return xt;
+}
+
+
+
+char* token;
+char* rest;
+char* delim_word (char* delims, bool upper)
+{
+	token = strtok_r(rest, delims, &rest);
+	if(upper) strupr(token);
+	return token;
+}
+
+char* word () { delim_word(" \t\n", true); }
 
 
 
@@ -124,9 +178,36 @@ void add_derived()
 	// TODO
 }
 
+void process_token(char* token)
+{
+	//dent_s* dw = dw_find(token);
+	ubyte flags;
+	codeptr xt = xt_find(token, &flags);
+	if(xt == 0) {
+		/* TODO
+		   cell_t v;
+		   if(int_str(token, &v)) {
+		   if(compiling)
+		   embed_literal(v);
+		   else
+		   push(v);
+		   } else {
+		   undefined(token);
+		   }
+		   */
+	} else {
+		//codeptr xt = (codeptr) dref(dw+sizeof(dw));
+		if(compiling && !(flags & F_IMM))
+			heapify((cell_t)xt);
+		else
+			xt();
+		//xdw(dw);
+	}
+}
 void process_tib()
 {
-	// TODO
+	rest = tib;
+	while(word()) process_token(token);
 }
 int main()
 {
@@ -136,7 +217,9 @@ int main()
 	add_derived();
 
 	puts("words are");
-	p_words();
+	//char * word = "WORDS";
+	process_token("words");
+	//p_words();
 	puts("fin");
 
 	while(fgets(tib, sizeof(tib), stdin)) {
