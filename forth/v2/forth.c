@@ -46,16 +46,17 @@ cell_t pop_x(stack_t* stk)
 		return stk->contents[--stk->size];
 }
 void push(cell_t v) { push_x(&sstack, v); }
-cell_t pop(cell_t v)  { return pop_x(&sstack); }
+cell_t pop()  { return pop_x(&sstack); }
 
 void rpush(cell_t v) { push_x(&rstack, v); }
-cell_t rpop(cell_t v)  { return pop_x(&rstack); }
+cell_t rpop()  { return pop_x(&rstack); }
 
 ubyte heap[10000];
 ubyte* hptr = heap;
 
 bool compiling = false;
 bool show_prompt = true;
+ubyte flags = 0;
 
 //char _TIB[136]; // The input buffer
 //char* TIB = _TIB;
@@ -143,7 +144,7 @@ void createz(ubyte flags, char* zname, codeptr fn) // zname being a null-termina
 	heapify((cell_t)fn);
 }
 
-codeptr xt_find(char* name, ubyte* flags) // name can be lowercase, if you like
+codeptr xt_find(char* name) // name can be lowercase, if you like
 {
 	dent_s* dw = latest;
 	codeptr xt = 0;
@@ -156,15 +157,15 @@ codeptr xt_find(char* name, ubyte* flags) // name can be lowercase, if you like
 	//return NULL;
 	//found:
 	if(!dw) return 0;
-	*flags = dw->flags;
+	flags = dw->flags;
 	xt = (codeptr) dref(++dw);
 	return xt;
 }
 
 void heapify_word(char* name)
 {
-	ubyte flags;
-	codeptr xt = xt_find(name, &flags);
+	//ubyte flags;
+	codeptr xt = xt_find(name);
 	heapify((cell_t) xt);
 }
 
@@ -222,6 +223,25 @@ void p_dots()
 	for(int i = 0; i< sstack.size; ++i) printf("%ld ", sstack.contents[i]);
 }
 
+void p_tick()
+{
+	word();
+	codeptr xt = xt_find(token);
+	if(xt)
+		push((cell_t) xt);
+	else
+		undefined(token);
+}
+
+void execute(codeptr xt)
+{
+	xt();
+}
+void p_execute()
+{
+	execute((codeptr) pop());
+}
+
 void docol()
 {
 	puts("TODO docol");
@@ -246,11 +266,14 @@ void p_exit()
 {
 }
 
+
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
 	{0,	"EXIT", p_exit},
 	{0,	":", p_colon},
 	{F_IMM,	";", p_semi},
+	{0,	"EXECUTE", p_execute},
+	{0,	"'", p_tick},
 	{0,	".S", p_dots},
 	{0,	"LIT", p_lit},
 	{0,	"WORDS", p_words},
@@ -291,8 +314,8 @@ void add_derived()
 void process_token(char* token)
 {
 	//dent_s* dw = dw_find(token);
-	ubyte flags;
-	codeptr xt = xt_find(token, &flags);
+	//ubyte flags;
+	codeptr xt = xt_find(token);
 	if(xt == 0) {
 		cell_t v;
 		if(int_str(token, &v)) {
@@ -308,7 +331,7 @@ void process_token(char* token)
 		if(compiling && !(flags & F_IMM))
 			heapify((cell_t)xt);
 		else
-			xt();
+			execute(xt);
 		//xdw(dw);
 	}
 }
