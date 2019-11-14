@@ -220,9 +220,33 @@ void p_dots()
 	for(int i = 0; i< sstack.size; ++i) printf("%ld ", sstack.contents[i]);
 }
 
+void docol()
+{
+	puts("TODO docol");
+}
+
+void p_semi()
+{
+	heapify_word("EXIT");
+	compiling = false;
+}
+
+void p_colon()
+{
+	word();
+	createz(0, token, docol);
+	compiling = true;
+}
+
+void p_exit()
+{
+}
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"EXIT", p_exit},
+	{0,	":", p_colon},
+	{0,	";", p_semi},
 	{0,	".S", p_dots},
 	{0,	"LIT", p_lit},
 	{0,	"WORDS", p_words},
@@ -247,7 +271,7 @@ void eval_string(char* str)
 }
 
 char* derived[] = {
-	"hi hi",
+	//"hi hi",
 	0
 };
 
