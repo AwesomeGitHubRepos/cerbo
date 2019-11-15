@@ -237,6 +237,14 @@ void p_dots()
 	for(int i = 0; i< sstack.size; ++i) printf("%ld ", sstack.contents[i]);
 }
 
+
+void p_plus() { push(pop() + pop()); }
+void p_minus() { cell_t v1 = pop(), v2 = pop(); push(v2-v1); }
+void p_mult() { push(pop() * pop()); }
+void p_div() { cell_t v1 = pop(), v2 = pop(); push(v2/v1); }
+
+void p_dot() { printf("%ld ", pop()); }
+
 void p_tick()
 {
 	word();
@@ -314,6 +322,11 @@ prim_s prims[] =  {
 	{0,	"EXECUTE", p_execute},
 	{0,	"'", p_tick},
 	{0,	".S", p_dots},
+	{0,  	"+", p_plus},
+	{0,  	"-", p_minus},
+	{0,  	"*", p_mult},
+	{0,  	"/", p_div},
+	{0,  	".", p_dot},
 	{0,	"LIT", p_lit},
 	{0,	"WORDS", p_words},
 	{0,	"HI", p_hi},
@@ -338,8 +351,9 @@ void eval_string(char* str)
 
 char* derived[] = {
 	//"hi hi",
-	": ho hi hi ; ho",
+	//": ho hi hi ; ho",
 	//": ho ; ho",
+	": 1+ 1 + ;",
 	0
 };
 
