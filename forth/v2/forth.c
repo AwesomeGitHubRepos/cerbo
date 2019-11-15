@@ -68,14 +68,15 @@ typedef struct { // dictionary entry
 	// name of word is packed before this struct
 	void* prev;
 	ubyte  flags;
-	char* name;
-	//byte  len; 
-	//char  name[]; // the name will actually be longer
+	//char* name;
+	//void* acf;
 } dent_s;
 
 dent_s *latest = NULL; // latest word being defined
 
-const ubyte F_IMM = 1;
+//const ubyte F_IMM = 1;
+const ubyte F_IMM = 1 << 7;
+
 
 /* not sure if this is strictly necessary
  * because we use strcasecmp instead of strcmp
@@ -128,29 +129,41 @@ void heapify (cell_t v)
 void create_header(ubyte flags, char* zname)
 {
 	char* name = hptr;
-	for(int i = 0 ; i<= strlen(zname); ++i) *hptr++ = toupper(zname[i]); // include trailing 0
+	ubyte noff = 0; // name offset
+	for(noff = 0 ; noff<= strlen(zname); ++noff) *hptr++ = toupper(zname[noff]); // include trailing 0
 	dent_s dw;
 	dw.prev = latest;
-	dw.flags = flags;
-	dw.name = name;
+	//ubyte len = hptr - name
+	dw.flags = flags | noff;
+	//dw.acf = acf;
+	//dw.name = name;
 	memcpy(hptr, &dw, sizeof(dw));
 	latest = (dent_s*) hptr;
 	hptr += sizeof(dw);
 }
 
-void createz(ubyte flags, char* zname, codeptr fn) // zname being a null-terminated string
+void createz(ubyte flags, char* zname, cell_t acf) // zname being a null-terminated string
 {
 	create_header(flags, zname);
-	heapify((cell_t)fn);
+	heapify(acf);
 }
 
-codeptr xt_find(char* name) // name can be lowercase, if you like
+char* name_dw(dent_s* dw)
+{
+	char* str = (char*) dw;
+	int name_off =  dw->flags & 0b111111;
+	str -= name_off; 
+	return str;
+
+}
+
+codeptr cfa_find(char* name) // name can be lowercase, if you like
 {
 	dent_s* dw = latest;
-	codeptr xt = 0;
+	//codeptr cfa = 0;
 	//strupr(name);
 	while(dw) {
-		if(strcasecmp(name, dw->name) == 0) break;
+		if(strcasecmp(name, name_dw(dw)) == 0) break;
 		//goto found;
 		dw = dw->prev;
 	}
@@ -158,14 +171,16 @@ codeptr xt_find(char* name) // name can be lowercase, if you like
 	//found:
 	if(!dw) return 0;
 	flags = dw->flags;
-	xt = (codeptr) dref(++dw);
-	return xt;
+	dw++;
+
+	//cfa = (codeptr) dref(++dw);
+	return (codeptr) dw;
 }
 
 void heapify_word(char* name)
 {
 	//ubyte flags;
-	codeptr xt = xt_find(name);
+	codeptr xt = cfa_find(name);
 	heapify((cell_t) xt);
 }
 
@@ -200,7 +215,7 @@ void p_hi() {
 void p_words() {
 	dent_s* dw = latest;
 	while(dw) {
-		puts(dw->name);
+		puts(name_dw(dw));
 		//for(int i = 0; i < dw->len; ++i) putchar(dw->name[i]);
 		//puts("");
 		dw = dw->prev;
@@ -226,16 +241,17 @@ void p_dots()
 void p_tick()
 {
 	word();
-	codeptr xt = xt_find(token);
-	if(xt)
-		push((cell_t) xt);
+	codeptr cfa = cfa_find(token);
+	if(cfa)
+		push((cell_t) cfa);
 	else
 		undefined(token);
 }
 
-void execute(codeptr xt)
+void execute(codeptr cfa)	
 {
-	xt();
+	codeptr fn = (codeptr) dref(cfa);
+	fn();
 }
 void p_execute()
 {
@@ -257,7 +273,7 @@ void p_semi()
 void p_colon()
 {
 	word();
-	createz(0, token, docol);
+	//createz(0, token, docol); TODO
 	printf("p_colon:created:%s.\n", token);
 	compiling = true;
 }
@@ -286,7 +302,7 @@ void add_primitives()
 	prim_s* p = prims;
 	while(p->zname) {
 		//puts(p->zname);
-		createz(p->flags, p->zname, (codeptr) p->fn);
+		createz(p->flags, p->zname, (cell_t) p->fn);
 		p++;
 	}
 }
@@ -315,8 +331,8 @@ void process_token(char* token)
 {
 	//dent_s* dw = dw_find(token);
 	//ubyte flags;
-	codeptr xt = xt_find(token);
-	if(xt == 0) {
+	codeptr cfa = cfa_find(token);
+	if(cfa == 0) {
 		cell_t v;
 		if(int_str(token, &v)) {
 			if(compiling)
@@ -329,9 +345,9 @@ void process_token(char* token)
 	} else {
 		//codeptr xt = (codeptr) dref(dw+sizeof(dw));
 		if(compiling && !(flags & F_IMM))
-			heapify((cell_t)xt);
+			heapify((cell_t)cfa);
 		else
-			execute(xt);
+			execute(cfa);
 		//xdw(dw);
 	}
 }
@@ -347,11 +363,12 @@ int main()
 	add_primitives();
 	add_derived();
 
-	/*
-	   puts("words are");
-	   process_token("words");
-	   puts("fin");
-	   */
+	if(1) {
+		//p_words();
+		puts("words are");
+		process_token("words");
+		puts("fin");
+	}
 
 	while(fgets(tib, sizeof(tib), stdin)) {
 		process_tib();
