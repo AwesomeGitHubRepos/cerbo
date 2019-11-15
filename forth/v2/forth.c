@@ -327,8 +327,33 @@ void p_create() { word(); createz(0, token, (cell_t) _create); }
 void p_comma() { heapify(pop()); }
 void p_prompt () { show_prompt = (bool) pop(); }
 
+void p_lsb() { compiling = false; }
+void p_rsb() { compiling = true; }
+void p_here () { push((cell_t)hptr); }
+
+void p_qbranch()
+{
+	if(pop()) 
+		RTOP = dref((void*) RTOP);
+	else
+		RTOP += sizeof(cell_t);
+}
+
+
+void p_dup()
+{
+	cell_t v = pop();
+	push(v); 
+	push(v);
+}
+
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	 "DUP", p_dup},
+	{F_IMM,	"[", p_lsb},
+	{0, 	"]", p_rsb},
+	{0, 	"?BRANCH", p_qbranch},
+	{0, 	"HERE", p_here},
 	{0, 	"PROMPT", p_prompt},
 	{0, 	",", p_comma},
 	{0, 	"CREATE", p_create},
