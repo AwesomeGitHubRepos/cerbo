@@ -220,24 +220,12 @@ void p_words() {
 	dent_s* dw = latest;
 	while(dw) {
 		puts(name_dw(dw));
-		//for(int i = 0; i < dw->len; ++i) putchar(dw->name[i]);
-		//puts("");
 		dw = dw->prev;
 	}
 }
 
 void p_lit() 
 {
-	//puts("TODO p_lit");
-	/*
-	   void* rt = rtop();
-	   cell_t v = dref(*rt);
-	 *rt += sizeof(cell_t);
-	 */
-	/*
-	   cell_t v = dref((void*) rstack[rtop-1]);
-	   rstack[rtop-1] += sizeof(cell_t);
-	   */
 	cell_t v = dref((void*)RTOP);
 	RTOP += sizeof(cell_t);
 	push(v);
