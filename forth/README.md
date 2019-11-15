@@ -7,7 +7,7 @@ bbf is a barebones Forth written in C with the following design goals:
 
 ## Versions
 
-* v1 - **CURRENT** version
+* [v1](v1) - **CURRENT** version
 * [v2](v2) - experimental version under development
 
 ## Bugs
