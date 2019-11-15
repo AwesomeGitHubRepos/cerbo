@@ -51,6 +51,8 @@ cell_t pop()  { return pop_x(&sstack); }
 
 void rpush(cell_t v) { push_x(&rstack, v); }
 cell_t rpop()  { return pop_x(&rstack); }
+#define RTOP rstack.contents[rstack.size-1]
+//void* rtop() { return &rstack->contents[rstack->size]; }
 
 ubyte heap[10000];
 ubyte* hptr = heap;
@@ -226,12 +228,19 @@ void p_words() {
 
 void p_lit() 
 {
-	puts("TODO p_lit");
+	//puts("TODO p_lit");
+	/*
+	   void* rt = rtop();
+	   cell_t v = dref(*rt);
+	 *rt += sizeof(cell_t);
+	 */
 	/*
 	   cell_t v = dref((void*) rstack[rtop-1]);
 	   rstack[rtop-1] += sizeof(cell_t);
-	   push(v);
 	   */
+	cell_t v = dref((void*)RTOP);
+	RTOP += sizeof(cell_t);
+	push(v);
 }
 
 void p_dots()
