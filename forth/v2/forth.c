@@ -53,6 +53,7 @@ cell_t rpop()  { return pop_x(&rstack); }
 
 ubyte heap[10000];
 ubyte* hptr = heap;
+codeptr W; // cfa  of the word to execute
 
 bool compiling = false;
 bool show_prompt = true;
@@ -250,6 +251,7 @@ void p_tick()
 
 void execute(codeptr cfa)	
 {
+	W = cfa;
 	codeptr fn = (codeptr) dref(cfa);
 	fn();
 }
@@ -258,9 +260,17 @@ void p_execute()
 	execute((codeptr) pop());
 }
 
+char* name_cfa(codeptr cfa)
+{
+	dent_s* dw = (dent_s*) cfa;
+	//dw--;
+	return name_dw(--dw);
+}
+
 void docol()
 {
 	puts("TODO docol");
+	printf("docol: name being executed:<%s>\n", name_cfa(W));
 }
 
 void p_semi()
@@ -273,7 +283,7 @@ void p_semi()
 void p_colon()
 {
 	word();
-	//createz(0, token, docol); TODO
+	createz(0, token, (cell_t) docol); 
 	printf("p_colon:created:%s.\n", token);
 	compiling = true;
 }
@@ -363,7 +373,7 @@ int main()
 	add_primitives();
 	add_derived();
 
-	if(1) {
+	if(0) {
 		//p_words();
 		puts("words are");
 		process_token("words");
