@@ -1,2 +1,3 @@
+0 prompt
 variable foo
-43 bar ! bar @ .
+43 foo ! foo @ .

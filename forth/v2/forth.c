@@ -16,7 +16,11 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef intptr_t cell_t;
+//typedef intptr_t cell_t;
+#if(__SIZEOF_POINTER__ ==8)
+typedef int64_t cell_t;
+#endif
+
 typedef cell_t* cellptr;
 typedef uint8_t ubyte;
 typedef void (*codeptr)();
@@ -321,9 +325,11 @@ void p_exc() { cell_t pos = pop(); cell_t val = pop(); store(pos, val); }
 void _create() { push((cell_t)++W); }
 void p_create() { word(); createz(0, token, (cell_t) _create); }
 void p_comma() { heapify(pop()); }
+void p_prompt () { show_prompt = (bool) pop(); }
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0, 	"PROMPT", p_prompt},
 	{0, 	",", p_comma},
 	{0, 	"CREATE", p_create},
 	{0, 	"!", p_exc},

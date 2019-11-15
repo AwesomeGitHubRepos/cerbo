@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+function print_help {
+cat <<EOF
+run tests
+EOF
+}
+ 
+
+case $1 in
+    h) print_help ; echo . ; exit ;;
+esac
+
+#rlwrap ./forth
+
+for f in *4th ../v1/*4th
+do
+	echo "============================="
+	echo $f
+	cat $f
+	echo "---"
+	./forth <$f
+	echo
+done
+
