@@ -1,7 +1,7 @@
 0 prompt
 : .test cr type cr ;
 
-z" vanilla if-then. Exoect no output" .test
+z" vanilla if-then. Expect no output" .test
 : t1 if 16 . then  ; 
 0 t1
 

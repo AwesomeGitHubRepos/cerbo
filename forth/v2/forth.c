@@ -52,6 +52,8 @@ cell_t pop_x(stack_t* stk)
 }
 void push(cell_t v) { push_x(&sstack, v); }
 cell_t pop()  { return pop_x(&sstack); }
+#define STOP sstack.contents[sstack.size-1]
+#define STOP_1 sstack.contents[sstack.size-2]
 
 void rpush(cell_t v) { push_x(&rstack, v); }
 cell_t rpop()  { return pop_x(&rstack); }
@@ -347,8 +349,42 @@ void p_dup()
 	push(v);
 }
 
+void p_z_slash () { delim_word("\"", false); push((cell_t)token); }
+void p_emit() { printf("%c", (char)pop()); }
+//void p_swap() { cell_t temp = dstack[tos-1]; dstack[tos-1] = dstack[tos-2]; dstack[tos-2] = temp; }
+void p_swap() { cell_t temp = STOP; STOP = STOP_1; STOP_1 = temp; }
+void p_immediate() { latest->flags |= F_IMM; }
+void p_type () { printf("%s", (char*) pop()); }
+
+void p_0branch()
+{
+	if(!pop()) 
+		RTOP = dref((void*) RTOP);
+	else
+		RTOP += sizeof(cell_t);
+}
+
+
+void p_compile()
+{
+	//cell_t cell = dref((void*)rstack[rtop-1]);
+	cell_t cell = dref((void*)RTOP);
+	heapify(cell);
+	//rstack[rtop-1] += sizeof(cell_t);
+	RTOP += sizeof(cell_t);
+}
+
+
+
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0, 	"TYPE", p_type},
+	{0, 	"COMPILE", p_compile},
+	{0, 	"0BRANCH", p_0branch},
+	{0, 	"IMMEDIATE", p_immediate},
+	{0, 	"SWAP", p_swap},
+	{0, 	"EMIT", p_emit},
+	{0, 	"Z\"", p_z_slash},
 	{0,	 "DUP", p_dup},
 	{F_IMM,	"[", p_lsb},
 	{0, 	"]", p_rsb},
@@ -393,11 +429,13 @@ void eval_string(char* str)
 }
 
 char* derived[] = {
-	//"hi hi",
-	//": ho hi hi ; ho",
-	//": ho ; ho",
 	": VARIABLE create 0 , ;",
 	": 1+ 1 + ;",
+	": CR 10 emit ;",
+	//": CONSTANT <builds , does> @ ;", // TODO reinstate
+	": IF compile 0branch here 0 , ; immediate",
+	": THEN here swap ! ; immediate",
+	//": ELSE compile branch here >t 0 , here swap ! t> ; immediate", // TODO
 	0
 };
 
