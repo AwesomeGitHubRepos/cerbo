@@ -17,6 +17,7 @@
 #include <string.h>
 
 typedef intptr_t cell_t;
+typedef cell_t cellptr;
 typedef uint8_t ubyte;
 typedef void (*codeptr)();
 
@@ -53,7 +54,7 @@ cell_t rpop()  { return pop_x(&rstack); }
 
 ubyte heap[10000];
 ubyte* hptr = heap;
-codeptr W; // cfa  of the word to execute
+cellptr W; // cfa  of the word to execute
 
 bool compiling = false;
 bool show_prompt = true;
@@ -251,7 +252,7 @@ void p_tick()
 
 void execute(codeptr cfa)	
 {
-	W = cfa;
+	W = (cellptr) cfa;
 	codeptr fn = (codeptr) dref(cfa);
 	fn();
 }
@@ -260,7 +261,7 @@ void p_execute()
 	execute((codeptr) pop());
 }
 
-char* name_cfa(codeptr cfa)
+char* name_cfa(cellptr cfa)
 {
 	dent_s* dw = (dent_s*) cfa;
 	//dw--;
@@ -269,22 +270,37 @@ char* name_cfa(codeptr cfa)
 
 void docol()
 {
-	puts("TODO docol");
-	printf("docol: name being executed:<%s>\n", name_cfa(W));
+	static codeptr cfa_exit = 0;
+	if(cfa_exit==0) cfa_exit = cfa_find("EXIT");
+	codeptr cfa;
+	cellptr IP = W;
+	//printf("docol: name being executed:<%s>\n", name_cfa(W));
+
+	IP += sizeof(cell_t);
+	for(;;) {
+		cfa = (codeptr) dref((void*)IP);
+		IP += sizeof(cell_t);
+		if(cfa == cfa_exit) break;
+		rpush((cell_t)IP);
+		execute(cfa);
+		IP = (cellptr) rpop();
+		//break; // TODO remove
+	}
+
 }
 
 void p_semi()
 {
 	heapify_word("EXIT");
 	compiling = false;
-	puts("p_semi:exit");
+	//puts("p_semi:exit");
 }
 
 void p_colon()
 {
 	word();
 	createz(0, token, (cell_t) docol); 
-	printf("p_colon:created:%s.\n", token);
+	//printf("p_colon:created:%s.\n", token);
 	compiling = true;
 }
 
@@ -325,6 +341,8 @@ void eval_string(char* str)
 
 char* derived[] = {
 	//"hi hi",
+	": ho hi hi ; ho",
+	//": ho ; ho",
 	0
 };
 
