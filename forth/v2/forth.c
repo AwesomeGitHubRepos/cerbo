@@ -58,7 +58,6 @@ cell_t pop()  { return pop_x(&sstack); }
 void rpush(cell_t v) { push_x(&rstack, v); }
 cell_t rpop()  { return pop_x(&rstack); }
 #define RTOP rstack.contents[rstack.size-1]
-//void* rtop() { return &rstack->contents[rstack->size]; }
 
 ubyte heap[10000];
 ubyte* hptr = heap;
@@ -68,8 +67,6 @@ bool compiling = false;
 bool show_prompt = true;
 ubyte flags = 0;
 
-//char _TIB[136]; // The input buffer
-//char* TIB = _TIB;
 char tib[132];
 int bytes_read = 0; // number of bytes read into TIB
 
@@ -78,13 +75,10 @@ typedef struct { // dictionary entry
 	// name of word is packed before this struct
 	void* prev;
 	ubyte  flags;
-	//char* name;
-	//void* acf;
 } dent_s;
 
 dent_s *latest = NULL; // latest word being defined
 
-//const ubyte F_IMM = 1;
 const ubyte F_IMM = 1 << 7;
 
 
@@ -95,7 +89,6 @@ char* strupr(char* str)
 { 
 	int c = -1, i =0;
 	if(!str) return NULL;
-	//char* ptr = str;
 	while(c = toupper(str[i])) {
 		str[i] = c;
 		i++;
@@ -143,10 +136,7 @@ void create_header(ubyte flags, char* zname)
 	for(noff = 0 ; noff<= strlen(zname); ++noff) *hptr++ = toupper(zname[noff]); // include trailing 0
 	dent_s dw;
 	dw.prev = latest;
-	//ubyte len = hptr - name
 	dw.flags = flags | noff;
-	//dw.acf = acf;
-	//dw.name = name;
 	memcpy(hptr, &dw, sizeof(dw));
 	latest = (dent_s*) hptr;
 	hptr += sizeof(dw);
@@ -170,26 +160,20 @@ char* name_dw(dent_s* dw)
 codeptr cfa_find(char* name) // name can be lowercase, if you like
 {
 	dent_s* dw = latest;
-	//codeptr cfa = 0;
 	//strupr(name);
 	while(dw) {
 		if(strcasecmp(name, name_dw(dw)) == 0) break;
-		//goto found;
 		dw = dw->prev;
 	}
-	//return NULL;
-	//found:
 	if(!dw) return 0;
 	flags = dw->flags;
 	dw++;
 
-	//cfa = (codeptr) dref(++dw);
 	return (codeptr) dw;
 }
 
 void heapify_word(char* name)
 {
-	//ubyte flags;
 	codeptr xt = cfa_find(name);
 	heapify((cell_t) xt);
 }
@@ -218,9 +202,7 @@ char* word () { delim_word(" \t\n", true); }
 void process_tib();
 
 
-void p_hi() {
-	puts("hello world");
-}
+void p_hi() { puts("hello world"); }
 
 void p_words() {
 	dent_s* dw = latest;
@@ -275,7 +257,6 @@ void p_execute()
 char* name_cfa(cellptr cfa)
 {
 	dent_s* dw = (dent_s*) cfa;
-	//dw--;
 	return name_dw(--dw);
 }
 
@@ -285,19 +266,13 @@ void docol()
 	if(cfa_exit==0) cfa_exit = cfa_find("EXIT");
 	codeptr cfa;
 	cellptr IP = W;
-	//printf("docol: name being executed:<%s>\n", name_cfa(W));
-
-	//IP += sizeof(cell_t);
 	IP++;
 	for(;;) {
-		//cfa = (codeptr) dref((void*)IP);
-		//IP += sizeof(cell_t);
 		cfa = (codeptr) dref(IP++);
 		if(cfa == cfa_exit) break;
 		rpush((cell_t)IP);
 		execute(cfa);
 		IP = (cellptr) rpop();
-		//break; // TODO remove
 	}
 
 }
@@ -306,20 +281,16 @@ void p_semi()
 {
 	heapify_word("EXIT");
 	compiling = false;
-	//puts("p_semi:exit");
 }
 
 void p_colon()
 {
 	word();
 	createz(0, token, (cell_t) docol); 
-	//printf("p_colon:created:%s.\n", token);
 	compiling = true;
 }
 
-void p_exit()
-{
-}
+void p_exit() { }
 
 void p_at () { push(dref((void*)pop())); }
 void p_exc() { cell_t pos = pop(); cell_t val = pop(); store(pos, val); }
@@ -351,7 +322,6 @@ void p_dup()
 
 void p_z_slash () { delim_word("\"", false); push((cell_t)token); }
 void p_emit() { printf("%c", (char)pop()); }
-//void p_swap() { cell_t temp = dstack[tos-1]; dstack[tos-1] = dstack[tos-2]; dstack[tos-2] = temp; }
 void p_swap() { cell_t temp = STOP; STOP = STOP_1; STOP_1 = temp; }
 void p_immediate() { latest->flags |= F_IMM; }
 void p_type () { printf("%s", (char*) pop()); }
@@ -367,10 +337,8 @@ void p_0branch()
 
 void p_compile()
 {
-	//cell_t cell = dref((void*)rstack[rtop-1]);
 	cell_t cell = dref((void*)RTOP);
 	heapify(cell);
-	//rstack[rtop-1] += sizeof(cell_t);
 	RTOP += sizeof(cell_t);
 }
 
@@ -416,7 +384,6 @@ void add_primitives()
 {
 	prim_s* p = prims;
 	while(p->zname) {
-		//puts(p->zname);
 		createz(p->flags, p->zname, (cell_t) p->fn);
 		p++;
 	}
@@ -450,8 +417,6 @@ void add_derived()
 
 void process_token(char* token)
 {
-	//dent_s* dw = dw_find(token);
-	//ubyte flags;
 	codeptr cfa = cfa_find(token);
 	if(cfa == 0) {
 		cell_t v;
@@ -464,12 +429,10 @@ void process_token(char* token)
 			undefined(token);
 		}
 	} else {
-		//codeptr xt = (codeptr) dref(dw+sizeof(dw));
 		if(compiling && !(flags & F_IMM))
 			heapify((cell_t)cfa);
 		else
 			execute(cfa);
-		//xdw(dw);
 	}
 }
 void process_tib()
