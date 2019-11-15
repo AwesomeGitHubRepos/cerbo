@@ -17,7 +17,7 @@
 #include <string.h>
 
 typedef intptr_t cell_t;
-typedef cell_t cellptr;
+typedef cell_t* cellptr;
 typedef uint8_t ubyte;
 typedef void (*codeptr)();
 
@@ -281,10 +281,12 @@ void docol()
 	cellptr IP = W;
 	//printf("docol: name being executed:<%s>\n", name_cfa(W));
 
-	IP += sizeof(cell_t);
+	//IP += sizeof(cell_t);
+	IP++;
 	for(;;) {
-		cfa = (codeptr) dref((void*)IP);
-		IP += sizeof(cell_t);
+		//cfa = (codeptr) dref((void*)IP);
+		//IP += sizeof(cell_t);
+		cfa = (codeptr) dref(IP++);
 		if(cfa == cfa_exit) break;
 		rpush((cell_t)IP);
 		execute(cfa);
@@ -313,9 +315,19 @@ void p_exit()
 {
 }
 
+void p_at () { push(dref((void*)pop())); }
+void p_exc() { cell_t pos = pop(); cell_t val = pop(); store(pos, val); }
+
+void _create() { push((cell_t)++W); }
+void p_create() { word(); createz(0, token, (cell_t) _create); }
+void p_comma() { heapify(pop()); }
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0, 	",", p_comma},
+	{0, 	"CREATE", p_create},
+	{0, 	"!", p_exc},
+	{0, 	"@", p_at},
 	{0,	"EXIT", p_exit},
 	{0,	":", p_colon},
 	{F_IMM,	";", p_semi},
@@ -353,6 +365,7 @@ char* derived[] = {
 	//"hi hi",
 	//": ho hi hi ; ho",
 	//": ho ; ho",
+	": VARIABLE create 0 , ;",
 	": 1+ 1 + ;",
 	0
 };
