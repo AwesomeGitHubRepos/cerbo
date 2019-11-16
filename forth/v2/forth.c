@@ -343,9 +343,27 @@ void p_compile()
 }
 
 
+void p_fromr()
+{
+	cell_t tos = rpop();
+	cell_t v = RTOP;
+	RTOP = tos;
+	push(v);
+}
+
+void p_tor()
+{
+	cell_t v = pop();
+	cell_t temp = RTOP;
+	RTOP = v;
+	rpush(temp);
+}
+
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	">R", p_tor},
+	{0,	"R>", p_fromr},
 	{0, 	"TYPE", p_type},
 	{0, 	"COMPILE", p_compile},
 	{0, 	"0BRANCH", p_0branch},
@@ -399,6 +417,7 @@ char* derived[] = {
 	": VARIABLE create 0 , ;",
 	": 1+ 1 + ;",
 	": CR 10 emit ;",
+	": .\" z\" type ;",
 	//": CONSTANT <builds , does> @ ;", // TODO reinstate
 	": IF compile 0branch here 0 , ; immediate",
 	": THEN here swap ! ; immediate",
