@@ -21,6 +21,10 @@
 typedef int64_t cell_t;
 #endif
 
+#define DEBUG(cmd) cmd
+#define DEBUGX(cmd)
+
+
 typedef cell_t* cellptr;
 typedef uint8_t ubyte;
 typedef void (*codeptr)();
@@ -155,6 +159,11 @@ char* name_dw(dent_s* dw)
 	str -= name_off; 
 	return str;
 
+}
+
+void* code(dent_s* dw)
+{
+	return ++dw;
 }
 
 codeptr cfa_find(char* name) // name can be lowercase, if you like
@@ -368,8 +377,60 @@ void p_bslash () { strtok_r(rest, "\n", &rest); }
 void p_drop () { pop(); }
 
 
+void p_dodoes() // not an immediate word
+{
+	DEBUGX(puts("calling dodoes"););
+	cell_t does_loc  = pop(); // provided by 555. Previous cell should be an EXIT
+
+	cell_t loc888 = (cell_t) code(latest) + 4*sizeof(cell_t);
+	DEBUGX(printf("dodoes thinks 888 is located at %p\n", (void*) loc888););
+	store(loc888, does_loc);
+
+	cell_t loc777 = loc888 - 2*sizeof(cell_t);
+	DEBUGX(printf("dodoes thinks 777 is located at %p\n", (void*) loc777););
+	cell_t offset = loc888 + 2*sizeof(cell_t); // points to just after the ';' of the docol 
+	store(loc777, offset); 
+}
+
+
+void p_does() // is immeditate
+{
+	heapify_word("LIT");
+	cell_t loc = (cell_t) hptr; // loc holds the location of 555
+	heapify(555); // ready for backfill
+	heapify_word("(DOES>)"); // aka p_dodoes
+	heapify_word("EXIT");
+	store(loc, (cell_t)hptr); // now backfill it
+	// so now 555 has been replaced by the cell after the EXIT, which gets pushed onto the stack
+	// so that (DOES>) knows where it is on the heap
+
+
+}
+
+
+void p_builds() // not an immediate word
+{
+	word();
+	createz(0, token, (cell_t) docol);
+
+	heapify_word("LIT");
+	DEBUGX(printf("p_builds: location of 777: %p\n", hptr););
+	heapify(777); // filled in properly by dodoes
+
+	heapify_word("BRANCH");
+	DEBUGX(printf("p_builds: location of 888: %p\n", hptr););
+	heapify(888);
+
+	heapify_word(";");
+}
+
+
+
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0, 	"<BUILDS", p_builds},
+	{F_IMM,	"DOES>", p_does},
+	{0, 	"(DOES>)", p_dodoes},
 	{0, 	"DROP", p_drop},
 	{0, 	"\\", p_bslash},
 	{0, 	"BRANCH", p_branch},
@@ -429,10 +490,10 @@ char* derived[] = {
 	": 1+ 1 + ;",
 	": CR 10 emit ;",
 	": .\" z\" type ;",
-	//": CONSTANT <builds , does> @ ;", // TODO reinstate
 	": IF compile 0branch here 0 , ; immediate",
 	": THEN here swap ! ; immediate",
 	": ELSE compile branch here >r 0 , here swap ! r> ; immediate", 
+	": CONSTANT <builds , does> @ ;",
 	0
 };
 

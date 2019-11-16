@@ -1,0 +1,140 @@
+=============================
+colon1.4th
+0 prompt
+: ho hi ;
+ho
+---
+hello world
+
+=============================
+life.4th
+0 prompt
+: life 42 ;
+life .s
+---
+Stack: (1):42 
+=============================
+rstack.4th
+0 prompt
+
+." Expect 2" cr
+: t1 2 >R R> . ;
+t1
+---
+Expect 2
+2 
+=============================
+tick.4th
+0 prompt
+' hi execute
+
+---
+hello world
+
+=============================
+var.4th
+0 prompt
+variable foo
+43 foo ! foo @ .
+---
+43 
+=============================
+../v1/again.4th
+0 prompt
+: begin here ; immediate
+: ?again compile ?branch , ; immediate
+: test 5 begin dup . 1 - dup ?again drop ;
+
+." about to run test" cr
+test
+cr
+---
+about to run test
+5 4 3 2 1 
+
+=============================
+../v1/builds.4th
+0 prompt
+z" BUILDS.4th ..." type cr
+\ testing the dreaded <builds/does via constant
+\ : constant <builds , does> @ ;
+11 constant eleven
+12 constant twelve
+z" Expect 11:" type cr
+eleven . cr
+z" Expect 12" type cr
+twelve . cr
+z" Expect 11:" type cr
+eleven . cr
+z" Expect 12" type cr
+twelve . cr
+z" ... finished" type cr
+1 prompt
+---
+BUILDS.4th ...
+Expect 11:
+11 
+Expect 12
+12 
+Expect 11:
+11 
+Expect 12
+12 
+... finished
+  ok
+
+=============================
+../v1/embed.4th
+0 prompt
+: h1 hi ;
+: h2 h1 ;
+h2
+
+---
+hello world
+
+=============================
+../v1/if.4th
+0 prompt
+: .test cr type cr ;
+
+z" vanilla if-then. Expect no output" .test
+: t1 if 16 . then  ; 
+0 t1
+
+z" Expect 16" .test
+2 t1
+
+z" if/then/else. Expect 42" .test
+: t2 if 42 . else 43 . then cr ;
+23 t2
+
+z" Expect 43" .test
+0 t2
+
+z" Finished" .test
+---
+
+vanilla if-then. Expect no output
+
+Expect 16
+16 
+if/then/else. Expect 42
+42 
+
+Expect 43
+43 
+
+Finished
+
+=============================
+../v1/test.4th
+0 prompt
+1 .  1 : t1 1+ 1+ 1+ ; 	t1 . 
+2 .  0 : t2 t1 t1 ; 	t2 .
+3 .  0 : t3 t2 ;	t3 .
+4 .  0 ' t3 execute .
+5 . variable bar 5 bar ! bar @ .
+6 . : t6 5 [ here ] dup . 1 - dup ?branch [ , ] ; t6
+---
+1 4 2 6 3 6 4 6 5 5 6 5 4 3 2 1 
