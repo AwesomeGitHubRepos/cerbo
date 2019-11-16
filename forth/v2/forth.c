@@ -359,9 +359,15 @@ void p_tor()
 	rpush(temp);
 }
 
+void p_branch()
+{
+	RTOP = dref((void*) RTOP);
+}
+
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0, 	"BRANCH", p_branch},
 	{0,	">R", p_tor},
 	{0,	"R>", p_fromr},
 	{0, 	"TYPE", p_type},
@@ -421,7 +427,7 @@ char* derived[] = {
 	//": CONSTANT <builds , does> @ ;", // TODO reinstate
 	": IF compile 0branch here 0 , ; immediate",
 	": THEN here swap ! ; immediate",
-	//": ELSE compile branch here >t 0 , here swap ! t> ; immediate", // TODO
+	": ELSE compile branch here >r 0 , here swap ! r> ; immediate", 
 	0
 };
 
