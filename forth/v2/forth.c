@@ -364,9 +364,14 @@ void p_branch()
 	RTOP = dref((void*) RTOP);
 }
 
+void p_bslash () { strtok_r(rest, "\n", &rest); }
+void p_drop () { pop(); }
+
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0, 	"DROP", p_drop},
+	{0, 	"\\", p_bslash},
 	{0, 	"BRANCH", p_branch},
 	{0,	">R", p_tor},
 	{0,	"R>", p_fromr},
