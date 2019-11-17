@@ -17,8 +17,13 @@
 #include <string.h>
 
 //typedef intptr_t cell_t;
+#if(__SIZEOF_POINTER__ ==4)
+typedef int32_t cell_t;
+const char* cell_fmt = "%ld ";
+#endif
 #if(__SIZEOF_POINTER__ ==8)
 typedef int64_t cell_t;
+const char* cell_fmt = "%ld ";
 #endif
 
 #define DEBUG(cmd) cmd
@@ -231,7 +236,7 @@ void p_lit()
 void p_dots()
 {
 	printf("Stack: (%d):", sstack.size);
-	for(int i = 0; i< sstack.size; ++i) printf("%ld ", sstack.contents[i]);
+	for(int i = 0; i< sstack.size; ++i) printf(cell_fmt, sstack.contents[i]);
 }
 
 
@@ -240,7 +245,7 @@ void p_minus() { cell_t v1 = pop(), v2 = pop(); push(v2-v1); }
 void p_mult() { push(pop() * pop()); }
 void p_div() { cell_t v1 = pop(), v2 = pop(); push(v2/v1); }
 
-void p_dot() { printf("%ld ", pop()); }
+void p_dot() { printf(cell_fmt, pop()); }
 
 void p_tick()
 {
