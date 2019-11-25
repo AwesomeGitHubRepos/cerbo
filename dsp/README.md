@@ -31,6 +31,11 @@ Links:
 * [Easy generation](http://www.firstpr.com.au/dsp/pink-noise/)
 
 
+## sampling
+
+* [sampling.ipynb](sampling.ipynb) - generate signals of various sorts
+
+
 ## Other references
 
 * [Differentiation and integration of audio signals](http://pcfarina.eng.unipr.it/Differentiation_Integration.htm)
