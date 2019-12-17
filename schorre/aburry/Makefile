@@ -1,0 +1,2 @@
+aburry : 
+	gcc $^ -o $@
