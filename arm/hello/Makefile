@@ -1,11 +1,16 @@
-BINS = hello ast
+CC = arm-linux-gnueabi-gcc
+BINS = hello ast sum
 
 all : $(BINS)
 
 hello : hello.S
-	arm-linux-gnueabi-gcc -static $^ -o $@
+	$(CC) -static $^ -o $@
 
 ast : ast.S
-	arm-linux-gnueabi-gcc -static $^ -o $@
+	$(CC) -static $^ -o $@
+
+sum : sum.S
+	$(CC) -static $^ -o $@
+
 clean :
 	rm -$(BINS)
