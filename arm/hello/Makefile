@@ -1,7 +1,10 @@
 CC = arm-linux-gnueabi-gcc
-BINS = hello ast sum
+BINS = hello ast sum parabola
 
 all : $(BINS)
+
+parabola : parabola.S
+	$(CC) -static $^ -o $@
 
 hello : hello.S
 	$(CC) -static $^ -o $@
