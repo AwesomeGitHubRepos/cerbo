@@ -38,7 +38,15 @@ my $bye = Q [
 	mov	r0, #0 @ return value 0
 	pop	{ip, pc}
 
-print_num_str:
+	@ FUNC: print integer
+	@ IN: r0 integer to be printed
+printd:
+	stmdb 	sp!, {lr}
+	mov	r1, r0
+	ldr	r0, =_printd
+	bl 	printf
+	ldmia	sp!, {pc}
+_printd:
 	.asciz "Printing %d\n"	
 ];
 
@@ -58,9 +66,8 @@ class A {
 
 	method print-stmt($/) { 
 		say "\t@ print statement"; 
-		say "\tldr	r0, =print_num_str" ; 
-		say "\tmov	r1, #66" ;
-		say "\tbl printf";
+		say "\tmov	r0, #66" ;
+		say "\tbl	printd";
 	}
 
 	method for-loop($/) { }
