@@ -37,6 +37,9 @@ my $bye = Q [
 	@ exit and cleanup
 	mov	r0, #0 @ return value 0
 	pop	{ip, pc}
+
+print_num_str:
+	.asciz "Printing %d\n"	
 ];
 
 sub write-varnames($vnames) {
@@ -52,8 +55,16 @@ class A {
 	has $.varnames = SetHash.new;
 
 	method TOP ($/) { ; say $bye; write-varnames $.varnames ; }
+
+	method print-stmt($/) { 
+		say "\t@ print statement"; 
+		say "\tldr	r0, =print_num_str" ; 
+		say "\tmov	r1, #66" ;
+		say "\tbl printf";
+	}
+
 	method for-loop($/) { }
-	method var ($/) { my $vname = $/.Str ; xsay "Ading var: $vname" ; $.varnames{"$vname"}++ ; }
+	method var ($/) { my $vname = $/.Str ; xsay "Adding var: $vname" ; $.varnames{"$vname"}++ ; }
 } 
 
 my $acts = A.new;
