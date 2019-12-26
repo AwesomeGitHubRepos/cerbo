@@ -88,7 +88,7 @@ class A {
 	method TOP ($/) { say $<stmts>.made;  say $bye; write-varnames $.varnames ; }
 
 	method stmts($/) {
-		my $res; 
+		my $res = ""; 
 		for @<statement> -> $stm { my $st1 = $stm.made ; $res ~= "$st1\n"; }
 		$/.make($res);
 
@@ -113,6 +113,8 @@ class A {
 		my $var = $<var>;
 		my $from = $<from>.made;
 		my $to = $<to>.made;
+		my $stmts = $<stmts>.made;
+		#my $stmts = "FOO";
 
 
 
@@ -134,7 +136,8 @@ $for-test:
 	bgt $end-for
 
 	@ ...
-	bl printd @ print var TODO remove
+	@ bl printd @ print var TODO remove
+	$stmts
 
 	@ for:next
 	load r0, $var
