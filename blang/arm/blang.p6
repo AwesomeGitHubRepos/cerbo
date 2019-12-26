@@ -68,14 +68,36 @@ class A {
 
 	method TOP ($/) { ; say $bye; write-varnames $.varnames ; }
 
+	method expr($/) {
+		#say "@ expr:";
+		my $res = "\t@ begin expr statement\n";
+		my $n = $<expr-p>.elems;
+		my $asm = @<expr-p>[0].made;
+
+		#say $asm;
+		$res = $res ~ $<expr-p>.first.made;
+		@<expr-p>.shift;		
+		for @<expr-p> -> $x {
+			#$res ~= "\tpush \{r0\}\n";
+			$res ~= "	mov	r1, r0\n";
+			$res ~= $x.made;
+			#$res ~= "\tpop \{r1\}\n";
+			$res ~= "\tadd r0, r0, r1\n";
+			
+		}
+		$res ~= "\t@end expr statement\n";
+		say $res;
+		#say $<expr-p>.elems; 
+	}
+
 	method expr-p($/) {
 		if $<num> {
 			my $label = "const_$<num>";
 			self!add-var( $label , $<num>);
-			tsay "@ move a constant to a register";
-			tsay "ldr r0, =$label";
-			tsay "ldr r0, [r0]";
-			tsay ""
+			my $asm = "ldr r0, =$label";
+			my $res  =  "\n\t@ expr-p:num move a constant to a register\n\t$asm\n\tldr r0, [r0]\n\n";
+			$/.make($res);
+			
 		} else {
 			say "var found";
 		}

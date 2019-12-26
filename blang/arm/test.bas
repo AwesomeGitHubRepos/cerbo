@@ -1,2 +1,1 @@
-print 42
-print 43
+print 41 + 1 + 2
