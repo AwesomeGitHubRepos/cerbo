@@ -1,1 +1,3 @@
-print 41 + 1 + 2 + sum
+let sum = 200 + 1
+let sum = sum + sum
+print sum + sum + 2

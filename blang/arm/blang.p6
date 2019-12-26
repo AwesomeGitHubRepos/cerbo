@@ -55,6 +55,7 @@ my $bye = Q [
 sub write-varnames(%vnames) {
 
 	say "@ variables";
+	say ".data";
 	for  %vnames.keys.sort -> $k {
 		say ".balign 4\n$k: .word %vnames{$k}";
 	}
@@ -66,7 +67,24 @@ class A {
 
 	method !add-var($k, $v) { %.varnames{$k} = $v; }
 
-	method TOP ($/) { ; say $bye; write-varnames $.varnames ; }
+	method TOP ($/) { say $bye; write-varnames $.varnames ; }
+
+	method statement($/) { 
+		if $<print-stmt> {
+			say $<print-stmt>.made; 
+		} elsif $<assign> {
+			say $<assign>.made;
+		}
+
+	}
+
+	method assign($/) {
+		my $res = "\t@ ASSIGN\n" ~ $<expr>.made;
+		my $label = "$<var>";
+		self!add-var($label, 0);
+		$res ~= "	ldr 	r1, =$label\n	str	r0, [r1]\n";
+		$/.make($res);
+	}
 
 	method expr($/) {
 		#say "@ expr:";
@@ -86,7 +104,8 @@ class A {
 
 		}
 		$res ~= "\t@end expr statement\n";
-		say $res;
+		#say $res;
+		$/.make($res);
 		#say $<expr-p>.elems; 
 	}
 
@@ -106,9 +125,11 @@ class A {
 	}
 
 	method print-stmt($/) { 
+		my $res = $<expr>.made ~ "\n	bl	printd\n";
+		$/.make($res);
 		#say "\t@ print statement"; 
 		#say "\tmov	r0, #66" ;
-		tsay "bl	printd";
+		#tsay "bl	printd";
 	}
 
 	method for-loop($/) { }
