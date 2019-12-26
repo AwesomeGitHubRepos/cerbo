@@ -1,3 +1,2 @@
-let sum = 200 + 1
-let sum = sum + sum
-print sum + sum + 2
+for i = 1+10 to 2+10+10
+next

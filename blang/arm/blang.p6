@@ -9,7 +9,7 @@ grammar G {
 	rule stmts 	{ <statement>* }
 	rule statement 	{ <print-stmt> | <for-loop> | <assign> }
 	rule print-stmt	{ 'print' <expr> }
-	rule for-loop 	{ 'for' <var> '=' <expr> 'to'  <expr>  <stmts> 'next' }
+	rule for-loop 	{ 'for' <var> '=' <from=.expr> 'to'  <to=.expr>  <stmts> 'next' }
 	rule assign	{ 'let' <var> '=' <expr> }
 
 	token var 	{ <[a..z]>+   }
@@ -27,6 +27,22 @@ xsay $m;
 # print the prologue 
 say  Q [
 	@ Automatically-generated assembler code
+
+	@ macros
+
+	.macro load reg, addr
+	ldr \reg, =\addr
+	ldr \reg, [\reg]
+	.endm
+
+	.macro store reg, addr
+	push {r4}
+	ldr r4, =\addr
+	str \reg, [r4]
+	pop {r4}
+	.endm
+
+
 	.global main
 	main:
 	@ entry point
@@ -61,11 +77,14 @@ sub write-varnames(%vnames) {
 	}
 }
 
+my $lid =0;
+sub mklabel() { $lid++; return "L$lid"; }
 
 class A {
 	has %.varnames;
 
 	method !add-var($k, $v) { %.varnames{$k} = $v; }
+	method !add-var1($k) { %.varnames{$k} = 0; }
 
 	method TOP ($/) { say $bye; write-varnames $.varnames ; }
 
@@ -74,7 +93,53 @@ class A {
 			say $<print-stmt>.made; 
 		} elsif $<assign> {
 			say $<assign>.made;
+		} elsif $<for-loop> {
+			say $<for-loop>.made;
 		}
+
+	}
+
+	method for-loop($/) {
+		my $to-label = mklabel;
+		self!add-var1($to-label);
+		my $for-test = mklabel;
+		my $end-for  = mklabel;
+		my $var = $<var>;
+		my $from = $<from>.made;
+		my $to = $<to>.made;
+
+
+
+		my $res = Q:s [ 
+	@ FOR
+	@ for:from precalc
+	$from
+	store r0, $var
+
+	@ for:to precalc
+	$to
+	store r0, $to-label
+
+	@ for:test
+$for-test:	
+	load r0, $var
+	load r1, $to-label
+	cmp  r0, r1
+	bgt $end-for
+
+	@ ...
+	bl printd @ print var TODO remove
+
+	@ for:next
+	load r0, $var
+	add r0, r0, #1
+	store r0, $var
+	b $for-test
+$end-for:	@for:end
+
+	];
+
+	$/.make($res);
 
 	}
 
@@ -132,7 +197,6 @@ class A {
 		#tsay "bl	printd";
 	}
 
-	method for-loop($/) { }
 	method var ($/) { my $vname = $/.Str ; xsay "Adding var: $vname" ; self!add-var($vname,  0) ; }
 } 
 
