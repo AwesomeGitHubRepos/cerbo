@@ -16,7 +16,7 @@ grammar G {
 	rule expr 	{ <expr-p>+ % '+' }
 	#rule expr 	{ <expr-p> ('+' <expr-p>)* }
 	rule expr-p	{ <num> | <var> }
- 	token num	{ <[0..9]>+ }
+	token num	{ <[0..9]>+ }
 }
 
 my $input = slurp;
@@ -26,9 +26,9 @@ xsay $m;
 
 # print the prologue 
 say  Q [
-@ Automatically-generated assembler code
-.global main
-main:
+	@ Automatically-generated assembler code
+	.global main
+	main:
 	@ entry point
 	push    {ip, lr}
 ];
@@ -42,13 +42,13 @@ my $bye = Q [
 
 	@ FUNC: print integer
 	@ IN: r0 integer to be printed
-printd:
+	printd:
 	stmdb 	sp!, {lr}
 	mov	r1, r0
 	ldr	r0, =_printd
 	bl 	printf
 	ldmia	sp!, {pc}
-_printd:
+	_printd:
 	.asciz "Printing %d\n"	
 ];
 
@@ -83,7 +83,7 @@ class A {
 			$res ~= $x.made;
 			#$res ~= "\tpop \{r1\}\n";
 			$res ~= "\tadd r0, r0, r1\n";
-			
+
 		}
 		$res ~= "\t@end expr statement\n";
 		say $res;
@@ -91,16 +91,18 @@ class A {
 	}
 
 	method expr-p($/) {
+		my $label;
 		if $<num> {
-			my $label = "const_$<num>";
+			$label = "const_$<num>";
 			self!add-var( $label , $<num>);
-			my $asm = "ldr r0, =$label";
-			my $res  =  "\n\t@ expr-p:num move a constant to a register\n\t$asm\n\tldr r0, [r0]\n\n";
-			$/.make($res);
-			
+
 		} else {
-			say "var found";
+			$label = "$<var>";
+			self!add-var($label, 0);
 		}
+		my $asm = "ldr r0, =$label";
+		my $res  =  "\n\t@ expr-p:num move a constant to a register\n\t$asm\n\tldr r0, [r0]\n\n";
+		$/.make($res);
 	}
 
 	method print-stmt($/) { 

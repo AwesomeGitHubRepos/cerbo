@@ -1,1 +1,1 @@
-print 41 + 1 + 2
+print 41 + 1 + 2 + sum
