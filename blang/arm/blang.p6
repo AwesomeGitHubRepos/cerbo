@@ -14,7 +14,6 @@ grammar G {
 
 	token var 	{ <[a..z]>+   }
 	rule expr 	{ <expr-p>+ % '+' }
-	#rule expr 	{ <expr-p> ('+' <expr-p>)* }
 	rule expr-p	{ <num> | <var> }
 	token num	{ <[0..9]>+ }
 }
@@ -86,15 +85,22 @@ class A {
 	method !add-var($k, $v) { %.varnames{$k} = $v; }
 	method !add-var1($k) { %.varnames{$k} = 0; }
 
-	method TOP ($/) { say $bye; write-varnames $.varnames ; }
+	method TOP ($/) { say $<stmts>.made;  say $bye; write-varnames $.varnames ; }
+
+	method stmts($/) {
+		my $res; 
+		for @<statement> -> $stm { my $st1 = $stm.made ; $res ~= "$st1\n"; }
+		$/.make($res);
+
+	}
 
 	method statement($/) { 
 		if $<print-stmt> {
-			say $<print-stmt>.made; 
+			$/.make($<print-stmt>.made); 
 		} elsif $<assign> {
-			say $<assign>.made;
+			$/.make($<assign>.made);
 		} elsif $<for-loop> {
-			say $<for-loop>.made;
+			$/.make($<for-loop>.made);
 		}
 
 	}
@@ -152,12 +158,10 @@ $end-for:	@for:end
 	}
 
 	method expr($/) {
-		#say "@ expr:";
 		my $res = "\t@ begin expr statement\n";
 		my $n = $<expr-p>.elems;
 		my $asm = @<expr-p>[0].made;
 
-		#say $asm;
 		$res = $res ~ $<expr-p>.first.made;
 		@<expr-p>.shift;		
 		for @<expr-p> -> $x {
@@ -169,7 +173,6 @@ $end-for:	@for:end
 
 		}
 		$res ~= "\t@end expr statement\n";
-		#say $res;
 		$/.make($res);
 		#say $<expr-p>.elems; 
 	}
@@ -184,17 +187,15 @@ $end-for:	@for:end
 			$label = "$<var>";
 			self!add-var($label, 0);
 		}
-		my $asm = "ldr r0, =$label";
-		my $res  =  "\n\t@ expr-p:num move a constant to a register\n\t$asm\n\tldr r0, [r0]\n\n";
+		#my $asm = "ldr r0, =$label";
+		#my $res  =  "\n\t@ expr-p:num move a constant to a register\n\t$asm\n\tldr r0, [r0]\n\n";
+		my $res = "	load 	r0, $label\n";
 		$/.make($res);
 	}
 
 	method print-stmt($/) { 
 		my $res = $<expr>.made ~ "\n	bl	printd\n";
 		$/.make($res);
-		#say "\t@ print statement"; 
-		#say "\tmov	r0, #66" ;
-		#tsay "bl	printd";
 	}
 
 	method var ($/) { my $vname = $/.Str ; xsay "Adding var: $vname" ; self!add-var($vname,  0) ; }
