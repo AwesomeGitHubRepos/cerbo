@@ -1,6 +1,7 @@
 #use trace;
 
 sub xsay($x) {}
+sub tsay($x) { say "\t$x"; }
 
 
 grammar G {
@@ -12,7 +13,8 @@ grammar G {
 	rule assign	{ 'let' <var> '=' <expr> }
 
 	token var 	{ <[a..z]>+   }
-	rule expr 	{ <expr-p> ('+' <expr-p>)* }
+	rule expr 	{ <expr-p>+ % '+' }
+	#rule expr 	{ <expr-p> ('+' <expr-p>)* }
 	rule expr-p	{ <num> | <var> }
  	token num	{ <[0..9]>+ }
 }
@@ -50,28 +52,43 @@ _printd:
 	.asciz "Printing %d\n"	
 ];
 
-sub write-varnames($vnames) {
+sub write-varnames(%vnames) {
 
 	say "@ variables";
-	for $vnames.keys.sort {
-		say ".balign 4\n$_: .word 0";
+	for  %vnames.keys.sort -> $k {
+		say ".balign 4\n$k: .word %vnames{$k}";
 	}
 }
 
 
 class A {
-	has $.varnames = SetHash.new;
+	has %.varnames;
+
+	method !add-var($k, $v) { %.varnames{$k} = $v; }
 
 	method TOP ($/) { ; say $bye; write-varnames $.varnames ; }
 
+	method expr-p($/) {
+		if $<num> {
+			my $label = "const_$<num>";
+			self!add-var( $label , $<num>);
+			tsay "@ move a constant to a register";
+			tsay "ldr r0, =$label";
+			tsay "ldr r0, [r0]";
+			tsay ""
+		} else {
+			say "var found";
+		}
+	}
+
 	method print-stmt($/) { 
-		say "\t@ print statement"; 
-		say "\tmov	r0, #66" ;
-		say "\tbl	printd";
+		#say "\t@ print statement"; 
+		#say "\tmov	r0, #66" ;
+		tsay "bl	printd";
 	}
 
 	method for-loop($/) { }
-	method var ($/) { my $vname = $/.Str ; xsay "Adding var: $vname" ; $.varnames{"$vname"}++ ; }
+	method var ($/) { my $vname = $/.Str ; xsay "Adding var: $vname" ; self!add-var($vname,  0) ; }
 } 
 
 my $acts = A.new;
