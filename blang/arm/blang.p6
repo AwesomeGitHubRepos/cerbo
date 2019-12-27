@@ -181,19 +181,19 @@ $end-for:	@for:end
 	}
 
 	method expr-p($/) {
-		my $label;
+		#my $label;
 		if $<num> {
-			$label = "const_$<num>";
-			self!add-var( $label , $<num>);
+			#$label = "const_$<num>";
+			#self!add-var( $label , $<num>);
+			$/.make("	ldr 	r0, =" ~ $<num> ~ "	@ expr-p const\n");
 
 		} else {
-			$label = "$<var>";
+			my $label = "$<var>";
 			self!add-var($label, 0);
+			$/.make("	load 	r0, $label	@ expr-p var\n");
 		}
-		#my $asm = "ldr r0, =$label";
-		#my $res  =  "\n\t@ expr-p:num move a constant to a register\n\t$asm\n\tldr r0, [r0]\n\n";
-		my $res = "	load 	r0, $label\n";
-		$/.make($res);
+		#my $res = "	load 	r0, $label\n";
+		#$/.make($res);
 	}
 
 	method print-stmt($/) { 
