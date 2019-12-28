@@ -5,9 +5,12 @@ else
 	CC = arm-linux-gnueabi-gcc
 endif
 
-BINS = hello ast sum parabola
+BINS = catasm hello ast sum parabola
 
 all : $(BINS)
+
+catasm : catasm.s
+	$(CC) -static $^ -o $@
 
 parabola : parabola.S
 	$(CC) -static $^ -o $@
