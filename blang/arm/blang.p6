@@ -60,7 +60,7 @@ my $bye = Q [
 	printd:
 	stmdb 	sp!, {lr}
 	mov	r1, r0
-	ldr	r0, =_printd
+	adr	r0, _printd
 	bl 	printf
 	ldmia	sp!, {pc}
 	_printd:
@@ -72,7 +72,8 @@ sub write-varnames(%vnames) {
 	say "@ variables";
 	say ".data";
 	for  %vnames.keys.sort -> $k {
-		say ".balign 4\n$k: .word %vnames{$k}";
+		#say ".balign 4\n$k: .word %vnames{$k}";
+		say "$k: .word %vnames{$k}";
 	}
 }
 
