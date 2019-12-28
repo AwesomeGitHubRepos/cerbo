@@ -9,7 +9,8 @@ main:
 loop:
 	bl	getchar
 	cmp	r0, #-1 @ test for EOF
-	beq	end_loop
+	@beq	end_loop
+	addeq	pc, pc, #4
 	blne	putchar
 	b	loop
 end_loop:
