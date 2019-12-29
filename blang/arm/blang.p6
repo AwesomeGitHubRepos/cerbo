@@ -136,8 +136,6 @@ $for-test:
 	cmp  r0, r1
 	bgt $end-for
 
-	@ ...
-	@ bl printd @ print var TODO remove
 	$stmts
 
 	@ for:next
