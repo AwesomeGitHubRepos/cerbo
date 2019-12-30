@@ -7,14 +7,19 @@ sub tsay($x) { say "\t$x"; }
 grammar G {
 	rule TOP 	{ ^ <stmts> $ }
 	rule stmts 	{ <statement>* }
-	rule statement 	{ <print-stmt> | <for-loop> | <assign> }
+	rule statement 	{ <printstr> | <print-stmt> | <for-loop> | <assign>   }
+	#rule dim	{ 'dim' <var> '(' <expr> ')' }
+	rule printstr	{ 'printstr' <expr> }
 	rule print-stmt	{ 'print' <expr> }
 	rule for-loop 	{ 'for' <var> '=' <from=.expr> 'to'  <to=.expr>  <stmts> 'next' }
 	rule assign	{ 'let' <var> '=' <expr> }
 
+	#token kstr	{ '"' <!before '"'>  }
+	token kstr	{ '"' .*? '"'  }
+	#regex kstr	{ ("\""([^\n\"\\]*(\\[.\n])*)*"\"") }
 	token var 	{ <[a..z]>+   }
 	rule expr 	{ <expr-p>+ % '+' }
-	rule expr-p	{ <num> | <var> }
+	rule expr-p	{ <num> | <var> | <kstr> }
 	token num	{ <[0..9]>+ }
 }
 
@@ -65,6 +70,13 @@ my $bye = Q [
 	ldmia	sp!, {pc}
 	_printd:
 	.asciz "Printing %d\n"	
+	.balign 4
+
+	@ FUNC: print string
+	printstr:
+	stmdb	sp!, {lr}
+	bl	puts
+	ldmia	sp!, {pc}
 ];
 
 sub write-varnames(%vnames) {
@@ -72,8 +84,7 @@ sub write-varnames(%vnames) {
 	say "@ variables";
 	say ".data";
 	for  %vnames.keys.sort -> $k {
-		#say ".balign 4\n$k: .word %vnames{$k}";
-		say "$k: .word %vnames{$k}";
+		say "$k: %vnames{$k}";
 	}
 }
 
@@ -82,11 +93,33 @@ sub mklabel() { $lid++; return "L$lid"; }
 
 class A {
 	has %.varnames;
+	#has %.kstrs;
 
-	method !add-var($k, $v) { %.varnames{$k} = $v; }
-	method !add-var1($k) { %.varnames{$k} = 0; }
+	method !add-asciz($k, $str) { %.varnames{$k} = ".asciz $str"};
+	method !add-var($k, $v) { %.varnames{$k} = ".word $v"; }
+	method !add-var1($k) { self!add-var( $k, 0); }
 
 	method TOP ($/) { say $<stmts>.made;  say $bye; write-varnames $.varnames ; }
+
+	method printstr($/) {
+		#my $label = $<expr>.made;
+		my $expr = $<expr>.made;
+		my $res = Q:s [
+	$expr
+	bl printstr
+		];
+		#my $res = "	bl printstr";
+		$/.make($res);
+		#say "printstr action called";
+	}
+
+	method kstr($/) { 
+		my $label = mklabel;
+		#say "kstr label is $label";
+		self!add-asciz( $label, $/.Str);
+		$/.make($label);
+		#%!kstrs{$label} = $/.Str;
+	}
 
 	method stmts($/) {
 		my $res = ""; 
@@ -102,7 +135,9 @@ class A {
 			$/.make($<assign>.made);
 		} elsif $<for-loop> {
 			$/.make($<for-loop>.made);
-		}
+		} elsif $<printstr> {
+			$/.make($<printstr>.made);
+		} else { die "unhandled statement"; }
 
 	}
 
@@ -186,11 +221,16 @@ $end-for:	@for:end
 			#self!add-var( $label , $<num>);
 			$/.make("	ldr 	r0, =" ~ $<num> ~ "	@ expr-p const\n");
 
-		} else {
+		} elsif $<var> {
 			my $label = "$<var>";
 			self!add-var($label, 0);
 			$/.make("	load 	r0, $label	@ expr-p var\n");
-		}
+		} elsif $<kstr> {
+			my $label = $<kstr>.made;
+			$/.make("	ldr	r0, =$label	@ expr-p kstr\n");
+			#say "expr-p:kstr called";
+		} else { die "Unhandles expr-p"; }
+
 		#my $res = "	load 	r0, $label\n";
 		#$/.make($res);
 	}
