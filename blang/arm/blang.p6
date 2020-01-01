@@ -75,17 +75,13 @@ class A {
 	$expr
 	bl printstr
 		];
-		#my $res = "	bl printstr";
 		$/.make($res);
-		#say "printstr action called";
 	}
 
 	method kstr($/) { 
 		my $label = mklabel;
-		#say "kstr label is $label";
 		self!add-asciz( $label, $/.Str);
 		$/.make($label);
-		#%!kstrs{$label} = $/.Str;
 	}
 
 	method stmts($/) {
@@ -109,6 +105,7 @@ class A {
 	}
 
 	method for-loop($/) {
+		
 		my $to-label = mklabel;
 		self!add-var1($to-label);
 		my $for-test = mklabel;
@@ -117,39 +114,12 @@ class A {
 		my $from = $<from>.made;
 		my $to = $<to>.made;
 		my $stmts = $<stmts>.made;
-		#my $stmts = "FOO";
+		my %vals = %( to-label => $to-label, for-test => $for-test, end-for => $end-for, 
+			var => $var, from => $from, to => $to, stmts => $stmts );
 
-
-
-		my $res = Q:s [ 
-	@ FOR
-	@ for:from precalc
-	$from
-	store r0, $var
-
-	@ for:to precalc
-	$to
-	store r0, $to-label
-
-	@ for:test
-$for-test:	
-	load r0, $var
-	load r1, $to-label
-	cmp  r0, r1
-	bgt $end-for
-
-	$stmts
-
-	@ for:next
-	load r0, $var
-	add r0, r0, #1
-	store r0, $var
-	b $for-test
-$end-for:	@for:end
-
-	];
-
-	$/.make($res);
+		my $plate = %plates{"for-loop"};
+		my $res = Template::Mustache.render($plate, %vals);
+		$/.make($res);
 
 	}
 
@@ -182,10 +152,7 @@ $end-for:	@for:end
 	}
 
 	method expr-p($/) {
-		#my $label;
 		if $<num> {
-			#$label = "const_$<num>";
-			#self!add-var( $label , $<num>);
 			$/.make("	ldr 	r0, =" ~ $<num> ~ "	@ expr-p const\n");
 
 		} elsif $<var> {
@@ -198,8 +165,6 @@ $end-for:	@for:end
 			#say "expr-p:kstr called";
 		} else { die "Unhandles expr-p"; }
 
-		#my $res = "	load 	r0, $label\n";
-		#$/.make($res);
 	}
 
 	method print-stmt($/) { 

@@ -1,4 +1,4 @@
-for i = 1 to 5
+for i = 1 to 3+2
 	print i
 next
 

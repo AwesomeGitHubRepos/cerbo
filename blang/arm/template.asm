@@ -1,3 +1,30 @@
+for-loop
+	@ FOR
+	@ for:from precalc
+	{{from}}
+	store r0, {{var}}
+
+	@ for:to precalc
+	{{to}}
+	store r0, {{to-label}}
+
+	@ for:test
+{{for-test}}:
+	load r0, {{var}}
+	load r1, {{to-label}}
+	cmp  r0, r1
+	bgt {{end-for}}
+
+	{{stmts}}
+
+	@ for:next
+	load r0, {{var}}
+	add r0, r0, #1
+	store r0, {{var}}
+	b {{for-test}}
+{{end-for}}:	@for:end
+
+%%
 prologue
 	@ Automatically-generated assembler code
 
