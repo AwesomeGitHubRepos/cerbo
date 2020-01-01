@@ -1,7 +1,10 @@
+use Template::Mustache;
 #use trace;
 
 sub xsay($x) {}
 sub tsay($x) { say "\t$x"; }
+
+
 
 
 grammar G {
@@ -28,56 +31,20 @@ my $input = slurp;
 my $m = G.parse($input);
 xsay $m;
 
-# print the prologue 
-say  Q [
-	@ Automatically-generated assembler code
+my $template = slurp  "template.asm";
+my @plates = split("%%\n", $template);
+my %plates;
+for @plates -> $p {
+	my @kv = split "\n", $p, 2;
+	my $k =  @kv[0];
+	my $v =  @kv[1];
+	%plates{$k} = $v;
+}
 
-	@ macros
-
-	.macro load reg, addr
-	ldr \reg, =\addr
-	ldr \reg, [\reg]
-	.endm
-
-	.macro store reg, addr
-	push {r4}
-	ldr r4, =\addr
-	str \reg, [r4]
-	pop {r4}
-	.endm
+say %plates{"prologue"};
 
 
-	.global main
-	main:
-	@ entry point
-	push    {ip, lr}
-];
 
-
-# exit and cleanup before we start putting out data
-my $bye = Q [
-	@ exit and cleanup
-	mov	r0, #0 @ return value 0
-	pop	{ip, pc}
-
-	@ FUNC: print integer
-	@ IN: r0 integer to be printed
-	printd:
-	stmdb 	sp!, {lr}
-	mov	r1, r0
-	adr	r0, _printd
-	bl 	printf
-	ldmia	sp!, {pc}
-	_printd:
-	.asciz "Printing %d\n"	
-	.balign 4
-
-	@ FUNC: print string
-	printstr:
-	stmdb	sp!, {lr}
-	bl	puts
-	ldmia	sp!, {pc}
-];
 
 sub write-varnames(%vnames) {
 
@@ -99,7 +66,7 @@ class A {
 	method !add-var($k, $v) { %.varnames{$k} = ".word $v"; }
 	method !add-var1($k) { self!add-var( $k, 0); }
 
-	method TOP ($/) { say $<stmts>.made;  say $bye; write-varnames $.varnames ; }
+	method TOP ($/) { say $<stmts>.made; say %plates{"epilogue"}  ; write-varnames $.varnames ; }
 
 	method printstr($/) {
 		#my $label = $<expr>.made;
