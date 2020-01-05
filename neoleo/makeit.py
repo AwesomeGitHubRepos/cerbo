@@ -7,7 +7,7 @@ import shutil
 from string import Template
 from importlib import reload
 
-BDIR= "/home/mcarter/repos/neoleo"
+BDIR= "/home/pi/repos/neoleo"
 
 def config_version():
     # get the version according to configure.ac
