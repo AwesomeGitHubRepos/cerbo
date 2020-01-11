@@ -5,9 +5,12 @@ else
 	CC = arm-linux-gnueabi-gcc
 endif
 
-BINS = catasm hello ast sum parabola
+BINS = catasm hello ast sum parabola mean
 
 all : $(BINS)
+
+mean : mean.s
+	$(CC) -mfpu=vfp -static $^ -o $@
 
 catasm : catasm.s
 	$(CC) -static $^ -o $@
