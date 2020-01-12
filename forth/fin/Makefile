@@ -1,2 +1,5 @@
-fin : fin.nim
-	nim c $^
+fin : fin.c
+	gcc $^ -o $@
+
+#fin : fin.nim
+#	nim c $^
