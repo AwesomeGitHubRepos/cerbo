@@ -1,3 +1,0 @@
-csv : csv.f90
-	gfortran csv.f90 -o csv
-
