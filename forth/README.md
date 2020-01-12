@@ -28,3 +28,7 @@ Similarly: `: count 5 [ here ] dup . 1 - dup ?branch [ , ] ;`
 ## References
 
 * [Forth Simplicity](http://wiki.c2.com/?ForthSimplicity) - defines IMMEDIATE?, NEXTWORD, NUMBER,, COMPILEWORD, [, ].
+
+## Also
+
+* [fin](fin) - Forth In Nim - an experiment to see if I can write a boot-strapping forth using Nim
