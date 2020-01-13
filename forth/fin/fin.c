@@ -12,6 +12,8 @@ char lwc; // last work created
 char heap[1000];
 int hptr = 0;
 
+int ip;
+
 int sstack[100];
 int sp = 0;
 void spush(int v) { sstack[sp++] = v; }
@@ -34,14 +36,18 @@ void define()
 
 void run(char ch)
 {
-	//puts("Running");
-	//char ch = lwc;
-	//static hp_end = dict
 	dict_s d = dict[ch];
-	int ip = d.hp;
+	int ip0 = ip = d.hp;
 	while(1) {
 		ch = heap[ip++];
 		if(ch == ';') break;
+		if(ch == 'x') {
+		       if(spop()) 
+			       break;
+		       else
+			       continue;
+		}
+		if(ch == 'a') { ip = ip0; continue; }
 		d = dict[ch];
 		if(d.prim) {
 			codeptr fn = (codeptr) d.hp;
@@ -57,21 +63,19 @@ void run(char ch)
 }
 
 
-void p_key()
-{
-	spush(getchar());
-	//puts("key called");
-}
-
-
-void p_emit()
-{
-	putchar(spop());
-	//puts("emit called");
-}
+void p_key() { spush(getchar()); }
+void p_emit() { putchar(spop()); }
+void p_push_lit_char() { spush(heap[ip++]); } 
+void p_minus() { spush(-spop() + spop()); }
+void p_dup()  { int v = spop(); spush(v); spush(v); }
+void p_not()	{ if(spop()==0) spush(1); else spush(0); }
 
 typedef struct {char name; void* fn; } prim_s;
 prim_s prims[] = {
+	{'~', p_not},
+	{'d', p_dup},
+	{'-', p_minus},
+	{'c', p_push_lit_char},
 	{'k', p_key},
 	{'e', p_emit},
 	0

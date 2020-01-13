@@ -1,3 +1,3 @@
 file ./fin
 b 44
-r <test01.4th
+r <test02.4th
