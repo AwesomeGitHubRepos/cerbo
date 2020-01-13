@@ -23,14 +23,14 @@ void define()
 		heap[hptr++] = ch;
 		if(ch== ';') break;
 	}
-	puts("Finished definition");
+	//puts("Finished definition");
 
 }
 
-void run()
+void run(char ch)
 {
-	puts("Running");
-	char ch = lwc;
+	//puts("Running");
+	//char ch = lwc;
 	//static hp_end = dict
 	dict_s d = dict[ch];
 	int ip = d.hp;
@@ -41,10 +41,11 @@ void run()
 		if(d.prim) {
 			codeptr fn = (codeptr) d.hp;
 			fn();
+		} else {
+			run(ch);
 		}
-		// TODO
 	}
-	puts("Finished running");
+	//puts("Finished running");
 
 
 
@@ -96,13 +97,13 @@ int main()
 				define();
 				break;
 			case 'r':
-				run();
+				run(lwc);
 				break;
 			case 'h': // halt
 				goto finis;
 				break;
 		}
-		puts("ok");
+		//puts("ok");
 	}
 finis:
 	puts("Halted");
