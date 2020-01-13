@@ -12,6 +12,11 @@ char lwc; // last work created
 char heap[1000];
 int hptr = 0;
 
+int sstack[100];
+int sp = 0;
+void spush(int v) { sstack[sp++] = v; }
+int spop() {return sstack[--sp]; }
+
 void define()
 {
 	int ch = getchar();
@@ -54,13 +59,15 @@ void run(char ch)
 
 void p_key()
 {
-	puts("key called");
+	spush(getchar());
+	//puts("key called");
 }
 
 
 void p_emit()
 {
-	puts("emit called");
+	putchar(spop());
+	//puts("emit called");
 }
 
 typedef struct {char name; void* fn; } prim_s;
