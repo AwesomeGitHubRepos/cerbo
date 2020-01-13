@@ -31,8 +31,13 @@ void run()
 {
 	puts("Running");
 	char ch = lwc;
-	while(ch != ';') {
-		dict_s d = dict[ch];
+	//static hp_end = dict
+	dict_s d = dict[ch];
+	int ip = d.hp;
+	while(1) {
+		ch = heap[ip++];
+		if(ch == ';') break;
+		d = dict[ch];
 		if(d.prim) {
 			codeptr fn = (codeptr) d.hp;
 			fn();
@@ -66,9 +71,10 @@ prim_s prims[] = {
 
 void add_prims()
 {
+	char ch;
 	prim_s* p = prims;
-	while(p) {
-		char ch = p->name;
+	while(ch = p->name) {
+		//char ch = p->name;
 		dict[ch].hp = (int64) p->fn;
 		dict[ch].prim = true;
 		p++;
@@ -80,6 +86,8 @@ int main()
 {
 	printf("int:%ld, void*:%ld\n", sizeof(int64), sizeof(void*));
 	assert(sizeof(int64) >= sizeof(void*));
+
+	add_prims();
 	int ch;
 	while(ch = getchar()) {
 		if(ch == EOF) break;

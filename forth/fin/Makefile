@@ -1,5 +1,8 @@
 fin : fin.c
-	gcc $^ -o $@
+	gcc -g $^ -o $@
+
+clean:
+	rm -f fin
 
 #fin : fin.nim
 #	nim c $^
