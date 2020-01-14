@@ -3,4 +3,11 @@ forth : forth.c
 	gcc -ggdb $^ -o $@ 
 
 clean:
-	rm -f forth
+	rm -f forth out
+
+check :
+	rm -f out
+	./run-tests > out
+	@echo "Diffs>"
+	@diff expected out
+
