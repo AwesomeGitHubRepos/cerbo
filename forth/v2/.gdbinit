@@ -1,4 +1,2 @@
-#b 275
-b code
-#r <life.4th
-r <../v1/builds.4th
+file ./forth
+r <defer.4th

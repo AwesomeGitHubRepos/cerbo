@@ -151,7 +151,7 @@ void create_header(ubyte flags, char* zname)
 	hptr += sizeof(dw);
 }
 
-void createz(ubyte flags, char* zname, cell_t acf) // zname being a null-terminated string
+void createz (ubyte flags, char* zname, cell_t acf) // zname being a null-terminated string
 {
 	create_header(flags, zname);
 	heapify(acf);
@@ -202,14 +202,33 @@ void embed_literal(cell_t v)
 
 char* token;
 char* rest;
+/*
 char* delim_word (char* delims, bool upper)
 {
 	token = strtok_r(rest, delims, &rest);
 	if(upper) strupr(token);
 	return token;
 }
+*/
 
-char* word () { delim_word(" \t\n", true); }
+char* get_word () 
+{ 
+	if(rest == 0) {
+		token = tib;
+	} else {
+		token = rest + 1;
+	}
+
+	if(*token ==0) return 0;
+	while(isspace(*token)) token++;
+	rest = token;
+	while(!isspace(*rest) && *rest) rest++;
+	*rest = 0;
+	strupr(token);
+	//printf("word:toke:<%s>\n", token);
+	if(*token == 0) token = 0;
+	return token;
+}
 
 
 
@@ -249,7 +268,7 @@ void p_dot() { printf(cell_fmt, pop()); }
 
 void p_tick()
 {
-	word();
+	get_word();
 	codeptr cfa = cfa_find(token);
 	if(cfa)
 		push((cell_t) cfa);
@@ -257,7 +276,7 @@ void p_tick()
 		undefined(token);
 }
 
-void execute(codeptr cfa)	
+void execute (codeptr cfa)	
 {
 	W = (cellptr) cfa;
 	codeptr fn = (codeptr) dref(cfa);
@@ -299,7 +318,7 @@ void p_semi()
 
 void p_colon()
 {
-	word();
+	get_word();
 	createz(0, token, (cell_t) docol); 
 	compiling = true;
 }
@@ -314,7 +333,7 @@ void p_at () { push(dref((void*)pop())); }
 void p_exc() { cell_t pos = pop(); cell_t val = pop(); store(pos, val); }
 
 void _create() { push((cell_t)++W); }
-void p_create() { word(); createz(0, token, (cell_t) _create); }
+void p_create() { get_word(); createz(0, token, (cell_t) _create); }
 void p_comma() { heapify(pop()); }
 void p_prompt () { show_prompt = (bool) pop(); }
 
@@ -340,15 +359,30 @@ void p_dup()
 
 void p_z_slash () 
 { 
-	cell_t loc = (cell_t)hptr;
+	//cell_t loc = (cell_t)hptr + sizeof(cell_t);
+	cell_t loc = (cell_t)hptr + 0* sizeof(cell_t);
 	if(compiling) {
 		heapify_word("BRANCH");
 		loc = (cell_t) hptr;
 		heapify(2572); // leet for zstr
 	}
 
-	char* src = delim_word("\"", false);
-	do {} while(*hptr++ = *src++);
+	//char* src = 0; // delim_word("\"", false);
+	 
+	//do {} while(*hptr++ = *src++);
+	token += 3; // movwe beyong the z" 
+	while(1) {
+		*hptr = *token;
+		if(*hptr == '"' || *hptr == 0) break;
+		hptr++;
+		token++;
+	}
+	rest = token;
+	*hptr = 0;
+	hptr++;
+
+	// alignment issues?
+	//while((cell_t) hptr % sizeof(cell_t)) hptr++;
 
 	if(compiling) {
 		store(loc, (cell_t)hptr); // backfil to after the embedded string
@@ -412,7 +446,14 @@ void p_branch()
 	RTOP = dref((void*) RTOP);
 }
 
-void p_bslash () { strtok_r(rest, "\n", &rest); }
+void p_bslash () 
+{ 
+	//puts("found baslah");
+	while(*rest) rest++;
+	rest--;
+	//token = 0;
+}
+
 void p_drop () { pop(); }
 
 
@@ -447,9 +488,9 @@ void p_does() // is immeditate
 }
 
 
-void p_builds() // not an immediate word
+void p_builds () // not an immediate word
 {
-	word();
+	get_word();
 	createz(0, token, (cell_t) docol);
 
 	heapify_word("LIT");
@@ -463,10 +504,55 @@ void p_builds() // not an immediate word
 	heapify_word(";");
 }
 
+void p_xdefer()
+{
+	puts("DEFER not set");
+}
 
+void p_defer()
+{
+	//p_create();
+	get_word();
+	DEBUG(printf("defer:token:%s\n", token));
+	createz(0, token, (cell_t) docol);
+	//create_header(0, token);
+	//heapify_word("DOCOL");
+	DEBUG(printf("DEFER:loc: %p\n", hptr));
+	heapify_word("XDEFER");
+	heapify_word(";");
+	//hptr +=sizeof(cell_t) ; /// hmm suspicious
+}
+
+
+
+void p_is ()
+{
+	get_word();
+	cell_t cfa = (cell_t) cfa_find(token);
+	if(cfa) {
+		cell_t offset = cfa + 1 *sizeof(cell_t);
+		DEBUG(printf("IS:offset: %p\n", (void*) offset));
+		DEBUG(printf("IS:xdefer: %p\n", p_xdefer));
+		codeptr xt = (codeptr) pop(); 
+		store(offset, (cell_t)xt);
+		return;
+	} else
+		undefined(token);
+
+}
+
+void p_len()
+{
+	push(strlen((const char*) pop()));
+}
+		
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"LEN", p_len},
+	{0,	"DEFER", p_defer},
+	{0,	"XDEFER", p_xdefer},
+	{0,	"IS", p_is}, // probably needs to be an immediate word
 	{0, 	"<BUILDS", p_builds},
 	{F_IMM,	"DOES>", p_does},
 	{0, 	"(DOES>)", p_dodoes},
@@ -536,6 +622,7 @@ char* derived[] = {
 	": CONSTANT <builds , does> @ ;",
 	": BEGIN here ; immediate",
 	": ?AGAIN compile ?branch , ; immediate",
+	//": DEFER 	<builds  [ ' xdefer ] , does> @  execute ;",
 	0
 };
 
@@ -570,8 +657,10 @@ void process_token(char* token)
 }
 void process_tib()
 {
-	rest = tib;
-	while(word()) process_token(token);
+	//token = tib;
+	//rest = tib;
+	rest = 0;
+	while(get_word()) process_token(token);
 }
 int main()
 {
