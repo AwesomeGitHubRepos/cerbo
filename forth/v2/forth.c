@@ -503,6 +503,8 @@ char* derived[] = {
 	": THEN here swap ! ; immediate",
 	": ELSE compile branch here >r 0 , here swap ! r> ; immediate", 
 	": CONSTANT <builds , does> @ ;",
+	": BEGIN here ; immediate",
+	": ?AGAIN compile ?branch , ; immediate",
 	0
 };
 
