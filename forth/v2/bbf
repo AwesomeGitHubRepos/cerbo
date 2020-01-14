@@ -12,5 +12,7 @@ case $1 in
     h) print_help ; echo . ; exit ;;
 esac
 
-rlwrap ./forth
+PATH=.:$PATH
+FTH=`which forth`
+rlwrap $FTH
 
