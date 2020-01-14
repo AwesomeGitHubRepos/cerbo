@@ -338,11 +338,41 @@ void p_dup()
 	push(v);
 }
 
-void p_z_slash () { delim_word("\"", false); push((cell_t)token); }
+void p_z_slash () 
+{ 
+	cell_t loc = (cell_t)hptr;
+	if(compiling) {
+		heapify_word("BRANCH");
+		loc = (cell_t) hptr;
+		heapify(2572); // leet for zstr
+	}
+
+	char* src = delim_word("\"", false);
+	do {} while(*hptr++ = *src++);
+
+	if(compiling) {
+		store(loc, (cell_t)hptr); // backfil to after the embedded string
+		heapify_word("LIT");
+		heapify(loc + sizeof(cell_t));
+
+	} else
+		push(loc); 
+}
+
+void p_type () { printf("%s", (char*) pop()); }
+
+void p_dot_slash () 
+{
+	p_z_slash();
+	if(compiling)
+		heapify_word("TYPE");
+	else
+		p_type();
+}
+
 void p_emit() { printf("%c", (char)pop()); }
 void p_swap() { cell_t temp = STOP; STOP = STOP_1; STOP_1 = temp; }
 void p_immediate() { latest->flags |= F_IMM; }
-void p_type () { printf("%s", (char*) pop()); }
 
 void p_0branch()
 {
@@ -451,7 +481,8 @@ prim_s prims[] =  {
 	{0, 	"IMMEDIATE", p_immediate},
 	{0, 	"SWAP", p_swap},
 	{0, 	"EMIT", p_emit},
-	{0, 	"Z\"", p_z_slash},
+	{F_IMM,	"Z\"", p_z_slash},
+	{F_IMM,	".\"", p_dot_slash},
 	{0,	 "DUP", p_dup},
 	{F_IMM,	"[", p_lsb},
 	{0, 	"]", p_rsb},
@@ -498,7 +529,7 @@ char* derived[] = {
 	": VARIABLE create 0 , ;",
 	": 1+ 1 + ;",
 	": CR 10 emit ;",
-	": .\" z\" type ;",
+	//": .\" z\" type ;",
 	": IF compile 0branch here 0 , ; immediate",
 	": THEN here swap ! ; immediate",
 	": ELSE compile branch here >r 0 , here swap ! r> ; immediate", 
