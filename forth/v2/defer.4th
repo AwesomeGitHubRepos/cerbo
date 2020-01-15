@@ -12,7 +12,7 @@ bar @ execute
 
 ." -------------" cr
 defer foo
- foo
+\ foo
 \ ' foo . cr
  : s 666 . cr ;
 \ s

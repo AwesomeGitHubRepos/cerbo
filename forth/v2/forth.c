@@ -511,6 +511,7 @@ void p_xdefer()
 
 void p_defer()
 {
+	puts("defer:called");
 	//p_create();
 	get_word();
 	DEBUG(printf("defer:token:%s\n", token));
