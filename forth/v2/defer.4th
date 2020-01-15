@@ -1,5 +1,15 @@
 0 prompt
 
+' xdefer constant 'xdefer
+: def <builds 'xdefer , does> @ execute ;
+def baz
+: s 1 . ;
+' baz .name
+' baz 8 +  @ .
+' 'xdefer .
+s ' is baz
+baz
+
   variable  bar 
 ' xdefer bar !
 

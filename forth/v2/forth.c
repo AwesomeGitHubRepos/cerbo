@@ -546,9 +546,14 @@ void p_len()
 	push(strlen((const char*) pop()));
 }
 		
+void p_name()
+{
+	puts(name_cfa((cellptr) pop()));
+}
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	".NAME", p_name},
 	{0,	"LEN", p_len},
 	{0,	"XDEFER", p_xdefer},
 	{0,	"DEFER", p_defer},
