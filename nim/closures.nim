@@ -1,6 +1,6 @@
 #  vim:  ts=4 sw=4 softtabstop=0 expandtab shiftwidth=4 smarttab syntax=off
 
-proc ioto(): proc(): int =
+proc iota(): proc(): int =
     var i = 0
     proc fn (): int =
         i = i + 1
