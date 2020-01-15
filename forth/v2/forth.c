@@ -128,7 +128,7 @@ void undefined(char* token){
 	printf("undefined word:<%s>\n", token);
 }
 
-cell_t dref(void* addr) { return *(cell_t*)addr; }
+cell_t dref (void* addr) { return *(cell_t*)addr; }
 
 void store (cell_t pos, cell_t val) { *(cell_t*)pos = val; }
 
@@ -515,12 +515,11 @@ void p_defer()
 	get_word();
 	DEBUG(printf("defer:token:%s\n", token));
 	createz(0, token, (cell_t) docol);
-	//create_header(0, token);
-	//heapify_word("DOCOL");
-	DEBUG(printf("DEFER:loc: %p\n", hptr));
+	//codeptr cfa = cfa_find("XDEFER");
+	//embed_literal((cell_t)cfa);
 	heapify_word("XDEFER");
+	//heapify_word("EXECUTE");
 	heapify_word(";");
-	//hptr +=sizeof(cell_t) ; /// hmm suspicious
 }
 
 
@@ -530,10 +529,10 @@ void p_is ()
 	get_word();
 	cell_t cfa = (cell_t) cfa_find(token);
 	if(cfa) {
-		cell_t offset = cfa + 1 *sizeof(cell_t);
+		cell_t offset = cfa + 0 *sizeof(cell_t);
 		DEBUG(printf("IS:offset: %p\n", (void*) offset));
 		DEBUG(printf("IS:xdefer: %p\n", p_xdefer));
-		codeptr xt = (codeptr) pop(); 
+		codeptr xt = (codeptr) dref((void*)pop()); 
 		store(offset, (cell_t)xt);
 		return;
 	} else
@@ -550,8 +549,8 @@ void p_len()
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
 	{0,	"LEN", p_len},
-	{0,	"DEFER", p_defer},
 	{0,	"XDEFER", p_xdefer},
+	{0,	"DEFER", p_defer},
 	{0,	"IS", p_is}, // probably needs to be an immediate word
 	{0, 	"<BUILDS", p_builds},
 	{F_IMM,	"DOES>", p_does},
