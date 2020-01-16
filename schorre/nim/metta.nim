@@ -2,7 +2,7 @@
 
 import streams
 
-var ssin = newStringStream("12  13")
+var ssin = newStringStream("12  + 13")
 
 var yylval = 1
 var yytext = ""
@@ -21,12 +21,26 @@ proc scan_all() =
         echo yytext
 
 proc num(): bool =
-    return yytext == "12"
+    for c in yytext:
+        if c < '0' or c > '9': return false
+    return true;
+
+######################################################################
+
+proc ex3_num(): bool =
+    if not num(): return false
+    echo "LD ", yytext
+    yylex()
+    return true
+
+proc ex3(): bool =
+    return ex3_num()
 
 proc ex1(): bool =
-    return num()
+    return ex3()
 
 
+yylex()
 discard ex1()
 
-scan_all()
+#scan_all()
