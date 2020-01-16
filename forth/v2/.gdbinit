@@ -1,3 +1,3 @@
 file ./forth
-b p_is
-r <defer.4th
+b 567
+r 

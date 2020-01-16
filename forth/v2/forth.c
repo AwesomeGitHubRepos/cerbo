@@ -313,6 +313,7 @@ void docol()
 void p_semi()
 {
 	heapify_word("EXIT");
+	heapify_word(";"); // added for the convenience of SEE so as not to confuse it with EXIT
 	compiling = false;
 }
 
@@ -530,10 +531,12 @@ void p_is ()
 	get_word();
 	cell_t cfa = (cell_t) cfa_find(token);
 	if(cfa) {
-		cell_t offset = cfa + 0 *sizeof(cell_t);
+		cell_t offset = cfa + 1 *sizeof(cell_t);
 		DEBUG(printf("IS:offset: %p\n", (void*) offset));
 		DEBUG(printf("IS:xdefer: %p\n", p_xdefer));
-		codeptr xt = (codeptr) dref((void*)pop()); 
+		cellptr xt = (cellptr) pop(); 
+		printf("IS:token name:%s", name_cfa((cellptr)xt));
+		//codeptr xt = (codeptr) dref((void*)pop()); 
 		store(offset, (cell_t)xt);
 		return;
 	} else
@@ -554,7 +557,7 @@ void p_name()
 void p_see()
 {
 	static cellptr cfa_docol = 0;
-	if(cfa_docol == 0) cfa_docol = (cellptr) cfa_find("DOCOL");
+	if(cfa_docol == 0) cfa_docol = (cellptr) dref(cfa_find("DOCOL"));
 	get_word();
 	cellptr cfa = (cellptr) cfa_find(token);
 	if(cfa == 0) { puts("UNFOUND"); return; }
@@ -564,8 +567,20 @@ void p_see()
 	dw--;
 	if(dw->flags & F_IMM) puts("IMMEDIATE");
 	
-	cfa = (cellptr) dref(cfa);
-	if(cfa != cfa_docol) puts("PRIM"); //sigh. doesn't work
+	//cfa = (cellptr) dref(cfa);
+	if((cellptr) dref(cfa) != cfa_docol) {
+		puts("PRIM");
+		return;
+	} // so far, this works
+
+
+	while(1) {
+		cellptr cfa1 = (cellptr) dref(++cfa);
+		char* name = name_cfa(cfa1);
+		puts(name);
+		if( strcmp(name, ";") == 0) break;
+		//puts("again");
+	}
 
 
 	//puts(name_cfa(cfa));
@@ -575,6 +590,7 @@ void p_see()
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"DOCOL", docol},
 	{0,	"SEE", p_see},
 	{0,	".NAME", p_name},
 	{0,	"LEN", p_len},
