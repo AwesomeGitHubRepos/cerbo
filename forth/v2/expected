@@ -1,10 +1,67 @@
 =============================
+builds.4th
+0 prompt
+z" BUILDS.4th ..." type cr
+\ testing the dreaded <builds/does via constant
+: const <builds , does> @ ;
+11 const eleven
+12 const twelve
+z" Expect 11:" type cr
+eleven . cr
+z" Expect 12" type cr
+twelve . cr
+z" Expect 11:" type cr
+eleven . cr
+z" Expect 12" type cr
+twelve . cr
+z" ... finished" type cr
+1 prompt
+---
+BUILDS.4th ...
+Expect 11:
+11 
+Expect 12
+12 
+Expect 11:
+11 
+Expect 12
+12 
+... finished
+  ok
+
+=============================
 colon1.4th
 0 prompt
 : ho hi ;
 ho
 ---
 hello world
+
+=============================
+defer.4th
+0 prompt
+
+defer foo
+ : s 666 . cr ;
+foo
+
+' hi is foo
+foo
+
+: x ." hello from x" cr ;
+' x is foo
+foo 
+
+
+ : y ." caoi from y" cr ;
+ ' y is foo
+foo
+---
+defer:called
+DEFER not set
+hello world
+hello from x
+caoi from y
 
 =============================
 life.4th

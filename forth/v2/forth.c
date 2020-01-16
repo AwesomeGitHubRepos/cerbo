@@ -295,14 +295,15 @@ char* name_cfa(cellptr cfa)
 
 void docol()
 {
-	static codeptr cfa_exit = 0;
+	static codeptr cfa_exit = 0, cfa_semi = 0;
 	if(cfa_exit==0) cfa_exit = cfa_find("EXIT");
+	if(cfa_semi==0) cfa_semi = cfa_find(";");
 	codeptr cfa;
 	cellptr IP = W;
 	IP++;
 	for(;;) {
 		cfa = (codeptr) dref(IP++);
-		if(cfa == cfa_exit) break;
+		if(cfa == cfa_exit || cfa == cfa_semi) break;
 		rpush((cell_t)IP);
 		execute(cfa);
 		IP = (cellptr) rpop();
@@ -513,14 +514,11 @@ void p_xdefer()
 void p_defer()
 {
 	puts("defer:called");
-	//p_create();
 	get_word();
-	DEBUG(printf("defer:token:%s\n", token));
+	DEBUGX(printf("defer:token:%s\n", token));
 	createz(0, token, (cell_t) docol);
-	//codeptr cfa = cfa_find("XDEFER");
-	//embed_literal((cell_t)cfa);
 	heapify_word("XDEFER");
-	//heapify_word("EXECUTE");
+	heapify_word("EXIT");
 	heapify_word(";");
 }
 
@@ -532,11 +530,10 @@ void p_is ()
 	cell_t cfa = (cell_t) cfa_find(token);
 	if(cfa) {
 		cell_t offset = cfa + 1 *sizeof(cell_t);
-		DEBUG(printf("IS:offset: %p\n", (void*) offset));
-		DEBUG(printf("IS:xdefer: %p\n", p_xdefer));
+		DEBUGX(printf("IS:offset: %p\n", (void*) offset));
+		DEBUGX(printf("IS:xdefer: %p\n", p_xdefer));
 		cellptr xt = (cellptr) pop(); 
-		printf("IS:token name:%s", name_cfa((cellptr)xt));
-		//codeptr xt = (codeptr) dref((void*)pop()); 
+		DEBUGX(printf("IS:token name:%s", name_cfa((cellptr)xt)));
 		store(offset, (cell_t)xt);
 		return;
 	} else
