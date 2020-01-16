@@ -564,6 +564,7 @@ void p_see()
 	dw--;
 	if(dw->flags & F_IMM) puts("IMMEDIATE");
 	
+	cfa = (cellptr) dref(cfa);
 	if(cfa != cfa_docol) puts("PRIM"); //sigh. doesn't work
 
 
