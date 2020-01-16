@@ -1,8 +1,9 @@
 #  vim:  ts=4 sw=4 softtabstop=0 expandtab shiftwidth=4 smarttab syntax=off
 
+import os
 import streams
 
-var ssin = newStringStream("12  + 13")
+var ssin = newStringStream("12  + ( 13 + 14 ) * 15")
 
 var yylval = 1
 var yytext = ""
@@ -27,17 +28,50 @@ proc num(): bool =
 
 ######################################################################
 
+proc mul(): bool =
+    if yytext != "*": return false
+    yylex()
+    return true
+
+proc plus(): bool =
+    if yytext != "+": return false
+    yylex()
+    return true
+
 proc ex3_num(): bool =
     if not num(): return false
     echo "LD ", yytext
     yylex()
     return true
 
+proc ex1(): bool
+
+proc brack(): bool =
+    if yytext != "(": return false
+    yylex();
+    discard ex1();
+    if yytext != ")": echo "expect ')', found ", yytext
+    yylex()
+    #raise OSError 
+    # newOSError(13, "Expected ')'")
+    return true
+
 proc ex3(): bool =
-    return ex3_num()
+    return ex3_num() or brack();
+
+proc ex2(): bool =
+    discard ex3()
+    while mul():
+        discard ex3()
+        echo "MUL"
+    return true
 
 proc ex1(): bool =
-    return ex3()
+    discard ex2()
+    while plus():
+        discard ex2()
+        echo "ADD"
+    return true
 
 
 yylex()
