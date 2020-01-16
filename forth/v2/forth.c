@@ -551,8 +551,30 @@ void p_name()
 	puts(name_cfa((cellptr) pop()));
 }
 
+void p_see()
+{
+	static cellptr cfa_docol = 0;
+	if(cfa_docol == 0) cfa_docol = (cellptr) cfa_find("DOCOL");
+	get_word();
+	cellptr cfa = (cellptr) cfa_find(token);
+	if(cfa == 0) { puts("UNFOUND"); return; }
+	
+	// determine if immediate
+	dent_s* dw = (dent_s*) cfa;
+	dw--;
+	if(dw->flags & F_IMM) puts("IMMEDIATE");
+	
+	if(cfa != cfa_docol) puts("PRIM"); //sigh. doesn't work
+
+
+	//puts(name_cfa(cfa));
+}
+
+
+
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"SEE", p_see},
 	{0,	".NAME", p_name},
 	{0,	"LEN", p_len},
 	{0,	"XDEFER", p_xdefer},
