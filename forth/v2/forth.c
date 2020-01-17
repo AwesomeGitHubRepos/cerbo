@@ -551,6 +551,11 @@ void p_name()
 	puts(name_cfa((cellptr) pop()));
 }
 
+bool streq(const char* str1, const char* str2)
+{
+	return strcmp(str1, str2) == 0;
+}
+
 void p_see()
 {
 	static cellptr cfa_docol = 0;
@@ -575,7 +580,8 @@ void p_see()
 		cellptr cfa1 = (cellptr) dref(++cfa);
 		char* name = name_cfa(cfa1);
 		puts(name);
-		if( strcmp(name, ";") == 0) break;
+		if(streq(name, "LIT")) printf("%ld\n", *(++cfa));
+		if(streq(name, ";")) break;
 		//puts("again");
 	}
 
