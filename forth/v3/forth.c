@@ -689,14 +689,12 @@ char* derived[] = {
 	": VARIABLE create 0 , ;",
 	": 1+ 1 + ;",
 	": CR 10 emit ;",
-	//": .\" z\" type ;",
-	": IF compile 0branch here 0 , ; immediate",
+	": IF postpone 0branch here 0 , ; immediate",
 	": THEN here swap ! ; immediate",
-	": ELSE compile branch here >r 0 , here swap ! r> ; immediate", 
+	": ELSE postpone branch here >r 0 , here swap ! r> ; immediate", 
 	": CONSTANT <builds , does> @ ;",
 	": BEGIN here ; immediate",
-	": ?AGAIN compile ?branch , ; immediate",
-	//": DEFER 	<builds  [ ' xdefer ] , does> @  execute ;",
+	": ?AGAIN postpone ?branch , ; immediate",
 	0
 };
 

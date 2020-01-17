@@ -14,3 +14,8 @@
 : y 		5 begin dup . 1 - dup ?again1 drop cr ;
 ." Expect 5 4 3 2 1" cr
 y
+
+: ?again2	postpone ?again1 ; immediate
+: y 		5 begin dup . 1 - dup ?again2 drop cr ;
+." Expect 5 4 3 2 1" cr
+y
