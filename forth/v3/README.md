@@ -1,7 +1,10 @@
-# bbf - barebones forth v2
+# bbf - barebones forth v3
 
-Indirect threading is used in this version. That is to say that it uses pointers to locations that in turn point to machine code. This is in contrast to
-v1, which stored the address of the dictionary header.
+bbf is written in C and uses direct threading. It supports things like 
+<code>DEFER</code>  <code>&lt;build ... does&gt;</code>, and other goodies.
+It is designed to be as easy to understand as possible, and can be used as
+a basis for further experimentation.
+
 
 ## Glossary
 
