@@ -11,6 +11,7 @@ bbf is a barebones Forth written in C with the following design goals:
 * [v2](v2) - **CURRENT** version. Changed the dictionary layout a little. Compiled words 
 now embed to "cfa" (code field address) instead of the head of the word's dictionary
 definition. Code should therefore run a little faster, although I haven't benchmarked it.
+* [v3](v3) - experimental version. I'm going beyond a strict barebones system now
 
 ## Bugs
 
