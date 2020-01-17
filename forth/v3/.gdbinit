@@ -1,3 +1,3 @@
 file ./forth
-b 567
-r 
+b p_postpone
+r <postpone.4th 

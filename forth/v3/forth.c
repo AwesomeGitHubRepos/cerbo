@@ -410,6 +410,13 @@ void p_emit() { printf("%c", (char)pop()); }
 void p_swap() { cell_t temp = STOP; STOP = STOP_1; STOP_1 = temp; }
 void p_immediate() { latest->flags |= F_IMM; }
 
+bool is_immediate(codeptr cfa) 
+{
+	dent_s* dw = (dent_s*) cfa;
+	dw--;
+	return (dw->flags & F_IMM);
+}
+
 void p_0branch()
 {
 	if(!pop()) 
@@ -419,11 +426,27 @@ void p_0branch()
 }
 
 
-void p_compile()
+void p_compile() 
 {
 	cell_t cell = dref((void*)RTOP);
 	heapify(cell);
 	RTOP += sizeof(cell_t);
+}
+void p_postpone ()
+{
+	//cellptr caller = (cellptr) dref((void*)RTOP);
+	//DEBUG(printf("POSTPONE:caller name:%s", name_cfa(caller)));
+	//heapify(cell);
+	//RTOP += sizeof(cell_t);
+	get_word();
+	codeptr cfa = (codeptr) cfa_find(token);
+	if(is_immediate(cfa)) {
+		//embed_literal((cell_t) cfa);
+		heapify_word(token);
+	} else {
+		heapify_word("COMPILE");
+		heapify_word(token);
+	}
 }
 
 
@@ -563,11 +586,13 @@ void p_see()
 	get_word();
 	cellptr cfa = (cellptr) cfa_find(token);
 	if(cfa == 0) { puts("UNFOUND"); return; }
+	printf(": %s\n",token);
 	
+	if(is_immediate((codeptr) cfa)) puts("IMMEDIATE");	
 	// determine if immediate
-	dent_s* dw = (dent_s*) cfa;
-	dw--;
-	if(dw->flags & F_IMM) puts("IMMEDIATE");
+	//dent_s* dw = (dent_s*) cfa;
+	//dw--;
+	//if(dw->flags & F_IMM) puts("IMMEDIATE");
 	
 	//cfa = (cellptr) dref(cfa);
 	if((cellptr) dref(cfa) != cfa_docol) {
@@ -580,7 +605,8 @@ void p_see()
 		cellptr cfa1 = (cellptr) dref(++cfa);
 		char* name = name_cfa(cfa1);
 		puts(name);
-		if(streq(name, "LIT")) printf("%ld\n", *(++cfa));
+		if(streq(name, "LIT") || streq(name, "0BRANCH") || streq(name, "?BRANCH") ) 
+			printf("%ld\n", *(++cfa));
 		if(streq(name, ";")) break;
 		//puts("again");
 	}
@@ -593,6 +619,7 @@ void p_see()
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{F_IMM,	"POSTPONE", p_postpone},
 	{0,	"DOCOL", docol},
 	{0,	"SEE", p_see},
 	{0,	".NAME", p_name},
