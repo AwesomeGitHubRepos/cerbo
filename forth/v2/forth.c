@@ -513,7 +513,7 @@ void p_xdefer()
 
 void p_defer()
 {
-	puts("defer:called");
+	//puts("defer:called");
 	get_word();
 	DEBUGX(printf("defer:token:%s\n", token));
 	createz(0, token, (cell_t) docol);

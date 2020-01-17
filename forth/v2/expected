@@ -57,7 +57,6 @@ foo
  ' y is foo
 foo
 ---
-defer:called
 DEFER not set
 hello world
 hello from x
