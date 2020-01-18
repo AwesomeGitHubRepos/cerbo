@@ -70,6 +70,36 @@ life .s
 ---
 Stack: (1):42 
 =============================
+literal.4th
+0 prompt
+: f  [ 1 2 + ] literal  ;
+." Expect: 3 3" cr
+f  . f  . cr
+
+: g [ f 1 + ] literal . ;
+." Expect: 4 4" cr
+g g cr
+
+: n23     23  postpone literal    ; immediate
+: nn n23 . cr ;
+." Expect 23:" cr
+nn
+." Expect 23:" cr
+nn
+
+.s cr
+---
+Expect: 3 3
+3 3 
+Expect: 4 4
+4 4 
+Expect 23:
+23 
+Expect 23:
+23 
+Stack: (0):
+
+=============================
 postpone.4th
 0 prompt
 : end postpone then ; immediate

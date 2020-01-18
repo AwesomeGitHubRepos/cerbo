@@ -1,3 +1,4 @@
 file ./forth
-b p_postpone
-r <postpone.4th 
+#b p_postpone
+b 587
+r <literal.4th 

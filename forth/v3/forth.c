@@ -4,7 +4,7 @@
  *
  * Enjoy!
  *
- * Mark Carter, Nov 2019
+ * Mark Carter, Jan 2020
  *
  */
 
@@ -434,10 +434,6 @@ void p_compile()
 }
 void p_postpone ()
 {
-	//cellptr caller = (cellptr) dref((void*)RTOP);
-	//DEBUG(printf("POSTPONE:caller name:%s", name_cfa(caller)));
-	//heapify(cell);
-	//RTOP += sizeof(cell_t);
 	get_word();
 	codeptr cfa = (codeptr) cfa_find(token);
 	if(is_immediate(cfa)) {
@@ -449,6 +445,13 @@ void p_postpone ()
 	}
 }
 
+void p_literal ()
+{
+	cell_t v = pop();
+	embed_literal(v);
+	//heapify_word("LIT");
+	//heapify(pop());
+}
 
 void p_fromr()
 {
@@ -579,6 +582,16 @@ bool streq(const char* str1, const char* str2)
 	return strcmp(str1, str2) == 0;
 }
 
+bool has_embedded_lit(char* name)
+{
+	static char *lits[] = {"LIT", "0BRANCH", "?BRANCH", "BRANCH"};
+	char **str = lits;
+	do {
+		if(streq(name, *str)) return true;
+	} while(*++str);
+	return false;
+}
+
 void p_see()
 {
 	static cellptr cfa_docol = 0;
@@ -605,8 +618,7 @@ void p_see()
 		cellptr cfa1 = (cellptr) dref(++cfa);
 		char* name = name_cfa(cfa1);
 		puts(name);
-		if(streq(name, "LIT") || streq(name, "0BRANCH") || streq(name, "?BRANCH") ) 
-			printf("%ld\n", *(++cfa));
+		if(has_embedded_lit(name)) printf("%ld\n", *(++cfa));
 		if(streq(name, ";")) break;
 		//puts("again");
 	}
@@ -619,6 +631,7 @@ void p_see()
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{F_IMM,	"LITERAL", p_literal},
 	{F_IMM,	"POSTPONE", p_postpone},
 	{0,	"DOCOL", docol},
 	{0,	"SEE", p_see},
@@ -695,6 +708,7 @@ char* derived[] = {
 	": CONSTANT <builds , does> @ ;",
 	": BEGIN here ; immediate",
 	": ?AGAIN postpone ?branch , ; immediate",
+	// ": LITERAL postpone lit , ; immediate",
 	0
 };
 
