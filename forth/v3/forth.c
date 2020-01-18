@@ -211,7 +211,7 @@ char* delim_word (char* delims, bool upper)
 }
 */
 
-char* get_word () 
+char* parse_word () 
 { 
 	if(rest == 0) {
 		token = tib;
@@ -230,7 +230,10 @@ char* get_word ()
 	return token;
 }
 
-
+void p_parse_word ()
+{
+	push((cell_t)parse_word());
+}
 
 void process_tib();
 
@@ -268,7 +271,7 @@ void p_dot() { printf(cell_fmt, pop()); }
 
 void p_tick()
 {
-	get_word();
+	parse_word();
 	codeptr cfa = cfa_find(token);
 	if(cfa)
 		push((cell_t) cfa);
@@ -320,7 +323,7 @@ void p_semi()
 
 void p_colon()
 {
-	get_word();
+	parse_word();
 	createz(0, token, (cell_t) docol); 
 	compiling = true;
 }
@@ -335,7 +338,7 @@ void p_at () { push(dref((void*)pop())); }
 void p_exc() { cell_t pos = pop(); cell_t val = pop(); store(pos, val); }
 
 void _create() { push((cell_t)++W); }
-void p_create() { get_word(); createz(0, token, (cell_t) _create); }
+void p_create() { parse_word(); createz(0, token, (cell_t) _create); }
 void p_comma() { heapify(pop()); }
 void p_prompt () { show_prompt = (bool) pop(); }
 
@@ -434,7 +437,7 @@ void p_compile()
 }
 void p_postpone ()
 {
-	get_word();
+	parse_word();
 	codeptr cfa = (codeptr) cfa_find(token);
 	if(is_immediate(cfa)) {
 		//embed_literal((cell_t) cfa);
@@ -518,7 +521,7 @@ void p_does() // is immeditate
 
 void p_builds () // not an immediate word
 {
-	get_word();
+	parse_word();
 	createz(0, token, (cell_t) docol);
 
 	heapify_word("LIT");
@@ -540,7 +543,7 @@ void p_xdefer()
 void p_defer()
 {
 	//puts("defer:called");
-	get_word();
+	parse_word();
 	DEBUGX(printf("defer:token:%s\n", token));
 	createz(0, token, (cell_t) docol);
 	heapify_word("XDEFER");
@@ -552,7 +555,7 @@ void p_defer()
 
 void p_is ()
 {
-	get_word();
+	parse_word();
 	cell_t cfa = (cell_t) cfa_find(token);
 	if(cfa) {
 		cell_t offset = cfa + 1 *sizeof(cell_t);
@@ -596,7 +599,7 @@ void p_see()
 {
 	static cellptr cfa_docol = 0;
 	if(cfa_docol == 0) cfa_docol = (cellptr) dref(cfa_find("DOCOL"));
-	get_word();
+	parse_word();
 	cellptr cfa = (cellptr) cfa_find(token);
 	if(cfa == 0) { puts("UNFOUND"); return; }
 	printf(": %s\n",token);
@@ -631,6 +634,7 @@ void p_see()
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"PARSE-WORD", p_parse_word},
 	{F_IMM,	"LITERAL", p_literal},
 	{F_IMM,	"POSTPONE", p_postpone},
 	{0,	"DOCOL", docol},
@@ -746,7 +750,7 @@ void process_tib()
 	//token = tib;
 	//rest = tib;
 	rest = 0;
-	while(get_word()) process_token(token);
+	while(parse_word()) process_token(token);
 }
 int main()
 {
