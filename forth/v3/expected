@@ -158,6 +158,18 @@ variable foo
 ---
 43 
 =============================
+while.4th
+0 prompt
+
+: test 6 begin 1 - dup while dup . repeat drop ;
+." Expect: 5 4 3 2 1" cr
+test cr
+.s
+---
+Expect: 5 4 3 2 1
+5 4 3 2 1 
+Stack: (0):
+=============================
 ../v1/again.4th
 0 prompt
 : begin here ; immediate

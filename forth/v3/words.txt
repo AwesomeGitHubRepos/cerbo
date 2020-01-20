@@ -1,0 +1,14 @@
+-----------------------------------------------------------------------
+REPEAT immediate
+
+See WHILE
+
+-----------------------------------------------------------------------
+WHILE immediate (BEGIN ... WHILE ... REPEAT)
+
+Example:
+: test 6 begin 1 - dup while dup . repeat drop ;
+text
+
+Output:
+5 4 3 2 1

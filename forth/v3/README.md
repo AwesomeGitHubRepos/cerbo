@@ -5,6 +5,11 @@ bbf is written in C and uses direct threading. It supports things like
 It is designed to be as easy to understand as possible, and can be used as
 a basis for further experimentation.
 
+##
+
+See also:
+
+* [words](words.txt)
 
 ## Glossary
 

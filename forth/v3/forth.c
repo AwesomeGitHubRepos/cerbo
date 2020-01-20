@@ -712,7 +712,8 @@ char* derived[] = {
 	": CONSTANT <builds , does> @ ;",
 	": BEGIN here ; immediate",
 	": ?AGAIN postpone ?branch , ; immediate",
-	// ": LITERAL postpone lit , ; immediate",
+	": WHILE	postpone if ; immediate",
+	": REPEAT	1 postpone literal postpone else 0 postpone literal postpone then  postpone ?again ; immediate",
 	0
 };
 
