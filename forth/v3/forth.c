@@ -632,9 +632,22 @@ void p_see()
 
 
 void p_cell () { push(sizeof(cell_t)); }
+void p_gt () { push(pop() <  pop()); }
+void p_ge () { push(pop() <= pop()); }
+void p_lt () { push(pop() >  pop()); }
+void p_le () { push(pop() >= pop()); }
+void p_eq () { push(pop() == pop()); }
+void p_ne () { push(pop() != pop()); }
+
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"!=", p_ne},
+	{0,	"=", p_eq},
+	{0,	"<=", p_le},
+	{0,	"<", p_lt},
+	{0,	">=", p_ge},
+	{0,	">", p_gt},
 	{0,	"CELL", p_cell},
 	{0,	"PARSE-WORD", p_parse_word},
 	{F_IMM,	"LITERAL", p_literal},
