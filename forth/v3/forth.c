@@ -631,9 +631,11 @@ void p_see()
 }
 
 
+void p_cell () { push(sizeof(cell_t)); }
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"CELL", p_cell},
 	{0,	"PARSE-WORD", p_parse_word},
 	{F_IMM,	"LITERAL", p_literal},
 	{F_IMM,	"POSTPONE", p_postpone},
@@ -714,6 +716,8 @@ char* derived[] = {
 	": ?AGAIN postpone ?branch , ; immediate",
 	": WHILE	postpone if ; immediate",
 	": REPEAT	1 postpone literal postpone else 0 postpone literal postpone then  postpone ?again ; immediate",
+	": CELLS	cell * ;",
+	": CELLS+	cells + ;",
 	0
 };
 
