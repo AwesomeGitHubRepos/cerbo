@@ -1,3 +1,24 @@
+OVER ( a b -- a b a )
+
+Equivalent of 1 pick
+
+Example:
+11 12 OVER
+
+Stack becomes:
+11 12 11
+
+-----------------------------------------------------------------------
+PICK ( x0 ... xu u -- x0 ... xu x0 )
+
+Example:
+11 12 13  2 pick
+
+Stack becomes:
+11 12 13 11
+
+See OVER
+
 -----------------------------------------------------------------------
 REPEAT immediate
 
@@ -8,7 +29,7 @@ WHILE immediate (BEGIN ... WHILE ... REPEAT)
 
 Example:
 : test 6 begin 1 - dup while dup . repeat drop ;
-text
+test
 
 Output:
 5 4 3 2 1

@@ -639,9 +639,19 @@ void p_le () { push(pop() >= pop()); }
 void p_eq () { push(pop() == pop()); }
 void p_ne () { push(pop() != pop()); }
 
+void p_pick ()
+{
+	int n = pop();
+	n = sstack.size - n -1;
+	if(n>=0)
+		push(sstack.contents[n]);
+	else
+		puts("Stack underflow");
+}
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"PICK", p_pick},
 	{0,	"!=", p_ne},
 	{0,	"=", p_eq},
 	{0,	"<=", p_le},
@@ -731,6 +741,7 @@ char* derived[] = {
 	": REPEAT	1 postpone literal postpone else 0 postpone literal postpone then  postpone ?again ; immediate",
 	": CELLS	cell * ;",
 	": CELLS+	cells + ;",
+	": OVER		1 pick ;",
 	0
 };
 
