@@ -1,10 +1,18 @@
 #  vim:  ts=4 sw=4 softtabstop=0 expandtab shiftwidth=4 smarttab syntax=off
 
+import tables
+
+var opcodes: seq[int]
+
+var labels = initTable[string, int]()
+
+proc found_label(line:string) =
+    labels[line] = len(opcodes)
+    echo "found label:", line, "."
+
 proc found_instr(line:string) = 
     return
 
-proc found_label(line:string) =
-    echo "found label:", line, "."
 
 proc top() =
     for line in lines "meta.asm":
