@@ -7,7 +7,7 @@ proc found_label(line:string) =
     echo "found label:", line, "."
 
 proc top() =
-    for line in lines "schorre-metaii.vm":
+    for line in lines "meta.asm":
         if len(line) == 0: continue
         if line[0] == '\t' or line[0] == ' ':
             found_instr(line)
