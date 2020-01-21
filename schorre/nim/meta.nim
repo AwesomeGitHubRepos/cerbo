@@ -2,6 +2,7 @@
 
 import re
 import os
+import streams
 import strutils
 import system
 import tables
@@ -12,6 +13,28 @@ type
 var opcodes: seq[seq[string]]
 var labels = initTable[string, int]()
 var ip:int = 0
+var exit_vm = false
+
+var input_string:string
+var switch:int
+
+#var stack: seq[int]
+
+proc tos():int =
+    return switch
+    #stack[len(stack)-1]
+
+var call_stack: seq[int]
+
+
+
+proc deln(n:int) =
+    #if n <= 0: return
+    input_string = input_string.substr(n)
+
+proc eat_white() =
+    while len(input_string) > 0 and (input_string[0] == ' ' or input_string[0] == '\t'):
+        deln(1)
 
 proc found_label(line:string) =
     labels[line] = len(opcodes)
@@ -26,6 +49,11 @@ proc found_instr(line:string) =
             arg = arg.substr(1, len(arg)-2 )
         opcodes.add(@[args[1], arg])
 
+proc match(str:string):bool =
+    if len(input_string) < len(str): return false
+    let against = input_string.substr(0, len(str)-1)
+    echo "against:<", against, ">"
+    return str == against
 
 proc parse() =
     for line in lines "meta.asm":
@@ -39,16 +67,42 @@ proc run_op() =
     let op = opcodes[ip]    
     ip += 1;
     let cmd = op[0]
+    var arg = ""
+    if len(op)>1 : arg = op[1]
     case cmd:
         of "ADR": ip = labels[op[1]]
-        else: raise newOSError(13, "Unknown opcode:" )
+        of "BF": 
+            if tos() == 0:
+                ip = labels[arg]
+        of "R":
+            if len(call_stack) == 0:
+                exit_vm = true
+            else:
+                ip = pop(call_stack)
+        of "TST": 
+            echo "TST called"
+            eat_white()
+            if match(arg):
+                echo "TST matched ", arg
+                deln(len(arg))
+                switch = 1
+            else:
+                switch = 0
+
+        else: raise newException(OSError, "Unkown opcode:" & cmd)
 
             
 
 proc run() =
-    while true: run_op()
+    while not exit_vm: run_op()
 
 parse()        
+
+var strm = newFileStream("meta.meta", fmRead)
+input_string = strm.readAll()
+strm.close()
+#echo input_string
+
 run()
 
 
