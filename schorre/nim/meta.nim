@@ -1,6 +1,7 @@
 #  vim:  ts=4 sw=4 softtabstop=0 expandtab shiftwidth=4 smarttab syntax=off
 
 import re
+import os
 import strutils
 import system
 import tables
@@ -9,8 +10,8 @@ type
     opcode_t =tuple[arg1, arg2:string]
 
 var opcodes: seq[seq[string]]
-
 var labels = initTable[string, int]()
+var ip:int = 0
 
 proc found_label(line:string) =
     labels[line] = len(opcodes)
@@ -34,7 +35,20 @@ proc parse() =
         else:
             found_label(line)
 
+proc run_op() =
+    let op = opcodes[ip]    
+    ip += 1;
+    let cmd = op[0]
+    case cmd:
+        of "ADR": ip = labels[op[1]]
+        else: raise newOSError(13, "Unknown opcode:" )
+
+            
+
+proc run() =
+    while true: run_op()
+
 parse()        
+run()
 
 
-echo opcodes
