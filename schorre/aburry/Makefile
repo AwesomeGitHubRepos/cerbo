@@ -1,2 +1,4 @@
-aburry :  meta.cpp
+metaii :  meta.cpp
 	g++ -I. --whole-program  $^ -o $@
+
+
