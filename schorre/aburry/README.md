@@ -23,6 +23,11 @@ Tested with GCC 4.8.3:
   ./metaii < metaii.meta > metaii.cpp
 ```
 
+## run an example
+```
+make expr
+./expr <expr.txt```
+
 ## Process
 
 I hand-compiled Schorre's META II from the paper. Using some C pre-processor macros and some vim tricks I
