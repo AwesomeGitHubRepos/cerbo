@@ -1,2 +1,2 @@
-metta : metta.nim
-	nim c metta.nim
+meta : meta.nim
+	nim c meta.nim
