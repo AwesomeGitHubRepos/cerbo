@@ -542,7 +542,6 @@ void p_xdefer()
 
 void p_defer()
 {
-	//puts("defer:called");
 	parse_word();
 	DEBUGX(printf("defer:token:%s\n", token));
 	createz(0, token, (cell_t) docol);
@@ -605,12 +604,7 @@ void p_see()
 	printf(": %s\n",token);
 	
 	if(is_immediate((codeptr) cfa)) puts("IMMEDIATE");	
-	// determine if immediate
-	//dent_s* dw = (dent_s*) cfa;
-	//dw--;
-	//if(dw->flags & F_IMM) puts("IMMEDIATE");
 	
-	//cfa = (cellptr) dref(cfa);
 	if((cellptr) dref(cfa) != cfa_docol) {
 		puts("PRIM");
 		return;
@@ -623,11 +617,9 @@ void p_see()
 		puts(name);
 		if(has_embedded_lit(name)) printf("%ld\n", *(++cfa));
 		if(streq(name, ";")) break;
-		//puts("again");
 	}
 
 
-	//puts(name_cfa(cfa));
 }
 
 
@@ -649,8 +641,13 @@ void p_pick ()
 		puts("Stack underflow");
 }
 
+bool refill() { return fgets(tib, sizeof(tib), stdin); }
+
+void p_refill() { push(refill()); }
+
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"REFILL", p_refill},
 	{0,	"PICK", p_pick},
 	{0,	"!=", p_ne},
 	{0,	"=", p_eq},
@@ -776,8 +773,6 @@ void process_token(char* token)
 }
 void process_tib()
 {
-	//token = tib;
-	//rest = tib;
 	rest = 0;
 	while(parse_word()) process_token(token);
 }
@@ -788,14 +783,8 @@ int main()
 	add_primitives();
 	add_derived();
 
-	if(0) {
-		//p_words();
-		puts("words are");
-		process_token("words");
-		puts("fin");
-	}
 
-	while(fgets(tib, sizeof(tib), stdin)) {
+	while(refill()) {
 		process_tib();
 		if(show_prompt) puts("  ok");
 	}

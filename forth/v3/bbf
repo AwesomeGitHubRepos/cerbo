@@ -12,7 +12,10 @@ case $1 in
     h) print_help ; echo . ; exit ;;
 esac
 
-PATH=.:$PATH
+#PATH=.:$PATH
 FTH=`which forth`
-rlwrap $FTH
+XDIR=`dirname $FTH`
+#rlwrap $FTH
 
+#cat $XDIR/extras.4th <(rlwrap cat) | forth
+rlwrap $FTH
