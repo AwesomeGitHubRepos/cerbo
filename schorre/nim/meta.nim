@@ -71,14 +71,35 @@ proc run_op() =
     if len(op)>1 : arg = op[1]
     case cmd:
         of "ADR": ip = labels[op[1]]
+
+        of "BE":
+            if switch == 0: return
+            echo "SYNTAX ERROR. Remainder of stream follows"
+            echo input_string
+            raise newException(OSError, "Syntax Error")
+
         of "BF": 
             if tos() == 0:
                 ip = labels[arg]
+
+        of "ID":
+            switch = 0
+            if len(input_string) < 1: return
+            if not Letters.contains(input_string[0]): return
+            switch = 1
+            var n = 1
+            while(len(input_string) > n and (Letters.contains(input_string[n]) or Digits.contains(input_string[n]))):
+                n = n + 1
+            let m = input_string.substr(0, n)
+            echo "Found ID:<", m, ">"
+
+
         of "R":
             if len(call_stack) == 0:
                 exit_vm = true
             else:
                 ip = pop(call_stack)
+
         of "TST": 
             echo "TST called"
             eat_white()
