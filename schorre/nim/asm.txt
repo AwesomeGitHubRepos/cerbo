@@ -1,3 +1,7 @@
+meta.asm requires the following 15 primitives: adr be bf bt ci cl cll end gn1 id lb out r set tst
+
+--------------------
+
 ADR IDENT : ADDRESS
 Produces the address which is assigned to the given identifier as a constant
 
@@ -9,6 +13,11 @@ Halt if switch is off, otherwise continue in sequence
 BF AAA	: BRANCH FALSE
 Branch to the address AAA if the top term in the stack is the integer 0. Otherwise, continue in
 sequence. Do not pop the stack
+
+
+CL STRING : COPY LITERAL
+Output the variable length string given as the srgument. A blank character will be inserted
+in the output following the string.
 
 
 ID : IDENTIFIER

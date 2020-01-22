@@ -82,6 +82,9 @@ proc run_op() =
             if tos() == 0:
                 ip = labels[arg]
 
+        of "CL":
+            echo op[1], " "
+
         of "ID":
             switch = 0
             if len(input_string) < 1: return
