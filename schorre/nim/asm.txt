@@ -5,6 +5,10 @@ BF AAA	: BRANCH FALSE
 Branch to the address AAA if the top term in the stack is the integer 0. Otherwise, continue in
 sequence. Do not pop the stack
 
+ID : IDENTIFIER
+After deletining initial blanks in the input string, test if it begins with an identifier,
+i.e. a letter followed by s sequence of letters and/or digits. If so, delete the
+identifier and set switch. If not, reset switch.
 
 R : RETURN
 Return to the exit address, popping up the stack by one or three cells according to the flag.
