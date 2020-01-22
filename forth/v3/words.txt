@@ -32,6 +32,13 @@ REPEAT immediate
 
 See WHILE
 
+
+-----------------------------------------------------------------------
+TIB ( -- addr )
+
+Put the address of TIB on the stack
+
+
 -----------------------------------------------------------------------
 WHILE immediate (BEGIN ... WHILE ... REPEAT)
 

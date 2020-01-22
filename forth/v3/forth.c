@@ -641,12 +641,13 @@ void p_pick ()
 		puts("Stack underflow");
 }
 
-bool refill() { return fgets(tib, sizeof(tib), stdin); }
-
+bool refill() 	{ rest = 0; tib[0] = 0; return fgets(tib, sizeof(tib), stdin); }
 void p_refill() { push(refill()); }
+void p_tib()	{ push((cell_t) tib); }
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"TIB", p_tib},
 	{0,	"REFILL", p_refill},
 	{0,	"PICK", p_pick},
 	{0,	"!=", p_ne},
