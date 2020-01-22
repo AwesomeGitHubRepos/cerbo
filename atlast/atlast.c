@@ -1094,6 +1094,18 @@ prim P_strlen() 		      /* Take length of string on stack top */
     S0 = strlen((char *) S0);
 }
 
+prim P_strncmp() 		      /* Compare top two strings on stack for max n chars*/
+{
+    int i;
+
+    Sl(3);
+    Hpc(S1);
+    Hpc(S2);
+    i = strncmp((char *) S1, (char *) S2, S0);
+    S2 = (i == 0) ? 0L : ((i > 0) ? 1L : -1L);
+    Pop;
+    Pop;
+}
 prim P_strcmp() 		      /* Compare top two strings on stack */
 {
     int i;
@@ -2783,6 +2795,7 @@ static struct primfcn primt[] = {
     {"0STRCAT", P_strcat},
     {"0S+", P_strcat},
     {"0STRLEN", P_strlen},
+    {"0STRNCMP", P_strncmp},
     {"0STRCMP", P_strcmp},
     {"0STRCHAR", P_strchar},
     {"0SUBSTR", P_substr},
