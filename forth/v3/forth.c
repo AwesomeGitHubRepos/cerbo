@@ -646,10 +646,12 @@ void p_refill () { push(refill()); }
 void p_tib ()	{ push((cell_t) tib); }
 
 void p_str_eq () { push(strcmp((const char*) pop(), (const char*) pop()) == 0); }
+void p_strn_eq () { int n = pop(); push(strncmp((const char*) pop(), (const char*) pop(), n) == 0); }
 
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"STRN=", p_strn_eq},
 	{0,	"STR=", p_str_eq},
 	{0,	"TIB", p_tib},
 	{0,	"REFILL", p_refill},
