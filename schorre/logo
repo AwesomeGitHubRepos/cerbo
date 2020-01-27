@@ -1,5 +1,13 @@
+to all? :list
+foreach :list [print (sentence ? "is (what? ?))]
+end
+
 to between? :v :lo :hi
 output and [:lo <= :v] [:v <= :hi]
+end
+
+to eg.all?
+all? (list 1 "foo "'bar "\( 3)
 end
 
 to letter? :c
