@@ -1,0 +1,25 @@
+to between? :v :lo :hi
+output and [:lo <= :v] [:v <= :hi]
+end
+
+to letter? :c
+output lower? :c or upper? :c
+end
+
+to lower? :c
+output between? ascii :c ascii "a ascii "z
+end
+
+to upper? :c
+output between? ascii :c ascii "A ascii "Z
+end
+
+to what? :in
+	if (number? :in) [output "number]
+	local "c1
+	make "c1 first :in
+	if c1 = "' [output "string]
+	if letter? c1 [output "id]
+	output "unknown
+end
+

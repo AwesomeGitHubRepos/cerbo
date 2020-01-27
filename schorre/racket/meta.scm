@@ -1,14 +1,4 @@
-#lang racket
-(require macro-debugger/expand)
-;(require swindle)
-;(require racket/stream)
-;(define ns (make-base-namespace))
-;(define ns (current-namespace))
-;(define (ev x) (eval x (scheme-report-environment 5)))
-;(define (ev x) (eval x (null-environment 5)))
-;(define (ev x) (eval x))
-;(define (ev x) (eval x ns))
-;(define (ev x) (apply x '()))
+;;;(load "meta.scm")
 
 
 (define desc "
@@ -18,21 +8,20 @@ PROGRAM = '.SYNTAX' .ID $ ST .END .,
 .END
 ")
 
+(define-syntax define-syntax-rule
+  (syntax-rules ()
+    [(define-syntax-rule (id arg ...) body)
+     (define-syntax id
+       (syntax-rules ()
+	 [(id arg ...) body]))]))
+
 (define-syntax-rule (each var lst  body ...)
   (for-each (lambda (var) body ...) lst))
 
 ;(each x '(12 13 14)  (display x) (display x) (newline))
 
    
-(define (displays . lst)   (each x lst (display x) (display " ")))
- 
-#|
-  (if (empty? lst)
-      (newline)
-      (begin
-        (display (car lst))
-        (displays (cdr lst)))))
-  |#           
+(define (displays . lst)   (each x lst (display x) (display " ")))    
 
 
 (define pin void)
@@ -58,8 +47,9 @@ PROGRAM = '.SYNTAX' .ID $ ST .END .,
 ;(define (eat-white) (accum white?))
 ;(define (accum-1 pred) (eat-white) (accum pred))
 (define (get-string)
+  (define res void)
   (rc)
-  (define res (accum (lambda (c) (not (char=? c #\')))))
+  (set! res (accum (lambda (c) (not (char=? c #\')))))
   (rc)
   res)
 
@@ -92,9 +82,11 @@ PROGRAM = '.SYNTAX' .ID $ ST .END .,
               lst)
     (newline)))
 
-(pin! "23  24")
 
-(define (seq . lst) (each pat lst (pat)))
+
+(define (seq . lst)
+  (displays "seq lst " lst)
+  (each pat lst (pat)))
 
 (define ($) (raise "TODO $"))
 
@@ -121,10 +113,11 @@ PROGRAM = '.SYNTAX' .ID $ ST .END .,
                $ (seq (str "+") (.NUMBER "LD " * "\nADD") )
                ))
 
-(define (prog1) (seq (.NUMBER "LD " *)))
+(define prog1 '(seq (.NUMBER "LD " *)))
 
 
 
-
-(yylex)
-(prog1)
+(begin
+  (pin! "23  24")
+  (yylex)
+  (apply (eval (car prog1)) (cadr prog1)))
