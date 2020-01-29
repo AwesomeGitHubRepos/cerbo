@@ -12,6 +12,7 @@ sub init-parser($str)
 {
 	$input_text = $str;
 	$pos = 0;
+	#yylex;
 }
 
 my $yytype;
@@ -27,29 +28,27 @@ sub yylex()
 	#say "yylex check on alpha:", cpeek(), ", ", isalpha(cpeek());
 	while iswhite(cpeek()) { cget(); }
 	return False unless cpeek();
-	#given cpeek() {
-		if isdigit(cpeek()) {
-			$yytype = "num";
-			while isdigit(cpeek()) { collect(); }
-		} elsif (cpeek() eq "'") { 
-			#say "found proper string";
-			$yytype = "str";
-			cget();
-			while cpeek() ne "'" { collect(); }
-			cget();
-		} elsif  cpeek() eq "." {
-			$yytype = "str";
-			collect();
-			while isalnum(cpeek()) or cpeek() eq "," { collect(); }
-		} elsif isalpha(cpeek()) {
-			$yytype = "id";
-			while isalnum(cpeek()) { collect(); }
-		} else {
-			#say "hit default yylex";
-			$yytype = "str";
-			collect();
-		}
-		#}
+	if isdigit(cpeek()) {
+		$yytype = "num";
+		while isdigit(cpeek()) { collect(); }
+	} elsif (cpeek() eq "'") { 
+		#say "found proper string";
+		$yytype = "str";
+		cget();
+		while cpeek() ne "'" { collect(); }
+		cget();
+	} elsif  cpeek() eq "." {
+		$yytype = "str";
+		collect();
+		while isalnum(cpeek()) or cpeek() eq "," { collect(); }
+	} elsif isalpha(cpeek()) {
+		$yytype = "id";
+		while isalnum(cpeek()) { collect(); }
+	} else {
+		#say "hit default yylex";
+		$yytype = "str";
+		collect();
+	}
 
 	return True;
 }
@@ -59,5 +58,35 @@ sub debug-lexer()
 	while yylex() { say "$yytype <$yytext>"; }
 }
 
-init-parser "hello world 'this is a string'  .NUMBER   .,( .OUT";
-debug-lexer();
+#debug-lexer();
+
+
+sub ms($targ) # match string
+{
+	return False if $targ ne $yytext;
+	say "ms:bingo";
+	yylex;
+	return True;
+}
+
+sub M_OUT(|args) 
+{
+	for args { print $_, " " ; }
+		#my $str = args[1];
+		#	say "M_OUT ", args.elems;
+
+	return True;
+}
+
+sub M_PROGRAM() {
+	return ((ms '.SYNTAX') and (M_OUT ".SYNTAX", "found"));
+}
+
+sub parse()
+{
+	yylex;
+	M_PROGRAM;
+}
+
+init-parser ".SYNTAX hello world 'this is a string'  .NUMBER \$\$  ., .OUT";
+parse;
