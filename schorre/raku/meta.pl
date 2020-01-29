@@ -60,33 +60,58 @@ sub debug-lexer()
 
 #debug-lexer();
 
+my $mtext;
+my $mtype;
 
-sub ms($targ) # match string
+sub set-match() {
+	$mtext = $yytext;
+	$mtype = $yytype;
+}
+
+sub id( @outs) # match .ID
 {
-	return False if $targ ne $yytext;
-	say "ms:bingo";
+	return False if $yytype ne "id";
+	#say "id matched";
+	set-match;
+	#say "mtext is now $mtext";
 	yylex;
+	M_OUT(@outs);
 	return True;
 }
 
-sub M_OUT(|args) 
+sub ms($targ, @outs) # match string
 {
-	for args { print $_, " " ; }
-		#my $str = args[1];
-		#	say "M_OUT ", args.elems;
+	return False if $targ ne $yytext;
+	set-match;
+	yylex;
+	M_OUT(@outs);
+	return True;
+}
 
+
+sub M_OUT(@args) {
+	#my @args1 = args[0];
+	#say args[1];
+	
+	for @args { 
+		#my $arg = $_;
+		#say "M_OUT arg:$arg";
+		print ($_ eq "*" ?? $mtext !! $_), "  " ; 
+	}
 	return True;
 }
 
 sub M_PROGRAM() {
-	return ((ms '.SYNTAX') and (M_OUT ".SYNTAX", "found"));
+	#return M_OUT(("foo", "bar"));
+	#return ((ms '.SYNTAX', ("foo", "bar")) and (M_OUT ".SYNTAX", "found"));
+	return (ms('.SYNTAX', [".SYNTAX"])
+		and id(["*", "\n"]));
 }
 
-sub parse()
-{
+sub parse() {
 	yylex;
 	M_PROGRAM;
 }
 
-init-parser ".SYNTAX hello world 'this is a string'  .NUMBER \$\$  ., .OUT";
+init-parser ".SYNTAX PROGRAM world 'this is a string'  .NUMBER \$\$  ., .OUT";
 parse;
