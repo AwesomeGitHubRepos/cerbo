@@ -1,15 +1,16 @@
 sub isalpha($x) { return $x (elem) (['a'..'z'] (|) ['A'..'Z']) ; }
 sub isdigit($x) { return $x (elem) ['0'..'9']; }
 sub isalnum($x) { return isalpha($x) or isdigit($x); }
-sub iswhite($x) { return " \t\rn\n".contains($x); }
+sub iswhite($x) { return  " \t\r\n".contains($x); }
 
-my $text;
+my $input_text;
 my $pos;
-sub cpeek() { return ~$text[$pos]; }
-sub cget()  { return ~$text[$pos++]; }
+sub tat($n)   { return ($n < chars($input_text) ?? substr($input_text, $n, 1) !! False); }
+sub cpeek() { return tat($pos); }
+sub cget()  { return tat($pos++); }
 sub init-parser($str)
 {
-	$text = $str;
+	$input_text = $str;
 	$pos = 0;
 }
 
@@ -20,34 +21,37 @@ sub collect() { $yytext ~=  cget(); }
 
 sub yylex()
 {
-	$yytype = "unk";
+	$yytype = "eof";
+	return False unless cpeek();
 	$yytext = "";
+	#say "yylex check on alpha:", cpeek(), ", ", isalpha(cpeek());
 	while iswhite(cpeek()) { cget(); }
-	given cpeek() {
-		when isdigit(cpeek()) {
+	return False unless cpeek();
+	#given cpeek() {
+		if isdigit(cpeek()) {
 			$yytype = "num";
 			while isdigit(cpeek()) { collect(); }
-		}
-		when (cpeek() eq "'") { # 39 is '
+		} elsif (cpeek() eq "'") { 
+			#say "found proper string";
 			$yytype = "str";
 			cget();
-			while cpeek() != "'" { collect(); }
+			while cpeek() ne "'" { collect(); }
 			cget();
-		}
-		when cpeek() eq "." {
+		} elsif  cpeek() eq "." {
 			$yytype = "str";
 			collect();
-			while isalnum(cpeek()) or cpeek() == "," { collect(); }
-		}
-		when isalpha(cpeek()) {
+			while isalnum(cpeek()) or cpeek() eq "," { collect(); }
+		} elsif isalpha(cpeek()) {
 			$yytype = "id";
 			while isalnum(cpeek()) { collect(); }
-		}
-		default {
+		} else {
+			#say "hit default yylex";
 			$yytype = "str";
 			collect();
 		}
-	}
+		#}
+
+	return True;
 }
 
 sub debug-lexer()
@@ -55,5 +59,5 @@ sub debug-lexer()
 	while yylex() { say "$yytype <$yytext>"; }
 }
 
-init-parser "hello world";
+init-parser "hello world 'this is a string'  .NUMBER   .,( .OUT";
 debug-lexer();
