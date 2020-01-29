@@ -1,7 +1,8 @@
 sub isalpha($x) { return $x (elem) (['a'..'z'] (|) ['A'..'Z']) ; }
 sub isdigit($x) { return $x (elem) ['0'..'9']; }
 sub isalnum($x) { return isalpha($x) or isdigit($x); }
-sub iswhite($x) { return  " \t\r\n".contains($x); }
+sub iswhite($x) { return True if $x eq "\n"; return  " \t\r\n".contains($x); }
+#sub iswhite($x) { say "iswhite:", ord($x); return  ord($x) (elem) [ 9 (|) 10 (|) 13 (|) 32] ; }
 
 my $input_text;
 my $pos;
@@ -20,13 +21,20 @@ my $yytext;
 
 sub collect() { $yytext ~=  cget(); }
 
+sub skipws() {
+	while iswhite(cpeek()) {
+		#say ord(cpeek());
+		#if cpeek() eq "\n" { say "found newline"; }
+		cget(); 
+	}
+}
 sub yylex()
 {
 	$yytype = "eof";
 	return False unless cpeek();
 	$yytext = "";
 	#say "yylex check on alpha:", cpeek(), ", ", isalpha(cpeek());
-	while iswhite(cpeek()) { cget(); }
+	skipws();
 	return False unless cpeek();
 	if isdigit(cpeek()) {
 		$yytype = "num";
@@ -88,6 +96,7 @@ sub ms($targ, @outs) # match string
 	return True;
 }
 
+sub zom(&fn) { while fn() {}; return True; }
 
 sub M_OUT(@args) {
 	#my @args1 = args[0];
@@ -101,11 +110,22 @@ sub M_OUT(@args) {
 	return True;
 }
 
+sub M_ST() {
+	return (
+		id(["*"])
+		and ms("=", ["="])
+		and id(["*"])
+		and ms(".,", [".,\n"])
+	);
+}
+
 sub M_PROGRAM() {
-	#return M_OUT(("foo", "bar"));
-	#return ((ms '.SYNTAX', ("foo", "bar")) and (M_OUT ".SYNTAX", "found"));
-	return (ms('.SYNTAX', [".SYNTAX"])
-		and id(["*", "\n"]));
+	return (
+		ms('.SYNTAX', [".SYNTAX"])
+		and id(["*", "\n"])
+		and zom(&M_ST)
+		and ms('.END', [".END at last"])
+		);
 }
 
 sub parse() {
@@ -113,5 +133,14 @@ sub parse() {
 	M_PROGRAM;
 }
 
-init-parser ".SYNTAX PROGRAM world 'this is a string'  .NUMBER \$\$  ., .OUT";
+my $p = q:to/EOS/;
+.SYNTAX PROGRAM 
+	world = foo .,
+	bar 	= baz .,
+.END
+EOS
+
+#say $p;
+
+init-parser $p;
 parse;
