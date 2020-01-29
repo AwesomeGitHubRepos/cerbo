@@ -110,11 +110,24 @@ sub M_OUT(@args) {
 	return True;
 }
 
+
+sub M_EX2() {
+	#say "M_EX2 called";
+	return id(["*"]);
+}
+
+
+sub M_ALT() { # Handle alternatives, the lowest precedence. It's what Schorre calls EX1
+	return (
+		M_EX2() and zom({ (ms("/", ["/"]) and M_EX2()); } )
+	);
+}
+
 sub M_ST() {
 	return (
 		id(["*"])
 		and ms("=", ["="])
-		and id(["*"])
+		and M_ALT()
 		and ms(".,", [".,\n"])
 	);
 }
@@ -135,7 +148,7 @@ sub parse() {
 
 my $p = q:to/EOS/;
 .SYNTAX PROGRAM 
-	world = foo .,
+	world = foo  / bar / smurf .,
 	bar 	= baz .,
 .END
 EOS
