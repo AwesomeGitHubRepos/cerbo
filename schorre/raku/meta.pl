@@ -115,7 +115,7 @@ sub M_OUT(@args) {
 	for @args { 
 		#my $arg = $_;
 		#say "M_OUT arg:$arg";
-		print ($_ eq "*" ?? $mtext !! $_), "  " ; 
+		print ($_ eq "*" ?? $mtext !! $_) ; 
 	}
 	return True;
 }
@@ -127,8 +127,9 @@ sub M_OOT() { # Output. Schorre calls it OUTPUT
 
 sub M_PAT() { # Pattern. Schorre calls it EX3
 	return (	
-		id(["*"])
+		id(["*", "()"])
 		or ms(".ID", ["--.ID--"])
+		or (ms("\$", ["zom(\{"]) and M_PAT() and M_OUT(["\})"]))
 		or qstr(["<", "*", ">"])
 	);
 }
@@ -141,23 +142,23 @@ sub M_POO() { # Pattern Or Output. Schorre call it EX2
 
 sub M_ALT() { # Handle alternatives, the lowest precedence. It's what Schorre calls EX1
 	return (
-		M_POO() and zom({ (ms("/", ["/"]) and M_POO()); } )
+		M_POO() and zom({ (ms("/", [" or "]) and M_POO()); } )
 	);
 }
 
 sub M_ST() {
 	return (
-		id(["sub", "*", "() \{\n" ]) # Output something like `sub PROGRAM() {'
-		and ms("=", ["="])
+		id(["sub ", "*", "() \{ return (\n" ]) # Output something like `sub PROGRAM() {'
+		and ms("=", [])
 		and M_ALT()
-		and ms(".,", ["\n\}.,\n"])
+		and ms(".,", ["\n\);}\n\n"])
 	);
 }
 
 sub M_PROGRAM() {
 	return (
 		ms('.SYNTAX', [])
-		and id(["*", "();\n"]) # the main routine that has to be called, e.g. `PRORGAM();'
+		and id(["*", "();\n\n"]) # the main routine that has to be called, e.g. `PRORGAM();'
 		and zom({M_ST()})
 		and ms('.END', [".END at last"])
 		);
@@ -170,7 +171,7 @@ sub parse() {
 
 my $p = q:to/EOS/;
 .SYNTAX PROGRAM 
-	PROGRAM = '.SYNTAX' .OUT .ID $ ST '.END' .,
+	PROGRAM = '.SYNTAX' .ID $ ST SUB '.END' .,
 	world = foo  .OUT / bar / smurf turf 'geek' .,
 	bar 	= baz .,
 .END
