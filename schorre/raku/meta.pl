@@ -121,8 +121,17 @@ sub M_OUT(@args) {
 }
 
 
+sub M_OOT1() { # Schorre calls it OUT1
+	return qstr(["*"]);
+}
+
 sub M_OOT() { # Output. Schorre calls it OUTPUT
-	return ms(".OUT",["M_OUT"]);
+	return (
+		ms(".OUT",[".OUT"])
+		and ms("(",["("])
+		and zom({M_OOT1()})
+		and ms(")", [")"])
+	);
 }
 
 sub M_PAT() { # Pattern. Schorre calls it EX3
@@ -172,7 +181,7 @@ sub parse() {
 my $p = q:to/EOS/;
 .SYNTAX PROGRAM 
 	PROGRAM = '.SYNTAX' .ID $ ST SUB '.END' .,
-	world = foo  .OUT / bar / smurf turf 'geek' .,
+	world = foo  .OUT('HELLO')  / bar / smurf turf 'geek' .,
 	bar 	= baz .,
 .END
 EOS
