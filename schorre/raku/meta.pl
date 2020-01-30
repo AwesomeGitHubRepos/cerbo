@@ -41,7 +41,7 @@ sub yylex()
 		while isdigit(cpeek()) { collect(); }
 	} elsif (cpeek() eq "'") { 
 		#say "found proper string";
-		$yytype = "str";
+		$yytype = "qstr";
 		cget();
 		while cpeek() ne "'" { collect(); }
 		cget();
@@ -87,7 +87,17 @@ sub id( @outs) # match .ID
 	return True;
 }
 
-sub ms($targ, @outs) # match string
+sub qstr(@outs) # match quoted string
+{
+	return False if $yytype ne "qstr";
+	#say "qstr:True";
+	set-match;
+	yylex;
+	M_OUT(@outs);
+	return True;
+}
+
+sub ms($targ, @outs) # match target string string
 {
 	return False if $targ ne $yytext;
 	set-match;
@@ -111,32 +121,44 @@ sub M_OUT(@args) {
 }
 
 
-sub M_EX2() {
+sub M_OOT() { # Output. Schorre calls it OUTPUT
+	return ms(".OUT",["M_OUT"]);
+}
+
+sub M_PAT() { # Pattern. Schorre calls it EX3
+	return (	
+		id(["*"])
+		or ms(".ID", ["--.ID--"])
+		or qstr(["<", "*", ">"])
+	);
+}
+
+sub M_POO() { # Pattern Or Output. Schorre call it EX2
 	#say "M_EX2 called";
-	return id(["*"]);
+	return zom({M_PAT() or M_OOT()});
 }
 
 
 sub M_ALT() { # Handle alternatives, the lowest precedence. It's what Schorre calls EX1
 	return (
-		M_EX2() and zom({ (ms("/", ["/"]) and M_EX2()); } )
+		M_POO() and zom({ (ms("/", ["/"]) and M_POO()); } )
 	);
 }
 
 sub M_ST() {
 	return (
-		id(["*"])
+		id(["sub", "*", "() \{\n" ]) # Output something like `sub PROGRAM() {'
 		and ms("=", ["="])
 		and M_ALT()
-		and ms(".,", [".,\n"])
+		and ms(".,", ["\n\}.,\n"])
 	);
 }
 
 sub M_PROGRAM() {
 	return (
-		ms('.SYNTAX', [".SYNTAX"])
-		and id(["*", "\n"])
-		and zom(&M_ST)
+		ms('.SYNTAX', [])
+		and id(["*", "();\n"]) # the main routine that has to be called, e.g. `PRORGAM();'
+		and zom({M_ST()})
 		and ms('.END', [".END at last"])
 		);
 }
@@ -148,7 +170,8 @@ sub parse() {
 
 my $p = q:to/EOS/;
 .SYNTAX PROGRAM 
-	world = foo  / bar / smurf .,
+	PROGRAM = '.SYNTAX' .OUT .ID $ ST '.END' .,
+	world = foo  .OUT / bar / smurf turf 'geek' .,
 	bar 	= baz .,
 .END
 EOS
