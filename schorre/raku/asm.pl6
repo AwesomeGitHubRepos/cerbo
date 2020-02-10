@@ -41,7 +41,7 @@ for @opcodes {
 #say %opnums;
 
 # REMEMBER STRINGS
-my @opcode-strings;
+my @str-table;
 
 
 # COMPILE THE ASSEMBLEY CODE
@@ -53,8 +53,8 @@ sub add-instruction($line) {
 	if $type == lbl {
 		@label-refs.push((@heap.elems, $arg));  # for subsequent back-filling
 	} elsif $type == str {
-		$arg1 = @opcode-strings.elems;
-		@opcode-strings.push($arg);
+		$arg1 = @str-table.elems;
+		@str-table.push($arg);
 	}
 
 	@heap.push($num * $oc + $arg1);
@@ -81,5 +81,26 @@ for @label-refs {
 	encode $loc, $opcode, $val;
 }
 
+sub disassemble() {	
+	$ip = 0;
+	loop {
+		my ($code, $val) = decode($ip);
+		my ($opcode, $type) = @opcodes[$code];
+		if $type == none {
+			$val = "";
+		} elsif $type == str {
+			$val =  @str-table[$val];
+		} else { # label
+			say "TODO label decode";
+		}
+
+		say "$ip $opcode $val";
+		$ip++;
+		last if $ip >= @heap.elems;
+	}
+}
+
+disassemble;
+
 say %labels;
-say @opcode-strings;
+#say @opcode-strings;
