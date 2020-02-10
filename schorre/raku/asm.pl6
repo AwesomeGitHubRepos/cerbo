@@ -70,7 +70,7 @@ for $asm.IO.lines -> $line {
 		%labels{$line} = @heap.elems;
 	}
 
-	say $line;
+	#say $line;
 }
 
 # backfill the label references
@@ -94,7 +94,14 @@ sub disassemble() {
 		} elsif $type == str {
 			$val =  @str-table[$val];
 		} else { # label
-			say "TODO label decode";
+			for @label-refs {
+				my ($loc, $label) = $_;
+				next if $loc != $ip;
+				$val = $label;
+				last;
+			}
+			#	if $loc == $ip 
+			#say "TODO label decode";
 		}
 
 		for %labels.kv -> $label, $loc {
@@ -113,5 +120,5 @@ sub disassemble() {
 
 disassemble;
 
-say %labels;
+#say %labels;
 #say @opcode-strings;
