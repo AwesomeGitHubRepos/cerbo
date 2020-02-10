@@ -74,15 +74,18 @@ for $asm.IO.lines -> $line {
 }
 
 # backfill the label references
+#say @label-refs;
 for @label-refs {
 	my ($loc, $label) = $_;
 	my ($opcode, $val) = decode($loc);
-	$val =  %labels{val};
+	$val =  %labels{$label};
+	#say "label-ref val: $val";
 	encode $loc, $opcode, $val;
 }
 
 sub disassemble() {	
 	$ip = 0;
+	#$label-ref = 0;
 	loop {
 		my ($code, $val) = decode($ip);
 		my ($opcode, $type) = @opcodes[$code];
@@ -94,7 +97,15 @@ sub disassemble() {
 			say "TODO label decode";
 		}
 
-		say "$ip $opcode $val";
+		for %labels.kv -> $label, $loc {
+			#my $key = $_[0];
+			#say "foo $_[1]";
+			if $loc == $ip {
+				say "$ip LABEL $label";
+			}
+		}
+
+		say "     $ip $opcode $val";
 		$ip++;
 		last if $ip >= @heap.elems;
 	}
