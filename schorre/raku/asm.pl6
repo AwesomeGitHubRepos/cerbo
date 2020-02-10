@@ -6,30 +6,37 @@ my %labels;
 my @label-refs;
 
 my $ip = 0; # instruction pointer
+my $switch = 0;
+my $finis = False;
 my @heap; # set of instructions
+my @call-stack; 
+my @data-stack;
+my @str-table;
+
 my $oc = 2** 24;
 sub encode($loc, $opcode, $val) { @heap[$loc] = $opcode* $oc + $val;}
 sub decode($loc) { my $code = @heap[$loc]; return ($code div $oc, $code % $oc); }
+sub last-el(@arr) { return @arr[@arr.elems-1];}
 
 enum OpType ( none => 0, str => 1, lbl => 2);
 
 my @opcodes = (
-	("adr", lbl),
-	("be", none),
-	("bf", lbl),
-	("bt", lbl),
-	("ci", none),	
-	("cl", str),
-	("cll", lbl),
-	("end", none),
-	("gn1", none),
-	("id", none),
-	("lb", none),
-	("out", none),
-	("r", none),
-	("set", none),
-	("sr", none),
-	("tst", str)
+	("adr", lbl, 	{ @call-stack.push($ip); $ip = $_[0]; } ),
+	("be", none, 	{ $finis =  $switch == 0; }  ),
+	("bf", lbl,	{ if last-el(@data-stack) == 0 { $ip = $_[0]}; }),
+	("bt", lbl,	{ if last-el(@data-stack) == 1 { $ip = $_[0]};}),
+	("ci", none,	{ say "TODO ci";}),	
+	("cl", str,	{ say "@str-table[$_[0]] ";}),
+	("cll", lbl,	{ say "TODO cll";}),
+	("end", none,	{ } ),
+	("gn1", none,	{ say "TODO gn1";} ),
+	("id", none,	{ say "TODO id";}),
+	("lb", none,	{ say "TODO lb"; }),
+	("out", none,	{ say "TODO out";}),
+	("r", none,	{ say "TODO r"; }),
+	("set", none,	{ say "TODO set";}),
+	("sr", none,	{ say "TODO sr";}),
+	("tst", str,	{ say "TODO tst";})
 );
 
 # CREATE A LOOK-UP TABLE OF THE OPCODES
@@ -40,8 +47,6 @@ for @opcodes {
 }
 #say %opnums;
 
-# REMEMBER STRINGS
-my @str-table;
 
 
 # COMPILE THE ASSEMBLEY CODE
@@ -122,3 +127,13 @@ disassemble;
 
 #say %labels;
 #say @opcode-strings;
+
+# RUN THE OPCODE
+$ip = 0;
+$finis = False;
+loop {
+	my ($opcode, $val) = decode($ip++);
+	my &fn = @opcodes[$opcode][2];
+	fn($val);
+	last if $finis;
+}

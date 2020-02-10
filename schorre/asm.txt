@@ -12,23 +12,32 @@ Halt if switch is off, otherwise continue in sequence
 
 BF AAA	: BRANCH FALSE
 Branch to the address AAA if the top term in the stack is the integer 0. Otherwise, continue in
-sequence. Do not pop the stack
+sequence. Do not pop the stack.
+
+
+BT AAA : BRANCH IF TRUE
+Branch to the address AAA if the top term in the stack is the integer 1. Otherwise, continue in
+sequence. Do not pop the stack.
 
 
 CL STRING : COPY LITERAL
-Output the variable length string given as the srgument. A blank character will be inserted
+Output the variable length string given as the argument. A blank character will be inserted
 in the output following the string.
 
 
+END : END
+Denotes the end of the program
+
+
 ID : IDENTIFIER
-After deletining initial blanks in the input string, test if it begins with an identifier,
-i.e. a letter followed by s sequence of letters and/or digits. If so, delete the
+After deleting initial blanks in the input string, test if it begins with an identifier,
+i.e. a letter followed by a sequence of letters and/or digits. If so, delete the
 identifier and set switch. If not, reset switch.
 
 
 R : RETURN
 Return to the exit address, popping up the stack by one or three cells according to the flag.
-If the stack is popper by only one cell, then clear the top two cells to blanks, because they
+If the stack is popped by only one cell, then clear the top two cells to blanks, because they
 were blank when the subroutines was entered.
 
 
