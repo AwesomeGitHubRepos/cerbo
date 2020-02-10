@@ -8,9 +8,25 @@ my $asm =  "../aburry/schorre-metaii.vm";
 my %labels;
 my $ip = 0; # instruction pointer
 
+enum OpType ( none => 0, str => 1, lbl => 2);
+
 my @opcodes = (
-	("adr", 1),
-	("cl", 1)
+	("adr", lbl),
+	("be", none),
+	("bf", lbl),
+	("bt", lbl),
+	("ci", none),	
+	("cl", str),
+	("cll", lbl),
+	("end", none),
+	("gn1", none),
+	("id", none),
+	("lb", none),
+	("out", none),
+	("r", none),
+	("set", none),
+	("sr", none),
+	("tst", str)
 );
 
 # CREATE A LOOK-UP TABLE OF THE OPCODES
@@ -35,7 +51,7 @@ for $asm.IO.lines -> $line {
 		%labels{$line} = $ip;
 	}
 
-	#say $line;
+	say $line;
 }
 
 say %labels;
