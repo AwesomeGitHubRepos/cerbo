@@ -213,18 +213,16 @@ char* delim_word (char* delims, bool upper)
 }
 */
 
-void str_begin(cell_t* loc)
+void str_begin (cell_t* loc)
 {
 	*loc = (cell_t)hptr + 0* sizeof(cell_t);
 	if(!compiling) return;
-	//if(compiling) {
-		heapify_word("BRANCH");
-		*loc = (cell_t) hptr;
-		heapify(2572); // leet for zstr
-	//}
+	heapify_word("BRANCH");
+	*loc = (cell_t) hptr;
+	heapify(2572); // leet for zstr
 }
 
-void str_end(cell_t loc)
+void str_end (cell_t loc)
 {
 
 	if(compiling) {
@@ -266,22 +264,19 @@ char* parse_word ()
 	if(*token ==0) return 0;
 	while(isspace(*token)) token++;
 	rest = token;
-	//char terminator = *rest == '"' ? 
 	yytype = unk;
 	if(*rest != '"') {
 		while(!isspace(*rest) && *rest) rest++;
 	} else {
-		puts("parse_world: parsing string");
+		//puts("parse_world: parsing string");
 		yytype = str;
 		token++;
 		rest++;
-		//token -= 2; // the following routine will advance it
-		//p_z_slash();
-		while(*rest != '"' && *rest) { putchar(*rest) ; rest++; }
+		while(*rest != '"' && *rest)  rest++; 
 	}
 
 	*rest = 0;
-	strupr(token);
+	if(yytype == unk) strupr(token);
 	//printf("word:toke:<%s>\n", token);
 	if(*token == 0) token = 0;
 	return token;
@@ -791,6 +786,13 @@ void add_derived()
 void process_token (char* token)
 {
 	if(yytype == str) {
+		cell_t loc;
+		str_begin(&loc);
+		while(token <= rest) { 
+			*hptr++ = *token++;
+			//if(token == rest) break;
+		}
+		str_end(loc);
 		return;
 	}
 

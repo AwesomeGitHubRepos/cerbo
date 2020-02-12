@@ -1,3 +1,13 @@
+STRINGS
+
+The word z" exists to create 0-terminated strings. The preferred 
+mechanism from Feb 2020 onwards is just to use regular C-style strings
+"like so".
+
+See the strings.4th file for more examples.
+
+
+-----------------------------------------------------------------------
 OVER ( a b -- a b a )
 
 Equivalent of 1 pick

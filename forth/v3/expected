@@ -205,6 +205,25 @@ t1
 Expect 2
 2 
 =============================
+strings.4th
+0 prompt
+\ Test out strings
+." Expect: <hello world>" cr
+"<hello world>" type cr cr
+
+
+." Expect: <hello again>" cr
+: s "<hello " "again>" swap type type cr ;
+s
+
+---
+Expect: <hello world>
+<hello world>
+
+Expect: <hello again>
+<hello again>
+
+=============================
 tick.4th
 0 prompt
 ' hi execute
