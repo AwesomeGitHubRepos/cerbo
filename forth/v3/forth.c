@@ -78,6 +78,8 @@ ubyte flags = 0;
 
 char tib[132];
 int bytes_read = 0; // number of bytes read into TIB
+enum yytype_e { unk, str};
+enum yytype_e yytype;
 
 
 typedef struct { // dictionary entry
@@ -211,6 +213,48 @@ char* delim_word (char* delims, bool upper)
 }
 */
 
+void str_begin(cell_t* loc)
+{
+	*loc = (cell_t)hptr + 0* sizeof(cell_t);
+	if(!compiling) return;
+	//if(compiling) {
+		heapify_word("BRANCH");
+		*loc = (cell_t) hptr;
+		heapify(2572); // leet for zstr
+	//}
+}
+
+void str_end(cell_t loc)
+{
+
+	if(compiling) {
+		store(loc, (cell_t)hptr); // backfil to after the embedded string
+		heapify_word("LIT");
+		heapify(loc + sizeof(cell_t));
+
+	} else
+		push(loc); 
+}
+
+void p_z_slash () 
+{ 
+	cell_t loc;
+	str_begin(&loc);
+ 
+	token += 3; // movwe beyong the z" 
+	while(1) {
+		*hptr = *token;
+		if(*hptr == '"' || *hptr == 0) break;
+		hptr++;
+		token++;
+	}
+	rest = token;
+	*hptr = 0;
+	hptr++;
+
+	str_end(loc);
+}
+
 char* parse_word () 
 { 
 	if(rest == 0) {
@@ -222,7 +266,20 @@ char* parse_word ()
 	if(*token ==0) return 0;
 	while(isspace(*token)) token++;
 	rest = token;
-	while(!isspace(*rest) && *rest) rest++;
+	//char terminator = *rest == '"' ? 
+	yytype = unk;
+	if(*rest != '"') {
+		while(!isspace(*rest) && *rest) rest++;
+	} else {
+		puts("parse_world: parsing string");
+		yytype = str;
+		token++;
+		rest++;
+		//token -= 2; // the following routine will advance it
+		//p_z_slash();
+		while(*rest != '"' && *rest) { putchar(*rest) ; rest++; }
+	}
+
 	*rest = 0;
 	strupr(token);
 	//printf("word:toke:<%s>\n", token);
@@ -362,41 +419,6 @@ void p_dup()
 	push(v);
 }
 
-void p_z_slash () 
-{ 
-	//cell_t loc = (cell_t)hptr + sizeof(cell_t);
-	cell_t loc = (cell_t)hptr + 0* sizeof(cell_t);
-	if(compiling) {
-		heapify_word("BRANCH");
-		loc = (cell_t) hptr;
-		heapify(2572); // leet for zstr
-	}
-
-	//char* src = 0; // delim_word("\"", false);
-	 
-	//do {} while(*hptr++ = *src++);
-	token += 3; // movwe beyong the z" 
-	while(1) {
-		*hptr = *token;
-		if(*hptr == '"' || *hptr == 0) break;
-		hptr++;
-		token++;
-	}
-	rest = token;
-	*hptr = 0;
-	hptr++;
-
-	// alignment issues?
-	//while((cell_t) hptr % sizeof(cell_t)) hptr++;
-
-	if(compiling) {
-		store(loc, (cell_t)hptr); // backfil to after the embedded string
-		heapify_word("LIT");
-		heapify(loc + sizeof(cell_t));
-
-	} else
-		push(loc); 
-}
 
 void p_type () { printf("%s", (char*) pop()); }
 
@@ -766,9 +788,15 @@ void add_derived()
 
 }
 
-void process_token(char* token)
+void process_token (char* token)
 {
+	if(yytype == str) {
+		return;
+	}
+
 	codeptr cfa = cfa_find(token);
+	//if(*token == '"') puts("process_token:string");
+
 	if(cfa == 0) {
 		cell_t v;
 		if(int_str(token, &v)) {

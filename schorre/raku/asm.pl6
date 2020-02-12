@@ -30,7 +30,7 @@ my @opcodes = (
 	("cll", lbl,	{ say "TODO cll";}),
 	("end", none,	{ } ),
 	("gn1", none,	{ say "TODO gn1";} ),
-	("id", none,	{ say "TODO id";}),
+	("id", none,	{ do-id;}),
 	("lb", none,	{ say "TODO lb"; }),
 	("out", none,	{ say "TODO out";}),
 	("r", none,	{ say "TODO r"; }),
@@ -39,6 +39,15 @@ my @opcodes = (
 	("tst", str,	{ say "TODO tst";})
 );
 
+my $ch = Nil;
+sub _peekc() { if ch$ == Nil {$ch = $*IN.getc; }; return $ch;}
+sub _getc() { _peekc; 
+
+sub do-id () {
+	say "TODO do-id";
+	while(whitespace(_peekc()) { _getc; }
+	$ch = $*IN.getc;
+}
 # CREATE A LOOK-UP TABLE OF THE OPCODES
 my %opnums;
 my $opnum;
