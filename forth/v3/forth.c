@@ -17,16 +17,26 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* GNU C preprocessor definitions can be obtained by executing:
+ * gcc -dM -E - < /dev/null
+ */
+
 //typedef intptr_t cell_t;
 #if(__SIZEOF_POINTER__ ==4)
 typedef int32_t cell_t;
 const char* cell_fmt = "%ld ";
-//typedef float32_t flt_t;
+//typedef float flt_t; // mdunno if this is true of rnot
 #endif
 #if(__SIZEOF_POINTER__ ==8)
 typedef int64_t cell_t;
 const char* cell_fmt = "%ld ";
-//typedef float64_t flt_t;
+//typedef double flt_t;
+#endif
+#if(__SIZEOF_POINTER__ == __SIZEOF_FLOAT__)
+typedef float flt_t;
+#endif
+#if(__SIZEOF_POINTER__ == __SIZEOF_DOUBLE__)
+typedef double flt_t;
 #endif
 
 #define DEBUG(cmd) cmd
@@ -870,7 +880,8 @@ void process_tib()
 int main()
 {
 	assert(sizeof(size_t) == sizeof(cell_t));
-	//assert(sizeof(float) == sizeof(cell_t));
+	assert(sizeof(flt_t) == sizeof(cell_t));
+	//printf("sizeof double=%ld, float=%ld, cell=%ld\n", sizeof(double), sizeof(float), sizeof(cell_t));
 	compiling = false;
 	add_primitives();
 	add_derived();
