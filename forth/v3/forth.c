@@ -32,11 +32,16 @@ typedef int64_t cell_t;
 const char* cell_fmt = "%ld ";
 //typedef double flt_t;
 #endif
+
 #if(__SIZEOF_POINTER__ == __SIZEOF_FLOAT__)
 typedef float flt_t;
+#define STR2F strtof
+const char* flt_fmt = "%f ";
 #endif
 #if(__SIZEOF_POINTER__ == __SIZEOF_DOUBLE__)
 typedef double flt_t;
+#define STR2F strtod
+const char* flt_fmt = "%g ";
 #endif
 
 #define DEBUG(cmd) cmd
@@ -93,11 +98,14 @@ char tib[132];
 int bytes_read = 0; // number of bytes read into TIB
 enum yytype_e { unk, str, inum, flt}; // inum means integer number
 enum yytype_e yytype;
+cell_t yylval;
+/*
 union yylval_u {
 	int i;
-	float f;
+	flt_t f;
 	//char* s;
 } yylval;
+*/
 
 
 typedef struct { // dictionary entry
@@ -147,7 +155,8 @@ bool int_str(char*s, cell_t *v)
 bool int_flt(char* s, cell_t* v)
 {
 	char* endptr;
-	*v = strtof(s, &endptr);
+	flt_t f = STR2F(s, &endptr);
+	memcpy(v, &f, sizeof(cell_t));
 	//printf("int_flt:last char is <%d>\n", *endptr);
 	return *endptr == 0; // there shouldn't be anything left to process if it's a valid float
 
@@ -298,13 +307,14 @@ void identify_word()
 	cell_t v;
 	if(int_str(token, &v)) {
 		yytype = inum;
-		yylval.i = v;
+		yylval = v;
 		return;
 	}
 
 	if(int_flt(token, &v)) {
 		yytype = flt;
-		yylval.f = v;
+		//yylval.f = v;
+		yylval = v;
 		return;
 	}
 
@@ -721,8 +731,45 @@ void p_int_str ()
 	push(ok);
 }
 
+void fpop(flt_t *f)
+{
+	cell_t f1 = pop();
+	memcpy(f, &f1, sizeof(cell_t));
+}
+
+void fpush(flt_t f)
+{
+	cell_t f1;
+	memcpy(&f1, &f, sizeof(cell_t));
+	push(f1);
+
+}
+
+void p_fdot()
+{
+	flt_t f;
+	fpop(&f);
+
+	//cell_t f = pop();
+	//flt_t f1;
+	//memcpy(&f1, &f, sizeof(cell_t));
+	printf(flt_fmt, f);
+}
+
+void p_ftimes()
+{
+	flt_t f1, f2;
+	fpop(&f1);
+	fpop(&f2);
+	fpush(f1*f2);
+	//flt_t f1 = fpop(), f2 = fpop();
+	//push(f1*f2);
+}
+
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"F*", p_ftimes},
+	{0,	"F.", p_fdot},
 	{0,	"STR>INT", p_int_str},
 	{0,	"STRN=", p_strn_eq},
 	{0,	"STR=", p_str_eq},
@@ -845,11 +892,13 @@ void process_token (char* token)
 	}
 
 	if(yytype == inum || yytype == flt) {
-		cell_t v;
+		cell_t v = yylval;
+		/*
 		if(yytype == inum)
 			v = yylval.i;
 		else
 			v = yylval.f;
+			*/
 
 		if(compiling)
 			embed_literal(v);
