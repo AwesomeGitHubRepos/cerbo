@@ -240,14 +240,6 @@ void embed_literal(cell_t v)
 
 char* token;
 char* rest;
-/*
-char* delim_word (char* delims, bool upper)
-{
-	token = strtok_r(rest, delims, &rest);
-	if(upper) strupr(token);
-	return token;
-}
-*/
 
 void str_begin (cell_t* loc)
 {
@@ -334,7 +326,7 @@ char* parse_word ()
 	identify_word();
 
 	*rest = 0;
-	if(yytype == unk) strupr(token);
+	//if(yytype == unk) strupr(token);
 	//printf("word:toke:<%s>\n", token);
 	if(*token == 0) token = 0;
 	return token;
@@ -766,8 +758,15 @@ void p_ftimes()
 	//push(f1*f2);
 }
 
+void p__char_()
+{
+	parse_word();
+	push(*token);
+}
+
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{F_IMM,	"[CHAR]", p__char_},
 	{0,	"F*", p_ftimes},
 	{0,	"F.", p_fdot},
 	{0,	"STR>INT", p_int_str},

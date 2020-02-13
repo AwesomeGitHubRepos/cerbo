@@ -1,10 +1,45 @@
-STRINGS
+-----------------------------------------------------------------------
+CAT: FLOATS
+
+As of 13-Feb-2020, bbf supports floats, inc. the words:
+F. F*
+
+
+-----------------------------------------------------------------------
+CAT: STRINGS
 
 The word z" exists to create 0-terminated strings. The preferred 
 mechanism from Feb 2020 onwards is just to use regular C-style strings
 "like so".
 
 See the strings.4th file for more examples.
+
+
+-----------------------------------------------------------------------
+[CHAR] immediate
+
+Push the first char in the next word onto the stack.
+
+Example:
+[char] x emit \ outputs x
+
+
+-----------------------------------------------------------------------
+F.
+
+Print float.
+
+Example:
+12.3 F. \ outputs 12.3
+
+
+-----------------------------------------------------------------------
+F*
+
+Multiply the first two items on stacks as if they were floats:
+
+Example:
+10.1 0.1 F* F. \ outputs 1.01
 
 
 -----------------------------------------------------------------------
