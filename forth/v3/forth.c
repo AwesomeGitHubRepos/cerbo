@@ -14,16 +14,19 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 //typedef intptr_t cell_t;
 #if(__SIZEOF_POINTER__ ==4)
 typedef int32_t cell_t;
 const char* cell_fmt = "%ld ";
+//typedef float32_t flt_t;
 #endif
 #if(__SIZEOF_POINTER__ ==8)
 typedef int64_t cell_t;
 const char* cell_fmt = "%ld ";
+//typedef float64_t flt_t;
 #endif
 
 #define DEBUG(cmd) cmd
@@ -78,8 +81,13 @@ ubyte flags = 0;
 
 char tib[132];
 int bytes_read = 0; // number of bytes read into TIB
-enum yytype_e { unk, str};
+enum yytype_e { unk, str, inum, flt}; // inum means integer number
 enum yytype_e yytype;
+union yylval_u {
+	int i;
+	float f;
+	//char* s;
+} yylval;
 
 
 typedef struct { // dictionary entry
@@ -124,6 +132,15 @@ bool int_str(char*s, cell_t *v)
 	}
 	*v *= sgn;
 	return true;
+}
+
+bool int_flt(char* s, cell_t* v)
+{
+	char* endptr;
+	*v = strtof(s, &endptr);
+	//printf("int_flt:last char is <%d>\n", *endptr);
+	return *endptr == 0; // there shouldn't be anything left to process if it's a valid float
+
 }
 
 void undefined(char* token){
@@ -253,6 +270,36 @@ void p_z_slash ()
 	str_end(loc);
 }
 
+void identify_word()
+{
+	yytype = unk;
+	if(*rest == '"') {
+		//puts("parse_world: parsing string");
+		yytype = str;
+		token++;
+		rest++;
+		while(*rest != '"' && *rest)  rest++; 
+		return;
+	}
+
+	while(!isspace(*rest) && *rest) rest++;
+	*rest = 0;
+
+	cell_t v;
+	if(int_str(token, &v)) {
+		yytype = inum;
+		yylval.i = v;
+		return;
+	}
+
+	if(int_flt(token, &v)) {
+		yytype = flt;
+		yylval.f = v;
+		return;
+	}
+
+}
+
 char* parse_word () 
 { 
 	if(rest == 0) {
@@ -264,16 +311,7 @@ char* parse_word ()
 	if(*token ==0) return 0;
 	while(isspace(*token)) token++;
 	rest = token;
-	yytype = unk;
-	if(*rest != '"') {
-		while(!isspace(*rest) && *rest) rest++;
-	} else {
-		//puts("parse_world: parsing string");
-		yytype = str;
-		token++;
-		rest++;
-		while(*rest != '"' && *rest)  rest++; 
-	}
+	identify_word();
 
 	*rest = 0;
 	if(yytype == unk) strupr(token);
@@ -796,25 +834,33 @@ void process_token (char* token)
 		return;
 	}
 
+	if(yytype == inum || yytype == flt) {
+		cell_t v;
+		if(yytype == inum)
+			v = yylval.i;
+		else
+			v = yylval.f;
+
+		if(compiling)
+			embed_literal(v);
+		else
+			push(v);
+		return;
+	}
+
 	codeptr cfa = cfa_find(token);
-	//if(*token == '"') puts("process_token:string");
 
 	if(cfa == 0) {
-		cell_t v;
-		if(int_str(token, &v)) {
-			if(compiling)
-				embed_literal(v);
-			else
-				push(v);
-		} else {
-			undefined(token);
-		}
-	} else {
-		if(compiling && !(flags & F_IMM))
-			heapify((cell_t)cfa);
-		else
-			execute(cfa);
+		undefined(token);
+		return;
 	}
+
+
+	if(compiling && !(flags & F_IMM))
+		heapify((cell_t)cfa);
+	else
+		execute(cfa);
+	
 }
 void process_tib()
 {
@@ -824,6 +870,7 @@ void process_tib()
 int main()
 {
 	assert(sizeof(size_t) == sizeof(cell_t));
+	//assert(sizeof(float) == sizeof(cell_t));
 	compiling = false;
 	add_primitives();
 	add_derived();
