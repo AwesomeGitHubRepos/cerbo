@@ -10,6 +10,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -766,8 +767,20 @@ void p__char_()
 
 void p_pt();
 
+void p_round()
+{
+	flt_t f;
+//#if(__SIZEOF_POINTER__ == __SIZEOF_FLOAT__)
+	fpop(&f);
+	f = roundf(f);
+	//f = round(f);
+	//cell_t f1 = (cell_t) f;
+	push((cell_t)f);
+}
+
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"ROUND", p_round},
 	{0,	"PT", p_pt},
 	{F_IMM,	"[CHAR]", p__char_},
 	{0,	"F*", p_ftimes},

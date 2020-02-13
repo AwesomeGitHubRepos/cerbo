@@ -85,6 +85,17 @@ See WHILE
 
 
 -----------------------------------------------------------------------
+ROUND ( float -- int )
+
+Round float to nearest int, but round halfway cases away from 0.
+
+Examples:
+12.3 round . \ outputs 12
+12.5 round . \ outputs 13
+-12.5 round . \ outputs -13
+ 
+
+-----------------------------------------------------------------------
 TIB ( -- addr )
 
 Put the address of TIB on the stack
