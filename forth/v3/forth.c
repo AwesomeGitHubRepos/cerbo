@@ -99,13 +99,6 @@ int bytes_read = 0; // number of bytes read into TIB
 enum yytype_e { unk, str, inum, flt}; // inum means integer number
 enum yytype_e yytype;
 cell_t yylval;
-/*
-union yylval_u {
-	int i;
-	flt_t f;
-	//char* s;
-} yylval;
-*/
 
 
 typedef struct { // dictionary entry
@@ -708,7 +701,14 @@ void p_pick ()
 		puts("Stack underflow");
 }
 
-bool refill ()	{ rest = 0; tib[0] = 0; return fgets(tib, sizeof(tib), stdin); }
+bool refill ()
+{ 
+	rest = 0; 
+	memset(tib, 0, sizeof(tib));
+	//tib[0] = 0; 
+	return fgets(tib, sizeof(tib), stdin); 
+}
+
 void p_refill () { push(refill()); }
 void p_tib ()	{ push((cell_t) tib); }
 
@@ -764,8 +764,11 @@ void p__char_()
 	push(*token);
 }
 
+void p_pt();
+
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"PT", p_pt},
 	{F_IMM,	"[CHAR]", p__char_},
 	{0,	"F*", p_ftimes},
 	{0,	"F.", p_fdot},
@@ -796,7 +799,7 @@ prim_s prims[] =  {
 	{F_IMM,	"DOES>", p_does},
 	{0, 	"(DOES>)", p_dodoes},
 	{0, 	"DROP", p_drop},
-	{0, 	"\\", p_bslash},
+	{F_IMM,	"\\", p_bslash},
 	{0, 	"BRANCH", p_branch},
 	{0,	">R", p_tor},
 	{0,	"R>", p_fromr},
@@ -865,6 +868,7 @@ char* derived[] = {
 	": CELLS	cell * ;",
 	": CELLS+	cells + ;",
 	": OVER		1 pick ;",
+	": SPACE	32 emit ;",
 	0
 };
 
@@ -920,6 +924,12 @@ void process_token (char* token)
 		execute(cfa);
 	
 }
+
+void p_pt()
+{
+	process_token((char*) pop());
+}
+
 void process_tib()
 {
 	rest = 0;

@@ -67,6 +67,12 @@ See OVER
 
 
 -----------------------------------------------------------------------
+PT
+
+Process Token
+
+
+-----------------------------------------------------------------------
 REFILL ( -- flag )
 
 Reads current input stream, and puts it into TIB (The Input Buffer)
