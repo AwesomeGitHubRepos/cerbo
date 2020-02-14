@@ -16,6 +16,18 @@ See the strings.4th file for more examples.
 
 
 -----------------------------------------------------------------------
+$CREATE ( str -- )
+
+Create word identified by str.
+
+Equivalent of create str
+
+Example:
+"foo" $create 42 ,
+foo @ . \ outputs 42
+
+
+-----------------------------------------------------------------------
 ++ ( addr -- )
 
 Increments a variable

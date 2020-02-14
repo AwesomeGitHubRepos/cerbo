@@ -433,10 +433,11 @@ void p_exit()
 void p_at () { push(dref((void*)pop())); }
 void p_exc() { cell_t pos = pop(); cell_t val = pop(); store(pos, val); }
 
-void _create() { push((cell_t)++W); }
-void p_create() { parse_word(); createz(0, token, (cell_t) _create); }
-void p_comma() { heapify(pop()); }
-void p_prompt () { show_prompt = (bool) pop(); }
+void _create () 	{ push((cell_t)++W); }
+void p_create() 	{ parse_word(); createz(0, token, (cell_t) _create); }
+void p_dlr_create () 	{ createz(0, (char*) pop(), (cell_t) _create); }
+void p_comma ()		{ heapify(pop()); }
+void p_prompt ()	{ show_prompt = (bool) pop(); }
 
 void p_lsb() { compiling = false; }
 void p_rsb() { compiling = true; }
@@ -789,6 +790,7 @@ void p_pc0nd ()
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"$CREATE", p_dlr_create},
 	{0,	"%0ND", p_pc0nd},
 	{0,	"ROUND", p_round},
 	{0,	"PT", p_pt},
