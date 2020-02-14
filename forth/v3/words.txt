@@ -16,6 +16,28 @@ See the strings.4th file for more examples.
 
 
 -----------------------------------------------------------------------
+++ ( addr -- )
+
+Increments a variable
+
+Example:
+variable id
+id ++ 
+id ++
+id @ . \ outputs 2
+
+
+-----------------------------------------------------------------------
+%0ND ( int n -- )
+
+Print int to n places, with leading 0's.
+
+Example:
+12 4 %0nd \ outputs 0012
+-12 3 %nd \ outputs -012
+
+
+-----------------------------------------------------------------------
 [CHAR] immediate
 
 Push the first char in the next word onto the stack.

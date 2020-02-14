@@ -778,8 +778,18 @@ void p_round()
 	push((cell_t)f);
 }
 
+void p_pc0nd ()
+{
+	char fmt[10];
+	sprintf(fmt, "%%0%dd", (int) pop());
+	//puts(fmt);
+	printf(fmt, pop());
+}
+
+
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"%0ND", p_pc0nd},
 	{0,	"ROUND", p_round},
 	{0,	"PT", p_pt},
 	{F_IMM,	"[CHAR]", p__char_},
@@ -882,6 +892,7 @@ char* derived[] = {
 	": CELLS+	cells + ;",
 	": OVER		1 pick ;",
 	": SPACE	32 emit ;",
+	": ++		dup @ 1+ swap ! ;",
 	0
 };
 
