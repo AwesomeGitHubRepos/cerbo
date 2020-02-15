@@ -715,6 +715,7 @@ void p_refill () { push(refill()); }
 void p_tib ()	{ push((cell_t) tib); }
 
 void p_str_eq () { push(strcmp((const char*) pop(), (const char*) pop()) == 0); }
+void p_str_lt () { push(strcmp((const char*) pop(), (const char*) pop()) < 0); }
 void p_strn_eq () { int n = pop(); push(strncmp((const char*) pop(), (const char*) pop(), n) == 0); }
 
 void p_int_str ()
@@ -807,6 +808,7 @@ prim_s prims[] =  {
 	{0,	"F.", p_fdot},
 	{0,	"STR>INT", p_int_str},
 	{0,	"STRN=", p_strn_eq},
+	{0,	"STR<", p_str_lt},
 	{0,	"STR=", p_str_eq},
 	{0,	"TIB", p_tib},
 	{0,	"REFILL", p_refill},
