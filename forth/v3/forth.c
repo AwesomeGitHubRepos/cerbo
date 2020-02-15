@@ -42,7 +42,7 @@ const char* flt_fmt = "%f ";
 #if(__SIZEOF_POINTER__ == __SIZEOF_DOUBLE__)
 typedef double flt_t;
 #define STR2F strtod
-const char* flt_fmt = "%g ";
+const char* flt_fmt = "%f ";
 #endif
 
 #define DEBUG(cmd) cmd
