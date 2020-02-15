@@ -787,9 +787,17 @@ void p_pc0nd ()
 	printf(fmt, pop());
 }
 
+void p_fneg()
+{
+	flt_t f;
+	fpop(&f);
+	fpush(-f);
+}
+
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"FNEG", p_fneg},
 	{0,	"$CREATE", p_dlr_create},
 	{0,	"%0ND", p_pc0nd},
 	{0,	"ROUND", p_round},
