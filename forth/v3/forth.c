@@ -903,8 +903,9 @@ char* derived[] = {
 	": CELLS	cell * ;",
 	": CELLS+	cells + ;",
 	": OVER		1 pick ;",
-	": SPACE	32 emit ;",
+	": SPACE	32 emit ;",	
 	": ++		dup @ 1+ swap ! ;",
+	": NOT		0 = if 1 else 0 then ;",
 	0
 };
 
