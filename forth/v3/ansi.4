@@ -1,12 +1,12 @@
 0 prompt
 \ playing with ansi escape sequences
 
-: esc[ 27 emit [char] [ emit ;
+\ http://ascii-table.com/ansi-escape-sequences.php
 
-\ goto line and column ( l c -- )
-: gotolc swap esc[ %d [char] ; emit  %d [char] f emit ;
+: ESC[ 		27 emit [char] [ emit ; \ begin escape sequence. 27 is ESC
 
-: cls esc[ "2J" type ; \ erase display and move cursor to home
+: GOTOLC	swap esc[ %d [char] ; emit  %d [char] f emit ; \ goto line and column ( l c -- )
+: CLS		esc[ "2J" type ; \ erase display and move cursor to home
 
 cls
 5 10 gotolc
