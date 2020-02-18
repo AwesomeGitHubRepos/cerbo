@@ -23,6 +23,9 @@ Run it: `cat cat.4th somefile.txt | forth`
 
 ## See also:
 
+
+* [bestiary](https://github.com/marcpaq/b1fipl) - single-file implementations of programming languages, which includs bbf3
+
 * [words](words.txt)
 
 ## Glossary
