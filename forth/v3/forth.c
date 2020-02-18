@@ -25,12 +25,12 @@
 //typedef intptr_t cell_t;
 #if(__SIZEOF_POINTER__ ==4)
 typedef int32_t cell_t;
-const char* cell_fmt = "%ld ";
+const char* cell_fmt = "%ld";
 //typedef float flt_t; // mdunno if this is true of rnot
 #endif
 #if(__SIZEOF_POINTER__ ==8)
 typedef int64_t cell_t;
-const char* cell_fmt = "%ld ";
+const char* cell_fmt = "%ld";
 //typedef double flt_t;
 #endif
 
@@ -354,7 +354,10 @@ void p_lit()
 void p_dots()
 {
 	printf("Stack: (%d):", sstack.size);
-	for(int i = 0; i< sstack.size; ++i) printf(cell_fmt, sstack.contents[i]);
+	for(int i = 0; i< sstack.size; ++i) {
+		printf(cell_fmt, sstack.contents[i]);
+		printf(" ");
+	}
 }
 
 
@@ -363,7 +366,9 @@ void p_minus() { cell_t v1 = pop(), v2 = pop(); push(v2-v1); }
 void p_mult() { push(pop() * pop()); }
 void p_div() { cell_t v1 = pop(), v2 = pop(); push(v2/v1); }
 
-void p_dot() { printf(cell_fmt, pop()); }
+void p_pcd() { printf(cell_fmt,  pop()); }
+void p_dot() { p_pcd(); printf(" "); }
+
 
 void p_tick()
 {
@@ -764,7 +769,7 @@ void p_ftimes()
 void p__char_()
 {
 	parse_word();
-	push(*token);
+	embed_literal(*token);
 }
 
 void p_pt();
@@ -798,6 +803,7 @@ void p_fneg()
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"%D", p_pcd},
 	{0,	"FNEG", p_fneg},
 	{0,	"$CREATE", p_dlr_create},
 	{0,	"%0ND", p_pc0nd},
