@@ -11,6 +11,7 @@
 void func(int sockfd) 
 { 
 	char buff[MAX]; 
+	char resp[MAX+20]; 
 	int n; 
 	for (;;) { 
 		bzero(buff, sizeof(buff)); 
@@ -18,10 +19,11 @@ void func(int sockfd)
 		n = 0; 
 		while ((buff[n++] = getchar()) != '\n') 
 			; 
+		//puts("");
 		write(sockfd, buff, sizeof(buff)); 
-		bzero(buff, sizeof(buff)); 
-		read(sockfd, buff, sizeof(buff)); 
-		printf("From Server : %s", buff); 
+		bzero(resp, sizeof(resp)); 
+		read(sockfd, resp, sizeof(resp)); 
+		printf("From Server : %s", resp); 
 		if ((strncmp(buff, "exit", 4)) == 0) { 
 			printf("Client Exit...\n"); 
 			break; 

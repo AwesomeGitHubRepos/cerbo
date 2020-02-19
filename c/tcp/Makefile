@@ -6,7 +6,7 @@ clean :
 	rm -f $(BINS)
 
 client : client.c
-	gcc $^ -o $@
+	gcc -fsanitize=address $^ -o $@ -lasan
 
 server : server.c
-	gcc $^ -o $@
+	gcc -fsanitize=address $^ -o $@ -lasan

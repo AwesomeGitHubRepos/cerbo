@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h> 
 #include <netdb.h> 
 #include <netinet/in.h> 
@@ -15,23 +16,38 @@
 void func(int sockfd) 
 { 
 	char buff[MAX]; 
+	char resp[MAX+20]; 
 	int n; 
 	// infinite loop for chat 
 	for (;;) { 
 		bzero(buff, MAX); 
 
 		// read the message from client and copy it in buffer 
-		read(sockfd, buff, sizeof(buff)); 
+		n = read(sockfd, buff, sizeof(buff)); 
+		if(n < 1) {
+			puts("Read failed");
+			break;
+		}
+
 		// print buffer which contains the client contents 
-		printf("From client: %s\t To client : ", buff); 
-		bzero(buff, MAX); 
-		n = 0; 
+		printf("From client: %s", buff); 
+		bzero(resp, MAX); 
+		
 		// copy server message in the buffer 
-		while ((buff[n++] = getchar()) != '\n') 
-			; 
+		sprintf(resp, "S: '%s'", buff);
+		puts(resp);
+
+		//while ((buff[n++] = getchar()) != '\n') 
+		//	; 
 
 		// and send that buffer to client 
-		write(sockfd, buff, sizeof(buff)); 
+		printf("Attempt write of %ld bytes: %s", strlen(resp), resp);
+		n = write(sockfd, resp, strlen(resp)); 
+		puts("Write completed");
+		if(n == -1) {
+			puts("Write failed");
+		}
+
 
 		// if msg contains "Exit" then server exit and chat ended. 
 		if (strncmp("exit", buff, 4) == 0) { 
@@ -41,8 +57,7 @@ void func(int sockfd)
 	} 
 } 
 
-// Driver function 
-int main() 
+void main_conn() 
 { 
 	int sockfd, connfd, len; 
 	struct sockaddr_in servaddr, cli; 
@@ -61,6 +76,13 @@ int main()
 	servaddr.sin_family = AF_INET; 
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY); 
 	servaddr.sin_port = htons(PORT); 
+
+
+	// make it reusable
+	const int       optVal = 1;
+	const socklen_t optLen = sizeof(optVal);
+	int rtn = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (void*) &optVal, optLen);
+	assert(rtn == 0);   /* this is optional */
 
 	// Binding newly created socket to given IP and verification 
 	if ((bind(sockfd, (SA*)&servaddr, sizeof(servaddr))) != 0) { 
@@ -93,5 +115,18 @@ int main()
 
 	// After chatting close the socket 
 	close(sockfd); 
+	//free(sockfd);
+	puts("Closing connection");
 } 
+
+int main() 
+{
+loop:
+	puts("Starting connection");
+	main_conn();
+	puts("Connecting stopped");
+	goto loop;
+
+	return 0;
+}
 
