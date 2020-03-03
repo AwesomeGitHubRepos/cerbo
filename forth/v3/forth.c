@@ -785,11 +785,18 @@ void p_round()
 	push((cell_t)f);
 }
 
+void p_pcnd ()
+{
+	char fmt[10];
+	sprintf(fmt, "%%%dd", (int) pop());
+	puts(fmt);
+	printf(fmt, pop());
+}
+
 void p_pc0nd ()
 {
 	char fmt[10];
 	sprintf(fmt, "%%0%dd", (int) pop());
-	//puts(fmt);
 	printf(fmt, pop());
 }
 
@@ -801,8 +808,14 @@ void p_fneg()
 }
 
 
+void p_floor() { flt_t f; fpop(&f); int i = (int) floor(f); push(i); }
+void p_ceil()  { flt_t f; fpop(&f); int i = (int) ceil(f); push(i); }
+
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"%ND", p_pcnd},
+	{0,	"CEIL", p_ceil},
+	{0,	"FLOOR", p_floor},
 	{0,	"%D", p_pcd},
 	{0,	"FNEG", p_fneg},
 	{0,	"$CREATE", p_dlr_create},

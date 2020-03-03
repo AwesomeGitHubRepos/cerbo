@@ -40,6 +40,17 @@ id @ . \ outputs 2
 
 
 -----------------------------------------------------------------------
+%ND ( int n -- )
+
+Print int to n places, with leading spaces.
+
+Example:
+\                   1234
+12  4 %nd \ outputs   12
+-12 4 %nd \ outputs  -12
+
+
+-----------------------------------------------------------------------
 %0ND ( int n -- )
 
 Print int to n places, with leading 0's.
@@ -47,6 +58,16 @@ Print int to n places, with leading 0's.
 Example:
 12 4 %0nd \ outputs 0012
 -12 3 %nd \ outputs -012
+
+
+-----------------------------------------------------------------------
+CEIL ( f -- i )
+
+Takes a float from top of the stack, takes its ceiling, then pushes
+that int to the stack
+
+Example:
+10.3 ceil . \ outputs 11
 
 
 -----------------------------------------------------------------------
@@ -74,6 +95,16 @@ Multiply the first two items on stacks as if they were floats:
 
 Example:
 10.1 0.1 F* F. \ outputs 1.01
+
+
+-----------------------------------------------------------------------
+FLOOR ( f -- i )
+
+Takes a float from top of the stack, takes its floor, then pushes
+that int to the stack
+
+Example:
+10.3 ceil . \ outputs 10
 
 
 -----------------------------------------------------------------------
