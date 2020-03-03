@@ -789,7 +789,6 @@ void p_pcnd ()
 {
 	char fmt[10];
 	sprintf(fmt, "%%%dd", (int) pop());
-	puts(fmt);
 	printf(fmt, pop());
 }
 
