@@ -197,6 +197,22 @@ Put the address of TIB on the stack
 
 
 -----------------------------------------------------------------------
+VARS:
+
+Creates mutliple variables until EOL
+
+Example:
+vars: foo bar baz
+is equivalent of variable foo variable bar variable baz
+
+Implementation:
+: VARS:        begin parse-word dup while $create 0 , repeat drop ;
+
+Discusssion:
+https://mcturra2000.wordpress.com/2020/02/16/forthlang-ninja-development/
+
+
+-----------------------------------------------------------------------
 WHILE immediate (BEGIN ... WHILE ... REPEAT)
 
 Example:

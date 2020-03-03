@@ -927,6 +927,7 @@ char* derived[] = {
 	": SPACE	32 emit ;",	
 	": ++		dup @ 1+ swap ! ;",
 	": NOT		0 = if 1 else 0 then ;",
+	": VARS:	begin parse-word dup while $create 0 , repeat drop ;",
 	0
 };
 
