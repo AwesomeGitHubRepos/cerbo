@@ -40,6 +40,17 @@ id @ . \ outputs 2
 
 
 -----------------------------------------------------------------------
+%ND ( int n -- )
+
+Print int to n places, with leading spaces.
+
+Example:
+\                   1234
+12  4 %nd \ outputs   12
+-12 4 %nd \ outputs  -12
+
+
+-----------------------------------------------------------------------
 %0ND ( int n -- )
 
 Print int to n places, with leading 0's.
@@ -47,6 +58,16 @@ Print int to n places, with leading 0's.
 Example:
 12 4 %0nd \ outputs 0012
 -12 3 %nd \ outputs -012
+
+
+-----------------------------------------------------------------------
+CEIL ( f -- i )
+
+Takes a float from top of the stack, takes its ceiling, then pushes
+that int to the stack
+
+Example:
+10.3 ceil . \ outputs 11
 
 
 -----------------------------------------------------------------------
@@ -77,12 +98,31 @@ Example:
 
 
 -----------------------------------------------------------------------
+FLOOR ( f -- i )
+
+Takes a float from top of the stack, takes its floor, then pushes
+that int to the stack
+
+Example:
+10.3 ceil . \ outputs 10
+
+
+-----------------------------------------------------------------------
 FNEG ( flt -- -flt)
 
 Float negation
 
 Evample
 12.3 fneg f. \ outputs -12.3
+
+
+-----------------------------------------------------------------------
+NEG  ( n -- -n)
+
+Integer negation
+
+Example:
+11 neg . \ outputs -11
 
 
 -----------------------------------------------------------------------
@@ -154,6 +194,22 @@ Is str1 < str2?
 TIB ( -- addr )
 
 Put the address of TIB on the stack
+
+
+-----------------------------------------------------------------------
+VARS:
+
+Creates mutliple variables until EOL
+
+Example:
+vars: foo bar baz
+is equivalent of variable foo variable bar variable baz
+
+Implementation:
+: VARS:        begin parse-word dup while $create 0 , repeat drop ;
+
+Discusssion:
+https://mcturra2000.wordpress.com/2020/02/16/forthlang-ninja-development/
 
 
 -----------------------------------------------------------------------
