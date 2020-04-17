@@ -812,8 +812,18 @@ void p_neg() { push(- pop()); }
 void p_floor() { flt_t f; fpop(&f); int i = (int) floor(f); push(i); }
 void p_ceil()  { flt_t f; fpop(&f); int i = (int) ceil(f); push(i); }
 
+void p_noname ()
+{
+	push((cell_t)hptr);
+	//heapify_word("DOCOL");
+	heapify((cell_t)docol);
+	compiling = true;
+}
+
+
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	":NONAME", p_noname},
 	{0,	"NEG", p_neg},
 	{0,	"%ND", p_pcnd},
 	{0,	"CEIL", p_ceil},
@@ -955,12 +965,6 @@ void process_token (char* token)
 
 	if(yytype == inum || yytype == flt) {
 		cell_t v = yylval;
-		/*
-		if(yytype == inum)
-			v = yylval.i;
-		else
-			v = yylval.f;
-			*/
 
 		if(compiling)
 			embed_literal(v);

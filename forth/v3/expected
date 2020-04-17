@@ -1,30 +1,40 @@
 =============================
 builds.4th
 0 prompt
+: expect  cr "Expect " type type  ":" type cr ;
 z" BUILDS.4th ..." type cr
 \ testing the dreaded <builds/does via constant
 : const <builds , does> @ ;
 11 const eleven
 12 const twelve
-z" Expect 11:" type cr
+
+"11" expect
 eleven . cr
-z" Expect 12" type cr
+
+"12" expect
 twelve . cr
-z" Expect 11:" type cr
+
+"11" expect
 eleven . cr
-z" Expect 12" type cr
+
+"12" expect
+
 twelve . cr
 z" ... finished" type cr
 1 prompt
 ---
 BUILDS.4th ...
+
 Expect 11:
 11 
-Expect 12
+
+Expect 12:
 12 
+
 Expect 11:
 11 
-Expect 12
+
+Expect 12:
 12 
 ... finished
   ok
@@ -145,6 +155,43 @@ Expect 23:
 Expect 23:
 23 
 Stack: (0):
+
+=============================
+noname.4th
+0 prompt
+\ https://forth-standard.org/standard/core/ColonNONAME
+: expect  cr "Expect " type type  ":" type cr ;
+"123" expect
+:noname 123 . cr ; execute
+
+defer print
+:noname . cr ; is print
+
+"23" expect
+23 print
+
+
+variable nn1
+variable nn2
+:noname 1234 . cr ; nn1 !
+:noname 9876 . cr ; nn2 !
+"1234" expect
+nn1 @ execute
+"9876" expect
+nn2 @ execute
+---
+
+Expect 123:
+123 
+
+Expect 23:
+23 
+
+Expect 1234:
+1234 
+
+Expect 9876:
+9876 
 
 =============================
 pick.4th
