@@ -203,7 +203,7 @@ void* code(dent_s* dw)
 	return ++dw;
 }
 
-codeptr cfa_find(char* name) // name can be lowercase, if you like
+codeptr cfa_find (char* name) // name can be lowercase, if you like
 {
 	dent_s* dw = latest;
 	//strupr(name);
@@ -820,9 +820,14 @@ void p_noname ()
 	compiling = true;
 }
 
+void p_find()
+{
+	push((cell_t)cfa_find((char*)pop()));
+}
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"FIND", p_find},
 	{0,	":NONAME", p_noname},
 	{0,	"NEG", p_neg},
 	{0,	"%ND", p_pcnd},

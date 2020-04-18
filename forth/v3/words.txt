@@ -112,6 +112,20 @@ Example:
 
 
 -----------------------------------------------------------------------
+FIND ( str -- xt )
+
+Find a word, returning its xt. 0 on word not found.
+
+Example 1:
+"hi" find execute \ prints hello world
+
+Example 2:
+variable foo
+33 foo !
+"foo" find cell + @ . \ prints 33
+
+
+-----------------------------------------------------------------------
 FLOOR ( f -- i )
 
 Takes a float from top of the stack, takes its floor, then pushes
