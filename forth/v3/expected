@@ -120,6 +120,29 @@ hello from x
 caoi from y
 
 =============================
+find.4th
+0 prompt
+: expect  cr "Expect " type type  ":" type cr ;
+
+"hello world" expect
+"hi" find execute
+
+
+"33" expect
+variable foo
+33 foo !
+"foo" find cell + @ .
+
+cr
+---
+
+Expect hello world:
+hello world
+
+Expect 33:
+33 
+
+=============================
 life.4th
 0 prompt
 : life 42 ;
