@@ -28,18 +28,6 @@ foo @ . \ outputs 42
 
 
 -----------------------------------------------------------------------
-++ ( addr -- )
-
-Increments a variable
-
-Example:
-variable id
-id ++ 
-id ++
-id @ . \ outputs 2
-
-
------------------------------------------------------------------------
 %ND ( int n -- )
 
 Print int to n places, with leading spaces.
@@ -61,13 +49,28 @@ Example:
 
 
 -----------------------------------------------------------------------
-CEIL ( f -- i )
+++ ( addr -- )
 
-Takes a float from top of the stack, takes its ceiling, then pushes
-that int to the stack
+Increments a variable
 
 Example:
-10.3 ceil . \ outputs 11
+variable id
+id ++ 
+id ++
+id @ . \ outputs 2
+
+
+-----------------------------------------------------------------------
+['] ( -- xt ) immediate
+
+Like ', but for compilation.
+
+Definition:
+: [']          ' postpone literal ; immediate
+
+Example:
+: ho ['] hi execute ;
+ho \ outputs hello world
 
 
 -----------------------------------------------------------------------
@@ -77,6 +80,17 @@ Push the first char in the next word onto the stack.
 
 Example:
 [char] x emit \ outputs x
+
+
+-----------------------------------------------------------------------
+CEIL ( f -- i )
+
+Takes a float from top of the stack, takes its ceiling, then pushes
+that int to the stack
+
+Example:
+10.3 ceil . \ outputs 11
+
 
 
 -----------------------------------------------------------------------
