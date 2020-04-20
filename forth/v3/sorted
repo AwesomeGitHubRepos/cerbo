@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+function print_help {
+cat <<EOF
+etc
+EOF
+}
+ 
+
+case $1 in
+    h) print_help ; echo . ; exit ;;
+esac
+
+sort <<EOI
+\`
+[
+$
+^
+&
+@
+]
+A
+a
+*
+/
++
+EOI
