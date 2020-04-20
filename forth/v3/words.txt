@@ -49,6 +49,14 @@ Example:
 
 
 -----------------------------------------------------------------------
+)LINES
+
+Counterpart of LINES(.
+
+See VARS for and example.
+
+
+-----------------------------------------------------------------------
 ++ ( addr -- )
 
 Increments a variable
@@ -80,6 +88,15 @@ Push the first char in the next word onto the stack.
 
 Example:
 [char] x emit \ outputs x
+
+
+-----------------------------------------------------------------------
+`
+
+Equivalent of POSTPONE.
+
+Definition:
+: ` postpone postpone ; immediate
 
 
 -----------------------------------------------------------------------
@@ -142,6 +159,12 @@ Float negation
 
 Evample
 12.3 fneg f. \ outputs -12.3
+
+
+-----------------------------------------------------------------------
+LINE(
+
+Counterpart of )LINE. See VARS for an example
 
 
 -----------------------------------------------------------------------
@@ -233,8 +256,12 @@ Example:
 vars: foo bar baz
 is equivalent of variable foo variable bar variable baz
 
-Implementation:
+Implementation 1:
 : VARS:        begin parse-word dup while $create 0 , repeat drop ;
+
+Implementation 2:
+: VARS:      line( $create 0 , )line ;
+
 
 Discusssion:
 https://mcturra2000.wordpress.com/2020/02/16/forthlang-ninja-development/

@@ -943,7 +943,10 @@ char* derived[] = {
 	": ++		dup @ 1+ swap ! ;",
 	": NOT		0 = if 1 else 0 then ;",
 	": [']		' postpone literal ; immediate",
-	": VARS:	begin parse-word dup while $create 0 , repeat drop ;",
+	": ` 		postpone postpone ; immediate",
+	": LINE( 	` begin ` parse-word ` dup ` while ; immediate",
+	": )LINE 	` repeat ` drop ; immediate",
+	": VARS:        line( $create 0 , )line ;",
 	0
 };
 
