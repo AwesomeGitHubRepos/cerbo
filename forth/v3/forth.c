@@ -485,13 +485,15 @@ void p_0branch()
 		RTOP += sizeof(cell_t);
 }
 
-
+/*
 void p_compile() 
 {
 	cell_t cell = dref((void*)RTOP);
 	heapify(cell);
 	RTOP += sizeof(cell_t);
 }
+*/
+
 void p_postpone ()
 {
 	parse_word();
@@ -862,7 +864,7 @@ prim_s prims[] =  {
 	{0,	">R", p_tor},
 	{0,	"R>", p_fromr},
 	{0, 	"TYPE", p_type},
-	{0, 	"COMPILE", p_compile},
+	//{0, 	"COMPILE", p_compile},
 	{0, 	"0BRANCH", p_0branch},
 	{0, 	"IMMEDIATE", p_immediate},
 	{0, 	"SWAP", p_swap},
@@ -911,6 +913,8 @@ void eval_string(char* str)
 }
 
 char* derived[] = {
+	": CELL+	cell + ;",
+	": COMPILE	r> dup @ , cell+ >r ;",
 	": LITERAL	postpone lit  ,   ; immediate",
 	": VARIABLE 	create 0 , ;",
 	": 1+ 		1 + ;",
