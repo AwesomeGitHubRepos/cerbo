@@ -370,6 +370,7 @@ void p_pcd() { printf(cell_fmt,  pop()); }
 void p_dot() { p_pcd(); printf(" "); }
 
 
+/*
 void p_tick()
 {
 	parse_word();
@@ -379,6 +380,8 @@ void p_tick()
 	else
 		undefined(token);
 }
+*/
+
 
 void execute (codeptr cfa)	
 {
@@ -896,7 +899,7 @@ prim_s prims[] =  {
 	{0,	":", p_colon},
 	{F_IMM,	";", p_semi},
 	{0,	"EXECUTE", p_execute},
-	{0,	"'", p_tick},
+	//{0,	"'", p_tick},
 	{0,	".S", p_dots},
 	{0,  	"+", p_plus},
 	{0,  	"-", p_minus},
@@ -942,11 +945,17 @@ char* derived[] = {
 	": SPACE	32 emit ;",	
 	": ++		dup @ 1+ swap ! ;",
 	": NOT		0 = if 1 else 0 then ;",
+	": UNDEFINED	\"Undefined word:<\" type type \">\" type cr ;",
+	": .UNDEFINED	\"ERR: undefined word\" type cr ;",
+	": ' parse-word dup find dup if swap drop else  drop undefined  [ parse-word .undefined find ] literal then ;",
 	": [']		' postpone literal ; immediate",
 	": ` 		postpone postpone ; immediate",
 	": LINE( 	` begin ` parse-word ` dup ` while ; immediate",
 	": )LINE 	` repeat ` drop ; immediate",
 	": VARS:        line( $create 0 , )line ;",
+	": EXPECT	 cr \"Expect \" type type  \":\" type cr ;",
+
+
 	0
 };
 
