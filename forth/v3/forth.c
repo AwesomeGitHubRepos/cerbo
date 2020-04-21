@@ -497,7 +497,6 @@ void p_postpone ()
 	parse_word();
 	codeptr cfa = (codeptr) cfa_find(token);
 	if(is_immediate(cfa)) {
-		//embed_literal((cell_t) cfa);
 		heapify_word(token);
 	} else {
 		heapify_word("COMPILE");
@@ -505,11 +504,13 @@ void p_postpone ()
 	}
 }
 
+/*
 void p_literal ()
 {
 	cell_t v = pop();
 	embed_literal(v);
 }
+*/
 
 void p_fromr()
 {
@@ -750,8 +751,6 @@ void p_ftimes()
 	fpop(&f1);
 	fpop(&f2);
 	fpush(f1*f2);
-	//flt_t f1 = fpop(), f2 = fpop();
-	//push(f1*f2);
 }
 
 void p__char_()
@@ -845,7 +844,7 @@ prim_s prims[] =  {
 	{0,	">", p_gt},
 	{0,	"CELL", p_cell},
 	{0,	"PARSE-WORD", p_parse_word},
-	{F_IMM,	"LITERAL", p_literal},
+	//{F_IMM,	"LITERAL", p_literal},
 	{F_IMM,	"POSTPONE", p_postpone},
 	{0,	"DOCOL", docol},
 	{0,	"SEE", p_see},
@@ -912,8 +911,9 @@ void eval_string(char* str)
 }
 
 char* derived[] = {
-	": VARIABLE create 0 , ;",
-	": 1+ 1 + ;",
+	": LITERAL	postpone lit  ,   ; immediate",
+	": VARIABLE 	create 0 , ;",
+	": 1+ 		1 + ;",
 	": CR 10 emit ;",
 	": IF postpone 0branch here 0 , ; immediate",
 	": THEN here swap ! ; immediate",
