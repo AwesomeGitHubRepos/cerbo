@@ -118,6 +118,13 @@ Implementation:
 
 
 -----------------------------------------------------------------------
+COMPILE
+
+Implementation:
+: COMPILE      r> dup @ , cell+ >r ;
+
+
+-----------------------------------------------------------------------
 F.
 
 Print float.
@@ -169,6 +176,22 @@ Float negation
 
 Evample
 12.3 fneg f. \ outputs -12.3
+
+
+-----------------------------------------------------------------------
+IF
+
+Implementation 1:
+: IF           postpone 0branch here 0 , ; immediate
+
+Implementation 2:
+: IF           compile 0branch here 0 , ; immediate
+ 
+Implementation 2 was introduced on 21-Apr-2020, superceding 1. The
+rationale is that the implementation of POSTPONE requires 
+conditional branching (i.e. IF), creating a "chicken and egg"
+situation. COMPILE works on non-immediate words (of which 0BRANCH
+is one). Implementation 2 therefore breaks the cyclic dependency.
 
 
 -----------------------------------------------------------------------
