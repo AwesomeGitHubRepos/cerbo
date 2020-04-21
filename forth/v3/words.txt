@@ -137,6 +137,9 @@ Example 1:
 "hi" find execute \ prints hello world
 
 Example 2:
+parse-word hi find execute \ prints hello world
+
+Example 3:
 variable foo
 33 foo !
 "foo" find cell + @ . \ prints 33
