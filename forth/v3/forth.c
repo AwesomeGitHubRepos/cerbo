@@ -370,19 +370,6 @@ void p_pcd() { printf(cell_fmt,  pop()); }
 void p_dot() { p_pcd(); printf(" "); }
 
 
-/*
-void p_tick()
-{
-	parse_word();
-	codeptr cfa = cfa_find(token);
-	if(cfa)
-		push((cell_t) cfa);
-	else
-		undefined(token);
-}
-*/
-
-
 void execute (codeptr cfa)	
 {
 	W = (cellptr) cfa;
@@ -522,8 +509,6 @@ void p_literal ()
 {
 	cell_t v = pop();
 	embed_literal(v);
-	//heapify_word("LIT");
-	//heapify(pop());
 }
 
 void p_fromr()
@@ -899,7 +884,6 @@ prim_s prims[] =  {
 	{0,	":", p_colon},
 	{F_IMM,	";", p_semi},
 	{0,	"EXECUTE", p_execute},
-	//{0,	"'", p_tick},
 	{0,	".S", p_dots},
 	{0,  	"+", p_plus},
 	{0,  	"-", p_minus},
