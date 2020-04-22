@@ -195,6 +195,16 @@ is one). Implementation 2 therefore breaks the cyclic dependency.
 
 
 -----------------------------------------------------------------------
+IMMEDIATE? ( xt -- flag)
+
+Is an xt an immediate word?
+
+Examples:
+' find immediate? . \ => 0
+' postpone immediate? . \ => 1
+
+
+-----------------------------------------------------------------------
 LINE(
 
 Counterpart of )LINE. See VARS for an example

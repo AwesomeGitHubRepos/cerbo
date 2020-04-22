@@ -811,8 +811,16 @@ void p_find()
 	push((cell_t)cfa_find((char*)pop()));
 }
 
+
+void p_immediateq ()
+{
+	cell_t imm  = is_immediate((codeptr) pop());
+	push(imm);
+}
+
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"IMMEDIATE?", p_immediateq},
 	{0,	"FIND", p_find},
 	{0,	":NONAME", p_noname},
 	{0,	"NEG", p_neg},

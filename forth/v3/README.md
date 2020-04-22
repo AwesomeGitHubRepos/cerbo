@@ -30,4 +30,4 @@ Run it: `cat cat.4th somefile.txt | forth`
 
 ## Glossary
 
-**cfa** - code field address
+**cfa** - code field address. This is the same as **xt**
