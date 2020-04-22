@@ -244,6 +244,27 @@ See OVER
 
 
 -----------------------------------------------------------------------
+POSTPONE immediate
+
+Original implementation:
+
+void p_postpone ()
+{
+	parse_word();
+	codeptr cfa = (codeptr) cfa_find(token);
+	if(!is_immediate(cfa)) 
+		heapify_word("COMPILE");
+	heapify_word(token);
+}
+
+...  {F_IMM,	"POSTPONE", p_postpone}, ...
+
+New Implementation on 22-Apr-2020:
+
+: POSTPONE	parse-word find dup immediate? if else compile compile then , ; immediate
+
+
+-----------------------------------------------------------------------
 PT
 
 Process Token

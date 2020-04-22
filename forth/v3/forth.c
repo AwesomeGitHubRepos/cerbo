@@ -494,6 +494,7 @@ void p_compile()
 }
 */
 
+/*
 void p_postpone ()
 {
 	parse_word();
@@ -502,6 +503,7 @@ void p_postpone ()
 		heapify_word("COMPILE");
 	heapify_word(token);
 }
+*/
 
 /*
 void p_literal ()
@@ -852,7 +854,7 @@ prim_s prims[] =  {
 	{0,	"CELL", p_cell},
 	{0,	"PARSE-WORD", p_parse_word},
 	//{F_IMM,	"LITERAL", p_literal},
-	{F_IMM,	"POSTPONE", p_postpone},
+	//{F_IMM,	"POSTPONE", p_postpone},
 	{0,	"DOCOL", docol},
 	{0,	"SEE", p_see},
 	{0,	".NAME", p_name},
@@ -920,14 +922,16 @@ void eval_string(char* str)
 char* derived[] = {
 	": CELL+	cell + ;",
 	": COMPILE	r> dup @ , cell+ >r ;",
+	": IF 		compile 0branch here 0 , ; immediate",
+	": THEN 	here swap ! ; immediate",
+	": ELSE 	compile branch here >r 0 , here swap ! r> ; immediate", 
+	": POSTPONE	parse-word find dup immediate? if else compile compile then , ; immediate",
+	": ` 		postpone postpone ; immediate", // simple alias
 	": LITERAL	postpone lit  ,   ; immediate",
 	": VARIABLE 	create 0 , ;",
 	": 1+ 		1 + ;",
 	": TAB		9 emit ;",
 	": CR 		10 emit ;",
-	": IF 		compile 0branch here 0 , ; immediate",
-	": THEN 	here swap ! ; immediate",
-	": ELSE 	compile branch here >r 0 , here swap ! r> ; immediate", 
 	": CONSTANT 	<builds , does> @ ;",
 	": BEGIN 	here ; immediate",
 	": ?AGAIN 	postpone ?branch , ; immediate",
@@ -943,7 +947,6 @@ char* derived[] = {
 	": .UNDEFINED	\"ERR: undefined word\" type cr ;",
 	": ' 		parse-word dup find dup if swap drop else  drop undefined  [ parse-word .undefined find ] literal then ;",
 	": [']		' postpone literal ; immediate",
-	": ` 		postpone postpone ; immediate",
 	": LINE( 	` begin ` parse-word ` dup ` while ; immediate",
 	": )LINE 	` repeat ` drop ; immediate",
 	": VARS:        line( $create 0 , )line ;",
