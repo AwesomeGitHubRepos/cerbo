@@ -419,11 +419,6 @@ void p_colon()
 	compiling = true;
 }
 
-void p_exit()
-{ 
-	// TODO: is this right? I'm not sure this function is ever called
-	rpop();
-}
 
 void p_at () { push(dref((void*)pop())); }
 void p_exc() { cell_t pos = pop(); cell_t val = pop(); store(pos, val); }
@@ -855,7 +850,6 @@ prim_s prims[] =  {
 	{0, 	"CREATE", p_create},
 	{0, 	"!", p_exc},
 	{0, 	"@", p_at},
-	{0,	"EXIT", p_exit},
 	{0,	":", p_colon},
 	{F_IMM,	";", p_semi},
 	{0,	"EXECUTE", p_execute},
@@ -887,6 +881,7 @@ void eval_string(char* str)
 }
 
 char* derived[] = {
+	": EXIT		;",
 	": CELL+	cell + ;",
 	": COMPILE	r> dup @ , cell+ >r ;",
 	": BRANCH	r> @ >r ;",

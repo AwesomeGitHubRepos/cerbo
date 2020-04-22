@@ -142,6 +142,19 @@ void p_compile()
 } 
 
 -----------------------------------------------------------------------
+EXIT
+
+Implementation:
+: EXIT         ;
+
+Effectively a no-op, as `docol' just uses it as a marker to
+stop its inner interpretation.
+
+It is the first word defined, as all defined words rely on its
+presence.
+
+
+-----------------------------------------------------------------------
 F.
 
 Print float.
