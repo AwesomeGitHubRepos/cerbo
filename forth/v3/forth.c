@@ -529,17 +529,11 @@ void p_tor()
 	rpush(temp);
 }
 
-void p_branch()
-{
-	RTOP = dref((void*) RTOP);
-}
 
 void p_bslash () 
 { 
-	//puts("found baslah");
 	while(*rest) rest++;
 	rest--;
-	//token = 0;
 }
 
 void p_drop () { pop(); }
@@ -867,7 +861,7 @@ prim_s prims[] =  {
 	{0, 	"(DOES>)", p_dodoes},
 	{0, 	"DROP", p_drop},
 	{F_IMM,	"\\", p_bslash},
-	{0, 	"BRANCH", p_branch},
+	//{0, 	"BRANCH", p_branch},
 	{0,	">R", p_tor},
 	{0,	"R>", p_fromr},
 	{0, 	"TYPE", p_type},
@@ -922,6 +916,7 @@ void eval_string(char* str)
 char* derived[] = {
 	": CELL+	cell + ;",
 	": COMPILE	r> dup @ , cell+ >r ;",
+	": BRANCH	r> @ >r ;",
 	": IF 		compile 0branch here 0 , ; immediate",
 	": THEN 	here swap ! ; immediate",
 	": ELSE 	compile branch here >r 0 , here swap ! r> ; immediate", 
