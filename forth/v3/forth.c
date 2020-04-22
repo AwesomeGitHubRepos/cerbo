@@ -485,33 +485,6 @@ void p_0branch()
 		RTOP += sizeof(cell_t);
 }
 
-/*
-void p_compile() 
-{
-	cell_t cell = dref((void*)RTOP);
-	heapify(cell);
-	RTOP += sizeof(cell_t);
-}
-*/
-
-/*
-void p_postpone ()
-{
-	parse_word();
-	codeptr cfa = (codeptr) cfa_find(token);
-	if(!is_immediate(cfa)) 
-		heapify_word("COMPILE");
-	heapify_word(token);
-}
-*/
-
-/*
-void p_literal ()
-{
-	cell_t v = pop();
-	embed_literal(v);
-}
-*/
 
 void p_fromr()
 {

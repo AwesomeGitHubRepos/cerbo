@@ -133,6 +133,13 @@ COMPILE
 Implementation:
 : COMPILE      r> dup @ , cell+ >r ;
 
+Original implementation:
+void p_compile() 
+{       
+        cell_t cell = dref((void*)RTOP);
+        heapify(cell);
+        RTOP += sizeof(cell_t);
+} 
 
 -----------------------------------------------------------------------
 F.
@@ -218,6 +225,16 @@ Examples:
 LINE(
 
 Counterpart of )LINE. See VARS for an example
+
+
+-----------------------------------------------------------------------
+LITERAL immediate
+
+Implementation:
+: LITERAL      postpone lit  ,   ; immediate
+
+Original implementation:
+void p_literal () { cell_t v = pop(); embed_literal(v); }
 
 
 -----------------------------------------------------------------------
