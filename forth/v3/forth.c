@@ -498,12 +498,9 @@ void p_postpone ()
 {
 	parse_word();
 	codeptr cfa = (codeptr) cfa_find(token);
-	if(is_immediate(cfa)) {
-		heapify_word(token);
-	} else {
+	if(!is_immediate(cfa)) 
 		heapify_word("COMPILE");
-		heapify_word(token);
-	}
+	heapify_word(token);
 }
 
 /*
