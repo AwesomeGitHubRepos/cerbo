@@ -156,7 +156,8 @@ bool int_flt(char* s, cell_t* v)
 
 }
 
-void undefined(char* token){
+void undefined(char* token)
+{
 	printf("undefined word:<%s>\n", token);
 }
 
@@ -170,22 +171,22 @@ void heapify (cell_t v)
 	hptr += sizeof(cell_t);
 }
 
-void create_header(ubyte flags, char* zname)
+void create_header (char* zname)
 {
 	char* name = hptr;
 	ubyte noff = 0; // name offset
 	for(noff = 0 ; noff<= strlen(zname); ++noff) *hptr++ = toupper(zname[noff]); // include trailing 0
 	dent_s dw;
 	dw.prev = latest;
-	dw.flags = flags | noff;
+	dw.flags = noff;
 	memcpy(hptr, &dw, sizeof(dw));
 	latest = (dent_s*) hptr;
 	hptr += sizeof(dw);
 }
 
-void createz (ubyte flags, char* zname, cell_t acf) // zname being a null-terminated string
+void createz (char* zname, cell_t acf) // zname being a null-terminated string
 {
-	create_header(flags, zname);
+	create_header(zname);
 	heapify(acf);
 }
 
@@ -195,7 +196,6 @@ char* name_dw(dent_s* dw)
 	int name_off =  dw->flags & 0b111111;
 	str -= name_off; 
 	return str;
-
 }
 
 void* code(dent_s* dw)
@@ -228,7 +228,6 @@ void embed_literal(cell_t v)
 {
 	heapify_word("LIT");
 	heapify(v);
-
 }
 
 
@@ -246,12 +245,10 @@ void str_begin (cell_t* loc)
 
 void str_end (cell_t loc)
 {
-
 	if(compiling) {
 		store(loc, (cell_t)hptr); // backfil to after the embedded string
 		heapify_word("LIT");
 		heapify(loc + sizeof(cell_t));
-
 	} else
 		push(loc); 
 }
@@ -303,7 +300,6 @@ void identify_word()
 		yylval = v;
 		return;
 	}
-
 }
 
 char* parse_word () 
@@ -320,8 +316,6 @@ char* parse_word ()
 	identify_word();
 
 	*rest = 0;
-	//if(yytype == unk) strupr(token);
-	//printf("word:toke:<%s>\n", token);
 	if(*token == 0) token = 0;
 	return token;
 }
@@ -402,7 +396,6 @@ void docol()
 		execute(cfa);
 		IP = (cellptr) rpop();
 	}
-
 }
 
 void p_semi()
@@ -415,7 +408,7 @@ void p_semi()
 void p_colon()
 {
 	parse_word();
-	createz(0, token, (cell_t) docol); 
+	createz(token, (cell_t) docol); 
 	compiling = true;
 }
 
@@ -424,8 +417,8 @@ void p_at () { push(dref((void*)pop())); }
 void p_exc() { cell_t pos = pop(); cell_t val = pop(); store(pos, val); }
 
 void _create () 	{ push((cell_t)++W); }
-void p_create() 	{ parse_word(); createz(0, token, (cell_t) _create); }
-void p_dlr_create () 	{ createz(0, (char*) pop(), (cell_t) _create); }
+void p_create() 	{ parse_word(); createz(token, (cell_t) _create); }
+void p_dlr_create () 	{ createz((char*) pop(), (cell_t) _create); }
 void p_comma ()		{ heapify(pop()); }
 void p_prompt ()	{ show_prompt = (bool) pop(); }
 
@@ -541,7 +534,7 @@ void p_does() // is immeditate
 void p_builds () // not an immediate word
 {
 	parse_word();
-	createz(0, token, (cell_t) docol);
+	createz(token, (cell_t) docol);
 
 	heapify_word("LIT");
 	DEBUGX(printf("p_builds: location of 777: %p\n", hptr););
@@ -563,7 +556,7 @@ void p_defer()
 {
 	parse_word();
 	DEBUGX(printf("defer:token:%s\n", token));
-	createz(0, token, (cell_t) docol);
+	createz(token, (cell_t) docol);
 	heapify_word("XDEFER");
 	heapify_word("EXIT");
 	heapify_word(";");
@@ -694,17 +687,12 @@ void fpush(flt_t f)
 	cell_t f1;
 	memcpy(&f1, &f, sizeof(cell_t));
 	push(f1);
-
 }
 
 void p_fdot()
 {
 	flt_t f;
 	fpop(&f);
-
-	//cell_t f = pop();
-	//flt_t f1;
-	//memcpy(&f1, &f, sizeof(cell_t));
 	printf(flt_fmt, f);
 }
 
@@ -727,11 +715,8 @@ void p_pt();
 void p_round()
 {
 	flt_t f;
-//#if(__SIZEOF_POINTER__ == __SIZEOF_FLOAT__)
 	fpop(&f);
 	f = roundf(f);
-	//f = round(f);
-	//cell_t f1 = (cell_t) f;
 	push((cell_t)f);
 }
 
@@ -815,8 +800,6 @@ prim_s prims[] =  {
 	{0,	">", p_gt},
 	{0,	"CELL", p_cell},
 	{0,	"PARSE-WORD", p_parse_word},
-	//{F_IMM,	"LITERAL", p_literal},
-	//{F_IMM,	"POSTPONE", p_postpone},
 	{0,	"DOCOL", docol},
 	{0,	"SEE", p_see},
 	{0,	".NAME", p_name},
@@ -829,11 +812,9 @@ prim_s prims[] =  {
 	{0, 	"(DOES>)", p_dodoes},
 	{0, 	"DROP", p_drop},
 	{F_IMM,	"\\", p_bslash},
-	//{0, 	"BRANCH", p_branch},
 	{0,	">R", p_tor},
 	{0,	"R>", p_fromr},
 	{0, 	"TYPE", p_type},
-	//{0, 	"COMPILE", p_compile},
 	{0, 	"0BRANCH", p_0branch},
 	{0, 	"IMMEDIATE", p_immediate},
 	{0, 	"SWAP", p_swap},
@@ -869,7 +850,8 @@ void add_primitives()
 {
 	prim_s* p = prims;
 	while(p->zname) {
-		createz(p->flags, p->zname, (cell_t) p->fn);
+		createz(p->zname, (cell_t) p->fn);
+		if(p->flags) p_immediate();
 		p++;
 	}
 }
@@ -914,7 +896,6 @@ char* derived[] = {
 	": )LINE 	` repeat ` drop ; immediate",
 	": VARS:        line( $create 0 , )line ;",
 	": EXPECT	 cr \"Expect \" type type  \":\" type cr ;",
-
 
 	0
 };
@@ -963,7 +944,6 @@ void process_token (char* token)
 		heapify((cell_t)cfa);
 	else
 		execute(cfa);
-	
 }
 
 void p_pt()
