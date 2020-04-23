@@ -423,8 +423,6 @@ void p_dlr_create () 	{ createz((char*) pop(), (cell_t) _create); }
 void p_comma ()		{ heapify(pop()); }
 void p_prompt ()	{ show_prompt = (bool) pop(); }
 
-void p_lsb() { state = false; }
-void p_rsb() { state = true; }
 void p_here () { push((cell_t)hptr); }
 
 void p_qbranch()
@@ -827,8 +825,6 @@ prim_s prims[] =  {
 	{F_IMM,	"Z\"", p_z_slash},
 	{F_IMM,	".\"", p_dot_slash},
 	{0,	 "DUP", p_dup},
-	{F_IMM,	"[", p_lsb},
-	{0, 	"]", p_rsb},
 	{0, 	"?BRANCH", p_qbranch},
 	{0, 	"HERE", p_here},
 	{0, 	"PROMPT", p_prompt},
@@ -895,6 +891,8 @@ char* derived[] = {
 	": NOT		0 = if 1 else 0 then ;",
 	": UNDEFINED	\"Undefined word:<\" type type \">\" type cr ;",
 	": .UNDEFINED	\"ERR: undefined word\" type cr ;",
+	": [		0 state ! ; immediate",
+	": ]		1 state ! ;",
 	": ' 		parse-word dup find dup if swap drop else  drop undefined  [ parse-word .undefined find ] literal then ;",
 	": [']		' postpone literal ; immediate",
 	": LINE( 	` begin ` parse-word ` dup ` while ; immediate",
