@@ -91,7 +91,8 @@ ubyte heap[10000];
 ubyte* hptr = heap;
 cellptr W; // cfa  of the word to execute
 
-bool compiling = false;
+//bool compiling = false;
+cell_t state = 0; // 0=>interpretting, 1=>compiling
 bool show_prompt = true;
 ubyte flags = 0;
 
@@ -237,7 +238,7 @@ char* rest;
 void str_begin (cell_t* loc)
 {
 	*loc = (cell_t)hptr + 0* sizeof(cell_t);
-	if(!compiling) return;
+	if(!state) return;
 	heapify_word("BRANCH");
 	*loc = (cell_t) hptr;
 	heapify(2572); // leet for zstr
@@ -245,7 +246,7 @@ void str_begin (cell_t* loc)
 
 void str_end (cell_t loc)
 {
-	if(compiling) {
+	if(state) {
 		store(loc, (cell_t)hptr); // backfil to after the embedded string
 		heapify_word("LIT");
 		heapify(loc + sizeof(cell_t));
@@ -402,14 +403,14 @@ void p_semi()
 {
 	heapify_word("EXIT");
 	heapify_word(";"); // added for the convenience of SEE so as not to confuse it with EXIT
-	compiling = false;
+	state = false;
 }
 
 void p_colon()
 {
 	parse_word();
 	createz(token, (cell_t) docol); 
-	compiling = true;
+	state = true;
 }
 
 
@@ -422,8 +423,8 @@ void p_dlr_create () 	{ createz((char*) pop(), (cell_t) _create); }
 void p_comma ()		{ heapify(pop()); }
 void p_prompt ()	{ show_prompt = (bool) pop(); }
 
-void p_lsb() { compiling = false; }
-void p_rsb() { compiling = true; }
+void p_lsb() { state = false; }
+void p_rsb() { state = true; }
 void p_here () { push((cell_t)hptr); }
 
 void p_qbranch()
@@ -448,7 +449,7 @@ void p_type () { printf("%s", (char*) pop()); }
 void p_dot_slash () 
 {
 	p_z_slash();
-	if(compiling)
+	if(state)
 		heapify_word("TYPE");
 	else
 		p_type();
@@ -752,7 +753,7 @@ void p_noname ()
 	push((cell_t)hptr);
 	//heapify_word("DOCOL");
 	heapify((cell_t)docol);
-	compiling = true;
+	state = true;
 }
 
 void p_find()
@@ -925,7 +926,7 @@ void process_token (char* token)
 	if(yytype == inum || yytype == flt) {
 		cell_t v = yylval;
 
-		if(compiling)
+		if(state)
 			embed_literal(v);
 		else
 			push(v);
@@ -940,7 +941,7 @@ void process_token (char* token)
 	}
 
 
-	if(compiling && !(flags & F_IMM))
+	if(state && !(flags & F_IMM))
 		heapify((cell_t)cfa);
 	else
 		execute(cfa);
@@ -961,7 +962,7 @@ int main()
 	assert(sizeof(size_t) == sizeof(cell_t));
 	assert(sizeof(flt_t) == sizeof(cell_t));
 	//printf("sizeof double=%ld, float=%ld, cell=%ld\n", sizeof(double), sizeof(float), sizeof(cell_t));
-	compiling = false;
+	state = false;
 	add_primitives();
 	add_derived();
 
