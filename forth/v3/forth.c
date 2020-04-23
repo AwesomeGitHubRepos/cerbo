@@ -741,7 +741,6 @@ void p_fneg()
 }
 
 
-void p_neg() { push(- pop()); }
 
 void p_floor() { flt_t f; fpop(&f); int i = (int) floor(f); push(i); }
 void p_ceil()  { flt_t f; fpop(&f); int i = (int) ceil(f); push(i); }
@@ -775,7 +774,6 @@ prim_s prims[] =  {
 	{0,	"IMMEDIATE?", p_immediateq},
 	{0,	"FIND", p_find},
 	{0,	":NONAME", p_noname},
-	{0,	"NEG", p_neg},
 	{0,	"%ND", p_pcnd},
 	{0,	"CEIL", p_ceil},
 	{0,	"FLOOR", p_floor},
@@ -897,8 +895,9 @@ char* derived[] = {
 	": [']		' postpone literal ; immediate",
 	": LINE( 	` begin ` parse-word ` dup ` while ; immediate",
 	": )LINE 	` repeat ` drop ; immediate",
-	": VARS:        line( $create 0 , )line ;",
+	": VARS:        line( $create 0 , )line ;",	
 	": EXPECT	 cr \"Expect \" type type  \":\" type cr ;",
+	": NEG		0 swap - ;",
 
 	0
 };
