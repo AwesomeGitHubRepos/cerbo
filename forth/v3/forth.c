@@ -768,8 +768,12 @@ void p_immediateq ()
 	push(imm);
 }
 
+
+void p_state() { push((cell_t) &state); }
+
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"STATE", p_state},
 	{0,	"IMMEDIATE?", p_immediateq},
 	{0,	"FIND", p_find},
 	{0,	":NONAME", p_noname},
