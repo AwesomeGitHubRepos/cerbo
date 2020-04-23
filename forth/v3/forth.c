@@ -546,17 +546,13 @@ void p_builds () // not an immediate word
 	heapify_word(";");
 }
 
-void p_xdefer()
-{
-	puts("DEFER not set");
-}
 
 void p_defer()
 {
 	parse_word();
 	DEBUGX(printf("defer:token:%s\n", token));
 	createz(token, (cell_t) docol);
-	heapify_word("XDEFER");
+	heapify_word("DEFERX");
 	heapify_word("EXIT");
 	heapify_word(";");
 }
@@ -805,7 +801,6 @@ prim_s prims[] =  {
 	{0,	"SEE", p_see},
 	{0,	".NAME", p_name},
 	{0,	"LEN", p_len},
-	{0,	"XDEFER", p_xdefer},
 	{0,	"DEFER", p_defer},
 	{0,	"IS", p_is}, // probably needs to be an immediate word
 	{0, 	"<BUILDS", p_builds},
@@ -898,6 +893,7 @@ char* derived[] = {
 	": VARS:        line( $create 0 , )line ;",	
 	": EXPECT	 cr \"Expect \" type type  \":\" type cr ;",
 	": NEG		0 swap - ;",
+	": DEFERX	\"DEFER not set\" type cr ;",
 
 	0
 };
