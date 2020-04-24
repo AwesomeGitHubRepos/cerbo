@@ -862,7 +862,9 @@ void eval_string(char* str)
 
 char* derived[] = {
 	": EXIT		;",
-	//": $CREATE	header 
+	": [		0 state ! ; immediate",
+	": ]		1 state ! ;",
+	//": $CREATE	header [ parse-word dovar find , ] ;",
 	//": CREATE	parse-word $create ;",
 	": CELL+	cell + ;",
 	": COMPILE	r> dup @ , cell+ >r ;",
@@ -890,8 +892,6 @@ char* derived[] = {
 	": NOT		0 = if 1 else 0 then ;",
 	": UNDEFINED	\"Undefined word:<\" type type \">\" type cr ;",
 	": .UNDEFINED	\"ERR: undefined word\" type cr ;",
-	": [		0 state ! ; immediate",
-	": ]		1 state ! ;",
 	": ' 		parse-word dup find dup if swap drop else  drop undefined  [ parse-word .undefined find ] literal then ;",
 	": [']		' postpone literal ; immediate",
 	": LINE( 	` begin ` parse-word ` dup ` while ; immediate",

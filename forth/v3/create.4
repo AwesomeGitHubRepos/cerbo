@@ -1,0 +1,11 @@
+: $CREATE    header [ parse-word dovar find , ] ;
+: CREATE	parse-word $create ;
+: VARIABLE     create 0 , ;
+
+see $create
+\  $create
+\ foo @ .
+
+variable foo
+foo @ .
+
