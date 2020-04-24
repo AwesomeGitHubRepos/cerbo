@@ -420,8 +420,25 @@ void p_at () { push(dref((void*)pop())); }
 void p_exc() { cell_t pos = pop(); cell_t val = pop(); store(pos, val); }
 
 void p_dovar () 	{ push((cell_t)++W); }
-void p_create() 	{ parse_word(); createz(token, (cell_t) p_dovar); }
-void p_dlr_create () 	{ createz((char*) pop(), (cell_t) p_dovar); }
+//void p_create() 	{ parse_word(); createz(token, (cell_t) p_dovar); }
+
+void p_dlr_create () 	
+{ 
+	//char* word = (char*) pop();
+	//printf("$CREATE <%s>\n", word);
+	//createz(word, (cell_t) p_dovar); 
+	
+	p_header();
+	heapify((cell_t)p_dovar);
+}
+
+void p_create() 	
+{ 
+	p_parse_word(); 
+	//p_dots();
+	p_dlr_create();
+}
+
 void p_comma ()		{ heapify(pop()); }
 void p_prompt ()	{ show_prompt = (bool) pop(); }
 
