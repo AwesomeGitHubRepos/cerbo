@@ -185,6 +185,8 @@ void create_header (char* zname)
 	hptr += sizeof(dw);
 }
 
+void p_header() { create_header((char*)pop()); }
+
 void createz (char* zname, cell_t acf) // zname being a null-terminated string
 {
 	create_header(zname);
@@ -766,6 +768,7 @@ void p_state() { push((cell_t) &state); }
 
 typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"HEADER", p_header},
 	{0,	"STATE", p_state},
 	{0,	"IMMEDIATE?", p_immediateq},
 	{0,	"FIND", p_find},
@@ -859,6 +862,8 @@ void eval_string(char* str)
 
 char* derived[] = {
 	": EXIT		;",
+	//": $CREATE	header 
+	//": CREATE	parse-word $create ;",
 	": CELL+	cell + ;",
 	": COMPILE	r> dup @ , cell+ >r ;",
 	": BRANCH	r> @ >r ;",
