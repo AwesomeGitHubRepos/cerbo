@@ -417,9 +417,9 @@ void p_colon()
 void p_at () { push(dref((void*)pop())); }
 void p_exc() { cell_t pos = pop(); cell_t val = pop(); store(pos, val); }
 
-void _create () 	{ push((cell_t)++W); }
-void p_create() 	{ parse_word(); createz(token, (cell_t) _create); }
-void p_dlr_create () 	{ createz((char*) pop(), (cell_t) _create); }
+void p_dovar () 	{ push((cell_t)++W); }
+void p_create() 	{ parse_word(); createz(token, (cell_t) p_dovar); }
+void p_dlr_create () 	{ createz((char*) pop(), (cell_t) p_dovar); }
 void p_comma ()		{ heapify(pop()); }
 void p_prompt ()	{ show_prompt = (bool) pop(); }
 
@@ -822,6 +822,7 @@ prim_s prims[] =  {
 	{0, 	"HERE", p_here},
 	{0, 	"PROMPT", p_prompt},
 	{0, 	",", p_comma},
+	{0,	"DOVAR", p_dovar},
 	{0, 	"CREATE", p_create},
 	{0, 	"!", p_exc},
 	{0, 	"@", p_at},
