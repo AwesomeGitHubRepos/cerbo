@@ -410,8 +410,10 @@ void p_semi()
 
 void p_colon()
 {
-	parse_word();
-	createz(token, (cell_t) docol); 
+	p_parse_word();
+	//createz(token, (cell_t) docol); 
+	p_header();
+	heapify((cell_t)docol);
 	state = true;
 }
 
