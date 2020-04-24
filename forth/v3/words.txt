@@ -15,17 +15,6 @@ mechanism from Feb 2020 onwards is just to use regular C-style strings
 See the strings.4th file for more examples.
 
 
------------------------------------------------------------------------
-$CREATE ( str -- )
-
-Create word identified by str.
-
-Equivalent of create str
-
-Example:
-"foo" $create 42 ,
-foo @ . \ outputs 42
-
 
 -----------------------------------------------------------------------
 %ND ( int n -- )
@@ -140,6 +129,47 @@ void p_compile()
         heapify(cell);
         RTOP += sizeof(cell_t);
 } 
+
+
+-----------------------------------------------------------------------
+CREATE
+
+Create a word.
+
+Implementation:
+: CREATE       parse-word create$ ;
+
+Example:
+create foo 12 , 
+foo @ . \ prints 12
+
+See also: variable
+
+
+-----------------------------------------------------------------------
+CREATE$ ( str -- )
+
+Create word identified by str.
+
+Equivalent of create str
+
+Example:
+"foo" $create 42 ,
+foo @ . \ outputs 42
+
+Original implementation:
+void p_dlr_create ()   { p_header(); heapify((cell_t)p_dovar); }
+
+Implementation 2:
+: CREATE$    header [ ' dovar @ ]   literal , ;
+
+Implementaion 3:
+: CREATE$      header [ parse-word lit find , parse-word dovar find @ ,  ] , ;
+Although verbose, its advantage over implementation 2 is that it
+does not require the words ' or literal to exist.
+
+
+See also: create
 
 -----------------------------------------------------------------------
 EXIT

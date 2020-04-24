@@ -1,11 +1,32 @@
-: $CREATE    header [ parse-word dovar find , ] ;
-: CREATE	parse-word $create ;
-: VARIABLE     create 0 , ;
+0 prompt
+: CREATE$    header [ ' dovar @ ]   literal , ;
+: heap: parse-word find , ;
 
-see $create
-\  $create
-\ foo @ .
+\ "$CREATE" header  parse-word docol find @ ,   heap: lit heap: dovar heap: exit heap: ;
+
+: CREATE$ header [ parse-word  lit find , parse-word dovar find @ , ] , ;
+
+see create$
+
+ : CREATE	parse-word create$ ;
+
+: variable  create 0 , ;
 
 variable foo
-foo @ .
+\ foo @ .
+12 foo !
 
+foo @ . cr
+
+"-----------------------" type cr
+
+"ho" header  ' docol @ , ' hi  , ' exit , ' ; ,
+see ho
+ho
+
+"hoo" header parse-word docol find @ .s ,  ' hi   , ' exit , ' ; ,
+see hoo
+"hoo" header ' docol @ .s ,  	  ' hi   , ' exit , ' ; ,
+see hoo
+hoo
+\ ho cr

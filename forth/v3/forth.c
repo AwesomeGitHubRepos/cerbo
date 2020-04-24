@@ -420,24 +420,9 @@ void p_at () { push(dref((void*)pop())); }
 void p_exc() { cell_t pos = pop(); cell_t val = pop(); store(pos, val); }
 
 void p_dovar () 	{ push((cell_t)++W); }
-//void p_create() 	{ parse_word(); createz(token, (cell_t) p_dovar); }
 
-void p_dlr_create () 	
-{ 
-	//char* word = (char*) pop();
-	//printf("$CREATE <%s>\n", word);
-	//createz(word, (cell_t) p_dovar); 
-	
-	p_header();
-	heapify((cell_t)p_dovar);
-}
-
-void p_create() 	
-{ 
-	p_parse_word(); 
-	//p_dots();
-	p_dlr_create();
-}
+//void p_dlr_create () 	{ p_header(); heapify((cell_t)p_dovar); }
+//void p_create() 	{ p_parse_word(); p_dlr_create(); }
 
 void p_comma ()		{ heapify(pop()); }
 void p_prompt ()	{ show_prompt = (bool) pop(); }
@@ -795,7 +780,7 @@ prim_s prims[] =  {
 	{0,	"FLOOR", p_floor},
 	{0,	"%D", p_pcd},
 	{0,	"FNEG", p_fneg},
-	{0,	"$CREATE", p_dlr_create},
+	//{0,	"$CREATE", p_dlr_create},
 	{0,	"%0ND", p_pc0nd},
 	{0,	"ROUND", p_round},
 	{0,	"PT", p_pt},
@@ -843,7 +828,7 @@ prim_s prims[] =  {
 	{0, 	"PROMPT", p_prompt},
 	{0, 	",", p_comma},
 	{0,	"DOVAR", p_dovar},
-	{0, 	"CREATE", p_create},
+	//{0, 	"CREATE", p_create},
 	{0, 	"!", p_exc},
 	{0, 	"@", p_at},
 	{0,	":", p_colon},
@@ -881,8 +866,8 @@ char* derived[] = {
 	": EXIT		;",
 	": [		0 state ! ; immediate",
 	": ]		1 state ! ;",
-	//": $CREATE	header [ parse-word dovar find , ] ;",
-	//": CREATE	parse-word $create ;",
+	": CREATE$	header [ parse-word lit find , parse-word dovar find @ ,  ] , ;",
+	": CREATE	parse-word create$ ;",
 	": CELL+	cell + ;",
 	": COMPILE	r> dup @ , cell+ >r ;",
 	": BRANCH	r> @ >r ;",
@@ -913,7 +898,7 @@ char* derived[] = {
 	": [']		' postpone literal ; immediate",
 	": LINE( 	` begin ` parse-word ` dup ` while ; immediate",
 	": )LINE 	` repeat ` drop ; immediate",
-	": VARS:        line( $create 0 , )line ;",	
+	": VARS:        line( create$ 0 , )line ;",	
 	": EXPECT	 cr \"Expect \" type type  \":\" type cr ;",
 	": NEG		0 swap - ;",
 	": DEFERX	\"DEFER not set\" type cr ;",
