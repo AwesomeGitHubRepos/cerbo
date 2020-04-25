@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h> // for strcasecmp
 
 /* GNU C preprocessor definitions can be obtained by executing:
  * gcc -dM -E - < /dev/null
@@ -166,11 +167,18 @@ cell_t dref (void* addr) { return *(cell_t*)addr; }
 
 void store (cell_t pos, cell_t val) { *(cell_t*)pos = val; }
 
-void heapify (cell_t v)
+void heapify_cell (cell_t v)
 {
 	store((cell_t)hptr, v);
 	hptr += sizeof(cell_t);
 }
+
+void heapify_codeptr (codeptr v) { heapify_cell((cell_t) v); }
+
+#define heapify(X) _Generic((X), \
+codeptr: heapify_codeptr, \
+default: heapify_cell \
+)(X)
 
 void create_header (char* zname)
 {
@@ -225,7 +233,7 @@ codeptr cfa_find (char* name) // name can be lowercase, if you like
 void heapify_word(char* name)
 {
 	codeptr xt = cfa_find(name);
-	heapify((cell_t) xt);
+	heapify(xt);
 }
 
 void embed_literal(cell_t v)
@@ -407,7 +415,7 @@ void start_word()
 	p_parse_word();
 	//createz(token, (cell_t) docol); 
 	p_header();
-	heapify((cell_t)docol);
+	heapify(docol);
 }
 
 void p_semi()
@@ -751,7 +759,7 @@ void p_noname ()
 {
 	push((cell_t)hptr);
 	//heapify_word("DOCOL");
-	heapify((cell_t)docol);
+	heapify(docol);
 	state = true;
 }
 
@@ -949,7 +957,7 @@ void process_token (char* token)
 
 
 	if(state && !(flags & F_IMM))
-		heapify((cell_t)cfa);
+		heapify(cfa);
 	else
 		execute(cfa);
 }
