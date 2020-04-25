@@ -193,6 +193,7 @@ void createz (char* zname, cell_t acf) // zname being a null-terminated string
 	heapify(acf);
 }
 
+
 char* name_dw(dent_s* dw)
 {
 	char* str = (char*) dw;
@@ -279,7 +280,6 @@ void identify_word()
 {
 	yytype = unk;
 	if(*rest == '"') {
-		//puts("parse_world: parsing string");
 		yytype = str;
 		token++;
 		rest++;
@@ -327,6 +327,7 @@ void p_parse_word ()
 {
 	push((cell_t)parse_word());
 }
+
 
 void process_tib();
 
@@ -401,6 +402,14 @@ void docol()
 	}
 }
 
+void start_word()
+{
+	p_parse_word();
+	//createz(token, (cell_t) docol); 
+	p_header();
+	heapify((cell_t)docol);
+}
+
 void p_semi()
 {
 	heapify_word("EXIT");
@@ -410,10 +419,7 @@ void p_semi()
 
 void p_colon()
 {
-	p_parse_word();
-	//createz(token, (cell_t) docol); 
-	p_header();
-	heapify((cell_t)docol);
+	start_word();
 	state = true;
 }
 
@@ -422,9 +428,6 @@ void p_at () { push(dref((void*)pop())); }
 void p_exc() { cell_t pos = pop(); cell_t val = pop(); store(pos, val); }
 
 void p_dovar () 	{ push((cell_t)++W); }
-
-//void p_dlr_create () 	{ p_header(); heapify((cell_t)p_dovar); }
-//void p_create() 	{ p_parse_word(); p_dlr_create(); }
 
 void p_comma ()		{ heapify(pop()); }
 void p_prompt ()	{ show_prompt = (bool) pop(); }
@@ -538,8 +541,7 @@ void p_does() // is immeditate
 
 void p_builds () // not an immediate word
 {
-	parse_word();
-	createz(token, (cell_t) docol);
+	start_word();
 
 	heapify_word("LIT");
 	DEBUGX(printf("p_builds: location of 777: %p\n", hptr););
@@ -555,9 +557,7 @@ void p_builds () // not an immediate word
 
 void p_defer()
 {
-	parse_word();
-	DEBUGX(printf("defer:token:%s\n", token));
-	createz(token, (cell_t) docol);
+	start_word();
 	heapify_word("DEFERX");
 	heapify_word("EXIT");
 	heapify_word(";");
