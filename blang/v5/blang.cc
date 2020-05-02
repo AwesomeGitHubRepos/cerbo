@@ -220,6 +220,7 @@ void eval_let()
 
 }
 
+
 void eval_kstr()
 {
 	int idx = iget();
@@ -230,10 +231,21 @@ void eval_kstr()
 	flush(cout);
 
 }
+
+
+void eval_print()
+{
+	cout << "eval_print:" << endl;
+	eval1(); 
+	cout << "eval_print:write" << endl;
+	cout << stringify(pop()) << " "; std::flush(cout);
+}
+
 const auto int1 = sizeof(int);
 const auto int2 = 2*sizeof(int);
 
 vector<opcode_t> opcodes{
+	opcode_t{KSTR,	"KSTR", int1,	eval_kstr},
 	opcode_t{GOTO,	"GOTO",	int1, 	eval_goto},
 	opcode_t{IF, 	"IF",	int1, 	eval_if},
 	opcode_t{INTEGER, "INT",int1, [](){ push(iget());}},
@@ -242,10 +254,9 @@ vector<opcode_t> opcodes{
 	opcode_t{LET, 	"LET",	int1, 	eval_let },
 	opcode_t{MUL, 	"MUL",	0, 	[](){ do_arith(MUL);}},
 	opcode_t{PLUS, 	"PLUS",	0, 	[](){ do_arith(PLUS);}},
-	opcode_t{PRINT, "PRINT",0, 	[](){ eval1(); cout << stringify(pop()) << " "; std::flush(cout);}},
+	opcode_t{PRINT, "PRINT",0, 	eval_print},
 	opcode_t{SUB, 	"SUB",	0,	[](){ do_arith(SUB);}},
-	opcode_t{VAR, 	"VAR",	int1, [](){ push(vars[iget()].value); }},
-	opcode_t{KSTR,	"KSTR", int1,	eval_kstr }
+	opcode_t{VAR, 	"VAR",	int1, [](){ push(vars[iget()].value); }}
 };
 
 map<yytokentype,opcode_t> opmap;
@@ -299,6 +310,13 @@ finis:
 		cout << i << " " << labels[i].name << " " <<stringify(labels[i].value) << "\n";
 		std::flush(cout);
 	}
+
+	cout << "\nKSTRS:\n";
+	for(int i = 0; i < kstrs.size(); ++i) {
+		cout << i << "\t\"" << kstrs[i] << "\"\n";
+		flush(cout);
+	}
+
 }
 
 void resolve_labels()
