@@ -16,7 +16,7 @@ using std::cout;
 using std::string;
 
 #include "blang.h"
-#include "blang.tab.hh"
+//#include "blang.tab.hh"
 
 int line_number = 0;
 //extern yylval;
@@ -84,5 +84,6 @@ JUST		{ return JUST;}
 PRINT		{ return PRINT;}
 [a-z]([a-z]|[0-9])*	{ set_yylval(var_idx(yytext)); return VAR; }
 :[a-z]([a-z]|[0-9])*	{ set_yylval(get_label_id(yytext));  return LABEL; }
+\"([^\\\"]|\\.)*\" 	{ return KSTR; }
 
 %%

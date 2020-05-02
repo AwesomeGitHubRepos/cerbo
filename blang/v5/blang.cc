@@ -1,31 +1,106 @@
 #include <cassert>
 #include <cmath>
-#include <functional>
+//#include <functional>
 #include <iostream>
 #include <stack>
-#include <vector>
+//#include <vector>
 
 #include <FlexLexer.h>
 
 #include "blang.h"
-#include "blang.tab.hh"
+//#include "blang.tab.hh"
 
 using namespace std;
 
 
 yyFlexLexer lexer; 
-//YYSTYPE top = 0; // root of the program
 int top = 0; // root of the program
-//vector<tac> tacs;
 
 
 static int ip = 0;       	
-stack<int> stk;
+//stack<int> stk;
+stack<val_t> stk;
+
+
+string stringify(val_t v)
+{
+	if(auto pval = get_if<float>(&v))
+		return to_string(*pval);
+
+	if(holds_alternative<string>(v))
+		return get<string>(v);
+
+	throw 666;
+}
+
+bool truthify(val_t v)
+{
+	if(auto pval = get_if<float>(&v))
+		return *pval != 0 ;
+
+	if(auto pval = get_if<string>(&v))
+		return pval->size() > 0;
+
+	throw 666;
+}
 
 int eval1();
 
+YYSTYPE join(YYSTYPE vec1, YYSTYPE vec2)
+{
+	vec1.insert(vec1.end(), vec2.begin(), vec2.end());
+	return vec1;
+}
 
+YYSTYPE join(YYSTYPE vec1, YYSTYPE vec2, YYSTYPE vec3)
+{
+	return join(vec1, join(vec2, vec3));
+}
 
+YYSTYPE join(YYSTYPE vec1, YYSTYPE vec2, YYSTYPE vec3, YYSTYPE vec4)
+{
+	return join(vec1, join(vec2, vec3, vec4));
+}
+YYSTYPE join(byte_t b, YYSTYPE vec1, YYSTYPE vec2)
+{
+	YYSTYPE vec{b};
+	vec = join(vec, join(vec1, vec2));
+	//vec1.insert(vec1.end(), vec2.begin(), vec2.end());
+	return vec;
+}
+
+YYSTYPE join_toke(yytokentype toke, YYSTYPE vec1)
+{
+	YYSTYPE vec{(byte_t) (toke-HALT)};
+	vec = join(vec, vec1);
+	return vec;
+}
+
+YYSTYPE join_toke(yytokentype toke, int i)
+{
+	return join_toke(toke, to_bvec(i));
+}
+
+YYSTYPE join_toke(yytokentype toke, YYSTYPE vec1, YYSTYPE vec2)
+{
+	YYSTYPE vec = join_toke(toke, vec1);
+	return join(vec, vec2);
+}
+
+YYSTYPE make_kstr(YYSTYPE str)
+{
+	return join_toke(KSTR, to_bvec(str.size()), str);
+	/*
+	YYSTYPE res;
+	int len = str.size();
+	res.reserve(3+len);
+	res[0] = KSTR;
+	res[1] = len;
+	for(int i =0; i<= len; i++) res[i+2] = str[i];
+
+	return res;
+	*/
+}
 
 void trace(std::string text)
 {
@@ -69,14 +144,15 @@ int iget(int& ip)
 int iget() { return iget(ip); }
 
 
-int pop()
+val_t pop()
 {
-	int i = stk.top();
+	val_t res = stk.top();
 	stk.pop();
-	return i;
+	return res;
 }
 
-void push(int i) { stk.push(i); }
+//void push(int i) { stk.push(i); }
+void push (val_t v) { stk.push(v); }
 
 typedef std::function<void()> func_t;
 typedef struct { yytokentype opcode; string name; int size; func_t fn; } opcode_t;
@@ -86,9 +162,9 @@ typedef struct { yytokentype opcode; string name; int size; func_t fn; } opcode_
 void do_arith(yytokentype type)
 {
 	eval1(); 
-	int a = pop();
+	int a = get<float>(pop());
 	eval1(); 
-	int b = pop();
+	int b = get<float>(pop());
 	int res;
 	switch(type) {
 		case PLUS:
@@ -110,13 +186,13 @@ void eval_goto()
 {
 	int idx = iget();
 
-	ip = labels[idx].value;
+	ip = get<float>(labels[idx].value);
 }
 
 void eval_if()
 {
 	//eval1();
-	int cond = pop();
+	bool cond = truthify(pop());
 	int jump  = iget();
 	if(!cond) ip += jump;
 }
@@ -131,7 +207,6 @@ void eval_let()
 {
 	int idx = iget();
 	eval1();
-	//int value   = pop();
 	vars[idx].value = pop();
 
 }
@@ -148,7 +223,7 @@ vector<opcode_t> opcodes{
 	opcode_t{LET, 	"LET",	int1, 	eval_let },
 	opcode_t{MUL, 	"MUL",	0, 	[](){ do_arith(MUL);}},
 	opcode_t{PLUS, 	"PLUS",	0, 	[](){ do_arith(PLUS);}},
-	opcode_t{PRINT, "PRINT",0, 	[](){ eval1(); cout << pop() << " "; std::flush(cout);}},
+	opcode_t{PRINT, "PRINT",0, 	[](){ eval1(); cout << stringify(pop()) << " "; std::flush(cout);}},
 	opcode_t{SUB, 	"SUB",	0,	[](){ do_arith(SUB);}},
 	opcode_t{VAR, 	"VAR",	int1, [](){ push(vars[iget()].value); }}
 };
@@ -171,7 +246,7 @@ void eval()
 	while(eval1());
 
 	cout << "Stack is: ";
-	while(!stk.empty()) cout << pop() << " ";
+	while(!stk.empty()) cout << stringify(pop()) << " ";
 	cout << "\n";
 
 	return;
@@ -201,7 +276,7 @@ finis:
 
 	cout << "\nLABELS:\n";
 	for(int i=0; i< labels.size(); ++i) {
-		cout << i << " " << labels[i].name << " " <<labels[i].value << "\n";
+		cout << i << " " << labels[i].name << " " <<stringify(labels[i].value) << "\n";
 		std::flush(cout);
 	}
 }

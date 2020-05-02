@@ -4,16 +4,22 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <variant>
 #include <vector>
 
 typedef unsigned char byte_t;
-
 #define YYSTYPE std::vector<byte_t>
-extern YYSTYPE yylval;
+#include "blang.tab.hh"
+
+
+
+//extern YYSTYPE yylval;
 inline YYSTYPE bcode;
+//typedef int yytokentype;
 
 
-typedef struct {std::string name; int value; } var_t;
+typedef std::variant<float, std::string> val_t;
+typedef struct {std::string name; val_t value; } var_t;
 inline std::vector<var_t> vars;
 inline std::vector<var_t> labels;
 
@@ -27,31 +33,12 @@ YYSTYPE to_bvec(int i);
 
 extern int top; // the top node
 
-/*
-#ifndef YYTOKENTYPE
-# define YYTOKENTYPE
-  enum yytokentype
-  {
-    HALT = 1,
-    STATEMENT,
-    DENT,
-    TEXT,
-    INTEGER,
-    JUST,
-    LRB,
-    RRB,
-    PLUS,
-    MUL,
-    DIV,
-    POW,
-    SEMI,
-    IF,
-    THEN,
-    ELSE,
-    FI,
-    PRINT,
-    SUB,
-    UMINUS
-  };
-#endif
-*/
+YYSTYPE join(YYSTYPE vec1, YYSTYPE vec2);
+YYSTYPE join(YYSTYPE vec1, YYSTYPE vec2, YYSTYPE vec3);
+YYSTYPE join(YYSTYPE vec1, YYSTYPE vec2, YYSTYPE vec3, YYSTYPE vec4);
+YYSTYPE join(byte_t b, YYSTYPE vec1, YYSTYPE vec2);
+YYSTYPE join_toke(yytokentype toke, YYSTYPE vec1);
+YYSTYPE join_toke(yytokentype toke, int i);
+YYSTYPE join_toke(yytokentype toke, YYSTYPE vec1, YYSTYPE vec2);
+YYSTYPE make_kstr(YYSTYPE str);
+
