@@ -87,20 +87,29 @@ YYSTYPE join_toke(yytokentype toke, YYSTYPE vec1, YYSTYPE vec2)
 	return join(vec, vec2);
 }
 
-YYSTYPE make_kstr(YYSTYPE str)
+int make_kstr(char* chars)
 {
-	return join_toke(KSTR, to_bvec(str.size()), str);
-	/*
-	YYSTYPE res;
-	int len = str.size();
-	res.reserve(3+len);
-	res[0] = KSTR;
-	res[1] = len;
-	for(int i =0; i<= len; i++) res[i+2] = str[i];
-
+	string str = chars;
+	int res = kstrs.size();
+	kstrs.push_back(str);
 	return res;
-	*/
 }
+
+/*
+YYSTYPE make_kstr(YYSTYPE bvec)
+{
+	//puts(yylval);
+	//string str = get<string>(v);
+	string str;
+	str.reserve(yylval.size());
+	for(int i = 0; i< bvec.size(); i++) str[i] = bvec[i];
+	//str = "TODO"s;
+	kstrs.push_back(str);
+	cout << "make_kstr:"s << str.size() << ":" << kstrs.size()-1 << ":" << str << endl;
+	//return join_toke(KSTR, to_bvec(str.size()), str);
+	return join_toke(KSTR, kstrs.size() -1);
+}
+*/
 
 void trace(std::string text)
 {
@@ -132,7 +141,7 @@ byte_t bget(int& ip)
 	return bcode[ip++];
 }
 
-int iget(int& ip)
+int iget (int& ip)
 {
 	int i = 0;
 	for(int j = 0; j< sizeof(int); ++j) 
@@ -211,6 +220,16 @@ void eval_let()
 
 }
 
+void eval_kstr()
+{
+	int idx = iget();
+	//cout << "IP" << ip << ",String length is: "s << idx <<endl;
+	string str = kstrs[idx];
+	cout << "eval_kstr:" << idx << "," << str << endl;
+	push(str);
+	flush(cout);
+
+}
 const auto int1 = sizeof(int);
 const auto int2 = 2*sizeof(int);
 
@@ -225,7 +244,8 @@ vector<opcode_t> opcodes{
 	opcode_t{PLUS, 	"PLUS",	0, 	[](){ do_arith(PLUS);}},
 	opcode_t{PRINT, "PRINT",0, 	[](){ eval1(); cout << stringify(pop()) << " "; std::flush(cout);}},
 	opcode_t{SUB, 	"SUB",	0,	[](){ do_arith(SUB);}},
-	opcode_t{VAR, 	"VAR",	int1, [](){ push(vars[iget()].value); }}
+	opcode_t{VAR, 	"VAR",	int1, [](){ push(vars[iget()].value); }},
+	opcode_t{KSTR,	"KSTR", int1,	eval_kstr }
 };
 
 map<yytokentype,opcode_t> opmap;

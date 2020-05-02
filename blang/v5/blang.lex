@@ -84,6 +84,6 @@ JUST		{ return JUST;}
 PRINT		{ return PRINT;}
 [a-z]([a-z]|[0-9])*	{ set_yylval(var_idx(yytext)); return VAR; }
 :[a-z]([a-z]|[0-9])*	{ set_yylval(get_label_id(yytext));  return LABEL; }
-\"([^\\\"]|\\.)*\" 	{ return KSTR; }
+\"([^\\\"]|\\.)*\" 	{ set_yylval(make_kstr(yytext)); return KSTR; }
 
 %%

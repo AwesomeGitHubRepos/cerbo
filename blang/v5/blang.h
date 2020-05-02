@@ -22,6 +22,7 @@ typedef std::variant<float, std::string> val_t;
 typedef struct {std::string name; val_t value; } var_t;
 inline std::vector<var_t> vars;
 inline std::vector<var_t> labels;
+inline std::vector<std::string> kstrs; // constant strings
 
 void trace(std::string text);
 void emit(std::string text);
@@ -40,5 +41,6 @@ YYSTYPE join(byte_t b, YYSTYPE vec1, YYSTYPE vec2);
 YYSTYPE join_toke(yytokentype toke, YYSTYPE vec1);
 YYSTYPE join_toke(yytokentype toke, int i);
 YYSTYPE join_toke(yytokentype toke, YYSTYPE vec1, YYSTYPE vec2);
-YYSTYPE make_kstr(YYSTYPE str);
+//YYSTYPE make_kstr(YYSTYPE str);
+int make_kstr(char* chars);
 
