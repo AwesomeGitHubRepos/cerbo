@@ -87,7 +87,7 @@ YYSTYPE join_toke(yytokentype toke, YYSTYPE vec1, YYSTYPE vec2)
 	return join(vec, vec2);
 }
 
-int make_kstr(char* chars)
+int make_kstr (char* chars)
 {
 	string str = chars;
 	int res = kstrs.size();
@@ -226,19 +226,19 @@ void eval_kstr()
 	int idx = iget();
 	//cout << "IP" << ip << ",String length is: "s << idx <<endl;
 	string str = kstrs[idx];
-	cout << "eval_kstr:" << idx << "," << str << endl;
+	//cout << "eval_kstr:" << idx << "," << str << endl;
 	push(str);
-	flush(cout);
+	//flush(cout);
 
 }
 
 
 void eval_print()
 {
-	cout << "eval_print:" << endl;
+	//cout << "eval_print:" << endl;
 	eval1(); 
-	cout << "eval_print:write" << endl;
-	cout << stringify(pop()) << " "; std::flush(cout);
+	//cout << "eval_print:write" << endl;
+	cout << stringify(pop()) << " \n"; std::flush(cout);
 }
 
 const auto int1 = sizeof(int);
@@ -271,33 +271,35 @@ int eval1()
 	return 1;
 }
 
-void eval()
+void print_stack ()
 {
-	ip = 0;
-	while(eval1());
-
+	if(stk.empty()) return;
 	cout << "Stack is: ";
 	while(!stk.empty()) cout << stringify(pop()) << " ";
 	cout << "\n";
-
-	return;
-
 }
+
 
 void decompile()
 {
+	return;
+
 	ip = 0;
 	while(1) {
 		auto opcode = bget(ip) + HALT;
 		if(opcode==HALT) goto finis;
 		opcode_t& op = opmap[(yytokentype) opcode];
 		cout << op.name << " ";
+		int ival = iget();
 		switch(op.opcode) {
 			case INTEGER: //fal;
 			case GOTO: // fallthrough
 			case LABEL:
-				cout << iget();
+				cout << ival;
 				break;
+			case KSTR:
+				cout << ival << "\t" << kstrs[ival];
+				// fall to default
 			default:
 				ip+= op.size;
 		}
@@ -356,7 +358,11 @@ int main()
 
 	decompile();
 
-	eval();
+	ip = 0;
+	while(eval1());
+
+	print_stack();
+
 
 	//disassemble();
 	//eval(top_prog_node);

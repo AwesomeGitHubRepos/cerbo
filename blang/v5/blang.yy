@@ -75,8 +75,10 @@ if_statement	:	IF expression THEN statements FI
 goto_statement	:	GOTO LABEL { $$ = join_toke(GOTO, $2); }
 label_statement	:	LABEL { $$ = join_toke(LABEL, $1); } // doesn't check for duplicate labels
 
+kstr		:	KSTR { $$ = join_toke(KSTR, $1); }
+
 print_statement	:	PRINT expression {$$ = join_toke(PRINT, $2); }
-		|	PRINT KSTR { $$ = join_toke(PRINT, $2); } 
+		|	PRINT kstr { $$ = join_toke(PRINT, $2); } 
 
 expression	:	expression PLUS expression { $$ = join_toke(PLUS, $1, $3); }
 		|	expression SUB expression { $$ = join_toke(SUB, $1, $3); }
