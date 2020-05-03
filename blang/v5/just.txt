@@ -1,5 +1,0 @@
-	JUST (1+2)*3 ;
-	JUST 20 ;
-	JUST -56;
-	JUST 20/2;
-	JUST 20 -2;

@@ -65,6 +65,7 @@ ws	[ \t\r\n]
 
 [\t\r ] // discard whitespace
 \n	line_number++;
+#.*\n	// discard comments
 "="		{ return EQ; }
 "("		{ return LRB; }
 ")"		{ return RRB; }

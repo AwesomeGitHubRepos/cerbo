@@ -36,6 +36,7 @@ void yyerror(const char* s);
 %token JREL
 %token GOTO LABEL
 %token KSTR
+%token SX // statement terminator. Used for commands with unlimited arguments
 
 %left  SUB PLUS
 %left  MUL DIV
@@ -57,6 +58,11 @@ statement	:	print_statement
 		|	if_statement
 		|	label_statement
 		|	goto_statement
+		|	just_statement
+		;
+
+just_statement	:	JUST arg { $$ = join_toke(JUST, $2); }
+	       	;
 
 assignment	:	VAR EQ expression {$$ = join_toke(LET, $1, $3); }
 
@@ -77,12 +83,20 @@ label_statement	:	LABEL { $$ = join_toke(LABEL, $1); } // doesn't check for dupl
 
 kstr		:	KSTR { $$ = join_toke(KSTR, $1); }
 
-print_statement	:	PRINT expression {$$ = join_toke(PRINT, $2); }
-		|	PRINT kstr { $$ = join_toke(PRINT, $2); } 
+print_statement	:	PRINT print_list {$$ = join_toke(PRINT, $2, YYSTYPE{SX-HALT}); }
+
+print_list	:	arg {$$ = $1; }
+	   	|	print_list arg {$$ = join($1, $2); }
+
+arg		:	kstr { $$ = $1; } 
+     		|	expression { $$ = $1 ; }
 
 expression	:	expression PLUS expression { $$ = join_toke(PLUS, $1, $3); }
 		|	expression SUB expression { $$ = join_toke(SUB, $1, $3); }
 		|	expression MUL expression { $$ = join_toke(MUL, $1, $3); }
+		|	expression DIV expression { $$ = join_toke(DIV, $1, $3); }
+		|	SUB expression %prec UMINUS { $$ = join_toke(UMINUS, $2); }
+		|	LRB expression RRB { $$ = $2; }
 		|	INTEGER { $$ = join_toke(INTEGER, $1); }
 		|	VAR { $$ = join_toke(VAR, $1); }
 

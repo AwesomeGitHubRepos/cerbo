@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cmath>
+#include <fstream>
 //#include <functional>
 #include <iostream>
 #include <stack>
@@ -21,6 +22,9 @@ static int ip = 0;
 //stack<int> stk;
 stack<val_t> stk;
 
+typedef std::function<void()> func_t;
+typedef struct { yytokentype opcode; string name; int size; func_t fn; } opcode_t;
+map<yytokentype,opcode_t> opmap;
 
 string stringify(val_t v)
 {
@@ -71,6 +75,13 @@ YYSTYPE join(byte_t b, YYSTYPE vec1, YYSTYPE vec2)
 
 YYSTYPE join_toke(yytokentype toke, YYSTYPE vec1)
 {
+	// verify that toke is evaluable
+	if( opmap.find(toke) == opmap.end()) {
+		//cerr << "ERROR: Couldn't find evaluater for opcode " << toke << endl;
+		throw std::out_of_range("No evaluator opcode:"s + to_string(toke) + " in file " + __FILE__ + " line " + to_string(__LINE__));
+	}
+
+
 	YYSTYPE vec{(byte_t) (toke-HALT)};
 	vec = join(vec, vec1);
 	return vec;
@@ -163,8 +174,6 @@ val_t pop()
 //void push(int i) { stk.push(i); }
 void push (val_t v) { stk.push(v); }
 
-typedef std::function<void()> func_t;
-typedef struct { yytokentype opcode; string name; int size; func_t fn; } opcode_t;
 
 //void do_int() { push(666); }
 
@@ -185,12 +194,20 @@ void do_arith(yytokentype type)
 		case MUL:
 			res = a*b;
 			break;
+		case DIV:
+			res = a/b;
+			break;
 		default:
 			assert(false);
 	}
 	push(res);
 }
 
+void eval_uminus()
+{
+	eval1();
+	push(-get<float>(pop()));
+}
 void eval_goto()
 {
 	int idx = iget();
@@ -228,23 +245,41 @@ void eval_kstr()
 	string str = kstrs[idx];
 	//cout << "eval_kstr:" << idx << "," << str << endl;
 	push(str);
-	//flush(cout);
+	cout << "eval_kstr:pushed:" << str << endl;
+	flush(cout);
 
 }
 
+string strpop() { return stringify(pop()); }
 
 void eval_print()
 {
-	//cout << "eval_print:" << endl;
-	eval1(); 
-	//cout << "eval_print:write" << endl;
-	cout << stringify(pop()) << " \n"; std::flush(cout);
+	//int opcode;
+	cout << "eval_print:entered" << endl;
+	while(1) {
+		int opcode = bget(ip) + HALT;
+		if(opcode == SX) break;		
+		cout << "eval_print: something:" << opcode << endl;
+		eval1(); 
+		cout << strpop() << " \n"; 
+		std::flush(cout);
+	}
+	cout << "eval_print:exiting" << endl;
+}
+
+void eval_just()
+{
+	eval1();
+	cout << "Just:" << strpop() << "\n";
 }
 
 const auto int1 = sizeof(int);
 const auto int2 = 2*sizeof(int);
 
 vector<opcode_t> opcodes{
+	opcode_t{UMINUS, "UMINUS", 0,	eval_uminus},
+	opcode_t{JUST,	"JUST",	0,	eval_just},
+	opcode_t{SX,	"SX",	0,	[](){;}}, // do nothing, it's a statement terminator
 	opcode_t{KSTR,	"KSTR", int1,	eval_kstr},
 	opcode_t{GOTO,	"GOTO",	int1, 	eval_goto},
 	opcode_t{IF, 	"IF",	int1, 	eval_if},
@@ -253,21 +288,28 @@ vector<opcode_t> opcodes{
 	opcode_t{LABEL, "LAB",	int1, 	[](){ iget(); }},
 	opcode_t{LET, 	"LET",	int1, 	eval_let },
 	opcode_t{MUL, 	"MUL",	0, 	[](){ do_arith(MUL);}},
+	opcode_t{DIV, 	"DIV",	0, 	[](){ do_arith(DIV);}},
 	opcode_t{PLUS, 	"PLUS",	0, 	[](){ do_arith(PLUS);}},
 	opcode_t{PRINT, "PRINT",0, 	eval_print},
 	opcode_t{SUB, 	"SUB",	0,	[](){ do_arith(SUB);}},
 	opcode_t{VAR, 	"VAR",	int1, [](){ push(vars[iget()].value); }}
 };
 
-map<yytokentype,opcode_t> opmap;
 
-int eval1()
+int eval1 ()
 {
 	int opcode = bget(ip) + HALT;
 	if(opcode==HALT) return 0;
 
 	opcode_t& op = opmap[(yytokentype) opcode];
-	op.fn();
+	try {
+		op.fn();
+	} catch (std::bad_function_call& e) {
+		cout << "ERROR:eval1:Bad function:" << opcode << ":`" << op.name << "'\n";
+		throw e;
+	}
+
+
 	return 1;
 }
 
@@ -282,43 +324,49 @@ void print_stack ()
 
 void decompile()
 {
-	return;
+	//return;
+	ofstream ofs;
+	ofs.open("decompile.txt");
 
 	ip = 0;
 	while(1) {
 		auto opcode = bget(ip) + HALT;
 		if(opcode==HALT) goto finis;
 		opcode_t& op = opmap[(yytokentype) opcode];
-		cout << op.name << " ";
+		ofs << op.name << " ";
 		int ival = iget();
 		switch(op.opcode) {
 			case INTEGER: //fal;
 			case GOTO: // fallthrough
 			case LABEL:
-				cout << ival;
+				ofs << ival;
 				break;
+			//case SX:
+			//	cout << 
 			case KSTR:
 				cout << ival << "\t" << kstrs[ival];
-				// fall to default
+				goto inc;
 			default:
+inc:
 				ip+= op.size;
 		}
-		cout << "\n";
+		ofs << "\n";
 	}
 finis:
 
-	cout << "\nLABELS:\n";
+	ofs << "\nLABELS:\n";
 	for(int i=0; i< labels.size(); ++i) {
-		cout << i << " " << labels[i].name << " " <<stringify(labels[i].value) << "\n";
-		std::flush(cout);
+		ofs << i << " " << labels[i].name << " " <<stringify(labels[i].value) << "\n";
+		std::flush(ofs);
 	}
 
-	cout << "\nKSTRS:\n";
+	ofs << "\nKSTRS:\n";
 	for(int i = 0; i < kstrs.size(); ++i) {
-		cout << i << "\t\"" << kstrs[i] << "\"\n";
-		flush(cout);
+		ofs << i << "\t\"" << kstrs[i] << "\"\n";
+		flush(ofs);
 	}
 
+	ofs.close();
 }
 
 void resolve_labels()
