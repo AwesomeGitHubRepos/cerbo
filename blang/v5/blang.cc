@@ -328,15 +328,19 @@ void decompile()
 	ofstream ofs;
 	ofs.open("decompile.txt");
 
+	int n = 0;
 	ip = 0;
 	while(1) {
 		auto opcode = bget(ip) + HALT;
 		if(opcode==HALT) goto finis;
+		ofs << "Instruction: " << ++n << endl;
 		opcode_t& op = opmap[(yytokentype) opcode];
 		ofs << op.name << " ";
 		int ival = iget();
 		switch(op.opcode) {
-			case INTEGER: //fal;
+			case INTEGER: 
+				cout << "INT" << endl;
+				//fal;
 			case GOTO: // fallthrough
 			case LABEL:
 				ofs << ival;
@@ -347,6 +351,7 @@ void decompile()
 				cout << ival << "\t" << kstrs[ival];
 				goto inc;
 			default:
+				ofs << "DEFAULT" << endl;
 inc:
 				ip+= op.size;
 		}
