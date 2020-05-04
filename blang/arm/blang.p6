@@ -1,3 +1,4 @@
+#!/usr/bin/env perl6
 use Template::Mustache;
 #use trace;
 
@@ -13,7 +14,8 @@ grammar G {
 	rule statement 	{ <printstr> | <print-stmt> | <for-loop> | <assign>   }
 	#rule dim	{ 'dim' <var> '(' <expr> ')' }
 	rule printstr	{ 'printstr' <expr> }
-	rule print-stmt	{ 'print' <expr> }
+	rule print-stmt	{ 'print' <expr-list> }
+	rule expr-list	{ <expr>+ % ',' }
 	rule for-loop 	{ 'for' <var> '=' <from=.expr> 'to'  <to=.expr>  <stmts> 'next' }
 	rule assign	{ 'let' <var> '=' <expr> }
 
@@ -168,7 +170,23 @@ class A {
 	}
 
 	method print-stmt($/) { 
-		my $res = $<expr>.made ~ "\n	bl	printd\n";
+		#my $res = map *.made, $/.<expr
+		my @exprs = $<expr-list>.values;
+		#say "expression list is ", @exprs;
+		my $res = "";
+
+		#map { my $foo = *.made.perl ; say " TODO 2 $foo "; }, $/.<expr-list>;
+		for @exprs -> $expr {
+			#say "TODO 1 ";
+			#say $express.made;
+			#say "XXXX";
+			$res ~= ($expr.made ~ "\n  bl      printd\n");
+		}
+
+		
+
+		#say "TODO $res XXX";
+
 		$/.make($res);
 	}
 
