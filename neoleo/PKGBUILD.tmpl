@@ -13,7 +13,6 @@ md5sums=('$MD5SUM')
 
 build() {
 	cd "$pkgname-$pkgver"
-	unset CPPFLAGS # Arch adds a -D_FORTIFY_SOURCE=2 which can mess things up with -Werror
 	./configure --prefix=/usr 
 	make
 }
