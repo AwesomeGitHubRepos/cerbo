@@ -1,4 +1,0 @@
-fkey 1 = "merge \"|telnet localhost 6667\""
-fkey 2 = "merge \"|~/a1\""
-fkey 3 = "merge \"|~/Downloads/client.scm\""
-

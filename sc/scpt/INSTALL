@@ -1,6 +1,0 @@
-To build scpt, you will need Bigloo. If you are using cygwin, then bigloo v3.3b (alpha) is known to work, whereas v3.3a-5 is known to fail to build.
-
-Building is straightforward:
-	make
-        make install
-
