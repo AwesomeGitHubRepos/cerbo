@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-# only useful to mcarter
-
-if [ ! -f configure ]; then
-	autoreconf -iv
-fi
-
-./configure --prefix=$HOME/.local
