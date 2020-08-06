@@ -1,3 +1,0 @@
-how now "browncow" # this is a comment
-
-"garned grows?" today
