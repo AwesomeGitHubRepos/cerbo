@@ -7,7 +7,7 @@ rem print_tokens()
 LABEL PROGRAM
 	getchar()
 	yylex()
-	ok = TST(".SYNTAX") and ID() and OUT("ADR " + yytext$) and STs() and TST(".END")
+	ok = TST(".SYNTAX") and ID() and OUT("	ADR " + star$) and STs() and TST(".END") and OUT("	END")
 	print "Finished SYTNAX"
 END
 
@@ -17,26 +17,45 @@ sub OUT(s$)
 end sub
 
 sub ID()
-	local ok
 	if  yytype$ <> "I"  return false
-	print "ID:passed"
+	star$ = yytext$
 	yylex()
 	return true
 end sub
 
-sub EX1()
+sub EX3()
+	return (ID() and OUT("	CLL *")) or (STR() and OUT("	TST " + star$))
+end sub
+
+sub EX2()
+	return EX3() and OUT("	EX2 BF *1")
+end sub
+
+sub EX1a()
+	while TST("/") and OUT("	BT *1") and EX2() wend
 	return true
 end sub
 
+sub EX1()
+	return EX2() and EX1a() and OUT("	R EX1")
+end sub
+
 sub STs()
-	local foo
-	return ID() and EX1() and TST(";")
+	while ID() and OUT("	ST " + star$) and TST("=") and EX1() and TST(";") and OUT("R") wend
+	return true
+end sub
+
+sub STR()
+	if yytype$ <> "S"  return false
+	star$ = yytext$
+	yylex()
+	return true
 end sub
 
 sub TST(s$)
 	local ok
 	ok  = (yytext$ = s$)
-	print "TST ", s$
+	rem print "TST ", s$
 	if ! ok return false
 	yylex()
 	return true
@@ -67,26 +86,38 @@ label begin
 		getchar()
 		goto begin
 	endif
-	ok = yy_id() or yy_string() or yy_unknown()
+	ok = yy_id() or yy_key() or yy_string() or yy_unknown()
 	return ok
 end sub
 
 sub yy_unknown()
-	print "unknown:", ch$
+	rem print "unknown:", ch$
 	getchar()
 	yytype$ = "U"
 	return true
 end sub
 
 sub yy_id()
-	if !(alpha or ch$ = ".") return false
+	if ! alpha  return false
 	while true
 		getchar()
 		if !(alpha or digit) break
 		yytext$ = yytext$ + ch$
 	wend
-	print "yy_id:", yytext$
+	rem print "yy_id:", yytext$
 	yytype$ = "I"
+	return true
+end sub
+
+sub yy_key()
+	if ch$ <> "." return false
+	while true
+		getchar()
+		if not alpha break
+		yytext$ = yytext$ + ch$
+	wend
+	rem print "yy_key:", yytext$
+	yytype$ = "K"
 	return true
 end sub
 
