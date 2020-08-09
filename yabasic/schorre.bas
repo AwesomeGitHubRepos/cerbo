@@ -1,76 +1,108 @@
 rem an interpreter
 rem 2020-08-08 mcarter started
 
+DQ = 34 rem the double-quote 
+rem print_tokens()
+
 LABEL PROGRAM
 	getchar()
-	gosub yylex
-	if yytext$ <> ".SYNTAX" goto yy_panic
-	gosub yylex
-	print "Syntax name is ", yytext$
-	gosub yylex
-	if yytext$ = "
+	yylex()
+	ok = TST(".SYNTAX") and ID() and OUT("ADR " + yytext$) and STs() and TST(".END")
 	print "Finished SYTNAX"
 END
 
+sub OUT(s$)
+	print s$
+	return true
+end sub
+
+sub ID()
+	local ok
+	if  yytype$ <> "I"  return false
+	print "ID:passed"
+	yylex()
+	return true
+end sub
+
+sub EX1()
+	return true
+end sub
+
+sub STs()
+	local foo
+	return ID() and EX1() and TST(";")
+end sub
+
+sub TST(s$)
+	local ok
+	ok  = (yytext$ = s$)
+	print "TST ", s$
+	if ! ok return false
+	yylex()
+	return true
+end sub
+	
 
 label yy_panic
 	print "Syntax error: unexpected:", yytext$
 	END
 
-DQ = 34 rem the double-quote 
 
 REM read all tokens
-label print_tokens
+sub print_tokens()
 	getchar()
 	while ch <> -1
-		gosub yylex
+		yylex()
 	wend
 	print "Finished analysing"
-END
+	end
+end sub
 
 REM 	=== LEXER ===
 
-label yylex
+sub yylex()
+label begin
 	yytext$ = ch$ 
 	if white then
 		getchar()
-		goto yylex
+		goto begin
 	endif
-	if alpha  or ch$ = "." goto yy_id
-	if ch = DQ goto yy_string
+	ok = yy_id() or yy_string() or yy_unknown()
+	return ok
+end sub
+
+sub yy_unknown()
 	print "unknown:", ch$
 	getchar()
-rem label yylex_end
-	return
+	yytype$ = "U"
+	return true
+end sub
 
+sub yy_id()
+	if !(alpha or ch$ = ".") return false
+	while true
+		getchar()
+		if !(alpha or digit) break
+		yytext$ = yytext$ + ch$
+	wend
+	print "yy_id:", yytext$
+	yytype$ = "I"
+	return true
+end sub
 
-rem label yy_white
-rem	getchar()
-rem	goto 
-rem	return
-rem	rem goto yylex_end
-
-
-label yy_id
-	getchar()
-	if !(alpha or digit) goto yyid_fin
-	yytext$ = yytext$ + ch$
-	goto yy_id
-label yyid_fin
-	print "ID:", yytext$
-	return
-	rem getchar()
-	goto yylex_end
-
-label yy_string REM tokenize a double-quoted string
+sub yy_string() REM tokenize a double-quoted string
+	rem print "yy_string:called:", ch
+	if ch <> DQ return false
 	yytext$ = ""
 	while getchar() <> DQ
 		yytext$ = yytext$ + ch$
 	wend
 	getchar()
 	print "string: '", yytext$, "'"
-	return
-	goto yylex_end
+	yytype$ = "S"
+	return true
+end sub
+
 
 
 sub isalpha(ch)
