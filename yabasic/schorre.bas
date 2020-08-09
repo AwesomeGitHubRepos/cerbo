@@ -1,6 +1,22 @@
 rem an interpreter
 rem 2020-08-08 mcarter started
 
+LABEL PROGRAM
+	getchar()
+	gosub yylex
+	if yytext$ <> ".SYNTAX" goto yy_panic
+	gosub yylex
+	print "Syntax name is ", yytext$
+	gosub yylex
+	if yytext$ = "
+	print "Finished SYTNAX"
+END
+
+
+label yy_panic
+	print "Syntax error: unexpected:", yytext$
+	END
+
 DQ = 34 rem the double-quote 
 
 REM read all tokens
@@ -12,9 +28,14 @@ label print_tokens
 	print "Finished analysing"
 END
 
+REM 	=== LEXER ===
+
 label yylex
 	yytext$ = ch$ 
-	if white goto yy_white
+	if white then
+		getchar()
+		goto yylex
+	endif
 	if alpha  or ch$ = "." goto yy_id
 	if ch = DQ goto yy_string
 	print "unknown:", ch$
@@ -23,10 +44,11 @@ rem label yylex_end
 	return
 
 
-label yy_white
-	getchar()
-	return
-	rem goto yylex_end
+rem label yy_white
+rem	getchar()
+rem	goto 
+rem	return
+rem	rem goto yylex_end
 
 
 label yy_id
