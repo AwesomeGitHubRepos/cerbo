@@ -43,14 +43,14 @@ prologue
 	pop {r4}
 	.endm
 
-	.macro init_kstr dest, src, len
-	ldr r0, =\dest
-	ldr r1, =\src
-	str r1, [r0]
-	mov r1, \len
-	str r1, [r0, #4] 	@length
-	str r1, [r0, #8] 	@capacity (same as length for fixed string)
-	.endm
+	@.macro init_kstr dest, src, len
+	@ldr r0, =\dest
+	@ldr r1, =\src
+	@str r1, [r0]
+	@mov r1, \len
+	@str r1, [r0, #4] 	@length
+	@str r1, [r0, #8] 	@capacity (same as length for fixed string)
+	@.endm
 	
 @ MACROS END
 
@@ -59,7 +59,7 @@ prologue
 	@ entry point
 	push    {ip, lr}
 
-	BL	kstr_init
+	@BL	kstr_init
 @ PROLOGUE END
 %%
 epilogue
