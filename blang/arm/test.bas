@@ -1,4 +1,7 @@
-for i = 1 to 3+2
+# simple test file
+#It's not necessary to put a space after the hash
+
+for i = 1 to 3+2 # a loop
 	print i
 next
 

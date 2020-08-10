@@ -12,10 +12,11 @@ sub tsay($x) { say "\t$x"; }
 grammar G {
 	rule TOP 	{ ^ <stmts> $ }
 	rule stmts 	{ <statement>* }
-	rule statement 	{ <printstr> | <print-stmt> | <for-loop> | <assign> | <goto> | <labelling>  }
+	rule statement 	{ <printstr> | <print-stmt> | <for-loop> | <assign> | <goto> | <labelling> | <rem> }
 	#rule dim	{ 'dim' <var> '(' <expr> ')' }
 	rule goto	{ 'goto' <label-id> }
 	rule labelling	{ <label-id> ':' }
+	rule rem	{ '#' \N*  }
 	rule printstr	{ 'printstr' <expr> }
 	rule print-stmt	{ 'print' <expr-list> }
 	rule expr-list	{ <expr>+ % ',' }
@@ -113,6 +114,8 @@ class A {
 			$/.make($<labelling>.made);
 		} elsif $<printstr> {
 			$/.make($<printstr>.made);
+		} elsif $<rem> {
+			$/.make("");	
 		} else { die "unhandled statement"; }
 
 	}
