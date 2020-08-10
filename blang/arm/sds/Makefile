@@ -2,8 +2,8 @@ BINS = sds-test asm
 
 all: sds-test asm
 
-asm : asm.S
-	arm-linux-gnueabi-gcc -static $^ -o $@
+asm : asm.S sds.c
+	arm-linux-gnueabi-gcc -ggdb -O0 -static $^ -o $@
 
 sds-test: sds.c sds.h testhelp.h
 	$(CC) -o sds-test sds.c -Wall -std=c99 -pedantic -O2 -DSDS_TEST_MAIN
