@@ -2,6 +2,7 @@
 use Template::Mustache;
 #use trace;
 
+sub xnote($x) {} # NB note prints to stderr
 sub xsay($x) {}
 sub tsay($x) { say "\t$x"; }
 
@@ -11,18 +12,20 @@ sub tsay($x) { say "\t$x"; }
 grammar G {
 	rule TOP 	{ ^ <stmts> $ }
 	rule stmts 	{ <statement>* }
-	rule statement 	{ <printstr> | <print-stmt> | <for-loop> | <assign>   }
+	rule statement 	{ <printstr> | <print-stmt> | <for-loop> | <assign> | <goto> | <labelling>  }
 	#rule dim	{ 'dim' <var> '(' <expr> ')' }
+	rule goto	{ 'goto' <label-id> }
+	rule labelling	{ <label-id> ':' }
 	rule printstr	{ 'printstr' <expr> }
 	rule print-stmt	{ 'print' <expr-list> }
 	rule expr-list	{ <expr>+ % ',' }
 	rule for-loop 	{ 'for' <var> '=' <from=.expr> 'to'  <to=.expr>  <stmts> 'next' }
 	rule assign	{ 'let' <var> '=' <expr> }
 
-	#token kstr	{ '"' <!before '"'>  }
 	token kstr	{ '"' .*? '"'  }
 	#regex kstr	{ ("\""([^\n\"\\]*(\\[.\n])*)*"\"") }
-	token var 	{ <[a..z]>+   }
+	token label-id	{ <:alpha>+ }
+	token var 	{ <:alpha>+   }
 	rule expr 	{ <expr-p>+ % '+' }
 	rule expr-p	{ <num> | <var> | <kstr> }
 	token num	{ <[0..9]>+ }
@@ -80,6 +83,10 @@ class A {
 		$/.make($res);
 	}
 
+	method goto($/) { my $res = "\tB $<label-id>"; $/.make("$res \t@ GOTO"); }
+
+	method labelling($/) { $/.make("$<label-id>:\t@ LABEL"); }
+
 	method kstr($/) { 
 		my $label = mklabel;
 		self!add-asciz( $label, $/.Str);
@@ -98,8 +105,12 @@ class A {
 			$/.make($<print-stmt>.made); 
 		} elsif $<assign> {
 			$/.make($<assign>.made);
+		} elsif $<goto> {
+			$/.make($<goto>.made);
 		} elsif $<for-loop> {
 			$/.make($<for-loop>.made);
+		} elsif $<labelling> {
+			$/.make($<labelling>.made);
 		} elsif $<printstr> {
 			$/.make($<printstr>.made);
 		} else { die "unhandled statement"; }
@@ -190,7 +201,7 @@ class A {
 		$/.make($res);
 	}
 
-	method var ($/) { my $vname = $/.Str ; xsay "Adding var: $vname" ; self!add-var($vname,  0) ; }
+	method var ($/) { my $vname = $/.Str ; xnote "Adding var: $vname" ; self!add-var($vname,  0) ; }
 } 
 
 my $acts = A.new;
