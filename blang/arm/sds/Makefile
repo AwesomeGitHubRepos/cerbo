@@ -1,5 +1,5 @@
 CC = arm-linux-gnueabi-gcc
-CC=gcc
+#CC=gcc
 
 BINS = sds-test asm
 
