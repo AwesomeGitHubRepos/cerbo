@@ -40,6 +40,30 @@ int TIDX = 0; // token index
 vector<ttype_t> ttypes;
 vector<string> tvals; // token values
 
+void eval()
+{
+	cout << "Running evaluator\n";
+	IP = 0;
+	while(1) {
+		auto [opcode, value] = decode(bcodes[IP]);
+		switch (opcode) {
+			case PRIN:
+				cout << value << "\n";
+				break;
+			case END:
+				cout << "STOP\n";
+				goto finis;
+				break;
+			default:
+				cerr << "EVAL: opcode unknown:" << opcode << "\n";
+				exit(1);
+		}
+		IP++;
+	}
+finis:
+	cout << "Exiting eval\n";
+}
+
 void yyparse()
 {
 	bcodes.reserve(10000); // plenty to keep us amused
@@ -142,6 +166,8 @@ int main(int argc, char** argv)
 	yyparse();
 
 	print_bcodes();
+
+	eval();
 
 	return 0;
 }
