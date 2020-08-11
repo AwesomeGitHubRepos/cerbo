@@ -13,55 +13,40 @@ main:
 	BL	_puts
 	OK @ 1
 
-	@ initialise a string
-	LDR	r0, =str1
-	mov	r1, #80 @default capacity of 80
-	BL	_malloc
-	LDR	r4, =str1
-	str	r0, [r4]
-	OK @ 2
-
-	@ copy string: str1 = str2
-	ldr	r0, =str1
-	ldr	r1, =str2
-	bl	_strcpy
-	
-
-	@ print copy
-	ldr	r0, =str1
-	bl	_puts
-
-
-	@ test concat: str1 += str2
-	ldr	r0, =str1
-	ldr	r1, =str2
-	bl	_strcat
-
-
-	@ print copy
-	ldr	r0, =str1
-	bl	_puts
-
-b exit	
-
 	
 	@ initialise a string
 	LDR	r0, =str1
+	LDR	r0, [r0]
 	BL	_sdsempty
 	LDR 	r4, =str1
 	str	r0, [r4]
 	OK @ 2
 	
+
 	@ set value of string
 	LDR	r0, =str1
+	LDR	r0, [r0]
 	LDR	r1, =str2
+	@LDR	r1, [r1]
 	BL	_sdscpy
 	LDR	r4, =str1
 	STR	r0, [r4]
 	OK @3
 
 	LDR	r0, =str1
+	LDR	r0, [r0]
 	BL	puts
+
+	@ free it
+	ldr	r0, =str1
+	ldr	r0, [r0]
+	bl _sdsfree
+	OK @4
+
+	@ free it double-free, Should barf
+	ldr	r0, =str1
+	ldr	r0, [r0]
+	bl _sdsfree
 
 exit:
 @ END MAIN
@@ -105,10 +90,15 @@ _sdscpy:
 	bl sdscpy
 	ldmia sp!, {pc}
 
+_sdsfree:
+	stmdb sp!, {lr}
+	bl sdsfree
+	ldmia sp!, {pc}
+
 .data
 
 .balign 4
-str1: .space 32, 0 
+str1: .word 0 
 str2: .asciz "Test of string copy"
 str3: .asciz "Begin tests"
 str4: .asciz "OK"

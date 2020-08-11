@@ -10,7 +10,8 @@ BINS = sds-test asm
 all: sds-test asm
 
 asm : asm.S sds.c
-	$(CC) -fsanitize=address   -ggdb -O0  $^ -o $@ # -static
+	#$(CC) -lasan -fsanitize=address   -ggdb -O0  $^ -o $@ # -static
+	$(CC)    -ggdb -O0  $^ -o $@ # -static
 
 sds-test: sds.c sds.h testhelp.h
 	$(CC) -o sds-test sds.c -Wall -std=c99 -pedantic -O2 -DSDS_TEST_MAIN
