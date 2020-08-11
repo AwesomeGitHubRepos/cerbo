@@ -34,19 +34,36 @@ void push_bcode(int opcode, int value)
 }
 
 
-enum ttype_t { QSTR, INT, PRIN, ID, UNK, EOI, END };
-map<int, string> typemap = { {QSTR, "QSTR"}, {INT, "INT"}, {PRIN, "PRIN"}, {ID, "ID"}, {UNK, "UNK"}, {EOI, "EOI"}, {END, "END"} };
+enum { QSTR=1, INT, PRIN, ID, UNK, EOI, END, GOTO };
+map<int, string> typemap = { 
+	{QSTR, "QSTR"}, {INT, "INT"}, {PRIN, "PRIN"}, {ID, "ID"}, 
+	{UNK, "UNK"}, {EOI, "EOI"}, {END, "END"}, {GOTO, "GOTO"}  };
+
+//map<string, int> keywords = {"PRIN", kPRIN
 int TIDX = 0; // token index
-vector<ttype_t> ttypes;
+vector<int> ttypes;
 vector<string> tvals; // token values
+
+map<string, int> goto_here;
+vector<int> goto_ips;
+vector<string> goto_labels;
+void add_goto(const string& label)
+{
+	//cout << "add_goto:ref to:" << label << "\n";
+	goto_ips.push_back(IP-1);
+	goto_labels.push_back(label);
+}
 
 void eval()
 {
 	cout << "Running evaluator\n";
 	IP = 0;
 	while(1) {
-		auto [opcode, value] = decode(bcodes[IP]);
+		auto [opcode, value] = decode(bcodes[IP++]);
 		switch (opcode) {
+			case GOTO:
+				IP = value;
+				break;
 			case PRIN:
 				cout << value << "\n";
 				break;
@@ -59,10 +76,15 @@ void eval()
 				cerr << "Possible type: " <<typemap[opcode] << "\n";
 				exit(1);
 		}
-		IP++;
 	}
 finis:
 	cout << "Exiting eval\n";
+}
+
+void yyerror(const string& msg)
+{
+	cerr << "yyparse() failure: " << msg << "\n";
+	exit(1);
 }
 
 void yyparse()
@@ -70,6 +92,24 @@ void yyparse()
 	bcodes.reserve(10000); // plenty to keep us amused
 loop:
 	switch(ttypes[TIDX]) {
+		case ID:
+			{
+				string id = tvals[TIDX];
+				TIDX++;
+				if(tvals[TIDX] == ":") {
+					goto_here[id] = IP;
+				}
+				// TODO more here, like assignments
+			}
+			break;
+		case GOTO:
+			if(ttypes[++TIDX]==ID) {
+				push_bcode(GOTO, 666); // will need backfilling
+				add_goto(tvals[TIDX]);
+			} else {
+				yyerror("GOTO expected an ID");
+			}
+			break;
 		case PRIN:
 			push_bcode(PRIN, atoi(tvals[++TIDX].c_str()));
 			break;
@@ -91,7 +131,7 @@ loop:
 
 ifstream ifs;
 
-void push_toke(ttype_t t, const string& toke) { ttypes.push_back(t); tvals.push_back(toke); }
+void push_toke(int t, const string& toke) { ttypes.push_back(t); tvals.push_back(toke); }
 
 void tokenise()
 {
@@ -111,14 +151,23 @@ void tokenise()
 			ifs.unget();
 			push_toke(INT, toke);
 		} else if (isalpha(c)) {
+			//keyword_or_id(c);
 			toke = c;
 			while(ifs.get(c) && isalpha(c)) toke += c;
 			ifs.unget();
 			transform(toke.begin(), toke.end(), toke.begin(), ::toupper);
-			if(toke == "PRIN")
-				push_toke(PRIN, toke);
-			else
-				push_toke(ID, toke);
+
+			for(auto& x: typemap) {
+				if(x.second == toke) {
+					push_toke(x.first, x.second);
+					goto found_key;
+				}
+			}
+
+			// not a keyword, so a regular ID
+			push_toke(ID, toke);
+found_key:
+			continue;
 		} else {
 			push_toke(UNK, string{c});
 		}
@@ -131,7 +180,7 @@ void print_tokens() {
 	cout << "Printing tokens\n";
 	int i = 0;
 	while(ttypes[i] != EOI) {
-		cout << "\t" << typemap[ttypes[i]] << "\t" << tvals[i] << "\n";
+		cout << "\t" << i << "\t" << typemap[ttypes[i]] << "\t" << tvals[i] << "\n";
 		i++;
 	}
 }
@@ -141,13 +190,27 @@ void print_bcodes()
 	cout << "Printing bcodes\n";
 	int i=0;
 loop:
-	auto[opcode, value] = decode(bcodes[i++]);
-	cout << "\t" << typemap[opcode] << "\t" << value << "\n";
+	auto[opcode, value] = decode(bcodes[i]);
+	cout << "\t" << i << "\t" << typemap[opcode] << "\t" << value << "\n";
+	i++;
 	if(opcode != EOI) goto loop;
 
 	cout << "Finished printing bcodes\n";
 
 }
+
+void resolve_gotos()
+{
+	for(int i =0; i < goto_labels.size(); i++) {
+		auto f = goto_here.find(goto_labels[i]);
+		if(f == goto_here.end())
+			yyerror("Can't resolve goto label:" + goto_labels[i]);
+		auto dest = f->second;
+		bcodes[goto_ips[i]] = encode(GOTO, dest);
+
+	}
+}
+
 int main(int argc, char** argv)
 {
 	if(argc != 2) {
@@ -165,7 +228,7 @@ int main(int argc, char** argv)
 	print_tokens();
 
 	yyparse();
-
+	resolve_gotos();
 	print_bcodes();
 
 	eval();
