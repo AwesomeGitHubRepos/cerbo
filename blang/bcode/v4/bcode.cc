@@ -55,7 +55,8 @@ void eval()
 				goto finis;
 				break;
 			default:
-				cerr << "EVAL: opcode unknown:" << opcode << "\n";
+				cerr << "EVAL: opcode unknown: " << opcode << "\n";
+				cerr << "Possible type: " <<typemap[opcode] << "\n";
 				exit(1);
 		}
 		IP++;
