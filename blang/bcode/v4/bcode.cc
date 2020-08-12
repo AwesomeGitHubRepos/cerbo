@@ -82,7 +82,7 @@ void panic() { throw 13; }
 
 void do_op(char optype)
 {
-	int v1 = get<int>(pop()), v2 = get<int>(dstack.top());
+	int v1 = get<int>(pop()), v2 = get<int>(pop());
 	int res;
 	switch(optype) {
 		case '+':	res = v2+v1; break;
@@ -91,7 +91,7 @@ void do_op(char optype)
 		case '/':	res = v2/v1; break;
 		default:	cerr << "do_op: unrecognised operator\n"; panic();
 	}
-	dstack.emplace(res);
+	push(res);
 }
 
 void eval()
@@ -101,13 +101,13 @@ void eval()
 	while(1) {
 		auto [opcode, value] = decode(IP++);
 		switch (opcode) {
-			case GOTO:	IP = get<int>(value); 				break;
-			case NEG:	dstack.emplace(-get<int>(dstack.top()));	break;
-			case OP: 	do_op(str(value)[0]); 				break;
-			case PRIN: 	cout << str(value) << "\n"; 			break;
-			case PRINT: 	cout << str(pop()) << "\n"; 			break;
-			case PUSH: 	push(value); 					break;
-			case END: 	cout << "STOP\n"; goto finis; 			break;
+			case GOTO:	IP = get<int>(value); 			break;
+			case NEG:	push(-get<int>(pop()));			break;
+			case OP: 	do_op(str(value)[0]); 			break;
+			case PRIN: 	cout << str(value) << "\n"; 		break;
+			case PRINT: 	cout << str(pop()) << "\n"; 		break;
+			case PUSH: 	push(value); 				break;
+			case END: 	cout << "STOP\n"; goto finis; 		break;
 			default:
 				cerr << "EVAL: opcode unknown: " << opcode << "\n";
 				cerr << "Possible type: " <<typemap[opcode] << "\n";
@@ -138,6 +138,15 @@ void yyerror(const string& msg)
 	exit(1);
 }
 
+void require(const string& str)
+{
+	TIDX++;
+	if(str==tval) return;
+	yyerror("Expected " + tval + ", found " + str);
+}
+
+void parse_expr_t ();
+
 void parse_expr_p ()
 {
 	TIDX++;
@@ -153,6 +162,9 @@ void parse_expr_p ()
 
 	if(ttype == INT) {
 		push_bcode(PUSH, stoi(tval));
+	} else if(tval == "(") {
+		parse_expr_t();
+		require(")");
 	} else {
 		yyerror("parse_expr_p expected int");
 	}
@@ -311,6 +323,19 @@ void resolve_gotos()
 	}
 }
 
+
+void check_stack()
+{
+	if(dstack.empty()) return;
+	cerr << "ERR: Exiting with non-empty stack.\n";
+	cerr << "Stack contents, top downwards: ";
+	while(! dstack.empty()) {
+		cerr << str(dstack.top()) << " ";
+		dstack.pop();
+	}
+	cerr << "\n";
+}
+
 int main(int argc, char** argv)
 {
 	if(argc != 2) {
@@ -332,6 +357,8 @@ int main(int argc, char** argv)
 	print_bcodes();
 
 	eval();
+
+	check_stack();
 
 	return 0;
 }
