@@ -7,7 +7,7 @@
 #include <iostream>
 #include <map>
 #include <sstream>
-//#include <stack>
+#include <stack>
 #include <string>
 #include <string.h>
 //#include <type_traits>
@@ -75,6 +75,10 @@ void add_goto(const string& label)
 	goto_labels.push_back(label);
 }
 
+stack<value_t> dstack; // data stack
+void push(const value_t& v) { dstack.push(v); }
+value_t pop() { value_t v = dstack.top(); dstack.pop(); return v; }
+
 void eval()
 {
 	cout << "Running evaluator\n";
@@ -89,10 +93,10 @@ void eval()
 				cout << str(value) << "\n";
 				break;
 			case PRINT:
-				//cout << pop() << "\n";
+				cout << str(pop()) << "\n";
 				break;
-				//case PUSHT:
-
+			case PUSH:
+				push(value);
 				break;
 			case END:
 				cout << "STOP\n";
