@@ -162,6 +162,8 @@ void parse_expr_p ()
 
 	if(ttype == INT) {
 		push_bcode(PUSH, stoi(tval));
+	} else if(ttype == QSTR) {
+		push_bcode(PUSH, tval);
 	} else if(tval == "(") {
 		parse_expr_t();
 		require(")");
