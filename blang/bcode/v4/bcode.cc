@@ -53,10 +53,10 @@ void push_bcode(int opcode, const value_t& v)
 }
 void push_bcode(int opcode) { push_bcode(opcode, monostate()); }
 
-enum { QSTR=1, INT, PRIN, ID, UNK, EOI, END, GOTO, PRINT, PUSH, OP };
+enum { QSTR=1, INT, PRIN, ID, UNK, EOI, END, GOTO, PRINT, PUSH, OP, NEG };
 map<int, string> typemap = { 
 	{QSTR, "QSTR"}, {INT, "INT"}, {PRIN, "PRIN"}, {PRINT, "PRINT"}, {PUSH, "PUSH"}, {ID, "ID"}, 
-	{UNK, "UNK"}, {EOI, "EOI"}, {END, "END"}, {GOTO, "GOTO"}, {OP, "OP"}  };
+	{UNK, "UNK"}, {EOI, "EOI"}, {END, "END"}, {GOTO, "GOTO"}, {OP, "OP"}, {NEG, "NEG"}  };
 
 int TIDX = 0; // token index
 vector<int> ttypes;
@@ -101,12 +101,13 @@ void eval()
 	while(1) {
 		auto [opcode, value] = decode(IP++);
 		switch (opcode) {
-			case GOTO:	IP = get<int>(value); break;
-			case OP: 	do_op(str(value)[0]); break;
-			case PRIN: 	cout << str(value) << "\n"; break;
-			case PRINT: 	cout << str(pop()) << "\n"; break;
-			case PUSH: 	push(value); break;
-			case END: 	cout << "STOP\n"; goto finis; break;
+			case GOTO:	IP = get<int>(value); 				break;
+			case NEG:	dstack.emplace(-get<int>(dstack.top()));	break;
+			case OP: 	do_op(str(value)[0]); 				break;
+			case PRIN: 	cout << str(value) << "\n"; 			break;
+			case PRINT: 	cout << str(pop()) << "\n"; 			break;
+			case PUSH: 	push(value); 					break;
+			case END: 	cout << "STOP\n"; goto finis; 			break;
 			default:
 				cerr << "EVAL: opcode unknown: " << opcode << "\n";
 				cerr << "Possible type: " <<typemap[opcode] << "\n";
@@ -141,11 +142,21 @@ void parse_expr_p ()
 {
 	TIDX++;
 	cout << "parse_expr_p:" << tval << "\n";
+
+	// optional negation
+	//bool neg = false;
+	if(ttype == OP and tval == "-") {
+		parse_expr_p();
+		push_bcode(NEG);
+		return;
+	}
+
 	if(ttype == INT) {
 		push_bcode(PUSH, stoi(tval));
 	} else {
 		yyerror("parse_expr_p expected int");
 	}
+
 }
 
 void parse_expr_t ()
