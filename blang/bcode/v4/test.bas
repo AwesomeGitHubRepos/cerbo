@@ -6,3 +6,4 @@ prin 13
 skip:
 prin 7
 prin 11
+prin "thats all"

@@ -10,6 +10,8 @@
 //#include <stack>
 #include <string>
 #include <string.h>
+//#include <type_traits>
+#include <variant>
 #include <vector>
 
 
@@ -17,29 +19,48 @@ using namespace std;
 
 typedef uint64_t cell_t;
 
-vector<cell_t> bcodes;
+typedef variant<monostate, int, string> value_t;
+vector<int> opcodes;
+vector<value_t> opvalues;
+
+//template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+//template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+string str(const value_t& v)
+{
+	if(holds_alternative<monostate>(v)) return "";
+	if(holds_alternative<int>(v)) return to_string(get<int>(v));
+	if(holds_alternative<string>(v)) return get<string>(v);
+	throw 788;
+}
+
+//vector<cell_t> bcodes;
 cell_t IP = 0; 
 
-cell_t encode(cell_t opcode, cell_t value) {	 return  (opcode << 56 ) + value; }
-tuple<cell_t, cell_t> decode(cell_t x)
+void encode(int pos, int opcode, const value_t& value)
 {
-	cell_t opcode = x >>56;
-	cell_t value = x- (opcode<<56);
-	return {opcode, value};
+	opcodes[pos] = opcode;
+	opvalues[pos] = value;
 }
 
-void push_bcode(int opcode, int value)
+tuple<int, value_t> decode(int x)
 {
-	bcodes[IP++] = encode(opcode, value);;
+	return {opcodes[x], opvalues[x]};
+	//cell_t opcode = x >>56;
+	//cell_t value = x- (opcode<<56);
+	//return {opcode, value};
+}
+
+void push_bcode(int opcode, const value_t& v)
+{
+	encode(IP++, opcode, v);;
 }
 
 
-enum { QSTR=1, INT, PRIN, ID, UNK, EOI, END, GOTO };
+enum { QSTR=1, INT, PRIN, ID, UNK, EOI, END, GOTO, PRINT, PUSH };
 map<int, string> typemap = { 
-	{QSTR, "QSTR"}, {INT, "INT"}, {PRIN, "PRIN"}, {ID, "ID"}, 
+	{QSTR, "QSTR"}, {INT, "INT"}, {PRIN, "PRIN"}, {PRINT, "PRINT"}, {PUSH, "PUSH"}, {ID, "ID"}, 
 	{UNK, "UNK"}, {EOI, "EOI"}, {END, "END"}, {GOTO, "GOTO"}  };
 
-//map<string, int> keywords = {"PRIN", kPRIN
 int TIDX = 0; // token index
 vector<int> ttypes;
 vector<string> tvals; // token values
@@ -59,13 +80,19 @@ void eval()
 	cout << "Running evaluator\n";
 	IP = 0;
 	while(1) {
-		auto [opcode, value] = decode(bcodes[IP++]);
+		auto [opcode, value] = decode(IP++);
 		switch (opcode) {
 			case GOTO:
-				IP = value;
+				IP = get<int>(value);
 				break;
 			case PRIN:
-				cout << value << "\n";
+				cout << str(value) << "\n";
+				break;
+			case PRINT:
+				//cout << pop() << "\n";
+				break;
+				//case PUSHT:
+
 				break;
 			case END:
 				cout << "STOP\n";
@@ -87,9 +114,30 @@ void yyerror(const string& msg)
 	exit(1);
 }
 
+#define ttype ttypes[TIDX]
+#define tval tvals[TIDX]
+
+void parse_expr()
+{
+	TIDX++;
+	if(ttype == INT)
+		push_bcode(PUSH, stoi(tval));
+	else
+		yyerror("parse_expr: unexpected type found");
+}
+
+void parse_print()
+{
+	parse_expr();
+	push_bcode(PRINT, 0);
+}
+
 void yyparse()
 {
-	bcodes.reserve(10000); // plenty to keep us amused
+	opcodes.reserve(10000);
+	opvalues.reserve(10000);
+
+	//bcodes.reserve(10000); // plenty to keep us amused
 loop:
 	switch(ttypes[TIDX]) {
 		case ID:
@@ -111,7 +159,12 @@ loop:
 			}
 			break;
 		case PRIN:
-			push_bcode(PRIN, atoi(tvals[++TIDX].c_str()));
+			//push_bcode(PRIN, stoi(tvals[++TIDX]));
+			++TIDX;
+			push_bcode(PRIN, tval);
+			break;
+		case PRINT:
+			parse_print();
 			break;
 		case END:
 			push_bcode(END, END);
@@ -172,8 +225,8 @@ found_key:
 			push_toke(UNK, string{c});
 		}
 	}
-	push_toke(END, "END");
-	push_toke(EOI, "EOI"); // cap it all off with an End Of Input
+	push_toke(END, "");
+	push_toke(EOI, ""); // cap it all off with an End Of Input
 }
 
 void print_tokens() {
@@ -190,8 +243,8 @@ void print_bcodes()
 	cout << "Printing bcodes\n";
 	int i=0;
 loop:
-	auto[opcode, value] = decode(bcodes[i]);
-	cout << "\t" << i << "\t" << typemap[opcode] << "\t" << value << "\n";
+	auto[opcode, value] = decode(i);
+	cout << "\t" << i << "\t" << typemap[opcode] << "\t" << str(value) << "\n";
 	i++;
 	if(opcode != EOI) goto loop;
 
@@ -206,7 +259,7 @@ void resolve_gotos()
 		if(f == goto_here.end())
 			yyerror("Can't resolve goto label:" + goto_labels[i]);
 		auto dest = f->second;
-		bcodes[goto_ips[i]] = encode(GOTO, dest);
+		encode(goto_ips[i], GOTO, dest);
 
 	}
 }
