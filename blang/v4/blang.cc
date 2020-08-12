@@ -168,37 +168,6 @@ value_t blang_cut(values vs)
 		return "";
 	else
 		return fields[fieldnum-1];
-
-	/*
-	size_t p0;
-	int nfound = 0;
-	for(p0 = 0 ; p0< len; ++p0) {
-		if(str[p0] == "\t") nfound++;
-
-	       	&& nfound == targ_field
-
-	cout << "blang_cut():1\n";
-	static std::regex rgx("\t");
-	cout << "blang_cut():2\n";
-	auto iter = std::sregex_token_iterator(str(vs[0]).begin(), str(vs[0]).end(), rgx, -1);
-	cout << "blang_cut():3\n";
-	auto end = std::sregex_token_iterator();
-	cout << "blang_cut():4\n";
-
-	int i = 0;
-	for(; iter != end; ++iter) {
-	cout << "blang_cut():5\n";
-
-		if(++i == num(vs[1])) {
-			cout << "blang_cut():found at " << i << "\n";
-			string s = *iter;
-		       	return s;
-		}
-	}
-
-	cout << "blang_cut():6\n";
-	return "";
-	*/
 }
 
 value_t blang_fmtnum(values vs)
@@ -224,20 +193,6 @@ value_t blang_fmtnum(values vs)
 	string res(buf.begin(), buf.end());
 	//cout << "blang_fmtnum:7:" << res << "\n";
 	return res;
-
-	/*
-	int width = num(vs[1]);
-	int prec = num(vs[2]);
-	//int hdr = str(vs[3]);
-
-	std::ostringstream s;
-	s.precision(prec);
-	s.width(width);
-	s << d;
-	string s1{s.str()};
-	return s1;
-	*/
-
 }
 
 value_t blang_print(values vs)
