@@ -558,7 +558,7 @@ T parse_multiop(tokens& tokes, std::function<U(tokens&)> make, strings ops)
 }
 Term make_term(tokens& tokes) { return parse_multiop<Term,Factor>(tokes, make_factor, {"*", "/"}); }
 Relop make_relop(tokens& tokes) { return parse_multiop<Relop,Term>(tokes, make_term, {"+", "-"}); }
-Expression make_expression(tokens& tokes) { return parse_multiop<Expression, Relop>(tokes, make_relop, 
+Expression make_expression (tokens& tokes) { return parse_multiop<Expression, Relop>(tokes, make_relop, 
 		{">", ">=", "<", "<=", "==", "!="}); }
 
 

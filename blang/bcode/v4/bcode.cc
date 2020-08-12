@@ -45,21 +45,18 @@ void encode(int pos, int opcode, const value_t& value)
 tuple<int, value_t> decode(int x)
 {
 	return {opcodes[x], opvalues[x]};
-	//cell_t opcode = x >>56;
-	//cell_t value = x- (opcode<<56);
-	//return {opcode, value};
 }
 
 void push_bcode(int opcode, const value_t& v)
 {
 	encode(IP++, opcode, v);;
 }
+void push_bcode(int opcode) { push_bcode(opcode, monostate()); }
 
-
-enum { QSTR=1, INT, PRIN, ID, UNK, EOI, END, GOTO, PRINT, PUSH };
+enum { QSTR=1, INT, PRIN, ID, UNK, EOI, END, GOTO, PRINT, PUSH, OP };
 map<int, string> typemap = { 
 	{QSTR, "QSTR"}, {INT, "INT"}, {PRIN, "PRIN"}, {PRINT, "PRINT"}, {PUSH, "PUSH"}, {ID, "ID"}, 
-	{UNK, "UNK"}, {EOI, "EOI"}, {END, "END"}, {GOTO, "GOTO"}  };
+	{UNK, "UNK"}, {EOI, "EOI"}, {END, "END"}, {GOTO, "GOTO"}, {OP, "OP"}  };
 
 int TIDX = 0; // token index
 vector<int> ttypes;
@@ -79,6 +76,24 @@ stack<value_t> dstack; // data stack
 void push(const value_t& v) { dstack.push(v); }
 value_t pop() { value_t v = dstack.top(); dstack.pop(); return v; }
 
+//void yyerror(const string& msg);
+
+void panic() { throw 13; }
+
+void do_op(char optype)
+{
+	int v1 = get<int>(pop()), v2 = get<int>(dstack.top());
+	int res;
+	switch(optype) {
+		case '+':	res = v2+v1; break;
+		case '-':	res = v2-v1; break;
+		case '*':	res = v2*v1; break;
+		case '/':	res = v2/v1; break;
+		default:	cerr << "do_op: unrecognised operator\n"; panic();
+	}
+	dstack.emplace(res);
+}
+
 void eval()
 {
 	cout << "Running evaluator\n";
@@ -86,22 +101,12 @@ void eval()
 	while(1) {
 		auto [opcode, value] = decode(IP++);
 		switch (opcode) {
-			case GOTO:
-				IP = get<int>(value);
-				break;
-			case PRIN:
-				cout << str(value) << "\n";
-				break;
-			case PRINT:
-				cout << str(pop()) << "\n";
-				break;
-			case PUSH:
-				push(value);
-				break;
-			case END:
-				cout << "STOP\n";
-				goto finis;
-				break;
+			case GOTO:	IP = get<int>(value); break;
+			case OP: 	do_op(str(value)[0]); break;
+			case PRIN: 	cout << str(value) << "\n"; break;
+			case PRINT: 	cout << str(pop()) << "\n"; break;
+			case PUSH: 	push(value); break;
+			case END: 	cout << "STOP\n"; goto finis; break;
 			default:
 				cerr << "EVAL: opcode unknown: " << opcode << "\n";
 				cerr << "Possible type: " <<typemap[opcode] << "\n";
@@ -112,28 +117,52 @@ finis:
 	cout << "Exiting eval\n";
 }
 
+#define ttype ttypes[TIDX]
+#define ttype_1 ttypes[TIDX+1]
+#define tval tvals[TIDX]
+#define tval_1 tvals[TIDX+1]
+
 void yyerror(const string& msg)
-{
+{	
 	cerr << "yyparse() failure: " << msg << "\n";
+	cerr << "\tTIDX: " << TIDX << "\n";
+	cerr << "\ttoken type: " << ttype << " ";
+	auto f = typemap.find(ttype);
+	if(f == typemap.end())
+		cout << "???";
+	else
+		cout << f->second;
+	cerr << "\n";
+	cerr << "\ttoken value: " << tval << "\n";
 	exit(1);
 }
 
-#define ttype ttypes[TIDX]
-#define tval tvals[TIDX]
-
-void parse_expr()
+void parse_expr_p ()
 {
 	TIDX++;
-	if(ttype == INT)
+	cout << "parse_expr_p:" << tval << "\n";
+	if(ttype == INT) {
 		push_bcode(PUSH, stoi(tval));
-	else
-		yyerror("parse_expr: unexpected type found");
+	} else {
+		yyerror("parse_expr_p expected int");
+	}
+}
+
+void parse_expr_t ()
+{
+	parse_expr_p();
+	while(ttype_1 == OP) {
+		auto op = tval_1;
+		TIDX++;
+		parse_expr_p();
+		push_bcode(OP, op);
+	}
 }
 
 void parse_print()
 {
-	parse_expr();
-	push_bcode(PRINT, 0);
+	parse_expr_t();
+	push_bcode(PRINT, monostate());
 }
 
 void yyparse()
@@ -177,8 +206,9 @@ loop:
 			push_bcode(EOI, EOI);
 			return;
 		default:
-			cerr << "Unrecognised token type\n";
-			exit(1);
+			yyerror("yyparse: Unrecognised token type");
+			//cerr << "Unrecognised token type\n";
+			//exit(1);
 	}
 	TIDX++;
 	goto loop;
@@ -225,6 +255,8 @@ void tokenise()
 			push_toke(ID, toke);
 found_key:
 			continue;
+		} else if(c=='+' || c=='-' || c=='*' || c == '/') {
+			push_toke(OP, string{c});
 		} else {
 			push_toke(UNK, string{c});
 		}
