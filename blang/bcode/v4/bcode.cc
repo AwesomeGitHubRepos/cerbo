@@ -1,12 +1,12 @@
 #include <cassert>
-#include <deque>
+//#include <deque>
 #include <fstream>
 #include <cstddef>
 #include <functional>
-#include <iomanip>
+//#include <iomanip>
 #include <iostream>
 #include <map>
-#include <sstream>
+//#include <sstream>
 #include <stack>
 #include <string>
 #include <string.h>
@@ -53,10 +53,10 @@ void push_bcode(int opcode, const value_t& v)
 }
 void push_bcode(int opcode) { push_bcode(opcode, monostate()); }
 
-enum { QSTR=1, INT, PRIN, ID, UNK, EOI, END, GOTO, PRINT, PUSH, OP, NEG };
+enum { QSTR=1, INT, PRIN, ID, UNK, EOI, END, GOTO, PRINT, PUSH, OP, NEG, ASS };
 map<int, string> typemap = { 
 	{QSTR, "QSTR"}, {INT, "INT"}, {PRIN, "PRIN"}, {PRINT, "PRINT"}, {PUSH, "PUSH"}, {ID, "ID"}, 
-	{UNK, "UNK"}, {EOI, "EOI"}, {END, "END"}, {GOTO, "GOTO"}, {OP, "OP"}, {NEG, "NEG"}  };
+	{UNK, "UNK"}, {EOI, "EOI"}, {END, "END"}, {GOTO, "GOTO"}, {OP, "OP"}, {NEG, "NEG"}, {ASS, "ASS"}  };
 
 int TIDX = 0; // token index
 vector<int> ttypes;
@@ -76,6 +76,8 @@ stack<value_t> dstack; // data stack
 void push(const value_t& v) { dstack.push(v); }
 value_t pop() { value_t v = dstack.top(); dstack.pop(); return v; }
 
+map<string, value_t> vars;
+
 //void yyerror(const string& msg);
 
 void panic() { throw 13; }
@@ -94,13 +96,15 @@ void do_op(char optype)
 	push(res);
 }
 
-void eval()
+void eval ()
 {
 	cout << "Running evaluator\n";
 	IP = 0;
 	while(1) {
 		auto [opcode, value] = decode(IP++);
 		switch (opcode) {
+			case ASS:	vars[str(value)] = pop();		break;
+			case ID:	push(vars[str(value)]);			break;
 			case GOTO:	IP = get<int>(value); 			break;
 			case NEG:	push(-get<int>(pop()));			break;
 			case OP: 	do_op(str(value)[0]); 			break;
@@ -111,6 +115,7 @@ void eval()
 			default:
 				cerr << "EVAL: opcode unknown: " << opcode << "\n";
 				cerr << "Possible type: " <<typemap[opcode] << "\n";
+				cerr << "IP: " << IP << "\n";
 				exit(1);
 		}
 	}
@@ -135,14 +140,15 @@ void yyerror(const string& msg)
 		cout << f->second;
 	cerr << "\n";
 	cerr << "\ttoken value: " << tval << "\n";
+	throw 3617;
 	exit(1);
 }
 
 void require(const string& str)
 {
-	TIDX++;
+	//TIDX++;
 	if(str==tval) return;
-	yyerror("Expected " + tval + ", found " + str);
+	yyerror("Expected " + str + ", found " + tval);
 }
 
 void parse_expr_t ();
@@ -150,7 +156,7 @@ void parse_expr_t ();
 void parse_expr_p ()
 {
 	TIDX++;
-	cout << "parse_expr_p:" << tval << "\n";
+	//cout << "parse_expr_p:" << tval << "\n";
 
 	// optional negation
 	//bool neg = false;
@@ -166,7 +172,10 @@ void parse_expr_p ()
 		push_bcode(PUSH, tval);
 	} else if(tval == "(") {
 		parse_expr_t();
+		TIDX++;
 		require(")");
+	} else if(ttype=ID) {
+		push_bcode(ID, tval);
 	} else {
 		yyerror("parse_expr_p expected int");
 	}
@@ -200,12 +209,18 @@ loop:
 	switch(ttypes[TIDX]) {
 		case ID:
 			{
-				string id = tvals[TIDX];
+				string id = tval;
 				TIDX++;
 				if(tvals[TIDX] == ":") {
 					goto_here[id] = IP;
+				} else { // assignment
+					//TIDX--;
+					string varname = id;
+					require("=");
+					parse_expr_t();
+					push_bcode(ASS, varname);
+					//TIDX++;
 				}
-				// TODO more here, like assignments
 			}
 			break;
 		case GOTO:
@@ -232,8 +247,6 @@ loop:
 			return;
 		default:
 			yyerror("yyparse: Unrecognised token type");
-			//cerr << "Unrecognised token type\n";
-			//exit(1);
 	}
 	TIDX++;
 	goto loop;
