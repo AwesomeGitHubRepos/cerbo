@@ -48,10 +48,5 @@ I think this is a good approach. You can compile a fully-fledged language by emi
 
 I am trying to write my assembler piecemeal, creating features as we go. I do hope I make it to the end. So here are the parts:
 
-[Part 1](v1/README.md) - halting, pushing and extensible execution, no branching
-
-[Part 2](v2/README.md) - labels and branches
-
-[Part 3](v3/README.md) - strings
 
 
