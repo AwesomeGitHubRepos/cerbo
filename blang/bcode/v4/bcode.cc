@@ -56,11 +56,11 @@ void push_bcode(int opcode, const value_t& v)
 }
 void push_bcode(int opcode) { push_bcode(opcode, monostate()); }
 
-enum { QSTR=1, INT, ID, UNK, EOI, END, GOTO, PRINT, PUSH, OP, NEG, ASS, IF };
+enum { QSTR=1, INT, ID, UNK, EOI, END, GOTO, PRINT, PUSH, OP, NEG, ASS, IF, THEN, FI };
 map<int, string> typemap = { 
 	{QSTR, "QSTR"}, {INT, "INT"}, {PRINT, "PRINT"}, {PUSH, "PUSH"}, {ID, "ID"}, 
 	{UNK, "UNK"}, {EOI, "EOI"}, {END, "END"}, {GOTO, "GOTO"}, {OP, "OP"}, 
-	{NEG, "NEG"}, {ASS, "ASS"}, {IF, "IF"}  };
+	{NEG, "NEG"}, {ASS, "ASS"}, {IF, "IF"}, {THEN, "THEN"}, {FI, "FI"}  };
 
 int TIDX = 0; // token index
 vector<int> ttypes;
@@ -273,9 +273,18 @@ void parse_if()
 	push_bcode(IF, -1);
 	dig_hole();
 	TIDX++;
-	//nb("next instruction 2: " + tval);
-	parse_stm();
-	TIDX--;
+	if(ttype != THEN) { // single-shot IF
+		//nb("next instruction 2: " + tval);
+		parse_stm();
+		TIDX--;
+		fill_hole();
+		return;
+	}
+
+	TIDX++;
+	while(ttype != FI) {
+		parse_stm();
+	}
 	fill_hole();
 }
 

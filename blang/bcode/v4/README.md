@@ -1,0 +1,12 @@
+# BCODE
+
+## Syntax
+
+### IF
+```
+TRUE = 1
+IF TRUE PRINT "I AM TRUE"
+IF TRUE THEN
+	PRINT "I AM ALSO TRUE"
+FI
+```
