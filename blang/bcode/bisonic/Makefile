@@ -1,7 +1,10 @@
 BUILT = lex.yy.cc yacc.tab.cc yacc.tab.h
 
-blang : blang.cc lex.yy.cc yacc.tab.cc
+blang : main.o lex.yy.cc yacc.tab.cc
 	g++ -std=c++17 $^ -o $@
+
+main.o : main.cc
+	g++ -c $<
 
 yacc.tab.cc : yacc.y
 	bison -o $@ --defines=yacc.tab.h $<

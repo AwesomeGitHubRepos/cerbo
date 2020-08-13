@@ -1,2 +1,1 @@
-hello foo$ fi99
-print printly
+print 12 + 13
