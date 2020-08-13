@@ -251,7 +251,7 @@ void parse_print() { parse_expr_t(); push_bcode(PRINT, monostate()); }
 void parse_stm()
 {
 	using vfunc = function<void()>;
-	map<int, vfunc> stm_map =  {
+	static const map<int, vfunc> stm_map =  {
 		{ID, 	parse_id},
 		{EOI, 	parse_eoi},
 		{END, 	parse_end},
