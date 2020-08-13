@@ -199,13 +199,16 @@ void parse_print()
 	push_bcode(PRINT, monostate());
 }
 
-void yyparse()
-{
-	opcodes.reserve(10000);
-	opvalues.reserve(10000);
+bool more = true;
 
-	//bcodes.reserve(10000); // plenty to keep us amused
-loop:
+void parse_stm()
+{
+	if(ttype== EOI) {
+		more = false;
+		push_bcode(EOI, monostate());
+		return;
+	}
+
 	switch(ttypes[TIDX]) {
 		case ID:
 			{
@@ -240,16 +243,23 @@ loop:
 			parse_print();
 			break;
 		case END:
-			push_bcode(END, END);
+			push_bcode(END, monostate());
 			break;
-		case EOI:
-			push_bcode(EOI, EOI);
-			return;
 		default:
 			yyerror("yyparse: Unrecognised token type");
 	}
-	TIDX++;
-	goto loop;
+}
+
+void yyparse()
+{
+	opcodes.reserve(10000);
+	opvalues.reserve(10000);
+	more = true;
+
+	while(more) {
+		parse_stm();
+		TIDX++;
+	}
 
 }
 
