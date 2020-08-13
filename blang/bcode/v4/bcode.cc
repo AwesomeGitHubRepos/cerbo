@@ -23,6 +23,9 @@ typedef variant<monostate, int, string> value_t;
 vector<int> opcodes;
 vector<value_t> opvalues;
 
+void nb(const string& msg) { cerr << msg << endl; }
+
+
 //template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 //template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 string str(const value_t& v)
@@ -53,9 +56,9 @@ void push_bcode(int opcode, const value_t& v)
 }
 void push_bcode(int opcode) { push_bcode(opcode, monostate()); }
 
-enum { QSTR=1, INT, PRIN, ID, UNK, EOI, END, GOTO, PRINT, PUSH, OP, NEG, ASS };
+enum { QSTR=1, INT, ID, UNK, EOI, END, GOTO, PRINT, PUSH, OP, NEG, ASS };
 map<int, string> typemap = { 
-	{QSTR, "QSTR"}, {INT, "INT"}, {PRIN, "PRIN"}, {PRINT, "PRINT"}, {PUSH, "PUSH"}, {ID, "ID"}, 
+	{QSTR, "QSTR"}, {INT, "INT"}, {PRINT, "PRINT"}, {PUSH, "PUSH"}, {ID, "ID"}, 
 	{UNK, "UNK"}, {EOI, "EOI"}, {END, "END"}, {GOTO, "GOTO"}, {OP, "OP"}, {NEG, "NEG"}, {ASS, "ASS"}  };
 
 int TIDX = 0; // token index
@@ -98,7 +101,7 @@ void do_op(char optype)
 
 void eval ()
 {
-	cout << "Running evaluator\n";
+	cout << "Running evaluator" << endl;
 	IP = 0;
 	while(1) {
 		auto [opcode, value] = decode(IP++);
@@ -108,15 +111,14 @@ void eval ()
 			case GOTO:	IP = get<int>(value); 			break;
 			case NEG:	push(-get<int>(pop()));			break;
 			case OP: 	do_op(str(value)[0]); 			break;
-			case PRIN: 	cout << str(value) << "\n"; 		break;
 			case PRINT: 	cout << str(pop()) << "\n"; 		break;
 			case PUSH: 	push(value); 				break;
 			case END: 	cout << "STOP\n"; goto finis; 		break;
 			default:
-				cerr << "EVAL: opcode unknown: " << opcode << "\n";
-				cerr << "Possible type: " <<typemap[opcode] << "\n";
-				cerr << "IP: " << IP << "\n";
-				exit(1);
+					cerr << "EVAL: opcode unknown: " << opcode << "\n";
+					cerr << "Possible type: " <<typemap[opcode] << "\n";
+					cerr << "IP: " << IP << "\n";
+					exit(1);
 		}
 	}
 finis:
@@ -193,61 +195,73 @@ void parse_expr_t ()
 	}
 }
 
-void parse_print()
+
+
+	template<class K, class V>
+V _find_or_die(const char* fname, int linenum, K key, map<K, V>  m, const string& msg)
 {
-	parse_expr_t();
-	push_bcode(PRINT, monostate());
+	auto f = m.find(key);
+	if(f != m.end()) return f->second;
+
+	cout << "FATAL: Key not found:" << fname << ":" << linenum << ":" << msg << "\n";
+	exit(1);
 }
+#define find_or_die(k, m, msg) _find_or_die(__func__, __LINE__, k, m, msg)
+
+
+
 
 bool more = true;
 
+void parse_end() { push_bcode(END, ""); }
+
+void parse_eoi() { more = false; push_bcode(EOI, ""); }
+
+void parse_id()
+{
+	string id = tval;
+	TIDX++;
+	if(tvals[TIDX] == ":") {
+		goto_here[id] = IP;
+	} else { // assignment
+		//TIDX--;
+		string varname = id;
+		require("=");
+		parse_expr_t();
+		push_bcode(ASS, varname);
+		//TIDX++;
+	}
+}
+
+
+
+void parse_goto()
+{
+	if(ttypes[++TIDX]==ID) {
+		push_bcode(GOTO, 666); // will need backfilling
+		add_goto(tvals[TIDX]);
+	} else {
+		yyerror("GOTO expected an ID");
+	}
+}
+
+
+void parse_print() { parse_expr_t(); push_bcode(PRINT, monostate()); }
+
 void parse_stm()
 {
-	if(ttype== EOI) {
-		more = false;
-		push_bcode(EOI, monostate());
-		return;
-	}
+	using vfunc = function<void()>;
+	map<int, vfunc> stm_map =  {
+		{ID, 	parse_id},
+		{EOI, 	parse_eoi},
+		{END, 	parse_end},
+		{GOTO, 	parse_goto},
+		{PRINT, parse_print}
+	};
 
-	switch(ttypes[TIDX]) {
-		case ID:
-			{
-				string id = tval;
-				TIDX++;
-				if(tvals[TIDX] == ":") {
-					goto_here[id] = IP;
-				} else { // assignment
-					//TIDX--;
-					string varname = id;
-					require("=");
-					parse_expr_t();
-					push_bcode(ASS, varname);
-					//TIDX++;
-				}
-			}
-			break;
-		case GOTO:
-			if(ttypes[++TIDX]==ID) {
-				push_bcode(GOTO, 666); // will need backfilling
-				add_goto(tvals[TIDX]);
-			} else {
-				yyerror("GOTO expected an ID");
-			}
-			break;
-		case PRIN:
-			//push_bcode(PRIN, stoi(tvals[++TIDX]));
-			++TIDX;
-			push_bcode(PRIN, tval);
-			break;
-		case PRINT:
-			parse_print();
-			break;
-		case END:
-			push_bcode(END, monostate());
-			break;
-		default:
-			yyerror("yyparse: Unrecognised token type");
-	}
+	auto fn = find_or_die(ttype, stm_map, "Unrecognised statement type:" + str(ttype));
+	fn();
+	TIDX++;
 }
 
 void yyparse()
@@ -255,12 +269,9 @@ void yyparse()
 	opcodes.reserve(10000);
 	opvalues.reserve(10000);
 	more = true;
+	TIDX=0;
 
-	while(more) {
-		parse_stm();
-		TIDX++;
-	}
-
+	while(more) parse_stm();
 }
 
 
@@ -309,8 +320,10 @@ found_key:
 			push_toke(UNK, string{c});
 		}
 	}
-	push_toke(END, "");
-	push_toke(EOI, ""); // cap it all off with an End Of Input
+	push_toke(END, "END"s);
+	nb("about to push EOI");
+	push_toke(EOI, "EOI"s); // cap it all off with an End Of Input
+	nb("pushed");
 }
 
 void print_tokens() {
@@ -318,21 +331,23 @@ void print_tokens() {
 	int i = 0;
 	while(ttypes[i] != EOI) {
 		cout << "\t" << i << "\t" << typemap[ttypes[i]] << "\t" << tvals[i] << "\n";
+		//cout << "Done\n";
 		i++;
 	}
+	cout << "Finished printing tokens\n";
 }
 
 void print_bcodes()
 {
-	cout << "Printing bcodes\n";
+	cout << "Printing bcodes" << endl;
 	int i=0;
 loop:
 	auto[opcode, value] = decode(i);
-	cout << "\t" << i << "\t" << typemap[opcode] << "\t" << str(value) << "\n";
+	cout << "\t" << i << "\t" << typemap[opcode] << "\t" << str(value) << endl;
 	i++;
 	if(opcode != EOI) goto loop;
 
-	cout << "Finished printing bcodes\n";
+	cout << "Finished printing bcodes" << endl;
 
 }
 

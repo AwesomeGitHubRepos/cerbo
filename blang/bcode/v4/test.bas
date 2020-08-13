@@ -1,9 +1,10 @@
 ' this should be OK
-prin 1
-goto skip
-prin 12
-prin 13
-skip:
-prin 7
-prin 11
-prin "thats all"
+print 12
+'goto skip
+'print 12
+'print 13
+'skip:
+'print 7
+'print 11
+'print "thats all"
+'skip:
