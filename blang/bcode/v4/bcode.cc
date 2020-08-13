@@ -56,10 +56,11 @@ void push_bcode(int opcode, const value_t& v)
 }
 void push_bcode(int opcode) { push_bcode(opcode, monostate()); }
 
-enum { QSTR=1, INT, ID, UNK, EOI, END, GOTO, PRINT, PUSH, OP, NEG, ASS };
+enum { QSTR=1, INT, ID, UNK, EOI, END, GOTO, PRINT, PUSH, OP, NEG, ASS, IF };
 map<int, string> typemap = { 
 	{QSTR, "QSTR"}, {INT, "INT"}, {PRINT, "PRINT"}, {PUSH, "PUSH"}, {ID, "ID"}, 
-	{UNK, "UNK"}, {EOI, "EOI"}, {END, "END"}, {GOTO, "GOTO"}, {OP, "OP"}, {NEG, "NEG"}, {ASS, "ASS"}  };
+	{UNK, "UNK"}, {EOI, "EOI"}, {END, "END"}, {GOTO, "GOTO"}, {OP, "OP"}, 
+	{NEG, "NEG"}, {ASS, "ASS"}, {IF, "IF"}  };
 
 int TIDX = 0; // token index
 vector<int> ttypes;
@@ -108,6 +109,7 @@ void eval ()
 		switch (opcode) {
 			case ASS:	vars[str(value)] = pop();		break;
 			case ID:	push(vars[str(value)]);			break;
+			case IF:	if(get<int>(pop()) ==0) IP = get<int>(value); break;
 			case GOTO:	IP = get<int>(value); 			break;
 			case NEG:	push(-get<int>(pop()));			break;
 			case OP: 	do_op(str(value)[0]); 			break;
@@ -123,6 +125,18 @@ void eval ()
 	}
 finis:
 	cout << "Exiting eval\n";
+}
+
+stack<int> holes; // jump statements
+void dig_hole () { holes.push(IP-1);}
+
+void fill_hole() 
+{ 
+	//int where = holes.top(); 
+	opvalues[holes.top()] = IP;
+	holes.pop(); 
+
+	//return v; 
 }
 
 #define ttype ttypes[TIDX]
@@ -213,6 +227,8 @@ V _find_or_die(const char* fname, int linenum, K key, map<K, V>  m, const string
 
 bool more = true;
 
+void parse_stm();
+
 void parse_end() { push_bcode(END, ""); }
 
 void parse_eoi() { more = false; push_bcode(EOI, ""); }
@@ -248,18 +264,35 @@ void parse_goto()
 
 void parse_print() { parse_expr_t(); push_bcode(PRINT, monostate()); }
 
-void parse_stm()
+void parse_if()
+{
+	//TIDX--;
+	//nb("next instruction 1: " + tval);
+	parse_expr_t();
+	//nb(str(TIDX));
+	push_bcode(IF, -1);
+	dig_hole();
+	TIDX++;
+	//nb("next instruction 2: " + tval);
+	parse_stm();
+	TIDX--;
+	fill_hole();
+}
+
+void parse_stm ()
 {
 	using vfunc = function<void()>;
 	static const map<int, vfunc> stm_map =  {
-		{ID, 	parse_id},
 		{EOI, 	parse_eoi},
 		{END, 	parse_end},
 		{GOTO, 	parse_goto},
+		{ID, 	parse_id},
+		{IF, 	parse_if},
 		{PRINT, parse_print}
 	};
 
-	auto fn = find_or_die(ttype, stm_map, "Unrecognised statement type:" + str(ttype));
+	auto fn = find_or_die(ttype, stm_map, "Unrecognised statement type:" + str(ttype) 
+			+ ":TIDX:" + str(TIDX) + ":tval:" + str(tval));
 	fn();
 	TIDX++;
 }
