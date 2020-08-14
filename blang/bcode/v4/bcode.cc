@@ -56,11 +56,11 @@ void push_bcode(int opcode, const value_t& v)
 }
 void push_bcode(int opcode) { push_bcode(opcode, monostate()); }
 
-enum { QSTR=1, INT, ID, UNK, EOI, END, GOTO, PRINT, PUSH, OP, NEG, ASS, IF, THEN, FI };
+enum { QSTR=1, INT, ID, UNK, EOI, END, GOTO, PRINT, PUSH, OP, NEG, ASS, IF, THEN, FI, ELSE };
 map<int, string> typemap = { 
 	{QSTR, "QSTR"}, {INT, "INT"}, {PRINT, "PRINT"}, {PUSH, "PUSH"}, {ID, "ID"}, 
 	{UNK, "UNK"}, {EOI, "EOI"}, {END, "END"}, {GOTO, "GOTO"}, {OP, "OP"}, 
-	{NEG, "NEG"}, {ASS, "ASS"}, {IF, "IF"}, {THEN, "THEN"}, {FI, "FI"}  };
+	{NEG, "NEG"}, {ASS, "ASS"}, {IF, "IF"}, {THEN, "THEN"}, {FI, "FI"}, {ELSE, "ELSE"}  };
 
 int TIDX = 0; // token index
 vector<int> ttypes;
@@ -132,12 +132,25 @@ void dig_hole () { holes.push(IP-1);}
 
 void fill_hole() 
 { 
-	//int where = holes.top(); 
 	opvalues[holes.top()] = IP;
 	holes.pop(); 
-
-	//return v; 
 }
+
+template<class T>
+T pop(stack<T>& stk) 
+{ 
+	T v= stk.top();
+	stk.pop();
+	return v;
+}
+
+void swap_hole()
+{
+	int v1 = pop(holes), v2 = pop(holes);
+	holes.push(v1);
+	holes.push(v2);
+}
+
 
 #define ttype ttypes[TIDX]
 #define ttype_1 ttypes[TIDX+1]
@@ -282,7 +295,18 @@ void parse_if()
 	}
 
 	TIDX++;
+	int num_elses = 0;
 	while(ttype != FI) {
+		if(ttype == ELSE) {
+			num_elses++;
+			if(num_elses>1) yyerror("Too many ELSE's in IF");
+			push_bcode(GOTO, -1);
+			fill_hole();
+			dig_hole();
+			TIDX++;
+			//nb("if tval=" + tval);
+			//swap_hole();
+		}
 		parse_stm();
 	}
 	fill_hole();
@@ -406,14 +430,15 @@ void resolve_gotos()
 }
 
 
-void check_stack()
+template<class T>
+void check_stack_empty(stack<T>& stk, const string& msg)
 {
 	if(dstack.empty()) return;
-	cerr << "ERR: Exiting with non-empty stack.\n";
+	cerr << "ERR: Exiting with non-empty " << msg << " stack.\n";
 	cerr << "Stack contents, top downwards: ";
-	while(! dstack.empty()) {
-		cerr << str(dstack.top()) << " ";
-		dstack.pop();
+	while(! stk.empty()) {
+		cerr << str(stk.top()) << " ";
+		stk.pop();
 	}
 	cerr << "\n";
 }
@@ -440,7 +465,8 @@ int main(int argc, char** argv)
 
 	eval();
 
-	check_stack();
+	check_stack_empty(dstack, "dstack");
+	check_stack_empty(holes, "holes");
 
 	return 0;
 }

@@ -1,17 +1,15 @@
-goto skip
-foo = 10
-'if 1 foo = foo * 2
-print "Expecting 20"
-print foo
-'if 0 foo = 23
-print "Expecting 20 (still)"
-print foo
-
-skip:
-
-if 1*0 print "hello"
-if 1-1+5 then
-	print "hi"
-	print "ho"
+if 0 then
+	if 0 then
+		print "a"
+	else 
+		print 12
+	fi
+else
+	if 0*21 then 
+		print "b"
+	else
+		print 13
+	fi
 fi
+
 print "Exactly"
