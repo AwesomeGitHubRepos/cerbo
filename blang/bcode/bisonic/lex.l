@@ -25,3 +25,4 @@ PRINT          	{ xnote("print"); return tPRINT; }
 {var}          	{ xnote("num");  return 1;}
 {var}\$      	{ xnote("str"); return 1; }
 {num}		{ return tNUM; }
+.		{ return (int) yytext[0]; }
