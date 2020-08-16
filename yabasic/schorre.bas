@@ -7,7 +7,7 @@ rem print_tokens()
 LABEL PROGRAM
 	getchar()
 	yylex()
-	ok = TST(".SYNTAX") and ID() and OUT("	ADR " + star$) and STs() and TST(".END") and OUT("	END")
+	ok = TST(".SYNTAX") and IDO("	ADR " + star$) and STs() and TSTO(".END", "	END")
 	print "Finished SYTNAX"
 END
 
@@ -16,11 +16,12 @@ sub OUT1()
 end sub
 
 sub OUTPUTa()
-	while OUT1() wend
+	while OUT1() 
+	wend
 	return true
 end sub
 
-sub OUTPUT(s$)
+sub OUTPUT()
 	return ((TST(".OUT") and TST("(") and OUTPUTa() and TST(")")) or (TSTO(".LABEL", "LB") and OUT1())) and OUT("OUT")
 end sub
 
@@ -43,16 +44,22 @@ sub IDO(out$)
 end sub
 
 sub EX3()
-	ok = 	IDO("	CLL *") or STRO("	TST " + star$) or TST0(".ID", "ID") or TSTO(".NUMBER", "NUM") or TSTO(".STRING", "SR") or (TSTO("(") and EX1() and TSTO(")")) or TSTO(".EMPTY", "SET") or TSTO("$", "LABEL *1") and EX3() and OUT("BT +1") and OUT("SET")
+	ok = 	IDO("	CLL *") or STRO("	TST " + star$) or TSTO(".ID", "ID") or TSTO(".NUMBER", "NUM") or TSTO(".STRING", "SR") or (TSTO("(") and EX1() and TSTO(")")) or TSTO(".EMPTY", "SET") or TSTO("$", "LABEL *1") and EX3() and OUT("BT +1") and OUT("SET")
 	return ok
 end sub
 
+sub EX2a()
+	while (EX3() and OUT("BE")) or OUTPUT()
+	wend
+	return true
+end sub
+
 sub EX2()
-	return EX3() and OUT("	EX2 BF *1")
+	return ((EX3() and OUT("	EX2 BF *1")) or OUTPUT()) and EX2a() and OUT(".LABEL *1")
 end sub
 
 sub EX1a()
-	while TST("/") and OUT("	BT *1") and EX2() wend
+	while TSTO("/", "	BT *1") and EX2() wend
 	return true
 end sub
 
@@ -61,7 +68,8 @@ sub EX1()
 end sub
 
 sub STs()
-	while ID() and OUT("	ST " + star$) and TST("=") and EX1() and TST(";") and OUT("R") wend
+	while IDO("	ST " + star$) and TST("=") and EX1() and TSTO(";", "R") 
+	wend
 	return true
 end sub
 
