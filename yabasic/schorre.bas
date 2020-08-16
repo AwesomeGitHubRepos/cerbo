@@ -11,8 +11,21 @@ LABEL PROGRAM
 	print "Finished SYTNAX"
 END
 
-sub OUT(s$)
-	print s$
+sub OUT1()
+	return TSTO("*1", "GN1") or TSTO("*2", "GN2") or TSTO("*", "CI") or STRO("CL *")
+end sub
+
+sub OUTPUTa()
+	while OUT1() wend
+	return true
+end sub
+
+sub OUTPUT(s$)
+	return ((TST(".OUT") and TST("(") and OUTPUTa() and TST(")")) or (TSTO(".LABEL", "LB") and OUT1())) and OUT("OUT")
+end sub
+
+sub OUT(out$)
+	print out$
 	return true
 end sub
 
@@ -23,8 +36,15 @@ sub ID()
 	return true
 end sub
 
+sub IDO(out$)
+	if not ID() return false
+	print out$
+	return true
+end sub
+
 sub EX3()
-	return (ID() and OUT("	CLL *")) or (STR() and OUT("	TST " + star$))
+	ok = 	IDO("	CLL *") or STRO("	TST " + star$) or TST0(".ID", "ID") or TSTO(".NUMBER", "NUM") or TSTO(".STRING", "SR") or (TSTO("(") and EX1() and TSTO(")")) or TSTO(".EMPTY", "SET") or TSTO("$", "LABEL *1") and EX3() and OUT("BT +1") and OUT("SET")
+	return ok
 end sub
 
 sub EX2()
@@ -52,6 +72,12 @@ sub STR()
 	return true
 end sub
 
+sub STRO(out$)
+	if not STR() return false
+	print out$
+	return true
+end sub
+
 sub TST(s$)
 	local ok
 	ok  = (yytext$ = s$)
@@ -61,6 +87,11 @@ sub TST(s$)
 	return true
 end sub
 	
+sub TSTO(s$, out$)
+	if ! TST(s$) return false
+	print out$
+	return true
+end sub
 
 label yy_panic
 	print "Syntax error: unexpected:", yytext$
