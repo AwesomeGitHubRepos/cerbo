@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stack>
 
 #include "blang.h"
 
@@ -61,21 +62,79 @@ void print_tacs()
 	puts("print_tacs:end");
 }
 
+YYSTYPE join_tac(YYSTYPE car, YYSTYPE cdr)
+{
+	tac_t t;
+	t.op = TAC_CONS;
+	t.args[0] = car;
+	t.args[1] = cdr;
+	tacs[tacs_idx] = t;
+	return &tacs[tacs_idx++];
+	//cout <<"join_tac:TODO\n";
+	//return nullptr;
+}
+
+YYSTYPE mkstm(int cmd, YYSTYPE arg)	
+{		
+	tac_t t;
+	t.op = cmd;
+	t.args[0] = arg;
+	tacs[tacs_idx] = t;
+	return &tacs[tacs_idx++];
+}
+
+//tacptr gettac(const tacarg& arg)
+//{
+//	return get<tacptr>(arg);
+//}
+
+
+stack<int> dstack;
+void dpush(int v) { dstack.push(v); }
+int dpop() { int v = dstack.top(); dstack.pop(); return v; }
+
+void eval(tacptr tac)
+{
+	switch(tac->op) {
+		case TAC_ADD:
+			dpush(dpop() + dpop());
+			cout << "eval:add:TODO\n";
+			break;
+		case TAC_ARG:
+			dpush(get<int>(tac->args[0]));
+			cout << "eval:arg:TODO\n";
+			break;
+		case TAC_PRINT:
+			cout << dpop() << "\n";
+			cout << "eval:print:TODO\n";
+			break;
+		case TAC_CONS:
+			eval(get<tacptr>(tac->args[0]));
+			eval(get<tacptr>(tac->args[1]));
+			break;
+
+	}
+
+}
+
+
 int main(int argc, char *argv[])
 {
 	tacs.reserve(10000);
 	yyin = fopen(argv[1], "r");
 
 	/*
-	while(yylex()) {
-		cout << "yytext = " << yytext << "\n";
-	}
-	*/
+	   while(yylex()) {
+	   cout << "yytext = " << yytext << "\n";
+	   }
+	   */
 
 	yyparse();
 	fclose(yyin);
 
 	print_tacs();
+
+	eval(&tacs[tacs_idx-1]);
 
 	return 0;
 }

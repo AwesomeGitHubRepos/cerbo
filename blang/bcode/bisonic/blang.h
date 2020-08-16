@@ -5,8 +5,10 @@
 #include <vector>
 
 // bennett p173
-#define TAC_ADD  1
-#define TAC_ARG 12
+#define TAC_ADD  	1
+#define TAC_ARG 	12
+#define TAC_PRINT 	13
+#define TAC_CONS	14
 
 extern int yylex();
 extern void yyerror(const char *);
@@ -37,5 +39,7 @@ inline int tacs_idx = 0;
 
 #define YYSTYPE tacptr
 
+YYSTYPE join_tac(YYSTYPE, YYSTYPE);
 YYSTYPE mkint(std::string);
 YYSTYPE mkbin(int, YYSTYPE, YYSTYPE);
+YYSTYPE mkstm(int, YYSTYPE);

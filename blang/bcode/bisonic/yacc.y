@@ -8,15 +8,22 @@
 
 %%
 
-program	: print_stm
+program	: stm_list
 	;
 
-print_stm 	: tPRINT expr { note("got PRINT"); }
-	;
+stm_list	: stm
+		| stm_list stm { $$ = join_tac($1, $2); }
+		;
+		
+stm		: print_stm
+     		;
 
-expr	: tNUM { $$ = mkint(yytext); }
-     	| expr '+' expr { note("got TAC_ADD"); $$ = mkbin(TAC_ADD, $1, $3);  }
-     	;
+print_stm 	: tPRINT expr { $$ = mkstm(TAC_PRINT, $2); }
+		;
+
+expr		: tNUM { $$ = mkint(yytext); }
+     		| expr '+' expr { $$ = mkbin(TAC_ADD, $1, $3);  }
+     		;
 
 %%
 

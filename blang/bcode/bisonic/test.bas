@@ -1,1 +1,2 @@
-PRINT 110 + 111
+PRINT 42
+print 43+1
