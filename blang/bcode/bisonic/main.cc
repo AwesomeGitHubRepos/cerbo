@@ -101,16 +101,19 @@ int gint(const tacarg& targ) { return get<int>(targ); }
 tacptr gptr(const tacarg& targ) { return get<tacptr>(targ); }
 tacarg eval(tacptr tac);
 
+tacarg eval(const tacarg& arg) { return eval(gptr(arg)); }
+
 using binfunc = function<int(int, int)>;
 int add(int a, int b) { return a+b; }
 int sub(int a, int b) { return a-b; }
 
 int binop(binfunc fn, const tacarg& arg0, const tacarg& arg1)
 {
-	int int0= gint(eval(gptr(arg0)));
-	int int1= gint(eval(gptr(arg1)));
+	int int0= gint(eval(arg0));
+	int int1= gint(eval(arg1));
 	return fn(int0, int1);
 }
+
 
 tacarg eval(tacptr tac)
 {
@@ -124,11 +127,11 @@ tacarg eval(tacptr tac)
 		case TAC_ARG:
 			return arg0;
 		case TAC_PRINT:
-			cout << gint(eval(gptr(arg0))) << "\n";
+			cout << gint(eval(arg0)) << "\n";
 			break;
 		case TAC_CONS:
-			eval(get<tacptr>(tac->args[0]));
-			eval(get<tacptr>(tac->args[1]));
+			eval(arg0);
+			eval(arg1);
 			break;
 
 	}
