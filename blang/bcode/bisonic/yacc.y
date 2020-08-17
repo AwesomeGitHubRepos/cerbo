@@ -6,6 +6,8 @@
 %token tNUM
 %token tPRINT
 
+%left '+'
+
 %%
 
 program	: stm_list
