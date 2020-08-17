@@ -93,20 +93,31 @@ stack<int> dstack;
 void dpush(int v) { dstack.push(v); }
 int dpop() { int v = dstack.top(); dstack.pop(); return v; }
 
-void eval(tacptr tac)
+//#define arg0 tac->args[0]
+//#define arg1 tac->args[1]
+
+int gint(const tacarg& targ) { return get<int>(targ); }
+tacptr gptr(const tacarg& targ) { return get<tacptr>(targ); }
+
+tacarg eval(tacptr tac)
 {
+	tacarg& arg0 = tac->args[0];
+	tacarg& arg1 = tac->args[1];
 	switch(tac->op) {
 		case TAC_ADD:
-			dpush(dpop() + dpop());
+			return gint(eval(gptr(arg0))) + gint(eval(gptr(arg1)));
+			//dpush(dpop() + dpop());
 			cout << "eval:add:TODO\n";
 			break;
 		case TAC_ARG:
-			dpush(get<int>(tac->args[0]));
-			cout << "eval:arg:TODO\n";
+			return arg0;
+			//dpush(get<int>(tac->args[0]));
+			//cout << "eval:arg:TODO\n";
 			break;
 		case TAC_PRINT:
-			cout << dpop() << "\n";
-			cout << "eval:print:TODO\n";
+			cout << gint(eval(gptr(arg0))) << "\n";
+			//cout << dpop() << "\n";
+			//cout << "eval:print:TODO\n";
 			break;
 		case TAC_CONS:
 			eval(get<tacptr>(tac->args[0]));
@@ -114,7 +125,7 @@ void eval(tacptr tac)
 			break;
 
 	}
-
+	return 0;
 }
 
 
