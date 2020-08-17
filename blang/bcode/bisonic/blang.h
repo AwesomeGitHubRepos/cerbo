@@ -6,6 +6,7 @@
 
 // bennett p173
 #define TAC_ADD  	1
+#define TAC_SUB		2
 #define TAC_ARG 	12
 #define TAC_PRINT 	13
 #define TAC_CONS	14

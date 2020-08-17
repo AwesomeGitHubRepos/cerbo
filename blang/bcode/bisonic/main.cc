@@ -1,3 +1,4 @@
+#include <functional>
 #include <iostream>
 #include <stack>
 
@@ -98,6 +99,18 @@ int dpop() { int v = dstack.top(); dstack.pop(); return v; }
 
 int gint(const tacarg& targ) { return get<int>(targ); }
 tacptr gptr(const tacarg& targ) { return get<tacptr>(targ); }
+tacarg eval(tacptr tac);
+
+using binfunc = function<int(int, int)>;
+int add(int a, int b) { return a+b; }
+int sub(int a, int b) { return a-b; }
+
+int binop(binfunc fn, const tacarg& arg0, const tacarg& arg1)
+{
+	int int0= gint(eval(gptr(arg0)));
+	int int1= gint(eval(gptr(arg1)));
+	return fn(int0, int1);
+}
 
 tacarg eval(tacptr tac)
 {
@@ -105,15 +118,18 @@ tacarg eval(tacptr tac)
 	tacarg& arg1 = tac->args[1];
 	switch(tac->op) {
 		case TAC_ADD:
-			return gint(eval(gptr(arg0))) + gint(eval(gptr(arg1)));
+			return binop(add, arg0, arg1);
+			//return gint(eval(gptr(arg0))) + gint(eval(gptr(arg1)));
 			//dpush(dpop() + dpop());
-			cout << "eval:add:TODO\n";
-			break;
+			//cout << "eval:add:TODO\n";
+			//break;
+		case TAC_SUB:
+			return binop(sub, arg0, arg1);
 		case TAC_ARG:
 			return arg0;
 			//dpush(get<int>(tac->args[0]));
 			//cout << "eval:arg:TODO\n";
-			break;
+			//break;
 		case TAC_PRINT:
 			cout << gint(eval(gptr(arg0))) << "\n";
 			//cout << dpop() << "\n";

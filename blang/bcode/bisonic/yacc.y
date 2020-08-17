@@ -6,7 +6,7 @@
 %token tNUM
 %token tPRINT
 
-%left '+'
+%left '+' '-'
 
 %%
 
@@ -25,6 +25,7 @@ print_stm 	: tPRINT expr { $$ = mkstm(TAC_PRINT, $2); }
 
 expr		: tNUM { $$ = mkint(yytext); }
      		| expr '+' expr { $$ = mkbin(TAC_ADD, $1, $3);  }
+     		| expr '-' expr { $$ = mkbin(TAC_SUB, $1, $3);  }
      		;
 
 %%
