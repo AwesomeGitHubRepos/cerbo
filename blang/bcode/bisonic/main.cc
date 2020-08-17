@@ -119,21 +119,12 @@ tacarg eval(tacptr tac)
 	switch(tac->op) {
 		case TAC_ADD:
 			return binop(add, arg0, arg1);
-			//return gint(eval(gptr(arg0))) + gint(eval(gptr(arg1)));
-			//dpush(dpop() + dpop());
-			//cout << "eval:add:TODO\n";
-			//break;
 		case TAC_SUB:
 			return binop(sub, arg0, arg1);
 		case TAC_ARG:
 			return arg0;
-			//dpush(get<int>(tac->args[0]));
-			//cout << "eval:arg:TODO\n";
-			//break;
 		case TAC_PRINT:
 			cout << gint(eval(gptr(arg0))) << "\n";
-			//cout << dpop() << "\n";
-			//cout << "eval:print:TODO\n";
 			break;
 		case TAC_CONS:
 			eval(get<tacptr>(tac->args[0]));
