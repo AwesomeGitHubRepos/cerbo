@@ -22,6 +22,7 @@ text		\"({ascii_char}|{escaped_char})*\"
 
 {ws}		{ }
 PRINT          	{ xnote("print"); return tPRINT; }
+{text}		{ return tTEXT; }
 {var}          	{ xnote("num");  return 1;}
 {var}\$      	{ xnote("str"); return 1; }
 {num}		{ return tNUM; }

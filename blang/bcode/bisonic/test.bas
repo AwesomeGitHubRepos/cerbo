@@ -1,3 +1,4 @@
+print "hello" + " uplifted " + "world"
 PRINT 42
 print 41+1
 print 44-2

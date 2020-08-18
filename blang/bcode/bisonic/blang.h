@@ -10,6 +10,7 @@
 #define TAC_ARG 	12
 #define TAC_PRINT 	13
 #define TAC_CONS	14
+#define TAC_CAT		15
 
 extern int yylex();
 extern void yyerror(const char *);
@@ -42,5 +43,9 @@ inline int tacs_idx = 0;
 
 YYSTYPE join_tac(YYSTYPE, YYSTYPE);
 YYSTYPE mkint(std::string);
+YYSTYPE mkstr(const std::string&);
 YYSTYPE mkbin(int, YYSTYPE, YYSTYPE);
 YYSTYPE mkstm(int, YYSTYPE);
+
+void syntax(const char* msg);
+std::string str(const tacarg& arg);

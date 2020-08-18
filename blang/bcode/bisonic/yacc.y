@@ -5,6 +5,7 @@
 
 %token tNUM
 %token tPRINT
+%token tTEXT
 
 %left '+' '-'
 
@@ -23,9 +24,14 @@ stm		: print_stm
 print_stm 	: tPRINT expr { $$ = mkstm(TAC_PRINT, $2); }
 		;
 
-expr		: tNUM { $$ = mkint(yytext); }
-     		| expr '+' expr { $$ = mkbin(TAC_ADD, $1, $3);  }
-     		| expr '-' expr { $$ = mkbin(TAC_SUB, $1, $3);  }
+expr		: num_expr | str_expr;
+
+str_expr	: tTEXT { $$ = mkstr(yytext); }
+	 	| str_expr '+' str_expr { $$ = mkbin(TAC_CAT, $1, $3); }
+
+num_expr	: tNUM { $$ = mkint(yytext); }
+     		| num_expr '+' num_expr { $$ = mkbin(TAC_ADD, $1, $3);  }
+     		| num_expr '-' num_expr { $$ = mkbin(TAC_SUB, $1, $3);  }
      		;
 
 %%
