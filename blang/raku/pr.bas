@@ -1,12 +1,13 @@
-	# print abcde
-	push 65 # a
-#loop:
+	# print ABCD
+	push 65 # A
+loop:
+	#call hello
 	dup
-	emit
+	call emit
 	inc
 	dup
 	push 69
 	sub
-	jlt loo
+	jlt loop
 	drop
 	halt
