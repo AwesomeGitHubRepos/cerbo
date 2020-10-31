@@ -1,6 +1,6 @@
 #!/usr/bin/env perl6
 
-enum Bcode <Call Halt Push>;
+enum Bcode <Call Drop Dup Halt Inc Jlt Push Sub>;
 my @bcodes;
 my @bvals;
 
@@ -10,8 +10,14 @@ sub spush(int32 $val) { @sstack.push($val); }
 sub spop() { return pop(@sstack); }
 
 sub bpush(Bcode $code, int32 $val) { @bcodes.push($code) ; @bvals.push($val); }
+sub slast() { return elems(@sstack) - 1 ; }
 
+
+#sub do-drop() { spop; }
+#sub do-dup() { spush( @sstack[slast] ; }
 sub do-emit() { print chr(spop()); }
+#sub do-inc() { @sstack[slast] += 1; }
+#sub do-jlt() { if spop() < 0 { $ip += @bvals[$ip-1]; } }
 sub do-print() { print spop; }
 sub do-hello() { say "Hello from raku blang"; }
 
@@ -67,9 +73,14 @@ loop {
 			#say "func is $func";
 			$func();
 		}
+		when Drop { spop;}
+		when Dup { spush( @sstack[slast]); }
 		when Halt { last; }
+		when Inc { @sstack[slast] += 1; }
+		when Jlt { if spop() < 0 { $ip += @bvals[$ip-1];} }
 		when Push { spush $val;}
-		default { say "Unknown opcode"; }
+		when Sub { my $v = spop; @sstack[slast] -= $v; }
+		default { say "Unknown opcode: $bcode before $ip"; }
 	}
 }
 say "Bye";
