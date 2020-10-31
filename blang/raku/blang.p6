@@ -1,3 +1,5 @@
+#!/usr/bin/env perl6
+
 enum Bcode <Call Halt Push>;
 my @bcodes;
 my @bvals;
