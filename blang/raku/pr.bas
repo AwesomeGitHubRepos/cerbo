@@ -1,2 +1,6 @@
-print 1
-print 2
+call hello
+push 120
+call emit
+push 10
+call emit
+halt
