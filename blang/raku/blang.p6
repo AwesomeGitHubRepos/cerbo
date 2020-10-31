@@ -34,11 +34,13 @@ sub xfound($str) {  }
 grammar G {
 	rule TOP { ^ <stmts> $ }
 	rule stmts { <statement>* }
-	rule statement { <call> | <halt> | <push> }
+	rule statement { <call> | <halt> | <push> | <comment> }
 	rule push { 'push' <int>  { bpush Push, $<int>.Int; }}
 	rule call { 'call' <id> {bpush Call, find-prim $<id>; } }
 	rule halt { 'halt'  {xfound "halt"; bpush Halt, 0;} }
+
 	#rule prin { 'print' <int> { push-int $<int>.Int ; push $pri ; } }
+	token comment	{ '#' \N*  }
 	token id { <[a..zA..Z]>+ }
 	token int	{ <[0..9]>+ }
 }
