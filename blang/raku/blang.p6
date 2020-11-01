@@ -1,6 +1,6 @@
 #!/usr/bin/env perl6
 
-enum Bcode <Call Drop Dup Halt Inc Jlt Push Sub>;
+enum Bcode <Add Call Drop Dup Halt Inc Jlt Push Sub>;
 my @bcodes;
 my @bvals;
 
@@ -19,7 +19,7 @@ sub slast() { return elems(@sstack) - 1 ; }
 sub do-emit() { print chr(spop()); }
 #sub do-inc() { @sstack[slast] += 1; }
 #sub do-jlt() { if spop() < 0 { $ip += @bvals[$ip-1]; } }
-sub do-print() { print spop; }
+sub do-print() { say spop; }
 sub do-hello() { say "Hello from raku blang"; }
 
 my @prims = (
@@ -55,10 +55,16 @@ grammar G {
 	rule inc { 'inc' { bpush0 Inc; }}
 	rule jlt { 'jlt' <id> { found "jlt"; add-jump $<id>, elems(@bcodes); bpush0 Jlt; }}
 	rule label { <id> ':' {found "label"; %labels{$<id>} = elems(@bcodes); } }
+	rule add	{ 'add' {bpush0 Add;}}
 	rule sub { 'sub' { bpush0 Sub;}}
-	rule push { 'push' <int>  { bpush Push, $<int>.Int; }}
+	#rule push { 'push' <int>  { bpush Push, $<int>.Int; }}
+	rule push { 'push' <expr> }
 	rule call { 'call' <id> {bpush Call, find-prim $<id>; } }
 	rule halt { 'halt'  {xfound "halt"; bpush0 Halt;} }
+	#rule expr	{ <expr-p>+ % <plus> }
+	rule expr	{ <expr-p> ( '+' <expr-p> {bpush0 Add;})* }
+	#token plus 	{ '+' {bpush0 Add;} }
+	rule expr-p	{ <int> { bpush Push, $<int>.Int; }}
 
 	#rule prin { 'print' <int> { push-int $<int>.Int ; push $pri ; } }
 	token comment	{ '#' \N*  }
@@ -91,10 +97,12 @@ sub disasm() {
 		print "$i\t";
 		my $bcode = @bcodes[$i];
 		my $val = @bvals[$i];
-		say "$bcode\t$val";
-		#given $bcode 
-			#	when Call 
+		print "$bcode\t";
+		given $bcode {
+			when Call { say @prims[$val][0]; }
+			default { say $val; }
 		}
+	}
 }
 		
 
@@ -106,6 +114,7 @@ sub run() {
 		my $val = @bvals[$ip];
 		$ip++;
 		given $bcode {
+			when Add { my $v = spop; @sstack[slast] += $v; }
 			when Call { 
 				#say @prims;
 				my $func = @prims[$val][1];
