@@ -46,6 +46,14 @@ sub add-jump($id, $pos) { @jump-ids.push($id); @jump-pos.push($pos); }
 sub found($str) { say "Found: $str"; }
 sub xfound($str) {  }
 
+sub add-sub($op) {
+	if $op eq '+' {
+		bpush0 Add;
+	} else {
+		bpush0 Sub;
+	}
+}
+
 grammar G {
 	rule TOP { ^ <stmts> $ }
 	rule stmts { <statement>* }
@@ -62,7 +70,8 @@ grammar G {
 	rule call { 'call' <id> {bpush Call, find-prim $<id>; } }
 	rule halt { 'halt'  {xfound "halt"; bpush0 Halt;} }
 	#rule expr	{ <expr-p>+ % <plus> }
-	rule expr	{ <expr-p> ( '+' <expr-p> {bpush0 Add;})* }
+	rule expr	{ <expr-p> ( <add-sub> <expr-p> { add-sub $<add-sub>;} )* }
+	token add-sub	{ '+' | '-' }
 	#token plus 	{ '+' {bpush0 Add;} }
 	rule expr-p	{ <int> { bpush Push, $<int>.Int; }}
 
