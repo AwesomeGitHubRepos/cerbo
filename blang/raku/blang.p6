@@ -1,6 +1,6 @@
 #!/usr/bin/env perl6
 
-enum Bcode <Add Call Drop Dup Halt Inc Jlt Push Sub>;
+enum Bcode <Add Call Div Drop Dup Halt Inc Jlt Mul Push Sub>;
 my @bcodes;
 my @bvals;
 
@@ -59,6 +59,14 @@ sub add-sub($op) {
 	}
 }
 
+sub mul-div($op) {
+	if $op eq '*' {
+		bpush0 Mul;
+	} else {
+		bpush0 Div;
+	}
+}
+
 sub calls($func-name) {
 	my $id = find-prim $func-name;
 	die("calls:fatal:unknown function:$func-name") if $id == -1;
@@ -82,16 +90,18 @@ grammar G {
 	rule jlt { 'jlt' <id> { found "jlt"; add-jump $<id>, elems(@bcodes); bpush0 Jlt; }}
 	rule label { <id> ':' {found "label"; %labels{$<id>} = elems(@bcodes); } }
 	rule add	{ 'add' {bpush0 Add;}}
+	rule mul	{ 'mul' {bpush0 Mul;}}
+	rule div	{ 'div' {bpush0 Div;}}
 	rule sub { 'sub' { bpush0 Sub;}}
 	#rule push { 'push' <int>  { bpush Push, $<int>.Int; }}
 	rule push { 'push' <expr> }
 	rule call { 'call' <id> {calls $<id>; } }
 	rule halt { 'halt'  {xfound "halt"; bpush0 Halt;} }
-	#rule expr	{ <expr-p>+ % <plus> }
-	rule expr	{ <expr-p> ( <add-sub> <expr-p> { add-sub $<add-sub>;} )* }
+	rule expr	{ <expr-mul> ( <add-sub> <expr-mul> { add-sub $<add-sub>;} )* }
 	token add-sub	{ '+' | '-' }
-	#token plus 	{ '+' {bpush0 Add;} }
-	rule expr-p	{ <int> { bpush Push, $<int>.Int; }}
+	rule expr-mul	{ <expr-prim> ( <mul-div> <expr-prim> { mul-div $<mul-div>;} )* }
+	token mul-div	{ '*' | '/' }
+	rule expr-prim	{ <int> { bpush Push, $<int>.Int; }}
 
 	rule prin { 'print' ((<expr> { calls "print"; }) | (<kstr> {mk-kstr $<kstr>.Str; calls "printkstr";})) }
 	token comment	{ '#' \N*  }
@@ -155,11 +165,13 @@ sub run() {
 				#say "func is $func";
 				$func();
 			}
+			when Div { my $v = spop; @sstack[slast] /= $v; }
 			when Drop { spop;}
 			when Dup { spush( @sstack[slast]); }
 			when Halt { last; }
 			when Inc { @sstack[slast] += 1; }
 			when Jlt { if spop() < 0 { $ip += @bvals[$ip-1]-1;} }
+			when Mul { my $v = spop; @sstack[slast] *= $v; }
 			when Push { spush $val;}
 			when Sub { my $v = spop; @sstack[slast] -= $v; }
 			default { die "Unknown opcode: $bcode before $ip";  }
