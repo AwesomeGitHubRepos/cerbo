@@ -1,6 +1,6 @@
 #!/usr/bin/env perl6
 
-enum Bcode <Add Call Div Drop Dup Halt Inc Jlt Jze Mul Push Sub>;
+enum Bcode <Add Ass Call Div Drop Dup Getn Halt Inc Jlt Jze Mul Push Sub>;
 my @bcodes;
 my @bvals;
 
@@ -93,13 +93,48 @@ sub mk-fi() {
 	@bvals[$loc] = here-$loc;
 }
 
+# numerical variables
+my Str @num-var-names;
+my @num-var-values;
+
+# find index
+sub findex(@keys, $key) {
+	loop (my $i=0; $i <elems(@keys); $i++)  {
+		if $key eq @keys[$i] { return $i; }
+	}
+	return -1;
+}
+
+
+sub mk-assign(Str $varname) {
+	my $i = findex(@num-var-names, $varname);
+	if $i < 0 {
+		$i = elems(@num-var-names);
+		@num-var-names.push($varname);
+		@num-var-values.push(0);
+	}
+	bpush Ass, $i;
+}
+
+sub mk-get-varn(Str $varname) {
+	my $i = findex(@num-var-names, $varname);
+	if $i < 0 {
+		$i = elems(@num-var-names);
+		@num-var-names.push($varname);
+		@num-var-values.push(0);
+	}
+	bpush Getn, $i;
+}
+
 
 grammar G {
 	rule TOP { ^ <stmts> $ }
 	rule stmts { <statement>* }
-	rule statement { <call> | <dup> | <drop> | <halt> | 
+	rule statement { <assign> | <call> | <dup> | <drop> | <halt> | 
 		<inc> | <if-stm> | <jlt> | <label> | 
 		<prin> | <push> | <sub> | <comment> }
+
+	rule assign	{ <id> '=' <expr> { mk-assign $<id>.Str; }  }
 	rule drop { 'drop' { found "drop"; bpush0 Drop; }}
 	rule dup { 'dup' { found "dup"; bpush0 Dup; }}
 	rule if-stm	{ 'if' <expr> 'then' { mk-if; } <stmts> 'fi' {mk-fi;} }
@@ -118,7 +153,7 @@ grammar G {
 	token add-sub	{ '+' | '-' }
 	rule expr-mul	{ <expr-prim> ( <mul-div> <expr-prim> { mul-div $<mul-div>;} )* }
 	token mul-div	{ '*' | '/' }
-	rule expr-prim	{ <int> { bpush Push, $<int>.Int; }}
+	rule expr-prim	{ (<int> { bpush Push, $<int>.Int; }) | (<id> {mk-get-varn $<id>.Str;}) }
 
 	rule prin { 'print' ((<expr> { calls "print"; }) | (<kstr> {mk-kstr $<kstr>.Str; calls "printkstr";})) }
 	token comment	{ '#' \N*  }
@@ -168,6 +203,7 @@ sub disasm() {
 		
 
 
+
 my $ip = 0;
 sub run() {
 	loop {
@@ -176,6 +212,7 @@ sub run() {
 		$ip++;
 		given $bcode {
 			when Add { my $v = spop; @sstack[slast] += $v; }
+			when Ass { @num-var-values[$val] = spop; }
 			when Call { 
 				#say @prims;
 				my $func = @prims[$val][1];
@@ -185,6 +222,7 @@ sub run() {
 			when Div { my $v = spop; @sstack[slast] /= $v; }
 			when Drop { spop;}
 			when Dup { spush( @sstack[slast]); }
+			when Getn { spush @num-var-values[$val]; }
 			when Halt { last; }
 			when Inc { @sstack[slast] += 1; }
 			when Jlt { if spop() < 0 { $ip += @bvals[$ip-1]-1;} }
