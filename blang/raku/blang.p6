@@ -1,6 +1,6 @@
 #!/usr/bin/env perl6
 
-enum Bcode <Add Call Div Drop Dup Halt Inc Jlt Mul Push Sub>;
+enum Bcode <Add Call Div Drop Dup Halt Inc Jlt Jze Mul Push Sub>;
 my @bcodes;
 my @bvals;
 
@@ -79,13 +79,30 @@ sub mk-kstr($kstr) {
 	bpush Push, $n;
 }
 
+sub here() { return elems(@bcodes); }
+
+my @ifs; # locations of if statements
+
+sub mk-if() {
+	@ifs.push(here);
+	bpush0 Jze;
+}
+
+sub mk-fi() {
+	my $loc = @ifs.pop;
+	@bvals[$loc] = here-$loc;
+}
+
+
 grammar G {
 	rule TOP { ^ <stmts> $ }
 	rule stmts { <statement>* }
-	rule statement { <call> | <dup> | <drop> | <halt> | <inc> | <jlt> | <label> | 
+	rule statement { <call> | <dup> | <drop> | <halt> | 
+		<inc> | <if-stm> | <jlt> | <label> | 
 		<prin> | <push> | <sub> | <comment> }
 	rule drop { 'drop' { found "drop"; bpush0 Drop; }}
 	rule dup { 'dup' { found "dup"; bpush0 Dup; }}
+	rule if-stm	{ 'if' <expr> 'then' { mk-if; } <stmts> 'fi' {mk-fi;} }
 	rule inc { 'inc' { bpush0 Inc; }}
 	rule jlt { 'jlt' <id> { found "jlt"; add-jump $<id>, elems(@bcodes); bpush0 Jlt; }}
 	rule label { <id> ':' {found "label"; %labels{$<id>} = elems(@bcodes); } }
@@ -126,10 +143,10 @@ say @bvals;
 sub resolve-labels() {
 	loop (my $i = 0; $i < elems(@jump-ids); $i++) {
 		my $id = @jump-ids[$i];
-		say "seolve-labels: id $id";
+		#say "seolve-labels: id $id";
 		my $pos = %labels{$id};
 		my $here = @jump-pos[$i];
-		say "resolve-labels: pos $pos here $here";
+		#say "resolve-labels: pos $pos here $here";
 		@bvals[@jump-pos[$i]] = $pos -$here;
 	}
 }
@@ -171,6 +188,7 @@ sub run() {
 			when Halt { last; }
 			when Inc { @sstack[slast] += 1; }
 			when Jlt { if spop() < 0 { $ip += @bvals[$ip-1]-1;} }
+			when Jze { if spop() == 0 { $ip += @bvals[$ip-1]-1;} }
 			when Mul { my $v = spop; @sstack[slast] *= $v; }
 			when Push { spush $val;}
 			when Sub { my $v = spop; @sstack[slast] -= $v; }
