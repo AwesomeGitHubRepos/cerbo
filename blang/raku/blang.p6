@@ -43,7 +43,6 @@ sub find-prim($name) {
 }
 
 my %labels;
-#my @label-pos;
 my @jump-ids;
 my @jump-pos;
 
@@ -95,7 +94,7 @@ sub mk-if() {
 
 sub mk-fi() {
 	my $loc = @ifs.pop;
-	@bvals[$loc] = here-$loc;
+	@bvals[$loc] = here;
 }
 
 # numerical variables
@@ -166,9 +165,8 @@ grammar G {
 
 	rule prin { 'print' ((<expr> { calls "print"; }) | (<kstr> {mk-kstr $<kstr>.Str; calls "printkstr";})) }
 	token comment	{ '#' \N*  }
-	token kstr	{ '"' <( <str=-["]>* )> '"'  {say "found kstr $<str>"; } }
-	#token kstr-1	{ 
-	token id { <[a..zA..Z]>+ }
+	token kstr	{ '"' <( <str=-["]>* )> '"'  }
+	token id 	{ <[a..zA..Z]>+ }
 	token int	{ <[0..9]>+ }
 	}
 
@@ -179,23 +177,19 @@ my $m = G.parse($input);
 # add on a final terminating halt
 bpush0 Halt;
 
-say @bcodes;
-say @bvals;
-
 sub resolve-labels() {
 	loop (my $i = 0; $i < elems(@jump-ids); $i++) {
 		my $id = @jump-ids[$i];
-		#say "seolve-labels: id $id";
 		my $pos = %labels{$id};
 		my $here = @jump-pos[$i];
-		#say "resolve-labels: pos $pos here $here";
 		@bvals[@jump-pos[$i]] = $pos;
 	}
 }
 
 
 sub disasm() {
-	loop (my $i=0; $i < elems(@bcodes); $i++) {
+	my $i;
+	loop ($i=0; $i < elems(@bcodes); $i++) {
 		print "$i\t";
 		my $bcode = @bcodes[$i];
 		my $val = @bvals[$i];
@@ -205,6 +199,13 @@ sub disasm() {
 			default { say $val; }
 		}
 	}
+
+	say "kstrs:";
+	loop ($i = 0; $i < elems(@kstrs); $i++) {
+		say "$i\t@kstrs[$i]";
+	}
+
+
 	say "---\n";
 }
 		
@@ -240,7 +241,7 @@ sub run() {
 	say "Bye";
 }
 
-say %labels;
+#say %labels;
 resolve-labels;
 disasm;
 run;
