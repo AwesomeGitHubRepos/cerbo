@@ -1,6 +1,6 @@
 #!/usr/bin/env perl6
 
-enum Bcode <Add Ass Call Div Drop Dup Getn Halt Inc Jlt Jze Mul Push Sub>;
+enum Bcode <Add Ass Call Div Drop Dup Getn Gosub Halt Inc Jlt Jze Mul Push Return Sub>;
 my @bcodes;
 my @bvals;
 
@@ -9,6 +9,11 @@ my @sstack; # regular stack
 sub spush(int32 $val) { @sstack.push($val); }
 sub spop() { return pop(@sstack); }
 
+my @rstack; # return stack for gosub
+sub rpush(int32 $ip) { @rstack.push($ip); }
+sub rpop() { return pop(@rstack); }
+
+
 my Str @kstrs; #constant strings
 
 sub bpush(Bcode $code, int32 $val) { @bcodes.push($code) ; @bvals.push($val); }
@@ -16,11 +21,8 @@ sub bpush0(Bcode $code) { bpush $code, 0; }
 sub slast() { return elems(@sstack) - 1 ; }
 
 
-#sub do-drop() { spop; }
 #sub do-dup() { spush( @sstack[slast] ; }
 sub do-emit() { print chr(spop()); }
-#sub do-inc() { @sstack[slast] += 1; }
-#sub do-jlt() { if spop() < 0 { $ip += @bvals[$ip-1]; } }
 sub do-print() { say spop; }
 sub do-printkstr() { say @kstrs[spop()]; }
 sub do-hello() { say "Hello from raku blang"; }
@@ -46,7 +48,10 @@ my @jump-ids;
 my @jump-pos;
 
 
-sub add-jump($id, $pos) { @jump-ids.push($id); @jump-pos.push($pos); }
+sub add-jump($id) { 
+	@jump-ids.push($id); 
+	@jump-pos.push(here); 
+}
 
 sub found($str) { say "Found: $str"; }
 sub xfound($str) {  }
@@ -130,30 +135,34 @@ sub mk-get-varn(Str $varname) {
 grammar G {
 	rule TOP { ^ <stmts> $ }
 	rule stmts { <statement>* }
-	rule statement { <assign> | <call> | <dup> | <drop> | <halt> | 
+	rule statement { <assign> | <call> | <dup> | <drop> | <gosub> | <halt> | 
 		<inc> | <if-stm> | <jlt> | <label> | 
-		<prin> | <push> | <sub> | <comment> }
+		<prin> | <push> | <ret> | <sub> | <comment> }
 
 	rule assign	{ <id> '=' <expr> { mk-assign $<id>.Str; }  }
 	rule drop { 'drop' { found "drop"; bpush0 Drop; }}
 	rule dup { 'dup' { found "dup"; bpush0 Dup; }}
 	rule if-stm	{ 'if' <expr> 'then' { mk-if; } <stmts> 'fi' {mk-fi;} }
 	rule inc { 'inc' { bpush0 Inc; }}
-	rule jlt { 'jlt' <id> { found "jlt"; add-jump $<id>, elems(@bcodes); bpush0 Jlt; }}
-	rule label { <id> ':' {found "label"; %labels{$<id>} = elems(@bcodes); } }
+	rule jlt 	{ 'jlt' <id> { add-jump $<id>; bpush0 Jlt; }}
+	rule label 	{ <id> ':' {found "label"; %labels{$<id>} = here; } }
 	rule add	{ 'add' {bpush0 Add;}}
 	rule mul	{ 'mul' {bpush0 Mul;}}
 	rule div	{ 'div' {bpush0 Div;}}
 	rule sub { 'sub' { bpush0 Sub;}}
-	#rule push { 'push' <int>  { bpush Push, $<int>.Int; }}
 	rule push { 'push' <expr> }
 	rule call { 'call' <id> {calls $<id>; } }
+	rule gosub	{ 'gosub' <id> {add-jump $<id> ; bpush0 Gosub; }}
 	rule halt { 'halt'  {xfound "halt"; bpush0 Halt;} }
+	rule ret	{ 'return' {bpush0 Return;}} 
+
+
 	rule expr	{ <expr-mul> ( <add-sub> <expr-mul> { add-sub $<add-sub>;} )* }
 	token add-sub	{ '+' | '-' }
 	rule expr-mul	{ <expr-prim> ( <mul-div> <expr-prim> { mul-div $<mul-div>;} )* }
 	token mul-div	{ '*' | '/' }
 	rule expr-prim	{ (<int> { bpush Push, $<int>.Int; }) | (<id> {mk-get-varn $<id>.Str;}) }
+
 
 	rule prin { 'print' ((<expr> { calls "print"; }) | (<kstr> {mk-kstr $<kstr>.Str; calls "printkstr";})) }
 	token comment	{ '#' \N*  }
@@ -169,8 +178,6 @@ my $m = G.parse($input);
 
 # add on a final terminating halt
 bpush0 Halt;
-#@bcodes.push Halt;
-#@bvals.push 0;
 
 say @bcodes;
 say @bvals;
@@ -182,7 +189,7 @@ sub resolve-labels() {
 		my $pos = %labels{$id};
 		my $here = @jump-pos[$i];
 		#say "resolve-labels: pos $pos here $here";
-		@bvals[@jump-pos[$i]] = $pos -$here;
+		@bvals[@jump-pos[$i]] = $pos;
 	}
 }
 
@@ -213,22 +220,19 @@ sub run() {
 		given $bcode {
 			when Add { my $v = spop; @sstack[slast] += $v; }
 			when Ass { @num-var-values[$val] = spop; }
-			when Call { 
-				#say @prims;
-				my $func = @prims[$val][1];
-				#say "func is $func";
-				$func();
-			}
+			when Call 	{ my $func = @prims[$val][1]; $func(); }
 			when Div { my $v = spop; @sstack[slast] /= $v; }
 			when Drop { spop;}
 			when Dup { spush( @sstack[slast]); }
 			when Getn { spush @num-var-values[$val]; }
+			when Gosub	{ rpush $ip; $ip = $val; }
 			when Halt { last; }
 			when Inc { @sstack[slast] += 1; }
-			when Jlt { if spop() < 0 { $ip += @bvals[$ip-1]-1;} }
-			when Jze { if spop() == 0 { $ip += @bvals[$ip-1]-1;} }
+			when Jlt { if spop() < 0 { $ip = @bvals[$ip-1];} }
+			when Jze { if spop() == 0 { $ip = @bvals[$ip-1];} }
 			when Mul { my $v = spop; @sstack[slast] *= $v; }
 			when Push { spush $val;}
+			when Return	{ $ip = rpop; }
 			when Sub { my $v = spop; @sstack[slast] -= $v; }
 			default { die "Unknown opcode: $bcode before $ip";  }
 		}

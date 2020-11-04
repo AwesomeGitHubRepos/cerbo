@@ -10,4 +10,3 @@ loop:
 	sub
 	jlt loop
 	drop
-	halt
