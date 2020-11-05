@@ -1,6 +1,6 @@
 #!/usr/bin/env perl6
 
-enum Bcode <Add Ass Call Div Drop Dup Getn Gosub Halt Inc Jlt Jze Mul Push Return Sub>;
+enum Bcode <Add Ass Call Div Drop Dup Getn Gosub Halt Inc Jlt Jze Mul Neg Push Return Sub>;
 my @bcodes;
 my @bvals;
 
@@ -55,21 +55,6 @@ sub add-jump($id) {
 sub found($str) { say "Found: $str"; }
 sub xfound($str) {  }
 
-sub add-sub($op) {
-	if $op eq '+' {
-		bpush0 Add;
-	} else {
-		bpush0 Sub;
-	}
-}
-
-sub mul-div($op) {
-	if $op eq '*' {
-		bpush0 Mul;
-	} else {
-		bpush0 Div;
-	}
-}
 
 sub calls($func-name) {
 	my $id = find-prim $func-name;
@@ -156,11 +141,16 @@ grammar G {
 	rule ret	{ 'return' {bpush0 Return;}} 
 
 
-	rule expr	{ <expr-mul> ( <add-sub> <expr-mul> { add-sub $<add-sub>;} )* }
-	token add-sub	{ '+' | '-' }
-	rule expr-mul	{ <expr-prim> ( <mul-div> <expr-prim> { mul-div $<mul-div>;} )* }
-	token mul-div	{ '*' | '/' }
-	rule expr-prim	{ (<int> { bpush Push, $<int>.Int; }) | (<id> {mk-get-varn $<id>.Str;}) }
+	#rule expr	{ <expr-mul>  ( <add-sub> <expr-mul>  { add-sub $<add-sub>.Str;} )* }
+	rule expr	{ <expr-mul>  <expr-a>* }
+	rule expr-a	{ ('+' <expr-mul> {bpush0 Add;}) | ('-' <expr-mul> {bpush0 Sub;})}
+	rule expr-mul	{ <expr-prim> <expr-b>* }
+	rule expr-b	{ ('*' <expr-prim> {bpush0 Mul;}) | ('/'  <expr-prim> {bpush0 Div;}) }
+	rule expr-prim	{ ('(' <expr> ')' ) |
+			  (<int> { bpush Push, $<int>.Int; }) | 
+			  (<id> {mk-get-varn $<id>.Str;}) |
+			  ( '-' <expr-prim> { bpush0 Neg;})
+		  	}
 
 
 	rule prin { 'print' ((<expr> { calls "print"; }) | (<kstr> {mk-kstr $<kstr>.Str; calls "printkstr";})) }
@@ -232,6 +222,7 @@ sub run() {
 			when Jlt { if spop() < 0 { $ip = @bvals[$ip-1];} }
 			when Jze { if spop() == 0 { $ip = @bvals[$ip-1];} }
 			when Mul { my $v = spop; @sstack[slast] *= $v; }
+			when Neg 	{ spush(-spop); }
 			when Push { spush $val;}
 			when Return	{ $ip = rpop; }
 			when Sub { my $v = spop; @sstack[slast] -= $v; }
