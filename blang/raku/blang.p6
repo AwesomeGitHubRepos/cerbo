@@ -158,14 +158,25 @@ grammar G {
 	token kstr	{ '"' <( <str=-["]>* )> '"'  }
 	token id 	{ <[a..zA..Z]>+ }
 	token int	{ <[0..9]>+ }
-	}
+}
 
-my $input = slurp;
 
-my $m = G.parse($input);
 
-# add on a final terminating halt
-bpush0 Halt;
+# read in program
+#my $nargs = elems($*ARGFILES);
+#say "nargs = $nargs";
+#if elems($*ARGFILES) > 0 {
+#	say "process arguments";
+#} else {
+#	say "read prog from stdin";
+#}
+#for $*ARGFILES ->$f {
+#	say "file $f";
+#}
+
+my $prog = slurp;
+my $m = G.parse($prog);
+bpush0 Halt; # add on a final terminating halt
 
 sub resolve-labels() {
 	loop (my $i = 0; $i < elems(@jump-ids); $i++) {
