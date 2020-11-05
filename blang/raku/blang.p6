@@ -1,6 +1,6 @@
 #!/usr/bin/env perl6
 
-enum Bcode <Add Ass Call Div Drop Dup Getn Gosub Halt Inc Jlt Jze Mul Neg Push Return Sub>;
+enum Bcode <Add Ass Call Div Drop Dup Getn Gosub Halt Inc Jlt Jmp Jze Mul Neg Push Return Sub>;
 my @bcodes;
 my @bvals;
 
@@ -82,6 +82,24 @@ sub mk-fi() {
 	@bvals[$loc] = here;
 }
 
+
+# looping structures
+my @loop-starts;
+my @loop-ends; # locations where you should abort the loop
+sub mk-while() {
+	@loop-starts.push(here);
+}
+sub mk-while-test() {
+	@loop-ends.push(here);
+	bpush0 Jze;
+}
+sub mk-wend() {
+	my $loc = @loop-starts.pop;
+	bpush  Jmp, $loc;
+	$loc = @loop-ends.pop;
+	@bvals[$loc] = here;
+}
+
 # numerical variables
 my Str @num-var-names;
 my @num-var-values;
@@ -121,7 +139,8 @@ grammar G {
 	rule stmts { <statement>* }
 	rule statement { <assign> | <call> | <dup> | <drop> | <gosub> | <halt> | 
 		<inc> | <if-stm> | <jlt> | <label> | 
-		<prin> | <push> | <ret> | <sub> | <comment> }
+		<prin> | <push> | <ret> | <sub> | <whilst> | 
+		<comment> }
 
 	rule assign	{ <id> '=' <expr> { mk-assign $<id>.Str; }  }
 	rule drop { 'drop' { found "drop"; bpush0 Drop; }}
@@ -139,6 +158,7 @@ grammar G {
 	rule gosub	{ 'gosub' <id> {add-jump $<id> ; bpush0 Gosub; }}
 	rule halt { 'halt'  {xfound "halt"; bpush0 Halt;} }
 	rule ret	{ 'return' {bpush0 Return;}} 
+	rule whilst	{ 'while' {mk-while;} <expr> {mk-while-test;} <stmts> 'wend' {mk-wend;} }
 
 
 	#rule expr	{ <expr-mul>  ( <add-sub> <expr-mul>  { add-sub $<add-sub>.Str;} )* }
@@ -231,6 +251,7 @@ sub run() {
 			when Halt { last; }
 			when Inc { @sstack[slast] += 1; }
 			when Jlt { if spop() < 0 { $ip = @bvals[$ip-1];} }
+			when Jmp	{ $ip = $val; }
 			when Jze { if spop() == 0 { $ip = @bvals[$ip-1];} }
 			when Mul { my $v = spop; @sstack[slast] *= $v; }
 			when Neg 	{ spush(-spop); }
