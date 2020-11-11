@@ -1,6 +1,7 @@
 #!/usr/bin/env perl6
 
-enum Bcode <Add Ass Call Div Drop Dup Getn Gosub Halt Inc Jlt Jmp Jze Mul Neg Push Return Sub>;
+enum Bcode <Add Ass Call Cat Div Drop Dup Getn Gosub Halt Inc Jlt Jmp Jze Mul Neg 
+	PrintNum PrintStr Push Return Sub>;
 my @bcodes;
 my @bvals;
 
@@ -62,11 +63,15 @@ sub calls($func-name) {
 	bpush Call, $id; 
 }
 
-sub mk-kstr($kstr) {
+sub mk-kstr(Str $kstr) {
 	my $n = elems(@kstrs);
 	@kstrs.push($kstr);
-	bpush Push, $n;
+	return $n;
 }
+#sub mk-kstr(Str $kstr) {
+#	bpush Push, (mk-kstr1 $kstr) ;
+#	#return $n;
+#}
 
 sub here() { return elems(@bcodes); }
 
@@ -173,9 +178,19 @@ grammar G {
 		  	}
 
 
-	rule prin { 'print' ((<expr> { calls "print"; }) | (<kstr> {mk-kstr $<kstr>.Str; calls "printkstr";})) }
+	rule str-expr	{ <str-expr-prim>  <str-expr-a>* }
+	rule str-expr-a	{ '+' <str-expr-prim> { bpush Cat, (mk-kstr "UNDEFINED");} }
+	rule str-expr-prim	{ <kstr> }
+
+	rule prin 	{ 'print' (<print-num> | <print-str>) }
+	rule print-num	{ <expr> { bpush0 PrintNum; }}
+	rule print-str	{ <str-expr> { bpush0 PrintStr; } }
+
 	token comment	{ '#' \N*  }
-	token kstr	{ '"' <( <str=-["]>* )> '"'  }
+	#token kstr	{ '"' <( <str=-["]>* )> '"'  { mk-kstr $<str>.Str; }}
+	token kstr	{ '"' <kstr1> '"'  { bpush Push, (mk-kstr $<kstr1>.Str); }}
+	token kstr1	{ <-["]>*  }
+
 	token id 	{ <[a..zA..Z]>+ }
 	token int	{ <[0..9]>+ }
 }
@@ -231,6 +246,12 @@ sub disasm() {
 }
 		
 
+sub do-cat( Int $idx) { 
+	my $arg2 = @kstrs[spop]; 
+	my $res = @kstrs[spop] ~ $arg2;  
+	@kstrs[$idx] = $res;
+	spush $idx;
+}
 
 
 my $ip = 0;
@@ -242,7 +263,8 @@ sub run() {
 		given $bcode {
 			when Add { my $v = spop; @sstack[slast] += $v; }
 			when Ass { @num-var-values[$val] = spop; }
-			when Call 	{ my $func = @prims[$val][1]; $func(); }
+			when Call	{ my $func = @prims[$val][1]; $func(); }
+			when Cat	{ do-cat $val;  }
 			when Div { my $v = spop; @sstack[slast] /= $v; }
 			when Drop { spop;}
 			when Dup { spush( @sstack[slast]); }
@@ -255,6 +277,8 @@ sub run() {
 			when Jze { if spop() == 0 { $ip = @bvals[$ip-1];} }
 			when Mul { my $v = spop; @sstack[slast] *= $v; }
 			when Neg 	{ spush(-spop); }
+			when PrintNum	{ say spop; }
+			when PrintStr	{ say @kstrs[spop]; }
 			when Push { spush $val;}
 			when Return	{ $ip = rpop; }
 			when Sub { my $v = spop; @sstack[slast] -= $v; }
