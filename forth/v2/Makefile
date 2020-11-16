@@ -1,13 +1,21 @@
-CFAGS = -ggdb -fsanitize-address
+#CFLAGS = -ggdb -fsanitize-address
+CFLAGS = -g -O0
+
 CC = g++
-forth : forth.cpp
-	$(CC) $(CFLAGS) $^ -o $@ -lasan
+
+all: forth
+
+forth.o : forth.cpp
+	$(CC) $(CFLAGS) -c $^ 
+
+forth : forth.o
+	$(CC) $^ -o $@
 
 clean:
-	rm -f forth out
+	rm -f forth out *.o
 
 check :
-	rm -f out
+	rm -f out 
 	./run-tests > out
 	@echo "Diffs>"
 	@diff expected out

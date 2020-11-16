@@ -753,7 +753,11 @@ void process_tib()
 	while(get_word()) process_token(token);
 }
 
-void get_tib() { fgets(tib, sizeof(tib),tib_in); }
+int get_tib() 
+{ 
+	fgets(tib, sizeof(tib),tib_in); 
+	return !feof(tib_in);
+}
 
 int main_routine()
 {
@@ -764,15 +768,14 @@ int main_routine()
 	//add_derived();
 	puts("skipped derived");
 
-	if(1) {
+	if(0) {
 		puts("words are");
 		p_words();
 		//process_token("words");
 		puts("fin");
 	}
 
-	while(1) {
-		get_tib();
+	while(get_tib()) {
 		process_tib();
 		if(show_prompt) puts("  ok");
 	}

@@ -1,3 +1,3 @@
 file ./forth
-b 567
-r 
+b 54
+r <oops.4th
