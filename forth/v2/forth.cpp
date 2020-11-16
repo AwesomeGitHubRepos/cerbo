@@ -8,13 +8,18 @@
  *
  */
 
+
+
 #include <assert.h>
 #include <ctype.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include <string.h>
+
+#include "forth.h"
+
 
 //typedef intptr_t cell_t;
 #if(__SIZEOF_POINTER__ ==4)
@@ -80,16 +85,54 @@ char tib[132];
 int bytes_read = 0; // number of bytes read into TIB
 
 
-typedef struct { // dictionary entry
+typedef struct dent { // dictionary entry
 	// name of word is packed before this struct
-	void* prev;
+	struct dent* prev;
 	ubyte  flags;
 } dent_s;
 
 dent_s *latest = NULL; // latest word being defined
 
-const ubyte F_IMM = 1 << 7;
+//const ubyte F_IMM = 1 << 7;
+#define F_IMM (1<<7)
 
+int isspace(int c)
+{
+	return ((c=='\t') || (c==' ') || (c=='\r') || (c=='\n'));
+}
+
+char toupper(char c)
+{
+	if(('a'<=c) && (c <= 'z'))
+		return c+ 'A' - 'a';
+	else
+		return c;
+}
+
+int strcasecmp(const char *s1, const char *s2)
+{
+	int offset,ch;
+	unsigned char a,b;
+
+	offset = 0;
+	ch = 0;
+	while( *(s1+offset) != '\0' )
+	{
+		/* check for end of s2 */
+		if( *(s2+offset)=='\0')
+			return( *(s1+offset) );
+
+		a = (unsigned)*(s1+offset);
+		b = (unsigned)*(s2+offset);
+		ch = toupper((char)a) - toupper((char)b);
+		//ch = toupper(a) - toupper(b);
+		if( ch<0 || ch>0 )
+			return(ch);
+		offset++;
+	}
+
+	return(ch);
+}
 
 /* not sure if this is strictly necessary
  * because we use strcasecmp instead of strcmp
@@ -98,7 +141,7 @@ char* strupr(char* str)
 { 
 	int c = -1, i =0;
 	if(!str) return NULL;
-	while(c = toupper(str[i])) {
+	while((c = toupper(str[i]))) {
 		str[i] = c;
 		i++;
 		if(c==0) return str;
@@ -106,7 +149,7 @@ char* strupr(char* str)
 	return str;
 }
 
-bool int_str(char*s, cell_t *v)
+bool int_str(const char*s, cell_t *v)
 {
 	*v = 0;
 	cell_t sgn = 1;
@@ -124,7 +167,7 @@ bool int_str(char*s, cell_t *v)
 	return true;
 }
 
-void undefined(char* token){
+void undefined(const char* token){
 	printf("undefined word:<%s>\n", token);
 }
 
@@ -138,9 +181,9 @@ void heapify (cell_t v)
 	hptr += sizeof(cell_t);
 }
 
-void create_header(ubyte flags, char* zname)
+void create_header(ubyte flags, const char* zname)
 {
-	char* name = hptr;
+	//char* name = (char*) hptr;
 	ubyte noff = 0; // name offset
 	for(noff = 0 ; noff<= strlen(zname); ++noff) *hptr++ = toupper(zname[noff]); // include trailing 0
 	dent_s dw;
@@ -151,7 +194,7 @@ void create_header(ubyte flags, char* zname)
 	hptr += sizeof(dw);
 }
 
-void createz (ubyte flags, char* zname, cell_t acf) // zname being a null-terminated string
+void createz (ubyte flags, const char* zname, cell_t acf) // zname being a null-terminated string
 {
 	create_header(flags, zname);
 	heapify(acf);
@@ -171,7 +214,7 @@ void* code(dent_s* dw)
 	return ++dw;
 }
 
-codeptr cfa_find(char* name) // name can be lowercase, if you like
+codeptr cfa_find(const char* name) // name can be lowercase, if you like
 {
 	dent_s* dw = latest;
 	//strupr(name);
@@ -186,7 +229,7 @@ codeptr cfa_find(char* name) // name can be lowercase, if you like
 	return (codeptr) dw;
 }
 
-void heapify_word(char* name)
+void heapify_word(const char* name)
 {
 	codeptr xt = cfa_find(name);
 	heapify((cell_t) xt);
@@ -203,13 +246,13 @@ void embed_literal(cell_t v)
 char* token;
 char* rest;
 /*
-char* delim_word (char* delims, bool upper)
-{
-	token = strtok_r(rest, delims, &rest);
-	if(upper) strupr(token);
-	return token;
-}
-*/
+   char* delim_word (char* delims, bool upper)
+   {
+   token = strtok_r(rest, delims, &rest);
+   if(upper) strupr(token);
+   return token;
+   }
+   */
 
 char* get_word () 
 { 
@@ -279,7 +322,7 @@ void p_tick()
 void execute (codeptr cfa)	
 {
 	W = (cellptr) cfa;
-	codeptr fn = (codeptr) dref(cfa);
+	codeptr fn = (codeptr) dref((void*) cfa);
 	fn();
 }
 void p_execute()
@@ -370,7 +413,7 @@ void p_z_slash ()
 	}
 
 	//char* src = 0; // delim_word("\"", false);
-	 
+
 	//do {} while(*hptr++ = *src++);
 	token += 3; // movwe beyong the z" 
 	while(1) {
@@ -545,7 +588,7 @@ void p_len()
 {
 	push(strlen((const char*) pop()));
 }
-		
+
 void p_name()
 {
 	puts(name_cfa((cellptr) pop()));
@@ -559,16 +602,16 @@ bool streq(const char* str1, const char* str2)
 void p_see()
 {
 	static cellptr cfa_docol = 0;
-	if(cfa_docol == 0) cfa_docol = (cellptr) dref(cfa_find("DOCOL"));
+	if(cfa_docol == 0) cfa_docol = (cellptr) dref((void*) cfa_find("DOCOL"));
 	get_word();
 	cellptr cfa = (cellptr) cfa_find(token);
 	if(cfa == 0) { puts("UNFOUND"); return; }
-	
+
 	// determine if immediate
 	dent_s* dw = (dent_s*) cfa;
 	dw--;
 	if(dw->flags & F_IMM) puts("IMMEDIATE");
-	
+
 	//cfa = (cellptr) dref(cfa);
 	if((cellptr) dref(cfa) != cfa_docol) {
 		puts("PRIM");
@@ -591,7 +634,8 @@ void p_see()
 
 
 
-typedef struct {ubyte flags; char* zname; codeptr fn; } prim_s;
+
+typedef struct {ubyte flags; const char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
 	{0,	"DOCOL", docol},
 	{0,	"SEE", p_see},
@@ -652,37 +696,36 @@ void add_primitives()
 	}
 }
 
-void eval_string(char* str)
+void eval_string(const char* str)
 {
 	strncpy(tib, str, sizeof(tib));
 	process_tib();
 }
 
-char* derived[] = {
+const char* derived[] = {
 	": VARIABLE create 0 , ;",
-	": 1+ 1 + ;",
+	//": 1+ 1 + ;",
 	": CR 10 emit ;",
-	//": .\" z\" type ;",
 	": IF compile 0branch here 0 , ; immediate",
 	": THEN here swap ! ; immediate",
 	": ELSE compile branch here >r 0 , here swap ! r> ; immediate", 
 	": CONSTANT <builds , does> @ ;",
 	": BEGIN here ; immediate",
 	": ?AGAIN compile ?branch , ; immediate",
-	//": DEFER 	<builds  [ ' xdefer ] , does> @  execute ;",
 	0
 };
 
 void add_derived()
 {
-	char** strs = derived;
+	const char** strs = derived;
 	while(*strs) {
+		puts(*strs);
 		eval_string(*strs++);
 	}
 
 }
 
-void process_token(char* token)
+void process_token(const char* token)
 {
 	codeptr cfa = cfa_find(token);
 	if(cfa == 0) {
@@ -709,23 +752,30 @@ void process_tib()
 	rest = 0;
 	while(get_word()) process_token(token);
 }
-int main()
+
+void get_tib() { fgets(tib, sizeof(tib),tib_in); }
+
+int main_routine()
 {
 	assert(sizeof(size_t) == sizeof(cell_t));
 	compiling = false;
 	add_primitives();
-	add_derived();
+	puts("added primitives");
+	//add_derived();
+	puts("skipped derived");
 
-	if(0) {
-		//p_words();
+	if(1) {
 		puts("words are");
-		process_token("words");
+		p_words();
+		//process_token("words");
 		puts("fin");
 	}
 
-	while(fgets(tib, sizeof(tib), stdin)) {
+	while(1) {
+		get_tib();
 		process_tib();
 		if(show_prompt) puts("  ok");
 	}
 	return 0;
 }
+

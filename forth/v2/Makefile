@@ -1,6 +1,7 @@
-forth : forth.c
-	#gcc -ggdb -fsanitize=address $^ -o $@ -lasan
-	gcc -ggdb $^ -o $@ 
+CFAGS = -ggdb -fsanitize-address
+CC = g++
+forth : forth.cpp
+	$(CC) $(CFLAGS) $^ -o $@ -lasan
 
 clean:
 	rm -f forth out
