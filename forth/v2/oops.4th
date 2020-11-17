@@ -1,4 +1,2 @@
-2 3 + .
-: 1+ 1 + ;
-3 1+ .
-
+: oops z" Can you see me?" type ;
+see oops
