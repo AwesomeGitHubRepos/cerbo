@@ -34,6 +34,10 @@ const char* cell_fmt = "%ld ";
 #define DEBUG(cmd) cmd
 #define DEBUGX(cmd)
 
+#define TODO(x) puts(x)
+
+void ACCEPT();
+void QUIT();
 
 typedef cell_t* cellptr;
 typedef uint8_t ubyte;
@@ -119,30 +123,6 @@ int strcasecmp(const char *s1, const char *s2)
 	return toupper(*s1) - toupper(*s2);
 }
 
-int strcasecmpXXX(const char *s1, const char *s2)
-{
-	int offset,ch;
-	unsigned char a,b;
-
-	offset = 0;
-	ch = 0;
-	while( *(s1+offset) != '\0' )
-	{
-		/* check for end of s2 */
-		if( *(s2+offset)=='\0')
-			return( *(s1+offset) );
-
-		a = (unsigned)*(s1+offset);
-		b = (unsigned)*(s2+offset);
-		ch = toupper((char)a) - toupper((char)b);
-		//ch = toupper(a) - toupper(b);
-		if( ch<0 || ch>0 )
-			return(ch);
-		offset++;
-	}
-
-	return(ch);
-}
 
 /* not sure if this is strictly necessary
  * because we use strcasecmp instead of strcmp
@@ -660,9 +640,28 @@ void p_see()
 
 
 
+void INTERPRET()
+{
+	BL();
+	WORD();
+	FIND();
+	/* If the word is found, it will be either executed (if it is an IMMEDIATE word, or if in the "interpret" state, STATE=0) or compiled into the dictionary (if in the "compile" state, STATE<>0). If not found, Forth attempts to convert the string as a number. If successful, LITERAL will either place it on the parameter stack (if in "interpret" state) or compile it as an in-line literal value (if in "compile" state). If not a Forth word and not a valid number, the string is typed, an error message is displayed, and the interpreter ABORTs. This process is repeated, string by string, until the end of the input line is reached. 
+	 * */
+
+	TODO("INTERPRET");
+}
+
+void ACCEPT()
+{
+	fgets(tib, sizeof(tib),tib_in); 
+}
+
 
 typedef struct {ubyte flags; const char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"INTERPRET", INTERPRET},
+	{0,	"ACCEPT", ACCEPT},
+	{0,	"QUIT", QUIT},
 	{0,	"EMBIN", p_branch},
 	{0,	"DOCOL", docol},
 	{0,	"SEE", p_see},
@@ -789,6 +788,22 @@ int get_tib()
 	return !feof(tib_in);
 }
 
+
+/* Attempted implementation of
+ * https://www.forth.com/starting-forth/9-forth-execution/
+ */
+
+void QUIT()
+{
+	while(1) {
+		rstack.size = 0; // clear return stack
+		ACCEPT();
+		INTERPRET();
+		printf(" ok \n"); // equiv of ." ok " CR
+	}
+}
+
+
 int main_routine()
 {
 	assert(sizeof(size_t) == sizeof(cell_t));
@@ -805,10 +820,15 @@ int main_routine()
 		puts("fin");
 	}
 
+	QUIT(); // doesn't return
+
+	/*
 	while(get_tib()) {
 		process_tib();
 		if(show_prompt) puts("  ok");
 	}
+	*/
+
 	return 0;
 }
 
