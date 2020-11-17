@@ -622,6 +622,7 @@ void p_see()
 }
 
 
+void BL() { push(20); }
 
 void INTERPRET()
 {
