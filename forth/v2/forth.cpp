@@ -622,17 +622,54 @@ void p_see()
 }
 
 
-void BL() { push(20); }
+void BL() { push(32); } // a space
+
+void FIND()
+{
+	char* addr = (char*) pop();
+	printf("WORD TO FIND:<");
+	for(int i = 0; i < *addr; i++) {
+		char c = *(addr+i+1);
+		putchar(c);
+	}
+	puts(">");
+}
+
+void WORD()
+{
+	static char word_pad[64]; // counted buffer to hold word found
+	char delim = pop();
+	//int size=0;
+	unsigned char len = 0;
+	while(tib[in] == delim) in++; // skip leading delimiters
+	while(in < ntib) {
+		char c = tib[in];
+		if(c == delim) break;
+		len++;
+		word_pad[len] = c;
+		in++;
+	}
+	word_pad[0] = len;
+	push((cell_t)word_pad);
+}
+
 
 void INTERPRET()
 {
-	BL();
-	WORD();
-	FIND();
+	while(1) {
+		BL();
+		WORD();
+		char* word = (char*) pop();
+		if(word[0] == 0) break;
+		push((cell_t)word);
+		FIND();
+		TODO("INTERPRET");
+	}
+	//p_dots(); seems to check out
+	
 	/* If the word is found, it will be either executed (if it is an IMMEDIATE word, or if in the "interpret" state, STATE=0) or compiled into the dictionary (if in the "compile" state, STATE<>0). If not found, Forth attempts to convert the string as a number. If successful, LITERAL will either place it on the parameter stack (if in "interpret" state) or compile it as an in-line literal value (if in "compile" state). If not a Forth word and not a valid number, the string is typed, an error message is displayed, and the interpreter ABORTs. This process is repeated, string by string, until the end of the input line is reached. 
 	 * */
 
-	TODO("INTERPRET");
 }
 
 /* See also QUERY
@@ -643,9 +680,9 @@ void QUERY()
 	ntib = 0;
 	while(ntib < sizeof(tib)) {
 		int c = getchar();
-		if(c<0) break;
+		if((c<0) || (c=='\n') || (c=='\r')) break;
 		tib[ntib++] = c;
-		if(c == '\n') break;
+		//if(c == '\n') break;
 	}
 	in = 0; // offset to current position in TIB
 }
