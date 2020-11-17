@@ -86,8 +86,9 @@ bool show_prompt = true;
 ubyte flags = 0;
 
 char tib[132];
-int bytes_read = 0; // number of bytes read into TIB
-
+//int bytes_read = 0; // number of bytes read into TIB
+int ntib=0; // #TIB
+int in=0; // >IN
 
 typedef struct dent { // dictionary entry
 	// name of word is packed before this struct
@@ -235,14 +236,6 @@ void embed_literal(cell_t v)
 
 char* token;
 char* rest;
-/*
-   char* delim_word (char* delims, bool upper)
-   {
-   token = strtok_r(rest, delims, &rest);
-   if(upper) strupr(token);
-   return token;
-   }
-   */
 
 char* get_word () 
 { 
@@ -616,26 +609,16 @@ void p_see()
 		if(streq(name, "LIT")) printf("%ld\n", *(++cfa));
 		if(streq(name, "EMBIN")) {
 			cellptr fin = (cellptr) dref(++cfa);
-			//printf("fin=%lx\n", fin);
 			char* cptr = (char*) (++cfa);
-			//while((cellptr*)cptr != (cellptr*)fin) {				
-			int i =0;
-			//while(i<24) {				
 			while(cptr != (char*) fin) {				
 				printf("%c", *cptr);
-				//printf(" %p\n", cptr);
 				cptr++;
-				i++;
 			}
 			puts("\nEMBIN END");
 			cfa = --fin;
 		}
 		if(streq(name, ";")) break;
-		//puts("again");
 	}
-
-
-	//puts(name_cfa(cfa));
 }
 
 
@@ -651,17 +634,30 @@ void INTERPRET()
 	TODO("INTERPRET");
 }
 
-void ACCEPT()
+/* See also QUERY
+ * http://www.mosaic-industries.com/embedded-systems/legacy-products/qed2-68hc11-microcontroller/software/chapter_16_advanced_topics
+ * */
+void QUERY()
 {
-	fgets(tib, sizeof(tib),tib_in); 
+	ntib = 0;
+	while(ntib < sizeof(tib)) {
+		int c = getchar();
+		if(c<0) break;
+		tib[ntib++] = c;
+		if(c == '\n') break;
+	}
+	in = 0; // offset to current position in TIB
 }
 
 
 typedef struct {ubyte flags; const char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
-	{0,	"INTERPRET", INTERPRET},
-	{0,	"ACCEPT", ACCEPT},
-	{0,	"QUIT", QUIT},
+	{0,	"BL", 		BL},
+	{0,	"WORD", 	WORD},
+	{0,	"FIND", 	FIND},
+	{0,	"INTERPRET", 	INTERPRET},
+	{0,	"QUERY", 	QUERY},
+	{0,	"QUIT", 	QUIT},
 	{0,	"EMBIN", p_branch},
 	{0,	"DOCOL", docol},
 	{0,	"SEE", p_see},
@@ -797,7 +793,7 @@ void QUIT()
 {
 	while(1) {
 		rstack.size = 0; // clear return stack
-		ACCEPT();
+		QUERY();
 		INTERPRET();
 		printf(" ok \n"); // equiv of ." ok " CR
 	}
@@ -823,11 +819,11 @@ int main_routine()
 	QUIT(); // doesn't return
 
 	/*
-	while(get_tib()) {
-		process_tib();
-		if(show_prompt) puts("  ok");
-	}
-	*/
+	   while(get_tib()) {
+	   process_tib();
+	   if(show_prompt) puts("  ok");
+	   }
+	   */
 
 	return 0;
 }
