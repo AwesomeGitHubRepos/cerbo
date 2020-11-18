@@ -12,6 +12,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <setjmp.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -20,6 +21,8 @@
 
 #include "forth.h"
 
+
+jmp_buf env_buffer;
 
 //typedef intptr_t cell_t;
 #if(__SIZEOF_POINTER__ ==4)
@@ -698,6 +701,7 @@ void to_CFA()
 void interpret_unfound()
 {
 	puts("TODO UNFOUND");
+	longjmp(env_buffer, 0);
 }
 void interpret_found(cell_t cfa)
 {
@@ -751,9 +755,18 @@ void QUERY()
 	in = 0; // offset to current position in TIB
 }
 
+void ABORT()
+{
+	puts("ABORT starting");
+	rstack.size = 0;
+	sstack.size = 0;
+	compiling = false; // enter execution mode
+	QUIT(); // normally loops forever, but can be ABORTed
+}
 
 typedef struct {ubyte flags; const char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"ABORT",	ABORT},
 	{0,	">CFA",		to_CFA},
 	{0,	"BL", 		BL},
 	{0,	"WORD", 	WORD},
@@ -922,7 +935,9 @@ int main_routine()
 		puts("fin");
 	}
 
-	QUIT(); // doesn't return
+//	int val; 
+	setjmp(env_buffer);
+	ABORT();
 
 	/*
 	   while(get_tib()) {
