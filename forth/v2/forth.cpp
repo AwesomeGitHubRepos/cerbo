@@ -304,13 +304,13 @@ void p_tick()
 
 void execute (codeptr cfa)	
 {
-	W = (cellptr) cfa;
+	W =  (cellptr) cfa;
 	codeptr fn = (codeptr) dref((void*) cfa);
 	fn();
 }
 void p_execute()
 {
-	execute((codeptr) pop());
+	execute((codeptr)pop());
 }
 
 char* name_cfa(cellptr cfa)
@@ -638,7 +638,7 @@ bool match_name(char* cstr, dent_s* dw)
 }
 
 /* returns the dictionary header, if the word is found. I'm being consistent with Jonesforth
- */
+*/
 
 void FIND()
 {
@@ -695,6 +695,24 @@ void to_CFA()
 	push((cell_t) ++dw);
 }
 
+void interpret_unfound()
+{
+	puts("TODO UNFOUND");
+}
+void interpret_found(cell_t cfa)
+{
+	//codeptr xt = (codeptr) dref((void*)cfa);
+	if(compiling && !(flags & F_IMM)) 
+		heapify(cfa);
+	else
+		execute((codeptr)cfa);
+
+	//fn();
+	//puts("TODO INTERPRET");
+}
+
+/* If the word is found, it will be either executed (if it is an IMMEDIATE word, or if in the "interpret" state, STATE=0) or compiled into the dictionary (if in the "compile" state, STATE<>0). If not found, Forth attempts to convert the string as a number. If successful, LITERAL will either place it on the parameter stack (if in "interpret" state) or compile it as an in-line literal value (if in "compile" state). If not a Forth word and not a valid number, the string is typed, an error message is displayed, and the interpreter ABORTs. This process is repeated, string by string, until the end of the input line is reached. 
+ * */
 void INTERPRET()
 {
 	while(1) {
@@ -707,17 +725,14 @@ void INTERPRET()
 		to_CFA();
 
 		cell_t cfa = pop();
-		if(cfa) {
-			codeptr fn = (codeptr) dref((void*)cfa);
-			fn();
-		}
+		if(cfa) 
+			interpret_found(cfa);
+		else 
+			interpret_unfound();
 
-		TODO("INTERPRET");
 	}
 	//p_dots(); seems to check out
 
-	/* If the word is found, it will be either executed (if it is an IMMEDIATE word, or if in the "interpret" state, STATE=0) or compiled into the dictionary (if in the "compile" state, STATE<>0). If not found, Forth attempts to convert the string as a number. If successful, LITERAL will either place it on the parameter stack (if in "interpret" state) or compile it as an in-line literal value (if in "compile" state). If not a Forth word and not a valid number, the string is typed, an error message is displayed, and the interpreter ABORTs. This process is repeated, string by string, until the end of the input line is reached. 
-	 * */
 
 }
 
