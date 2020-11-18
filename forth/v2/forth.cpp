@@ -636,6 +636,10 @@ bool match_name(char* cstr, dent_s* dw)
 	return true;
 
 }
+
+/* returns the dictionary header, if the word is found. I'm being consistent with Jonesforth
+ */
+
 void FIND()
 {
 	char* addr = (char*) pop();
@@ -661,15 +665,6 @@ void FIND()
 		dw = dw->prev;
 	}
 	push(0);
-/*
-	if(dw) {
-		puts("dw found");
-		flags = dw->flags;
-		dw++;
-	}
-
-	push((cell_t) dw);
-	*/
 }
 
 void WORD()
@@ -690,6 +685,15 @@ void WORD()
 	push((cell_t)word_pad);
 }
 
+void to_CFA()
+{
+	dent_s* dw = (dent_s*) pop();
+	if(dw==0) {
+		push(0);
+		return;
+	}
+	push((cell_t) ++dw);
+}
 
 void INTERPRET()
 {
@@ -700,6 +704,14 @@ void INTERPRET()
 		if(word[0] == 0) break;
 		push((cell_t)word);
 		FIND();
+		to_CFA();
+
+		cell_t cfa = pop();
+		if(cfa) {
+			codeptr fn = (codeptr) dref((void*)cfa);
+			fn();
+		}
+
 		TODO("INTERPRET");
 	}
 	//p_dots(); seems to check out
@@ -727,6 +739,7 @@ void QUERY()
 
 typedef struct {ubyte flags; const char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	">CFA",		to_CFA},
 	{0,	"BL", 		BL},
 	{0,	"WORD", 	WORD},
 	{0,	"FIND", 	FIND},

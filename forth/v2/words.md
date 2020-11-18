@@ -2,6 +2,13 @@
 
 Implementation notes
 
+## >CFA ( dw -- cfa)
+
+Convert a dictionary header pointer to cfa (code field address, aka codeword pointer).
+
+If dw is 0, then 0 is returned
+
+
 ## EMBIN
 
 Functionally equivalent of BRANCH at execution time, but is used by SEE to identify embedded binary data,
