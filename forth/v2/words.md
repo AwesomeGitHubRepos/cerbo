@@ -15,6 +15,13 @@ Functionally equivalent of BRANCH at execution time, but is used by SEE to ident
 such as from Z". It then knows to display the next items in the heap, rather than trying to dereference
 it, which is disasterous!
 
+## NUMBER ( cstr -- n)
+
+Convert  the count and character string at addr,  to a  signed
+     32-bit integer, using the current base.  If numeric conversion
+     is not possible,  an error condition exists (ABORT" is called).   The string  may
+     contain a preceding negative sign.
+
 ## SEE
 
 See also: EMBIN

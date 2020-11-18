@@ -40,7 +40,11 @@ const char* cell_fmt = "%ld ";
 #define TODO(x) puts(x)
 
 void ACCEPT();
+void BL();
 void QUIT();
+void WORD();
+void p_create();
+void mk_docol();
 
 typedef cell_t* cellptr;
 typedef uint8_t ubyte;
@@ -88,6 +92,7 @@ bool compiling = false;
 bool show_prompt = true;
 ubyte flags = 0;
 
+static char word_pad[64]; // scratch counted buffer to hold word found
 char tib[132];
 //int bytes_read = 0; // number of bytes read into TIB
 int ntib=0; // #TIB
@@ -176,23 +181,26 @@ void heapify (cell_t v)
 	hptr += sizeof(cell_t);
 }
 
-void create_header(ubyte flags, const char* zname)
+
+void create_full_header(ubyte flags, const char* cstr, codeptr fn)
 {
-	//char* name = (char*) hptr;
 	ubyte noff = 0; // name offset
-	for(noff = 0 ; noff<= strlen(zname); ++noff) *hptr++ = toupper(zname[noff]); // include trailing 0
+	int len = *cstr++;
+	for(int i =0; i<len; i++) *hptr++ = toupper(*cstr++);
+	//for(noff = 0 ; noff<= strlen(zname); ++noff) *hptr++ = toupper(zname[noff]); // include trailing 0
 	dent_s dw;
 	dw.prev = latest;
-	dw.flags = flags | noff;
+	//dw.flags = flags | noff;
+	dw.flags = flags | len;
 	memcpy(hptr, &dw, sizeof(dw));
 	latest = (dent_s*) hptr;
 	hptr += sizeof(dw);
 }
 
-void createz (ubyte flags, const char* zname, cell_t acf) // zname being a null-terminated string
+
+void create_header(const char* cstr, codeptr fn)
 {
-	create_header(flags, zname);
-	heapify(acf);
+	create_full_header(0, cstr, fn);
 }
 
 char* name_dw(dent_s* dw)
@@ -237,12 +245,16 @@ void embed_literal(cell_t v)
 }
 
 
-char* token;
-char* rest;
+//char* token;
+//char* rest;
 
-char* get_word () 
+#if 0
+void  get_word () 
 { 
-	if(rest == 0) {
+	BL(); WORD();
+
+	/*
+	  if(rest == 0) {
 		token = tib;
 	} else {
 		token = rest + 1;
@@ -257,11 +269,12 @@ char* get_word ()
 	//printf("word:toke:<%s>\n", token);
 	if(*token == 0) token = 0;
 	return token;
+	*/
 }
+#endif
 
 
-
-void process_tib();
+//void process_tib();
 
 
 void p_hi() { puts("hello world"); }
@@ -297,12 +310,15 @@ void p_dot() { printf(cell_fmt, pop()); }
 
 void p_tick()
 {
+	puts("TODO p_tick");
+#if 0
 	get_word();
 	codeptr cfa = cfa_find(token);
 	if(cfa)
 		push((cell_t) cfa);
 	else
 		undefined(token);
+#endif
 }
 
 void execute (codeptr cfa)	
@@ -349,8 +365,7 @@ void p_semi()
 
 void p_colon()
 {
-	get_word();
-	createz(0, token, (cell_t) docol); 
+	mk_docol(); 
 	compiling = true;
 }
 
@@ -364,7 +379,16 @@ void p_at () { push(dref((void*)pop())); }
 void p_exc() { cell_t pos = pop(); cell_t val = pop(); store(pos, val); }
 
 void _create() { push((cell_t)++W); }
-void p_create() { get_word(); createz(0, token, (cell_t) _create); }
+
+void get_create(codeptr fn)
+{
+	BL();
+	WORD();
+	create_header(word_pad, fn);
+}
+void p_create() { get_create(_create); }
+void mk_docol() { get_create(docol); }
+
 void p_comma() { heapify(pop()); }
 void p_prompt () { show_prompt = (bool) pop(); }
 
@@ -390,6 +414,8 @@ void p_dup()
 
 void p_z_slash () 
 { 
+	puts("TODO p_z_slash");
+#if 0
 	//cell_t loc = (cell_t)hptr + sizeof(cell_t);
 	cell_t loc = (cell_t)hptr + 0* sizeof(cell_t);
 	if(compiling) {
@@ -422,6 +448,7 @@ void p_z_slash ()
 
 	} else
 		push(loc); 
+#endif
 }
 
 void p_type () { printf("%s", (char*) pop()); }
@@ -478,11 +505,8 @@ void p_branch()
 }
 
 void p_bslash () 
-{ 
-	//puts("found baslah");
-	while(*rest) rest++;
-	rest--;
-	//token = 0;
+{
+	puts("TODO p_baslah");
 }
 
 void p_drop () { pop(); }
@@ -521,8 +545,7 @@ void p_does() // is immeditate
 
 void p_builds () // not an immediate word
 {
-	get_word();
-	createz(0, token, (cell_t) docol);
+	mk_docol();
 
 	heapify_word("LIT");
 	DEBUGX(printf("p_builds: location of 777: %p\n", hptr););
@@ -543,9 +566,9 @@ void p_xdefer()
 void p_defer()
 {
 	//puts("defer:called");
-	get_word();
-	DEBUGX(printf("defer:token:%s\n", token));
-	createz(0, token, (cell_t) docol);
+	//get_word();
+	//DEBUGX(printf("defer:token:%s\n", token));
+	mk_docol();
 	heapify_word("XDEFER");
 	heapify_word("EXIT");
 	heapify_word(";");
@@ -555,6 +578,8 @@ void p_defer()
 
 void p_is ()
 {
+	puts("TODO p_is");
+#if 0
 	get_word();
 	cell_t cfa = (cell_t) cfa_find(token);
 	if(cfa) {
@@ -567,7 +592,7 @@ void p_is ()
 		return;
 	} else
 		undefined(token);
-
+#endif
 }
 
 void p_len()
@@ -587,6 +612,8 @@ bool streq(const char* str1, const char* str2)
 
 void p_see()
 {
+	puts("TODO see");
+#if 0
 	static cellptr cfa_docol = 0;
 	if(cfa_docol == 0) cfa_docol = (cellptr) dref((void*) cfa_find("DOCOL"));
 	get_word();
@@ -622,6 +649,7 @@ void p_see()
 		}
 		if(streq(name, ";")) break;
 	}
+#endif
 }
 
 
@@ -672,7 +700,6 @@ void FIND()
 
 void WORD()
 {
-	static char word_pad[64]; // counted buffer to hold word found
 	char delim = pop();
 	//int size=0;
 	unsigned char len = 0;
@@ -698,10 +725,52 @@ void to_CFA()
 	push((cell_t) ++dw);
 }
 
+void _abort(const char* zstr)
+{
+	puts(zstr);
+	longjmp(env_buffer, 0);
+
+}
+
+void NUMBER()
+{
+	char* cstr = (char*) pop();
+	int len = *cstr++;
+	int sgn = 1;
+	int num = 0;
+
+	if(len==0) goto fail;
+
+	if(*cstr == '+' || *cstr == '-') {
+		if(len==1) goto fail;
+		if(*cstr=='-') sgn = -1;
+		cstr++;
+		len--;
+	}
+
+	for(int i = 0; i< len; i++) {
+		char c = *cstr++;
+		if(c < '0' || c > '9') goto fail;
+		num = num* 10 + c-'0';
+	}
+
+	num *= sgn;
+	push(num);
+	return;
+fail:
+	_abort("Unrecognised");
+}
+
 void interpret_unfound()
 {
-	puts("TODO UNFOUND");
-	longjmp(env_buffer, 0);
+	push((cell_t)word_pad);
+	NUMBER();
+	cell_t num = pop();
+	if(compiling)
+		embed_literal(num);
+	else
+		push(num);
+
 }
 void interpret_found(cell_t cfa)
 {
@@ -766,6 +835,7 @@ void ABORT()
 
 typedef struct {ubyte flags; const char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"NUMBER",	NUMBER},
 	{0,	"ABORT",	ABORT},
 	{0,	">CFA",		to_CFA},
 	{0,	"BL", 		BL},
@@ -825,20 +895,47 @@ prim_s prims[] =  {
 	0
 };
 
+#if 0
+void createz (ubyte flags, const char* zname, cell_t acf) // zname being a null-terminated string
+{
+	create_header(flags, zname);
+	heapify(acf);
+}
+#endif
+
+#if 0
+char* cstr_zstr(char* zstr)
+{
+	if(zstr==0) return 0;
+	unsigned char len = strlen(zstr);
+	for(unsigned char  i = len; i>0; i++)
+		zstr[i] = zstr[i-1];
+	zstr[0] = len;
+}
+#endif
+
 void add_primitives()
 {
 	prim_s* p = prims;
-	while(p->zname) {
-		createz(p->flags, p->zname, (cell_t) p->fn);
+	//char *zname;
+	while((p->zname)) {
+		// convert a 0-terminated string to counted string
+		unsigned len = strlen(p->zname);
+		memcpy(word_pad+1, p->zname, len);
+		*word_pad = len;
+
+		create_full_header(p->flags, word_pad, p->fn);
 		p++;
 	}
 }
 
+#if 0
 void eval_string(const char* str)
 {
 	strncpy(tib, str, sizeof(tib));
 	process_tib();
 }
+#endif
 
 const char* derived[] = {
 	": VARIABLE create 0 , ;",
@@ -855,14 +952,17 @@ const char* derived[] = {
 
 void add_derived()
 {
+	puts("TODO add_derived");
+#if 0
 	const char** strs = derived;
 	while(*strs) {
 		puts(*strs);
 		eval_string(*strs++);
 	}
-
+#endif
 }
 
+#if 0
 void process_token(const char* token)
 {
 	codeptr cfa = cfa_find(token);
@@ -888,8 +988,6 @@ void process_token(const char* token)
 }
 void process_tib()
 {
-	//token = tib;
-	//rest = tib;
 	rest = 0;
 	while(get_word()) process_token(token);
 }
@@ -899,6 +997,7 @@ int get_tib()
 	fgets(tib, sizeof(tib),tib_in); 
 	return !feof(tib_in);
 }
+#endif
 
 
 /* Attempted implementation of
