@@ -98,6 +98,18 @@ bool show_prompt = true;
 ubyte flags = 0;
 
 static char word_pad[64]; // scratch counted buffer to hold word found
+
+/* convert null-terminated string to counted string on word_pad
+ * */
+void word_pad_cstr(const char* zstr)
+{
+	// convert a 0-terminated string to counted string
+	ubyte len = strlen(zstr);
+	memcpy(word_pad+1, zstr, len);
+	*word_pad = len;
+	//debug_cstr(word_pad);
+}
+
 char tib[132];
 //int bytes_read = 0; // number of bytes read into TIB
 int ntib=0; // #TIB
@@ -275,18 +287,18 @@ void  get_word ()
 	BL(); WORD();
 
 	/*
-	  if(rest == 0) {
-		token = tib;
-	} else {
-		token = rest + 1;
-	}
+	   if(rest == 0) {
+	   token = tib;
+	   } else {
+	   token = rest + 1;
+	   }
 
-	if(*token ==0) return 0;
-	while(isspace(*token)) token++;
-	rest = token;
-	while(!isspace(*rest) && *rest) rest++;
-	*rest = 0;
-	strupr(token);
+	   if(*token ==0) return 0;
+	   while(isspace(*token)) token++;
+	   rest = token;
+	   while(!isspace(*rest) && *rest) rest++;
+	 *rest = 0;
+	 strupr(token);
 	//printf("word:toke:<%s>\n", token);
 	if(*token == 0) token = 0;
 	return token;
@@ -633,7 +645,7 @@ bool streq(const char* str1, const char* str2)
 void p_see()
 {
 	puts("TODO see");
-	
+
 	BL(); WORD(); FIND(); to_CFA();
 	//get_word();
 	//codeptr cfa = (codeptr) pop();
@@ -688,10 +700,10 @@ bool match_name(char* cstr, dent_s* dw)
 	if(len != *dw_cstr) return false;
 	while(len--) if(toupper(*++cstr) != toupper(*++dw_cstr)) return false;
 	/*
-	for(int i = 0; i< cstr_len; i++) {
-		if(toupper(*(cstr+i+1)) != toupper(*(dw_str+i))) return false;
-	}
-	*/
+	   for(int i = 0; i< cstr_len; i++) {
+	   if(toupper(*(cstr+i+1)) != toupper(*(dw_str+i))) return false;
+	   }
+	   */
 	return true;
 
 }
@@ -939,12 +951,7 @@ void add_primitives()
 	prim_s* p = prims;
 	//char *zname;
 	while((p->zname)) {
-		// convert a 0-terminated string to counted string
-		ubyte len = strlen(p->zname);
-		memcpy(word_pad+1, p->zname, len);
-		*word_pad = len;
-		//debug_cstr(word_pad);
-
+		word_pad_cstr(p->zname);
 		create_full_header(p->flags, word_pad, p->fn);
 		p++;
 	}
@@ -1036,14 +1043,24 @@ void QUIT()
 }
 
 
+codeptr cfa_find_zstr(const char* zstr)
+{
+	word_pad_cstr(zstr);
+	push((cell_t) word_pad);
+	FIND();
+	to_CFA();
+	return (codeptr)pop();
+}
+
 int main_routine()
 {
 	assert(sizeof(size_t) == sizeof(cell_t));
 	compiling = false;
 	add_primitives();
-	cfa_docol = cfa_find("DOCOL");
-	cfa_exit = cfa_find("EXIT");
-	cfa_semi = cfa_find(";");
+	cfa_docol = cfa_find_zstr("DOCOL");
+	assert(cfa_docol);
+	cfa_exit = cfa_find_zstr("EXIT");
+	cfa_semi = cfa_find_zstr(";");
 
 	//puts("added primitives");
 #if 0
@@ -1059,7 +1076,7 @@ int main_routine()
 		puts("fin");
 	}
 
-//	int val; 
+	//	int val; 
 	setjmp(env_buffer);
 	ABORT();
 
