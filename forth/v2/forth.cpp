@@ -41,14 +41,19 @@ const char* cell_fmt = "%ld ";
 
 void ACCEPT();
 void BL();
+void FIND();
 void QUIT();
 void WORD();
 void p_create();
 void mk_docol();
+void to_CFA();
 
 typedef cell_t* cellptr;
 typedef uint8_t ubyte;
 typedef void (*codeptr)();
+
+// some common cf's, which we fill in during initialisation
+static codeptr cfa_exit = 0, cfa_semi = 0, cfa_docol =0;
 
 typedef struct {
 	int size;
@@ -172,6 +177,7 @@ void undefined(const char* token){
 }
 
 cell_t dref (void* addr) { return *(cell_t*)addr; }
+cell_t dref (cell_t addr) { return *(cell_t*)addr; }
 
 void store (cell_t pos, cell_t val) { *(cell_t*)pos = val; }
 
@@ -357,9 +363,6 @@ char* name_cfa(cellptr cfa)
 
 void docol()
 {
-	static codeptr cfa_exit = 0, cfa_semi = 0;
-	if(cfa_exit==0) cfa_exit = cfa_find("EXIT");
-	if(cfa_semi==0) cfa_semi = cfa_find(";");
 	codeptr cfa;
 	cellptr IP = W;
 	IP++;
@@ -630,27 +633,31 @@ bool streq(const char* str1, const char* str2)
 void p_see()
 {
 	puts("TODO see");
-#if 0
-	static cellptr cfa_docol = 0;
-	if(cfa_docol == 0) cfa_docol = (cellptr) dref((void*) cfa_find("DOCOL"));
-	get_word();
-	cellptr cfa = (cellptr) cfa_find(token);
-	if(cfa == 0) { puts("UNFOUND"); return; }
+	
+	BL(); WORD(); FIND(); to_CFA();
+	//get_word();
+	//codeptr cfa = (codeptr) pop();
+	cell_t loc = pop();
+	if(loc == 0) { puts("UNFOUND"); return; }
 
 	// determine if immediate
-	dent_s* dw = (dent_s*) cfa;
+	dent_s* dw = (dent_s*) loc;
 	dw--;
 	if(dw->flags & F_IMM) puts("IMMEDIATE");
 
-	//cfa = (cellptr) dref(cfa);
-	if((cellptr) dref(cfa) != cfa_docol) {
+	if(dref(loc) != (cell_t) cfa_docol) {
 		puts("PRIM");
 		return;
-	} // so far, this works
+	} 
 
 
 	while(1) {
-		cellptr cfa1 = (cellptr) dref(++cfa);
+		cellptr cfa = (cellptr) dref(++loc);
+		//cfa += sizeof(cell_t);
+		//loc++;
+		printf(".");
+		if(cfa == (cellptr) cfa_semi) return;
+#if 0
 		char* name = name_cfa(cfa1);
 		puts(name);
 		if(streq(name, "LIT")) printf("%ld\n", *(++cfa));
@@ -665,8 +672,8 @@ void p_see()
 			cfa = --fin;
 		}
 		if(streq(name, ";")) break;
-	}
 #endif
+	}
 }
 
 
@@ -1034,6 +1041,10 @@ int main_routine()
 	assert(sizeof(size_t) == sizeof(cell_t));
 	compiling = false;
 	add_primitives();
+	cfa_docol = cfa_find("DOCOL");
+	cfa_exit = cfa_find("EXIT");
+	cfa_semi = cfa_find(";");
+
 	//puts("added primitives");
 #if 0
 	add_derived();
