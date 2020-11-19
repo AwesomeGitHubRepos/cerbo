@@ -181,12 +181,23 @@ void heapify (cell_t v)
 	hptr += sizeof(cell_t);
 }
 
+void debug_cstr(char* cstr)
+{
+	ubyte len = *cstr++;
+	printf("debug_str:%d:<", len);
+	while(len--) putchar(*cstr++);
+	puts(">");
+}
+
 
 void create_full_header(ubyte flags, const char* cstr, codeptr fn)
 {
 	ubyte noff = 0; // name offset
-	int len = *cstr++;
-	for(int i =0; i<len; i++) *hptr++ = toupper(*cstr++);
+	ubyte len = *cstr;
+	memcpy(hptr, cstr, len+1);
+	hptr += len +1;
+	//while(1+len--) *hptr++ = toupper(*cstr++);
+	//for(int i =0; i<len; i++) *hptr++ = toupper(*cstr++);
 	//for(noff = 0 ; noff<= strlen(zname); ++noff) *hptr++ = toupper(zname[noff]); // include trailing 0
 	dent_s dw;
 	dw.prev = latest;
@@ -203,11 +214,11 @@ void create_header(const char* cstr, codeptr fn)
 	create_full_header(0, cstr, fn);
 }
 
-char* name_dw(dent_s* dw)
+char* name_dw (dent_s* dw)
 {
 	char* str = (char*) dw;
 	int name_off =  dw->flags & 0b111111;
-	str -= name_off; 
+	str -= name_off -1; 
 	return str;
 
 }
@@ -282,7 +293,13 @@ void p_hi() { puts("hello world"); }
 void p_words() {
 	dent_s* dw = latest;
 	while(dw) {
-		puts(name_dw(dw));
+		char* cstr = name_dw(dw);
+		ubyte len = *cstr++;
+		printf("%d <", len);
+		while(len--) putchar(*cstr++);
+		puts(">");
+		//puts(name_dw(dw));
+		
 		dw = dw->prev;
 	}
 }
@@ -920,9 +937,10 @@ void add_primitives()
 	//char *zname;
 	while((p->zname)) {
 		// convert a 0-terminated string to counted string
-		unsigned len = strlen(p->zname);
+		ubyte len = strlen(p->zname);
 		memcpy(word_pad+1, p->zname, len);
 		*word_pad = len;
+		debug_cstr(word_pad);
 
 		create_full_header(p->flags, word_pad, p->fn);
 		p++;
@@ -1027,7 +1045,7 @@ int main_routine()
 	puts("skipped derived");
 #endif
 
-	if(0) {
+	if(1) {
 		puts("words are");
 		p_words();
 		//process_token("words");
