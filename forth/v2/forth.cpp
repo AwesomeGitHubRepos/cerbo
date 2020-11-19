@@ -181,11 +181,17 @@ void heapify (cell_t v)
 	hptr += sizeof(cell_t);
 }
 
-void debug_cstr(char* cstr)
+
+void print_cstr(char* cstr)
 {
 	ubyte len = *cstr++;
-	printf("debug_str:%d:<", len);
 	while(len--) putchar(*cstr++);
+}
+
+void debug_cstr(char* cstr)
+{
+	printf("debug_str:%d:<", *cstr);
+	print_cstr(cstr);
 	puts(">");
 }
 
@@ -196,6 +202,7 @@ void create_full_header(ubyte flags, const char* cstr, codeptr fn)
 	ubyte len = *cstr;
 	memcpy(hptr, cstr, len+1);
 	hptr += len +1;
+	//debug_cstr(hptr-(char*)len-1);
 	//while(1+len--) *hptr++ = toupper(*cstr++);
 	//for(int i =0; i<len; i++) *hptr++ = toupper(*cstr++);
 	//for(noff = 0 ; noff<= strlen(zname); ++noff) *hptr++ = toupper(zname[noff]); // include trailing 0
@@ -218,7 +225,7 @@ char* name_dw (dent_s* dw)
 {
 	char* str = (char*) dw;
 	int name_off =  dw->flags & 0b111111;
-	str -= name_off -1; 
+	str = str-name_off-1; 
 	return str;
 
 }
@@ -294,12 +301,8 @@ void p_words() {
 	dent_s* dw = latest;
 	while(dw) {
 		char* cstr = name_dw(dw);
-		ubyte len = *cstr++;
-		printf("%d <", len);
-		while(len--) putchar(*cstr++);
-		puts(">");
-		//puts(name_dw(dw));
-		
+		print_cstr(cstr);		
+		puts("");
 		dw = dw->prev;
 	}
 }
@@ -940,7 +943,7 @@ void add_primitives()
 		ubyte len = strlen(p->zname);
 		memcpy(word_pad+1, p->zname, len);
 		*word_pad = len;
-		debug_cstr(word_pad);
+		//debug_cstr(word_pad);
 
 		create_full_header(p->flags, word_pad, p->fn);
 		p++;
