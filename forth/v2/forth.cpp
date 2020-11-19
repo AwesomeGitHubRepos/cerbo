@@ -196,23 +196,20 @@ void debug_cstr(char* cstr)
 }
 
 
+
 void create_full_header(ubyte flags, const char* cstr, codeptr fn)
 {
 	ubyte noff = 0; // name offset
 	ubyte len = *cstr;
 	memcpy(hptr, cstr, len+1);
 	hptr += len +1;
-	//debug_cstr(hptr-(char*)len-1);
-	//while(1+len--) *hptr++ = toupper(*cstr++);
-	//for(int i =0; i<len; i++) *hptr++ = toupper(*cstr++);
-	//for(noff = 0 ; noff<= strlen(zname); ++noff) *hptr++ = toupper(zname[noff]); // include trailing 0
 	dent_s dw;
 	dw.prev = latest;
-	//dw.flags = flags | noff;
 	dw.flags = flags | len;
 	memcpy(hptr, &dw, sizeof(dw));
 	latest = (dent_s*) hptr;
 	hptr += sizeof(dw);
+	heapify((cell_t) fn);
 }
 
 
@@ -698,21 +695,12 @@ bool match_name(char* cstr, dent_s* dw)
 void FIND()
 {
 	char* cstr = (char*) pop();
-	/*
-	   strncasecmp(addr, addr, *addr);
-	   printf("WORD TO FIND:<");
-	   for(int i = 0; i < *addr; i++) {
-	   char c = *(addr+i+1);
-	   putchar(c);
-	   }
-	   puts(">");
-	   */
 	dent_s* dw = latest;
 	while(dw) {
 		if(match_name(cstr, dw)) {
-			puts("FIND:matched");
+			//puts("FIND:matched");
 			flags = dw->flags;
-			if(flags & F_IMM) puts("FIND: it's an immediate word");
+			//if(flags & F_IMM) puts("FIND: it's an immediate word");
 			push((cell_t)dw);
 			return;
 		}
@@ -1053,7 +1041,7 @@ int main_routine()
 	puts("skipped derived");
 #endif
 
-	if(1) {
+	if(0) {
 		puts("words are");
 		p_words();
 		//process_token("words");
