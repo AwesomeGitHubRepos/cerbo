@@ -12,7 +12,7 @@ forth : forth.o
 	$(CC) $^ -o $@
 
 clean:
-	rm -f forth out *.o
+	rm -f forth out *.o cscope.out
 
 check :
 	rm -f out 
