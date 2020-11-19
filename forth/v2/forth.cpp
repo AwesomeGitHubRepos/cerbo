@@ -677,13 +677,17 @@ void BL() { push(32); } // a space
 
 bool match_name(char* cstr, dent_s* dw)
 {
-	int dw_len = dw->flags & 0b01111111;
-	int cstr_len = *cstr;
-	char* dw_str = (char*)dw - dw_len;
-	if(dw_len-1 != cstr_len) return false;
+	if(cstr == 0 || dw == 0) return false;
+	//int dw_len = dw->flags & 0b01111111;
+	ubyte len = *cstr;
+	char* dw_cstr = name_dw(dw);
+	if(len != *dw_cstr) return false;
+	while(len--) if(toupper(*++cstr) != toupper(*++dw_cstr)) return false;
+	/*
 	for(int i = 0; i< cstr_len; i++) {
 		if(toupper(*(cstr+i+1)) != toupper(*(dw_str+i))) return false;
 	}
+	*/
 	return true;
 
 }
@@ -693,7 +697,7 @@ bool match_name(char* cstr, dent_s* dw)
 
 void FIND()
 {
-	char* addr = (char*) pop();
+	char* cstr = (char*) pop();
 	/*
 	   strncasecmp(addr, addr, *addr);
 	   printf("WORD TO FIND:<");
@@ -705,15 +709,16 @@ void FIND()
 	   */
 	dent_s* dw = latest;
 	while(dw) {
-		if(match_name(addr, dw)) {
-			//puts("matched");
+		if(match_name(cstr, dw)) {
+			puts("FIND:matched");
 			flags = dw->flags;
-			//if(flags & F_IMM) puts("it's an immediate word");
+			if(flags & F_IMM) puts("FIND: it's an immediate word");
 			push((cell_t)dw);
 			return;
 		}
 
 		dw = dw->prev;
+		//print_cstr(name_dw(dw));
 	}
 	push(0);
 }

@@ -15,6 +15,9 @@ Functionally equivalent of BRANCH at execution time, but is used by SEE to ident
 such as from Z". It then knows to display the next items in the heap, rather than trying to dereference
 it, which is disasterous!
 
+
+## FIND ( cstr -- dw)
+
 ## NUMBER ( cstr -- n)
 
 Convert  the count and character string at addr,  to a  signed
@@ -26,3 +29,9 @@ Convert  the count and character string at addr,  to a  signed
 
 See also: EMBIN
 
+
+## GLOSSARY
+
+cw	counted string
+
+dw	dictionay word
