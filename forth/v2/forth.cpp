@@ -188,8 +188,11 @@ void undefined(const char* token){
 	printf("undefined word:<%s>\n", token);
 }
 
-cell_t dref (void* addr) { return *(cell_t*)addr; }
-cell_t dref (cell_t addr) { return *(cell_t*)addr; }
+template <class T>
+cell_t dref (T addr) { return *(cell_t*)addr; }
+
+//cell_t dref (void* addr) { return *(cell_t*)addr; }
+//cell_t dref (cell_t addr) { return *(cell_t*)addr; }
 
 void store (cell_t pos, cell_t val) { *(cell_t*)pos = val; }
 
@@ -236,10 +239,17 @@ void create_header(const char* cstr, codeptr fn)
 	create_full_header(0, cstr, fn);
 }
 
+
+cellptr cfa_dw(dent_s* dw)
+{
+	++dw;
+	return (cellptr)dw;
+}
+
 char* name_dw (dent_s* dw)
 {
 	char* str = (char*) dw;
-	int name_off =  dw->flags & 0b111111;
+	ubyte name_off =  dw->flags & 0b111111;
 	str = str-name_off-1; 
 	return str;
 
@@ -314,7 +324,13 @@ void p_hi() { puts("hello world"); }
 
 void p_words() {
 	dent_s* dw = latest;
+	printf("dw \t\tcfa \t\txt \t\tname\n");
 	while(dw) {
+		printf("%p\t", dw);
+		cellptr cfa = cfa_dw(dw);
+		printf("%p\t", cfa);
+		printf("%p\t", dref(cfa));
+
 		char* cstr = name_dw(dw);
 		print_cstr(cstr);		
 		puts("");
@@ -367,6 +383,7 @@ void p_execute()
 	execute((codeptr)pop());
 }
 
+// convert a CFA into a counted name string
 char* name_cfa(cellptr cfa)
 {
 	dent_s* dw = (dent_s*) cfa;
@@ -657,7 +674,7 @@ void p_see()
 	dw--;
 	if(dw->flags & F_IMM) puts("IMMEDIATE");
 
-	if(dref(loc) != (cell_t) cfa_docol) {
+	if(dref(loc) != dref(cfa_docol)) {
 		puts("PRIM");
 		return;
 	} 
@@ -667,7 +684,9 @@ void p_see()
 		cellptr cfa = (cellptr) dref(++loc);
 		//cfa += sizeof(cell_t);
 		//loc++;
-		printf(".");
+		char* cname = name_cfa(cfa);
+		print_cstr(cname);
+		printf("\n");
 		if(cfa == (cellptr) cfa_semi) return;
 #if 0
 		char* name = name_cfa(cfa1);
