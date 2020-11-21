@@ -123,6 +123,8 @@ typedef struct dent { // dictionary entry
 
 dent_s *latest = NULL; // latest word being defined
 
+bool match_name(char* cstr, dent_s* dw);
+
 //const ubyte F_IMM = 1 << 7;
 #define F_IMM (1<<7)
 
@@ -260,19 +262,19 @@ void* code(dent_s* dw)
 	return ++dw;
 }
 
-codeptr cfa_find(const char* name) // name can be lowercase, if you like
+codeptr cfa_find(const char* zname) // name can be lowercase, if you like
 {
 	dent_s* dw = latest;
+	word_pad_cstr(zname);
 	//strupr(name);
 	while(dw) {
-		if(strcasecmp(name, name_dw(dw)) == 0) break;
+		if(match_name(word_pad, dw)) {
+			flags = dw->flags;
+			return (codeptr) ++dw;
+		}
 		dw = dw->prev;
 	}
-	if(!dw) return 0;
-	flags = dw->flags;
-	dw++;
-
-	return (codeptr) dw;
+	return 0;
 }
 
 void heapify_word(const char* name)
@@ -718,11 +720,6 @@ bool match_name(char* cstr, dent_s* dw)
 	char* dw_cstr = name_dw(dw);
 	if(len != *dw_cstr) return false;
 	while(len--) if(toupper(*++cstr) != toupper(*++dw_cstr)) return false;
-	/*
-	   for(int i = 0; i< cstr_len; i++) {
-	   if(toupper(*(cstr+i+1)) != toupper(*(dw_str+i))) return false;
-	   }
-	   */
 	return true;
 
 }
@@ -954,16 +951,6 @@ void createz (ubyte flags, const char* zname, cell_t acf) // zname being a null-
 }
 #endif
 
-#if 0
-char* cstr_zstr(char* zstr)
-{
-	if(zstr==0) return 0;
-	unsigned char len = strlen(zstr);
-	for(unsigned char  i = len; i>0; i++)
-		zstr[i] = zstr[i-1];
-	zstr[0] = len;
-}
-#endif
 
 void add_primitives()
 {
@@ -976,13 +963,6 @@ void add_primitives()
 	}
 }
 
-#if 0
-void eval_string(const char* str)
-{
-	strncpy(tib, str, sizeof(tib));
-	process_tib();
-}
-#endif
 
 const char* derived[] = {
 	": VARIABLE create 0 , ;",
@@ -1079,7 +1059,9 @@ int main_routine()
 	cfa_docol = cfa_find_zstr("DOCOL");
 	assert(cfa_docol);
 	cfa_exit = cfa_find_zstr("EXIT");
+	assert(cfa_exit);
 	cfa_semi = cfa_find_zstr(";");
+	assert(cfa_semi);
 
 	//puts("added primitives");
 #if 0
