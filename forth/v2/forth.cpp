@@ -53,7 +53,7 @@ typedef uint8_t ubyte;
 typedef void (*codeptr)();
 
 // some common cf's, which we fill in during initialisation
-static codeptr cfa_exit = 0, cfa_semi = 0, cfa_docol =0;
+static codeptr cfa_exit = 0, cfa_semi = 0, cfa_docol =0, cfa_lit = 0;
 
 typedef struct {
 	int size;
@@ -285,7 +285,8 @@ void heapify_word(const char* name)
 
 void embed_literal(cell_t v)
 {
-	heapify_word("LIT");
+	//heapify_word("LIT");
+	heapify((cell_t) cfa_lit);
 	heapify(v);
 }
 
@@ -666,9 +667,7 @@ void p_see()
 	puts("TODO see");
 
 	BL(); WORD(); FIND(); to_CFA();
-	//get_word();
-	//codeptr cfa = (codeptr) pop();
-	cell_t loc = pop();
+	cellptr loc = (cellptr) pop();
 	if(loc == 0) { puts("UNFOUND"); return; }
 
 	// determine if immediate
@@ -683,13 +682,14 @@ void p_see()
 
 
 	while(1) {
+		//loc += sizeof(cell_t);
 		cellptr cfa = (cellptr) dref(++loc);
-		//cfa += sizeof(cell_t);
-		//loc++;
 		char* cname = name_cfa(cfa);
 		print_cstr(cname);
 		printf("\n");
 		if(cfa == (cellptr) cfa_semi) return;
+		if(cfa == (cellptr) cfa_lit) printf("%ld\n", *(++loc));
+
 #if 0
 		char* name = name_cfa(cfa1);
 		puts(name);
@@ -1062,6 +1062,8 @@ int main_routine()
 	assert(cfa_exit);
 	cfa_semi = cfa_find_zstr(";");
 	assert(cfa_semi);
+	cfa_lit = cfa_find_zstr("LIT");
+	assert(cfa_lit);
 
 	//puts("added primitives");
 #if 0
