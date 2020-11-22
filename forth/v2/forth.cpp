@@ -18,6 +18,7 @@
 #include <stdint.h>
 //#include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "forth.h"
 
@@ -290,37 +291,6 @@ void embed_literal(cell_t v)
 	heapify(v);
 }
 
-
-//char* token;
-//char* rest;
-
-#if 0
-void  get_word () 
-{ 
-	BL(); WORD();
-
-	/*
-	   if(rest == 0) {
-	   token = tib;
-	   } else {
-	   token = rest + 1;
-	   }
-
-	   if(*token ==0) return 0;
-	   while(isspace(*token)) token++;
-	   rest = token;
-	   while(!isspace(*rest) && *rest) rest++;
-	 *rest = 0;
-	 strupr(token);
-	//printf("word:toke:<%s>\n", token);
-	if(*token == 0) token = 0;
-	return token;
-	*/
-}
-#endif
-
-
-//void process_tib();
 
 
 void p_hi() { puts("hello world"); }
@@ -682,7 +652,6 @@ void p_see()
 
 
 	while(1) {
-		//loc += sizeof(cell_t);
 		cellptr cfa = (cellptr) dref(++loc);
 		char* cname = name_cfa(cfa);
 		print_cstr(cname);
@@ -822,14 +791,10 @@ void interpret_unfound()
 }
 void interpret_found(cell_t cfa)
 {
-	//codeptr xt = (codeptr) dref((void*)cfa);
 	if(compiling && !(flags & F_IMM)) 
 		heapify(cfa);
 	else
 		execute((codeptr)cfa);
-
-	//fn();
-	//puts("TODO INTERPRET");
 }
 
 /* If the word is found, it will be either executed (if it is an IMMEDIATE word, or if in the "interpret" state, STATE=0) or compiled into the dictionary (if in the "compile" state, STATE<>0). If not found, Forth attempts to convert the string as a number. If successful, LITERAL will either place it on the parameter stack (if in "interpret" state) or compile it as an in-line literal value (if in "compile" state). If not a Forth word and not a valid number, the string is typed, an error message is displayed, and the interpreter ABORTs. This process is repeated, string by string, until the end of the input line is reached. 
@@ -881,8 +846,12 @@ void ABORT()
 	QUIT(); // normally loops forever, but can be ABORTed
 }
 
+void p_bye() { exit(0); }
+
+
 typedef struct {ubyte flags; const char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	"BYE",		p_bye},
 	{0,	"NUMBER",	NUMBER},
 	{0,	"ABORT",	ABORT},
 	{0,	">CFA",		to_CFA},
@@ -943,13 +912,6 @@ prim_s prims[] =  {
 	0
 };
 
-#if 0
-void createz (ubyte flags, const char* zname, cell_t acf) // zname being a null-terminated string
-{
-	create_header(flags, zname);
-	heapify(acf);
-}
-#endif
 
 
 void add_primitives()
@@ -989,42 +951,6 @@ void add_derived()
 #endif
 }
 
-#if 0
-void process_token(const char* token)
-{
-	codeptr cfa = cfa_find(token);
-	if(cfa == 0) {
-		cell_t v;
-		if(int_str(token, &v)) {
-			if(compiling) {
-				//puts("about to embed literal");
-				embed_literal(v);
-				//puts("done embedding literal"); // TODO the existence of this line prevents crashing
-			} else {
-				push(v);
-			}
-		} else {
-			undefined(token);
-		}
-	} else {
-		if(compiling && !(flags & F_IMM))
-			heapify((cell_t)cfa);
-		else
-			execute(cfa);
-	}
-}
-void process_tib()
-{
-	rest = 0;
-	while(get_word()) process_token(token);
-}
-
-int get_tib() 
-{ 
-	fgets(tib, sizeof(tib),tib_in); 
-	return !feof(tib_in);
-}
-#endif
 
 
 /* Attempted implementation of
