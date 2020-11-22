@@ -44,7 +44,7 @@ void ACCEPT();
 void BL();
 void FIND();
 void QUIT();
-void WORD();
+void p_word();
 void p_create();
 void mk_docol();
 void to_CFA();
@@ -223,7 +223,7 @@ void debug_cstr(char* cstr)
 
 void create_full_header(ubyte flags, const char* cstr, codeptr fn)
 {
-	ubyte noff = 0; // name offset
+	//ubyte noff = 0; // name offset
 	ubyte len = *cstr;
 	memcpy(hptr, cstr, len+1);
 	hptr += len +1;
@@ -302,7 +302,7 @@ void p_words() {
 		printf("%p\t", dw);
 		cellptr cfa = cfa_dw(dw);
 		printf("%p\t", cfa);
-		printf("%p\t", dref(cfa));
+		printf("%p\t", (void*) dref(cfa));
 
 		char* cstr = name_dw(dw);
 		print_cstr(cstr);		
@@ -405,7 +405,7 @@ void _create() { push((cell_t)++W); }
 void get_create(codeptr fn)
 {
 	BL();
-	WORD();
+	p_word();
 	create_header((char*) pop(), fn);
 }
 void p_create() { get_create(_create); }
@@ -636,7 +636,7 @@ void p_see()
 {
 	puts("TODO see");
 
-	BL(); WORD(); FIND(); to_CFA();
+	BL(); p_word(); FIND(); to_CFA();
 	cellptr loc = (cellptr) pop();
 	if(loc == 0) { puts("UNFOUND"); return; }
 
@@ -715,7 +715,7 @@ void FIND()
 	push(0);
 }
 
-void WORD()
+void p_word()
 {
 	char delim = pop();
 	//int size=0;
@@ -803,7 +803,7 @@ void INTERPRET()
 {
 	while(1) {
 		BL();
-		WORD();
+		p_word();
 		char* word = (char*) pop();
 		if(word[0] == 0) break;
 		push((cell_t)word);
@@ -828,7 +828,7 @@ void INTERPRET()
 void QUERY()
 {
 	ntib = 0;
-	while(ntib < sizeof(tib)) {
+	while(ntib < (int) sizeof(tib)) {
 		int c = getchar();
 		if((c<=0) || (c=='\n') || (c=='\r')) break;
 		tib[ntib++] = c;
@@ -856,7 +856,7 @@ prim_s prims[] =  {
 	{0,	"ABORT",	ABORT},
 	{0,	">CFA",		to_CFA},
 	{0,	"BL", 		BL},
-	{0,	"WORD", 	WORD},
+	{0,	"WORD", 	p_word},
 	{0,	"FIND", 	FIND},
 	{0,	"INTERPRET", 	INTERPRET},
 	{0,	"QUERY", 	QUERY},

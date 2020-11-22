@@ -1,5 +1,5 @@
 #CFLAGS = -ggdb -fsanitize-address
-CFLAGS = -g -O0
+CFLAGS = -g -O0 -Wall
 
 CC = g++
 
