@@ -406,7 +406,7 @@ void get_create(codeptr fn)
 {
 	BL();
 	WORD();
-	create_header(word_pad, fn);
+	create_header((char*) pop(), fn);
 }
 void p_create() { get_create(_create); }
 void mk_docol() { get_create(docol); }
@@ -679,7 +679,7 @@ void p_see()
 }
 
 
-void BL() { push(32); } // a space
+void BL () { push(32); } // a space
 
 bool match_name(char* cstr, dent_s* dw)
 {

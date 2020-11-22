@@ -1,4 +1,4 @@
 file ./forth
-b 420
-#r <oops.4th
-r
+b 813
+r <oops.4th
+#r
