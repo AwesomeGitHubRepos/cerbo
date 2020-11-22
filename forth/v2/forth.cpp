@@ -942,11 +942,17 @@ const char* derived[] = {
 void add_derived()
 {
 	puts("TODO add_derived");
-#if 0
+#if 1
 	const char** strs = derived;
 	while(*strs) {
 		puts(*strs);
-		eval_string(*strs++);
+		ntib = strlen(*strs);
+		memcpy(tib, *strs, ntib);
+		in = 0;
+		INTERPRET();
+		(void) *strs++;
+
+		//eval_string(*strs++);
 	}
 #endif
 }
@@ -992,7 +998,7 @@ int main_routine()
 	assert(cfa_lit);
 
 	//puts("added primitives");
-#if 0
+#if 1
 	add_derived();
 #else
 	puts("skipped derived");
