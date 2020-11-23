@@ -81,7 +81,10 @@ cell_t pop_x(stack_t* stk)
 	} else 
 		return stk->contents[--stk->size];
 }
-void push(cell_t v) { push_x(&sstack, v); }
+
+template<class T>
+void push (T v) { push_x(&sstack, (cell_t) v); }
+
 cell_t pop()  { return pop_x(&sstack); }
 #define STOP sstack.contents[sstack.size-1]
 #define STOP_1 sstack.contents[sstack.size-2]
@@ -436,41 +439,35 @@ void p_dup()
 
 void p_z_slash () 
 { 
-	puts("TODO p_z_slash");
-#if 0
-	//cell_t loc = (cell_t)hptr + sizeof(cell_t);
-	cell_t loc = (cell_t)hptr + 0* sizeof(cell_t);
+	// TODO: handle unterminated string
+	
+	cellptr loc =(cellptr)  hptr;
 	if(compiling) {
 		heapify_word("EMBIN");
-		loc = (cell_t) hptr;
+		loc = (cellptr) hptr;
 		heapify(2572); // leet for zstr
 	}
 
-	//char* src = 0; // delim_word("\"", false);
 
-	//do {} while(*hptr++ = *src++);
-	token += 3; // move beyong the z" 
+	in++; // move beyong the z" 
 	while(1) {
-		*hptr = *token;
+		*hptr = *(tib+in);
 		if(*hptr == '"' || *hptr == 0) break;
 		hptr++;
-		token++;
+		in++;
 	}
-	rest = token;
 	*hptr = 0;
 	hptr++;
+	in++;
 
 	// alignment issues?
 	//while((cell_t) hptr % sizeof(cell_t)) hptr++;
 
 	if(compiling) {
-		store(loc, (cell_t)hptr); // backfil to after the embedded string
-		heapify_word("LIT");
-		heapify(loc + sizeof(cell_t));
-
+		store((cell_t)loc, (cell_t)hptr); // backfill to after the embedded string
+		embed_literal((cell_t) ++loc);
 	} else
 		push(loc); 
-#endif
 }
 
 void p_type () { printf("%s", (char*) pop()); }
@@ -752,6 +749,7 @@ void _abort(const char* zstr)
 void NUMBER()
 {
 	char* cstr = (char*) pop();
+	char* cstr_copy = cstr;
 	int len = *cstr++;
 	int sgn = 1;
 	int num = 0;
@@ -775,7 +773,9 @@ void NUMBER()
 	push(num);
 	return;
 fail:
-	_abort("Unrecognised");
+	printf("Unrecognised: <");
+	print_cstr(cstr_copy);	
+	_abort(">");
 }
 
 void interpret_unfound()
