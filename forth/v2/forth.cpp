@@ -517,10 +517,7 @@ void p_branch()
 	RTOP = dref((void*) RTOP);
 }
 
-void p_bslash () 
-{
-	puts("TODO p_baslah");
-}
+void p_bslash () { in = ntib; }
 
 void p_drop () { pop(); }
 
@@ -938,20 +935,14 @@ const char* derived[] = {
 
 void add_derived()
 {
-	puts("TODO add_derived");
-#if 1
 	const char** strs = derived;
 	while(*strs) {
-		puts(*strs);
 		ntib = strlen(*strs);
 		memcpy(tib, *strs, ntib);
 		in = 0;
 		INTERPRET();
 		(void) *strs++;
-
-		//eval_string(*strs++);
 	}
-#endif
 }
 
 
@@ -1011,13 +1002,6 @@ int main_routine()
 	//	int val; 
 	setjmp(env_buffer);
 	ABORT();
-
-	/*
-	   while(get_tib()) {
-	   process_tib();
-	   if(show_prompt) puts("  ok");
-	   }
-	   */
 
 	return 0;
 }
