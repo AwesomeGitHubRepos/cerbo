@@ -439,8 +439,6 @@ void p_dup()
 
 void p_z_slash () 
 { 
-	// TODO: handle unterminated string
-	
 	cellptr loc =(cellptr)  hptr;
 	if(compiling) {
 		heapify_word("EMBIN");
@@ -448,20 +446,16 @@ void p_z_slash ()
 		heapify(2572); // leet for zstr
 	}
 
-
 	in++; // move beyong the z" 
 	while(1) {
 		*hptr = *(tib+in);
-		if(*hptr == '"' || *hptr == 0) break;
+		if(*hptr == '"' || *hptr == 0 || in == ntib) break;
 		hptr++;
 		in++;
 	}
 	*hptr = 0;
 	hptr++;
 	in++;
-
-	// alignment issues?
-	//while((cell_t) hptr % sizeof(cell_t)) hptr++;
 
 	if(compiling) {
 		store((cell_t)loc, (cell_t)hptr); // backfill to after the embedded string
