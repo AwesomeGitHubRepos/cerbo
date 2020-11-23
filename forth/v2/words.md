@@ -8,6 +8,17 @@ Convert a dictionary header pointer to cfa (code field address, aka codeword poi
 
 If dw is 0, then 0 is returned
 
+## >LITERAL ( n -- )
+
+Embeds a literal in the heap.
+
+```
+: eg [ 42 >literal ] ;
+```
+is equivalent to
+```
+: eg 42 ;
+
 
 ## EMBIN
 

@@ -849,8 +849,11 @@ void ABORT()
 void p_bye() { exit(0); }
 
 
+void p_to_literal() { embed_literal(pop()); }
+
 typedef struct {ubyte flags; const char* zname; codeptr fn; } prim_s;
 prim_s prims[] =  {
+	{0,	">LITERAL",	p_to_literal},
 	{0,	"BYE",		p_bye},
 	{0,	"NUMBER",	NUMBER},
 	{0,	"ABORT",	ABORT},
