@@ -1,7 +1,0 @@
-EPIC	EPIC
-S0101   "Current PER"
-S0102   "P20 of historic PERS"
-S0103   "P50 (i.e. median) of historic PERS"
-S0104   "P80 of historic PERS"
-S0105   "Is current PER <= P20?"
-S0106   "Is current PER >= P80?"
