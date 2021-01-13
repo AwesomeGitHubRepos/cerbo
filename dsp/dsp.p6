@@ -22,19 +22,47 @@ sub integrate(@wav, $dt) {
 	return @res;
 }
 
+sub scale($x, $x-lo, $x-hi, $lo, $hi)
+{
+	return $lo + ($hi - $lo) * ($x - $x-lo) / ($x-hi - $x-lo);
+}
 
-my @wav = sq-wave(8000, 10, 440);
-my $min = min @wav;
-my $max = max @wav;
-say "Min is $min, max is $max";
-
-@wav = integrate @wav, 1/8000;
-@wav = integrate @wav, 1/8000;
-save-wave @wav;
+sub scale-array(@arr, $lo, $hi)
+{
+	my $min = min @arr;
+	my $max = max @arr;
+	return @arr.map({scale $_, $min, $max, $lo, $hi});
+}
 
 
-@wav = @wav.map({ $_ == -1.0 ?? 0 !! 255 } );
+sub scale-integrate(@arr, $dt)
+{
+	return scale-array (integrate @arr, $dt), -1.0, 1.0;
+}
+
+my $sample-freq = 8000;
+my $dt = 1/$sample-freq;
+
+my @wav1 = sq-wave($sample-freq, 10, 440);
+my @wav2 = scale-integrate @wav1, $dt;
+my @wav3 = scale-integrate @wav2, $dt;
+
+# save waves as plottable data
+my $fout = open '/tmp/dsp.dat', :w;
+$fout.print("t sq tri sin\n");
+for (0..100) -> $i {
+	my $t = $i * $dt;
+	$fout.print("$t @wav1[$i] @wav2[$i] @wav3[$i]\n");
+}
+$fout.close();
+
+
+
+#@wav = integrate @wav, $dt;
+my @wav = scale-array(@wav3, 0, 255).map({$_.Int});
+#save-wave @wav.head(100);
+
+
 my $blob = blob8.new(@wav); 
 spurt "/tmp/dsp.raw", $blob;
 run "aplay", "/tmp/dsp.raw";
-#say $blob;
