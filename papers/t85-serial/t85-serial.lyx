@@ -1,0 +1,1010 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Serial output from an ATtiny85
+\end_layout
+
+\begin_layout Author
+by Mark Carter
+\end_layout
+
+\begin_layout Date
+January, 2021
+\end_layout
+
+\begin_layout Abstract
+The serial protocol is used to display a multitude of information, and is
+ often an indispensable aid that developers use on MCUs (microcontrollers)
+ for debugging purposes.
+ The ATtiny85 is a small device with a limited number of pins that has no
+ standard serial module.
+\end_layout
+
+\begin_layout Abstract
+This paper gives a high-level overview of the serial protocol itself, and
+ presents code, with analysis, that can be used on an ATtiny85 to transmit
+ data to a serial device.
+ The code is designed to be easy to understand and conservative in its use
+ of variable and program space.
+ It is not aggressively optimised, though.
+\end_layout
+
+\begin_layout Abstract
+The resulting code is less than 100 lines long, and is available online.
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+Programming MCUs can be a frustrating experience.
+ It is helpful to be able to inspect the state of the device.
+ Typical options are blinking LEDs and displays such as OLEDs, LCDs and
+ segment displays.
+ LEDs can convey only limited information, and are unsuitable if that informatio
+n changes rapidly.
+ Displays can show more output, but the programmer may not want to incorporate
+ a display in the final device, nor put in the additional effort to program
+ them.
+ Displays usually use either the I2C or SPI protocols.
+ The ATtiny85 only has 5 pins available for GPIO (General Purpose Input/Output),
+ so using them for a display may be undesirable or impossible.
+\end_layout
+
+\begin_layout Standard
+Serial communication is another option, and one of the most popular.
+ A lot of information can be displayed in a variety of formats.
+ It is exceedingly flexible.
+ Serial devices can be used to both receive information from the MCU or
+ send data to it.
+ A variety of configurations are available, including the use of clocks,
+ parity check bits, and a differing number of 
+\begin_inset Quotes eld
+\end_inset
+
+stop
+\begin_inset Quotes erd
+\end_inset
+
+ bits.
+ This paper takes the simplest approach.
+ Only transmission from the MCU is considered here, and there is no use
+ of clocks or parity checks.
+\end_layout
+
+\begin_layout Standard
+Features to note about the serial protocol are:
+\end_layout
+
+\begin_layout Enumerate
+In an idle state, the line is high.
+\end_layout
+
+\begin_layout Enumerate
+The bit 1 is represented by setting the line high.
+ 0 is represented by setting the line low.
+\end_layout
+
+\begin_layout Enumerate
+Data is transmitted one byte at a time.
+ Bits are sent in LSB (Least Significant Bbit) order.
+\end_layout
+
+\begin_layout Enumerate
+The rate of transfer is reckoned in 
+\begin_inset Quotes eld
+\end_inset
+
+bauds
+\begin_inset Quotes erd
+\end_inset
+
+.
+ It is the rate at which the clock operates; a bit rate.
+ Popular bit rates are 9,600 baud and 115,200 baud, but there are others.
+ Early teletypes, for example, operated at a meager 75 baud 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "bauds"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Both sender and receiver must agree beforehand on the baud rate, as the
+ serial protocol does not normally use an external pulsing clock that synchronis
+es transmission.
+ This also means that the transmission rates must be fairly accurate.
+ Clock drifting may mean that a wrong state is interpreted.
+ As the baud rate increases, the risk increases.
+ For this reason, the software in this paper uses a baud rate of 9,600.
+\end_layout
+
+\begin_layout Enumerate
+Transmission of a byte is initiated by sending a 
+\begin_inset Quotes eld
+\end_inset
+
+start bit
+\begin_inset Quotes erd
+\end_inset
+
+ for one cycle.
+ This entails sending the line low.
+\end_layout
+
+\begin_layout Enumerate
+Next, the bits are sent, as noted above, with one bit per cycle.
+\end_layout
+
+\begin_layout Enumerate
+After 8 bits have been transmitted, either 1 or 2 
+\begin_inset Quotes eld
+\end_inset
+
+stop bits
+\begin_inset Quotes erd
+\end_inset
+
+ are sent, thereby putting the line into an idle state.
+ This entails sending the line high for either 1 or 2 cycles.
+ This paper uses 2 stop bits to help with the integrity of the signal.
+ It does not matter if the receiver is only configured for 1 stop bit.
+ It will just perceive it as a continuing idle state.
+\end_layout
+
+\begin_layout Standard
+By way of example, consider the transmission of the letter 
+\begin_inset Quotes eld
+\end_inset
+
+A
+\begin_inset Quotes erd
+\end_inset
+
+.
+ In ASCII, 
+\begin_inset Quotes eld
+\end_inset
+
+A
+\begin_inset Quotes erd
+\end_inset
+
+ is decimal 65, binary 01000001.
+ Here is a timing diagram showing how it is transmitted:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename uart.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now that the serial protocol has been introduced, the rest of the paper
+ explains how an asynchronous (i.e.
+ blocking) piece of transmission code can be developed for the ATtiny85.
+ Reception is not discussed, as it would seriously complicate the design
+ of the software.
+ This paper therefore concerns itself with using the serial protocol as
+ a means of debugging and general output, rather than as a more general
+ two-way control protocol.
+\end_layout
+
+\begin_layout Standard
+Refer to Appendix A in order to obtain, compile, and upload the code used
+ in this article.
+\end_layout
+
+\begin_layout Section
+Discussion of the code
+\end_layout
+
+\begin_layout Standard
+It is assumed that the reader has obtained the code in accordance with Appendix
+ A in order to follow the discussion.
+\end_layout
+
+\begin_layout Standard
+The ATtiny85 has two timers, designated here as Timer0 and Timer1.
+ Timer0 is used for 
+\family typewriter
+delay()
+\family default
+, 
+\family typewriter
+millis()
+\family default
+, 
+\family typewriter
+micros()
+\family default
+, and possibly other important routines.
+ It is best, therefore, not to use it.
+ So, instead, we use Timer1 in order to generate timed interrupts at the
+ required baud rate.
+ We need so set the clock prescaler and a compare match value in order to
+ do this.
+ We use a comparison interrupt on Timer1 in order to set the transmit pin
+ at the appropriate time.
+ We also need to enable interrupts.
+ This is encapsulated in file 
+\family typewriter
+rpi/attiny85/timer1.cc
+\family default
+ with the following code:
+\end_layout
+
+\begin_layout Verbatim
+/** Initialise Timer1 for an interrupt
+\end_layout
+
+\begin_layout Verbatim
+ *
+\end_layout
+
+\begin_layout Verbatim
+ * You must implement ISR(TIM1_COMPA_vect).
+ See project
+\end_layout
+
+\begin_layout Verbatim
+ * timer1 for an example
+\end_layout
+
+\begin_layout Verbatim
+ */
+\end_layout
+
+\begin_layout Verbatim
+void init_timer1(unsigned long f_cpu, unsigned long freq)
+\end_layout
+
+\begin_layout Verbatim
+{
+\end_layout
+
+\begin_layout Verbatim
+        TCCR1 = 0; // stop the counter
+\end_layout
+
+\begin_layout Verbatim
+        TCNT1 = 0;
+\end_layout
+
+\begin_layout Verbatim
+        OCR1C = 0;
+\end_layout
+
+\begin_layout Verbatim
+        if(freq==0) return;
+\end_layout
+
+\begin_layout Verbatim
+
+\end_layout
+
+\begin_layout Verbatim
+        int prescale = 1;
+\end_layout
+
+\begin_layout Verbatim
+        while(freq * 256 * (1<<(prescale-1)) < f_cpu)
+\end_layout
+
+\begin_layout Verbatim
+                prescale++;
+\end_layout
+
+\begin_layout Verbatim
+        TCCR1 = (1<<CTC1);
+\end_layout
+
+\begin_layout Verbatim
+        TCCR1 |= prescale;
+\end_layout
+
+\begin_layout Verbatim
+        int divisor = f_cpu/(1<<(prescale-1))/freq;
+\end_layout
+
+\begin_layout Verbatim
+        OCR1C = divisor; // compare match value
+\end_layout
+
+\begin_layout Verbatim
+        TIMSK |= (1<<OCIE1A); // enable compare match interrupt
+\end_layout
+
+\begin_layout Verbatim
+        sei();
+\end_layout
+
+\begin_layout Verbatim
+}
+\end_layout
+
+\begin_layout Standard
+Here, 
+\family typewriter
+f_cpu
+\family default
+ refers to the speed of the CPU (likely 1MB, although it could be 8MB or
+ some other value) and the frequency of the interrupt (
+\family typewriter
+freq
+\family default
+).
+ Rather than hard-code values for the prescaler and match divisor, it is
+ possible to compute suitable them, as this routine has done.
+\end_layout
+
+\begin_layout Standard
+Having commandeered Timer1 for serial port transmission, it is not possible
+ (or at least difficult) to use it for PWM output.
+ Note that Timer1 is also often used for PWM output and generating tones.
+ An introduction to pin changes and timer interrupts for the ATtiny85 may
+ be found elsewhere
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-1"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+A demonstration of how to produce serial output is contained in 
+\family typewriter
+rpi/attiny85/serial-avrlib/main.cc
+\family default
+.
+ It defines an arbitrarily-chosen transmission pin:
+\end_layout
+
+\begin_layout Verbatim
+#define TX (1<<PB1)
+\end_layout
+
+\begin_layout Standard
+and a main routine which sends the letters 
+\family typewriter
+ABCD
+\family default
+ to TX as a serial port once a second:
+\end_layout
+
+\begin_layout Verbatim
+int main()
+\end_layout
+
+\begin_layout Verbatim
+{
+\end_layout
+
+\begin_layout Verbatim
+        PORTB = TX; // set TX output high
+\end_layout
+
+\begin_layout Verbatim
+        DDRB = TX; // set TX for output
+\end_layout
+
+\begin_layout Verbatim
+        init_timer1(F_CPU, 9600); 
+\end_layout
+
+\begin_layout Verbatim
+
+\end_layout
+
+\begin_layout Verbatim
+        for(;;) {
+\end_layout
+
+\begin_layout Verbatim
+                for(int c = 'A'; c < 'E'; c++)
+\end_layout
+
+\begin_layout Verbatim
+                        send(c);
+\end_layout
+
+\begin_layout Verbatim
+                send('
+\backslash
+r');
+\end_layout
+
+\begin_layout Verbatim
+                send('
+\backslash
+n');
+\end_layout
+
+\begin_layout Verbatim
+                _delay_ms(1000);
+\end_layout
+
+\begin_layout Verbatim
+        }
+\end_layout
+
+\begin_layout Verbatim
+}
+\end_layout
+
+\begin_layout Standard
+As you can see, the TX pin is set for output, the timer is initialised,
+ and the function 
+\family typewriter
+send()
+\family default
+ is called to transmit a single character.
+ This function is defined as follows:
+\end_layout
+
+\begin_layout Verbatim
+void send(u8 c)
+\end_layout
+
+\begin_layout Verbatim
+{
+\end_layout
+
+\begin_layout Verbatim
+        send_bit(0); // start bit
+\end_layout
+
+\begin_layout Verbatim
+        for(u8 i = 0; i < 8; i++) {
+\end_layout
+
+\begin_layout Verbatim
+                send_bit(c & 1); // send LSB
+\end_layout
+
+\begin_layout Verbatim
+                c >>= 1; // shift right
+\end_layout
+
+\begin_layout Verbatim
+        }
+\end_layout
+
+\begin_layout Verbatim
+        send_bit(1); // stop bit
+\end_layout
+
+\begin_layout Verbatim
+        send_bit(1); // stop bit
+\end_layout
+
+\begin_layout Verbatim
+}
+\end_layout
+
+\begin_layout Standard
+Transmission is started by sending the TX line low.
+ Then each bit of the byte is sent to be output in LSB (Least Significant
+ Bit) order.
+ After the byte has been sent, two stop bits are pushed out.
+ This comprises of setting the TX line high for two cycles.
+ One stop bit is probably sufficient, though.
+\end_layout
+
+\begin_layout Standard
+Sending bits requires co-ordination between the interrupt and non-interrupt
+ code.
+ Two variables are defined:
+\end_layout
+
+\begin_layout Verbatim
+volatile u8 tx_rdy = 1; // TX ready
+\end_layout
+
+\begin_layout Verbatim
+volatile u8 tx_bit = 1; // bit to send
+\end_layout
+
+\begin_layout Verbatim
+
+\end_layout
+
+\begin_layout Standard
+The first one is set to 1 if a bit has been transmitted; 0 otherwise.
+ The second one contains the value that needs to be transmitted: either
+ a 1 or a 0.
+ The bit is set up for transmission using the following function:
+\end_layout
+
+\begin_layout Verbatim
+void send_bit(u8 b)
+\end_layout
+
+\begin_layout Verbatim
+{
+\end_layout
+
+\begin_layout Verbatim
+        while(!tx_rdy); // wait until we're OK to send bit
+\end_layout
+
+\begin_layout Verbatim
+        tx_bit = b; // set the bit to send
+\end_layout
+
+\begin_layout Verbatim
+        tx_rdy = 0; // unready the output state
+\end_layout
+
+\begin_layout Verbatim
+}
+\end_layout
+
+\begin_layout Standard
+Sending a bit takes some time, as it needs the interrupt to fire.
+ So the function must block until the preceding bit, assuming it exists,
+ has been sent.
+ The MCU is then ready to transmit the next bit.
+ It does this in the second line of the function.
+ The bit needs to be put in a pending state.
+ This is done in the last line of the function.
+\end_layout
+
+\begin_layout Standard
+It may be objected that the last two lines of the function are not atomic,
+ and may garble the correct state.
+ This should not matter, though, as the timings should be well within the
+ rate of transmission of the data.
+\end_layout
+
+\begin_layout Standard
+The bit is sent, at the required frequency, using the interrupt:
+\end_layout
+
+\begin_layout Verbatim
+
+\end_layout
+
+\begin_layout Verbatim
+ISR(TIMER1_COMPA_vect)
+\end_layout
+
+\begin_layout Verbatim
+{
+\end_layout
+
+\begin_layout Verbatim
+        if(tx_bit)
+\end_layout
+
+\begin_layout Verbatim
+                PORTB |= TX; // set TX pin high
+\end_layout
+
+\begin_layout Verbatim
+        else
+\end_layout
+
+\begin_layout Verbatim
+                PORTB &= ~TX; // set TX pin low
+\end_layout
+
+\begin_layout Verbatim
+        tx_rdy = 1; // flag that we've finished sending the bit
+\end_layout
+
+\begin_layout Verbatim
+}
+\end_layout
+
+\begin_layout Standard
+It sets the TX pin high or low depending on whether the bit that needs outputtin
+g is 1, or 0, respectively.
+ In the last line of the function it sets a flag to indicate that the bit
+ has been transmitted.
+\end_layout
+
+\begin_layout Standard
+Note that when there is no bit that needs transmission, i.e.
+ the serial line is in an 
+\begin_inset Quotes eld
+\end_inset
+
+idle
+\begin_inset Quotes erd
+\end_inset
+
+ state, the 
+\family typewriter
+tx_bit
+\family default
+ is, by default, set to 1.
+ Idling therefore needs no special-case handling.
+\end_layout
+
+\begin_layout Standard
+This completes the code.
+ Barring timer setup, serial transmission can be programmed in under 80
+ lines of code.
+ As can be seen, state management is straightforward.
+\end_layout
+
+\begin_layout Section
+Conclusion
+\end_layout
+
+\begin_layout Standard
+The ATtiny85 has 8K of flash RAM 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-4"
+literal "false"
+
+\end_inset
+
+.
+ The entirety of the code in the example uses only 646 bytes of flash memory.
+ This is quite reasonable, and includes code from the avr library itself
+ (e.g.
+ using the delay function), which will take up an unknown amount of space.
+ The author has not sized up the memory requirement separately.
+\end_layout
+
+\begin_layout Standard
+The presented code could certainly do with tightening up.
+ Greater encapsulation is possible, as is a more refined bundling and abstractio
+n of the code.
+ This is likely to be achieved as the git repository is further developed.
+ However, it suffices for illustrative purposes for now.
+\end_layout
+
+\begin_layout Standard
+A baud rate of 9,600 is only moderate, and is likely to be able to be improved,
+ e.g.
+ by increasing the clock speed.
+ Transmission rates of 115,200 may prove a bridge too far in the current
+ setup.
+\end_layout
+
+\begin_layout Standard
+A further area for exploration is the investigation of the possibility of
+ sending data synchronously.
+ This will complicate the code, though.
+\end_layout
+
+\begin_layout Standard
+Lastly, it should be noted that the Atmel datasheet 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-5"
+literal "false"
+
+\end_inset
+
+ states, in section 15.4.1, that an alternative usage for its USI (Universal
+ Serial Interface) is:
+\end_layout
+
+\begin_layout Quotation
+Using the USI Data Register in three-wire mode it is possible to implement
+ a more compact and higher performance UART than by software, only.
+\end_layout
+
+\begin_layout Standard
+A common problem in MCU programming is 
+\begin_inset Quotes eld
+\end_inset
+
+getting the thing working
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The effort presented here is aimed at achieving that goal, rather than
+ finessing what are likely to be better lines of attack, but are more difficult
+ to get working without a greater understanding of the hardware involved.
+ It should also be noted that the approach adopted in this article is reasonably
+ generic and adaptable to a wide range of MCUs, as it does not rely on any
+ special features of the hardware.
+\end_layout
+
+\begin_layout Section*
+\start_of_appendix
+Appendix A: Obtaining and compiling the code
+\end_layout
+
+\begin_layout Standard
+In order to compile the code, the AVR lib and ancillary utilities must be
+ installed.
+ On Debian Buster, this is achieved by issuing the command:
+\end_layout
+
+\begin_layout Verbatim
+sudo apt install avr-libc avrdude binutils-avr gcc-avr
+\end_layout
+
+\begin_layout Standard
+Other distributions have similar facilities, which is beyond the scope of
+ this article.
+\end_layout
+
+\begin_layout Standard
+Obtain the code for this article by changing to some suitable working directory,
+ and issuing the command:
+\end_layout
+
+\begin_layout Verbatim
+git clone https://github.com/blippy/rpi.git
+\end_layout
+
+\begin_layout Standard
+Change into the directory that contains the serial code and compile it:
+\end_layout
+
+\begin_layout Verbatim
+cd rpi/attiny85/serial-avrlib
+\end_layout
+
+\begin_layout Verbatim
+make
+\end_layout
+
+\begin_layout Standard
+Upload the code to the chip:
+\end_layout
+
+\begin_layout Verbatim
+make flash
+\end_layout
+
+\begin_layout Standard
+Code can be uploaded to the chip using an Arduino as an ISP
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-3"
+literal "false"
+
+\end_inset
+
+, or from a Raspberry Pi
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-2"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "bauds"
+literal "false"
+
+\end_inset
+
+StackExchange.
+ 
+\emph on
+What standard UART rates are there?
+\emph default
+ <
+\begin_inset CommandInset href
+LatexCommand href
+target "https://bit.ly/3nRu3Jf"
+
+\end_inset
+
+> [Accessed 17 January 2021]
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-1"
+
+\end_inset
+
+EmbeddedThoughts.
+ 
+\emph on
+ATtiny85: Introduction to Pin Change and Timer Interrupts.
+
+\emph default
+ <
+\begin_inset CommandInset href
+LatexCommand href
+target "https://bit.ly/2XOP2ln"
+
+\end_inset
+
+> [Accessed 16 January 2021].
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-4"
+
+\end_inset
+
+Microchip.
+ 
+\emph on
+ATtiny85: Device overview.
+
+\emph default
+ <
+\begin_inset CommandInset href
+LatexCommand href
+target "https://bit.ly/3nQrBm7"
+
+\end_inset
+
+> [Accessed 16 January 2021]
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-5"
+
+\end_inset
+
+Atmel.
+ 
+\emph on
+Atmel 8-bit AVR Microcontroller with 2/4/8K Bytes In-System Programmable
+ Flash.
+ ATtiny25/V / ATtiny45/V / ATtiny85/V
+\emph default
+.
+ <
+\begin_inset CommandInset href
+LatexCommand href
+target "https://bit.ly/2XP5KRs"
+
+\end_inset
+
+> [Accessed 16 January 2021].
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-3"
+
+\end_inset
+
+Instructables.
+ 
+\emph on
+Arduino ISP to ATtiny85.
+
+\emph default
+ <
+\begin_inset CommandInset href
+LatexCommand href
+target "https://bit.ly/3ijx2J4"
+
+\end_inset
+
+>.
+ [Accessed 16 January 2021]
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-2"
+
+\end_inset
+
+Instructables.
+ 
+\emph on
+Programming the ATtiny85 From Raspberry Pi.
+
+\emph default
+ <
+\begin_inset CommandInset href
+LatexCommand href
+target "https://bit.ly/35MnSA5"
+
+\end_inset
+
+>.
+ [Accessed 16 January 2021].
+\end_layout
+
+\end_body
+\end_document
