@@ -903,7 +903,8 @@ prim_s prims[] =  {
 	{0,	"LIT", p_lit},
 	{0,	"WORDS", p_words},
 	{0,	"HI", p_hi},
-	0
+
+	{0, 0, 0},
 };
 
 
