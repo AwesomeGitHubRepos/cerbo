@@ -39,4 +39,5 @@ Links:
 ## Other references
 
 * [Differentiation and integration of audio signals](http://pcfarina.eng.unipr.it/Differentiation_Integration.htm)
+* [Simplest lowpass filter](https://www.dsprelated.com/freebooks/filters/Simplest_Lowpass_Filter_I.html) **excellent**
 
