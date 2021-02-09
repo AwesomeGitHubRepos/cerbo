@@ -39,5 +39,6 @@ Links:
 ## Other references
 
 * [Differentiation and integration of audio signals](http://pcfarina.eng.unipr.it/Differentiation_Integration.htm)
+* [Rakulang: Puttering about with digital signals](https://mcturra2000.wordpress.com/2021/01/14/rakulang-puttering-about-with-digital-signals/)
 * [Simplest lowpass filter](https://www.dsprelated.com/freebooks/filters/Simplest_Lowpass_Filter_I.html) **excellent**
 
