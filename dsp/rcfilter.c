@@ -5,6 +5,8 @@
 #include <time.h>
 #include <stdlib.h>
 
+/* looks very good based on analysis of results in audacity */
+
 int main()
 {
 	double sample_rate = 16000.0; // in Hz
