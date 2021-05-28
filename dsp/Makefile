@@ -1,5 +1,5 @@
 #OBJS = hz440.o white.o
-BINS = brown choco db05-117 hz440 pink white
+BINS = brown choco db05-117 hz440 pink rcfilter white
 LIBS = -lm
 
 all : $(BINS)
@@ -26,6 +26,12 @@ plot : db05-117.out
 	#cat db05-117.out | gnuplot -p -e 'plot "/dev/stdin" with lines'
 	./db05-117 >db05-117.out
 
+rcfilter : rcfilter.c
+	gcc $^ -o $@ -lm
+
+rcfilter.wav : rcfilter
+	./rcfilter
+	sox -r 16k -e unsigned -b 8 -c 1 rcfilter.raw rcfilter.wav
 
 white.wav : white
 	./white
