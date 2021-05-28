@@ -10,6 +10,9 @@ all : $(BINS)
 brown : brown.c
 	gcc $^ -o $@ -lm
 
+hz440 : hz440.c
+	gcc $^ -o $@ -lm
+
 pink : pink.cc
 	g++ $^ -o $@
 
@@ -24,5 +27,9 @@ plot : db05-117.out
 	./db05-117 >db05-117.out
 
 
+white.wav : white
+	./white
+	sox -r 16k -e unsigned -b 8 -c 1 white.raw white.wav
+    
 clean :
 	rm -f *raw *.wav $(BINS)
