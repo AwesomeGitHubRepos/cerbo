@@ -1,2 +1,2 @@
 wave : wave.cc
-	gcc $^ -o $@ -lsndfile
+	g++ $^ -o $@ -lsndfile
