@@ -1,3 +1,3 @@
 threads : threads.cc
-	g++ $^ -o $@ 
+	g++ $^ -o $@  -lpthread
 
