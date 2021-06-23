@@ -16,6 +16,8 @@ using namespace std;
 
 #define FPB 512 // frames per buffer
 
+//typedef paInt16 dtype;
+
 SNDFILE* sndfile = nullptr;
 
 void _check(int line, PaError err)
@@ -113,10 +115,10 @@ void do_blocking()
 	paerr = Pa_StartStream(strm);
 	CHECK();
 
-	// TODO semi-working
 	short buff[FPB*2];
 	while(sf_count_t nread = sf_readf_short(sndfile, buff, FPB)) {
-		for(int i = 0; i < FPB/2; ++i)
+		// just take channel 0
+		for(int i = 0; i < FPB; ++i)
 			buff[i] = buff[i*2+1];
 		paerr = Pa_WriteStream(strm, buff, FPB);
 		CHECK();
