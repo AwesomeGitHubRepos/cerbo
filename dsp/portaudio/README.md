@@ -6,6 +6,7 @@ Sound generation
 
 ``
 sudo apt install libportaudio2 libportaudiocpp0 portaudio19-dev portaudio19-doc
+sudo apt install libsndfile1-dev # to read file
 ```
 
 Examples are in:
