@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <iostream>
-//#include <sndfile.h>
+#include <sndfile.h>
 #include <thread>
 #include <semaphore.h>
 #include <unistd.h>
@@ -10,6 +10,9 @@
 static sem_t sem;
 
 using namespace std;
+
+SNDFILE* sndfile = nullptr;
+
 
 void worker()
 {
@@ -25,11 +28,24 @@ int main()
 	thread th(worker);
 	sem_init(&sem, 0, 0);
 
+	// open soundfile
+	SF_INFO sfinfo;
+	sfinfo.format = 0;
+	sndfile = sf_open("/home/pi/Music/sheep.wav", SFM_READ, &sfinfo);
+	assert(sndfile);
+	cout << "Sample rate: " << sfinfo.samplerate << "\n";
+	int nchannels = sfinfo.channels;
+	cout << "Channels: " << nchannels << "\n";
+	printf("Format: 0x%X, ", sfinfo.format);
+	cout << "Wave file?: " << ((SF_FORMAT_WAV>>2) == (sfinfo.format>>2)) << "\n";
+	printf("Sizeof short: %d\n", sizeof(short));
+
 	while(1) {
 		sleep(2);
-		sem_post(&sem);
+		//sem_post(&sem);
 	}
 
 	th.join();
+	sf_close(sndfile);
 	return 0;
 }
