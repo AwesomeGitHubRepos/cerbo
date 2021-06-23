@@ -1,3 +1,3 @@
 playwav : playwav.cc
-	g++ $^ -o $@  -lpthread -lsndfile
+	g++ $^ -o $@  -lpthread -lsndfile -lportaudio
 

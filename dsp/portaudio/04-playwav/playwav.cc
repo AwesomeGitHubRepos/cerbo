@@ -4,6 +4,7 @@
 #include <thread>
 #include <semaphore.h>
 #include <unistd.h>
+#include <portaudio.h>
 
 
 
@@ -40,6 +41,10 @@ int main()
 	cout << "Wave file?: " << ((SF_FORMAT_WAV>>2) == (sfinfo.format>>2)) << "\n";
 	printf("Sizeof short: %d\n", sizeof(short));
 
+	PaError paerr;
+	paerr = Pa_Initialize();
+	assert(paerr == paNoError);
+
 	while(1) {
 		sleep(2);
 		//sem_post(&sem);
@@ -47,5 +52,7 @@ int main()
 
 	th.join();
 	sf_close(sndfile);
+	paerr = Pa_Terminate();
+	assert(paerr == paNoError);
 	return 0;
 }
