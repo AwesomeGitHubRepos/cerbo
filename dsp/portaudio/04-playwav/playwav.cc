@@ -8,7 +8,7 @@
 #include <atomic>
 #include <string.h>
 
-
+#define BLOCKING 1
 
 static sem_t sem;
 
@@ -18,10 +18,24 @@ using namespace std;
 
 SNDFILE* sndfile = nullptr;
 
+void _check(int line, PaError err)
+{
+	if(err == paNoError) return;
+	const char* msg = Pa_GetErrorText(err);
+	printf("Failed:%d:%s\n", line, msg);
+	exit(1);
+}
+
+
+#define CHECK() _check(__LINE__, paerr);
+
 atomic<int> playing{0};
 
 short buff0[FPB];
 short buff1[FPB];
+
+PaError paerr;
+PaStream* strm;
 
 void reader()
 {
@@ -51,28 +65,12 @@ int callback(const void* ibuffer, void *obuffer, unsigned long fpb,
 	return paContinue;
 }
 
-int main()
+void do_nonblocking()
 {
+
 	thread th(reader);
 	sem_init(&sem, 0, 0);
 
-	// open soundfile
-	SF_INFO sfinfo;
-	sfinfo.format = 0;
-	sndfile = sf_open("/home/pi/Music/sheep.wav", SFM_READ, &sfinfo);
-	assert(sndfile);
-	cout << "Sample rate: " << sfinfo.samplerate << "\n";
-	int nchannels = sfinfo.channels;
-	cout << "Channels: " << nchannels << "\n";
-	printf("Format: 0x%X, ", sfinfo.format);
-	cout << "Wave file?: " << ((SF_FORMAT_WAV>>2) == (sfinfo.format>>2)) << "\n";
-	printf("Sizeof short: %d\n", sizeof(short));
-
-	// init sound stream
-	PaError paerr;
-	paerr = Pa_Initialize();
-	assert(paerr == paNoError);
-	PaStream* strm;
 	paerr = Pa_OpenDefaultStream(&strm, 
 			0, // number input channels
 			1, // number output channels
@@ -99,6 +97,58 @@ int main()
 	}
 
 	th.join();
+}
+
+void do_blocking()
+{
+	paerr = Pa_OpenDefaultStream(&strm, 
+			0, // number input channels
+			1, // number output channels
+			paInt16, // sample format: signed 16 bit format
+			44100.0, // sample rate
+			FPB, // frames per buffer
+			NULL, // callback 0 implies blocking
+			NULL);
+	CHECK();
+	paerr = Pa_StartStream(strm);
+	CHECK();
+
+	// TODO semi-working
+	short buff[FPB*2];
+	while(sf_count_t nread = sf_readf_short(sndfile, buff, FPB)) {
+		for(int i = 0; i < FPB/2; ++i)
+			buff[i] = buff[i*2+1];
+		paerr = Pa_WriteStream(strm, buff, FPB);
+		CHECK();
+	}
+
+
+}
+
+int main()
+{
+	// open soundfile
+	SF_INFO sfinfo;
+	sfinfo.format = 0;
+	sndfile = sf_open("/home/pi/Music/sheep.wav", SFM_READ, &sfinfo);
+	assert(sndfile);
+	cout << "Sample rate: " << sfinfo.samplerate << "\n";
+	int nchannels = sfinfo.channels;
+	cout << "Channels: " << nchannels << "\n";
+	printf("Format: 0x%X, ", sfinfo.format);
+	cout << "Wave file?: " << ((SF_FORMAT_WAV>>2) == (sfinfo.format>>2)) << "\n";
+	printf("Sizeof short: %d\n", sizeof(short));
+
+	// init sound stream
+	paerr = Pa_Initialize();
+	assert(paerr == paNoError);
+#if BLOCKING
+	do_blocking();
+#else
+	do_nonblocking();
+#endif
+
+
 	sf_close(sndfile);
 	Pa_StopStream(strm);
 	Pa_CloseStream(strm);
