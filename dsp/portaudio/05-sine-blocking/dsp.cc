@@ -7,18 +7,29 @@
 #include <portaudio.h>
 #include <atomic>
 #include <string.h>
+#include <math.h>
+#include <chrono>
+
 
 #define BLOCKING 1
 
 static sem_t sem;
 
 using namespace std;
+using namespace std::chrono;
 
-#define FPB 512 // frames per buffer
+#define FPB 512
+//#define FPB (512*4)
 
+static_assert(sizeof(float) == 4);
+
+constexpr float sample_freq = 4000.0;
+constexpr float dt = 1.0/sample_freq;
+constexpr float sine_freq = 440.0; // Hz
+constexpr float pi = 3.1412;
+constexpr float w = 2.0 * pi * sine_freq; // angular frequency
 //typedef paInt16 dtype;
 
-SNDFILE* sndfile = nullptr;
 
 void _check(int line, PaError err)
 {
@@ -31,83 +42,20 @@ void _check(int line, PaError err)
 
 #define CHECK() _check(__LINE__, paerr);
 
-atomic<int> playing{0};
-
-short buff0[FPB];
-short buff1[FPB];
 
 PaError paerr;
 PaStream* strm;
 
-void reader()
+int main()
 {
-	static int i = 0;
-	while(1) {
-		//printf("Worker %d\n", i++);
-		sem_wait(&sem);
-		short* buff = buff0;
-		if(playing == 0) buff = buff1;
-		sf_count_t nread = sf_readf_short(sndfile, buff, FPB);
-		putchar('.');
-	}
-}
-
-int callback(const void* ibuffer, void *obuffer, unsigned long fpb, 
-		const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags,
-		void* userData)
-{
-	assert(obuffer != NULL);
-	short* buff = buff0;
-	if(playing==1) buff = buff1;
-	memcpy(obuffer, buff, FPB);
-	playing = 1 - playing;
-	//putchar('-');
-	sem_post(&sem);
-
-	return paContinue;
-}
-
-void do_nonblocking()
-{
-
-	thread th(reader);
-	sem_init(&sem, 0, 0);
-
+	// init sound stream
+	paerr = Pa_Initialize();
+	CHECK();
 	paerr = Pa_OpenDefaultStream(&strm, 
 			0, // number input channels
 			1, // number output channels
-			paInt16, // sample format: signed 16 bit format
-			44100.0, // sample rate
-			FPB, // frames per buffer
-			callback,
-			NULL);
-	assert(paerr == paNoError);
-	paerr = Pa_StartStream(strm);
-	if(paerr != paNoError) {
-		const char* msg = Pa_GetErrorText(paerr);
-		printf("Pa_StartStream error : %s\n", msg);
-		exit(1);
-	}
-	//assert(paerr == paNoError);
-
-
-
-	while(1) {
-		//Pa_Sleep(2000);
-		sleep(2);
-		//sem_post(&sem);
-	}
-
-	th.join();
-}
-
-void do_blocking()
-{
-	paerr = Pa_OpenDefaultStream(&strm, 
-			0, // number input channels
-			1, // number output channels
-			paInt16, // sample format: signed 16 bit format
-			44100.0, // sample rate
+			paFloat32,
+			sample_freq, // sample rate
 			FPB, // frames per buffer
 			NULL, // callback 0 implies blocking
 			NULL);
@@ -115,46 +63,46 @@ void do_blocking()
 	paerr = Pa_StartStream(strm);
 	CHECK();
 
-	short buff[FPB*2];
-	while(sf_count_t nread = sf_readf_short(sndfile, buff, FPB)) {
-		// just take channel 0
-		for(int i = 0; i < FPB; ++i)
-			buff[i] = buff[i*2+1];
-		paerr = Pa_WriteStream(strm, buff, FPB);
-		CHECK();
+	int nblocks = 1000;
+	float  buff[FPB*nblocks];
+	auto start = high_resolution_clock::now();
+	float t = 0;
+	for(int i = 0; i< FPB*nblocks; ++i) {
+		buff[i] = sin(w*t);
+		t+= dt;
 	}
+	auto stop = high_resolution_clock::now();
+	auto duration = duration_cast<microseconds>(stop - start);
+	 cout << "Time taken by function: " << duration.count() << " microseconds" << endl;
 
+	/*
+	   while(sf_count_t nread = sf_readf_short(sndfile, buff, FPB)) {
+	// just take channel 0
+	for(int i = 0; i < FPB; ++i)
+	buff[i] = buff[i*2+1];
+	}
+	*/
 
-}
+	for(int i = 0; i<nblocks; ++i) {
+			paerr = Pa_WriteStream(strm, buff + i*FPB, FPB);
+			CHECK();
+	}
+#if 0
+	while(1) {
+		for(int i = 0; i< FPB; ++i) {
+			buff[i] = sin(w * t);
+			t += dt;
+			paerr = Pa_WriteStream(strm, buff, FPB);
+			CHECK();
+		}
 
-int main()
-{
-	// open soundfile
-	SF_INFO sfinfo;
-	sfinfo.format = 0;
-	sndfile = sf_open("/home/pi/Music/sheep.wav", SFM_READ, &sfinfo);
-	assert(sndfile);
-	cout << "Sample rate: " << sfinfo.samplerate << "\n";
-	int nchannels = sfinfo.channels;
-	cout << "Channels: " << nchannels << "\n";
-	printf("Format: 0x%X, ", sfinfo.format);
-	cout << "Wave file?: " << ((SF_FORMAT_WAV>>2) == (sfinfo.format>>2)) << "\n";
-	printf("Sizeof short: %d\n", sizeof(short));
-
-	// init sound stream
-	paerr = Pa_Initialize();
-	assert(paerr == paNoError);
-#if BLOCKING
-	do_blocking();
-#else
-	do_nonblocking();
+		t = fmod(t, 1.0/sine_freq); 
+	}
 #endif
 
-
-	sf_close(sndfile);
 	Pa_StopStream(strm);
 	Pa_CloseStream(strm);
 	paerr = Pa_Terminate();
-	assert(paerr == paNoError);
+	CHECK();
 	return 0;
 }

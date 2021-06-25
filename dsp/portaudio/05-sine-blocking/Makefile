@@ -1,5 +1,7 @@
 BIN = dsp
 
 $(BIN) : dsp.cc
-	g++ $^ -o $@  -lpthread -lsndfile -lportaudio
+	g++ $^ -o $@  -lpthread -lportaudio -lm
 
+clean:
+	rm -f $(BIN)
