@@ -23,7 +23,7 @@ using namespace std::chrono;
 
 static_assert(sizeof(float) == 4);
 
-constexpr float sample_freq = 4000.0;
+constexpr float sample_freq = 44000.0;
 constexpr float dt = 1.0/sample_freq;
 constexpr float sine_freq = 440.0; // Hz
 constexpr float pi = 3.1412;
@@ -73,7 +73,7 @@ int main()
 	}
 	auto stop = high_resolution_clock::now();
 	auto duration = duration_cast<microseconds>(stop - start);
-	 cout << "Time taken by function: " << duration.count() << " microseconds" << endl;
+	cout << "Time taken by function: " << duration.count() << " microseconds" << endl;
 
 	/*
 	   while(sf_count_t nread = sf_readf_short(sndfile, buff, FPB)) {
@@ -83,18 +83,19 @@ int main()
 	}
 	*/
 
-	for(int i = 0; i<nblocks; ++i) {
-			paerr = Pa_WriteStream(strm, buff + i*FPB, FPB);
-			CHECK();
-	}
 #if 0
+	for(int i = 0; i<nblocks; ++i) {
+		paerr = Pa_WriteStream(strm, buff + i*FPB, FPB);
+		CHECK();
+	}
+#else
 	while(1) {
 		for(int i = 0; i< FPB; ++i) {
 			buff[i] = sin(w * t);
 			t += dt;
-			paerr = Pa_WriteStream(strm, buff, FPB);
-			CHECK();
 		}
+		paerr = Pa_WriteStream(strm, buff, FPB);
+		CHECK();
 
 		t = fmod(t, 1.0/sine_freq); 
 	}
