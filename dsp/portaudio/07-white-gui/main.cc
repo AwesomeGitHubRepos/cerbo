@@ -45,6 +45,8 @@ PaStream* strm;
 
 atomic<bool> keep_generating{true};
 atomic<bool> output_square_wave{false};
+atomic<float> vol{1};
+atomic<bool> vol_on{true};
 
 void generate()
 {
@@ -61,11 +63,13 @@ void generate()
 			sample_every = sample_freq / noise_freq;
 		}
 		bool sqwave = output_square_wave;
+		float local_vol = vol;
+		if(!vol_on) local_vol = 0;
 		for(int i = 0; i< FPB; ++i) {
 			if(sqwave) {
-				sample_value = sample_num < sample_every/2 ? 1.0 : -1.0;
+				sample_value = sample_num < sample_every/2 ? local_vol : -local_vol;
 			} else if(sample_num == 0) { // maybe select a random noise value
-				sample_value = rand() < RAND_MAX/2 ? 1.0 : -1.0;
+				sample_value = rand() < RAND_MAX/2 ? local_vol : -local_vol;
 			}
 
 			buff[i] = sample_value;
@@ -91,6 +95,16 @@ void slider_callback(Fl_Value_Slider* slider, void* data)
 void square_changed(Fl_Check_Button* btn, void* data)
 {
 	output_square_wave = btn->value();
+}
+
+void vol_changed_callback(Fl_Slider* slider, void* data)
+{
+	vol = slider->value();
+}
+
+void vol_on_changed(Fl_Check_Button* btn, void* data)
+{
+	vol_on = btn->value();
 }
 
 
