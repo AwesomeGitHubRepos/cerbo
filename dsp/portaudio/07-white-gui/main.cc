@@ -44,6 +44,7 @@ PaStream* strm;
 
 
 atomic<bool> keep_generating{true};
+atomic<bool> output_square_wave{false};
 
 void generate()
 {
@@ -52,17 +53,21 @@ void generate()
 	float sample_every = sample_freq / noise_freq;
 	int sample_num = 0;
 	//auto sample_value = rand() < RAND_MAX/2 ? 1.0 : 0.0;
-	float sample_value;
+	float sample_value = 0;
 	while(keep_generating) {
 		if(local_noise_freq != noise_freq) {
 			local_noise_freq = noise_freq.load();
 			sample_num = 0;
 			sample_every = sample_freq / noise_freq;
 		}
+		bool sqwave = output_square_wave;
 		for(int i = 0; i< FPB; ++i) {
-			if(sample_num == 0) {
-				sample_value = rand() < RAND_MAX/2 ? 1.0 : 0.0;
+			if(sqwave) {
+				sample_value = sample_num < sample_every/2 ? 1.0 : -1.0;
+			} else if(sample_num == 0) { // maybe select a random noise value
+				sample_value = rand() < RAND_MAX/2 ? 1.0 : -1.0;
 			}
+
 			buff[i] = sample_value;
 			sample_num++;
 			if(sample_num >= sample_every) sample_num = 0;
@@ -75,6 +80,7 @@ void generate()
 
 }
 
+
 void slider_callback(Fl_Value_Slider* slider, void* data)
 {
 	noise_freq = slider->value();
@@ -82,12 +88,19 @@ void slider_callback(Fl_Value_Slider* slider, void* data)
 	//return 0;
 }
 
+void square_changed(Fl_Check_Button* btn, void* data)
+{
+	output_square_wave = btn->value();
+}
+
+
+
 void gui_thread()
 {
-        Fl_Double_Window* root = make_window();
-        root->show();
-        auto res = Fl::run();
-        keep_generating = false;
+	Fl_Double_Window* root = make_window();
+	root->show();
+	auto res = Fl::run();
+	keep_generating = false;
 
 }
 

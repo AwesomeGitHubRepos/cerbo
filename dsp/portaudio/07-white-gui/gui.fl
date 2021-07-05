@@ -12,8 +12,13 @@ Function {make_window()} {open
     } {
       Fl_Value_Slider slider {
         label Cutoff
-        callback slider_callback selected
+        callback slider_callback
         xywh {130 50 275 25} type Horizontal align 4 minimum 10 maximum 40000 step 10 value 8000
+      }
+      Fl_Check_Button {} {
+        label Square
+        callback square_changed selected
+        xywh {100 100 25 25} down_box DOWN_BOX when 1
       }
     }
   }
