@@ -45,7 +45,7 @@ PaStream* strm;
 
 atomic<bool> keep_generating{true};
 atomic<bool> output_square_wave{false};
-atomic<float> vol{1};
+atomic<float> vol{0.1};
 atomic<bool> vol_on{true};
 
 void generate()
