@@ -28,8 +28,13 @@ start:
 	return;
 pausing:
 	if(millis() - start < 2000) return;
-	puts("Task finished");
+	puts("That's enough waiting");
+	where = &&finis;
+	return;
+finis:
 	done = true;
+	puts("Task finished");
+	return;
 }
 
 int main()
