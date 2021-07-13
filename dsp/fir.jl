@@ -15,5 +15,5 @@ h = reverse(h)
 
 a3 = DSP.conv(a2, h)
 a4 = round.(UInt8, a3)
-write("out.bin", a4)
+write("out-fir.raw", a4)
 
